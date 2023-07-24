@@ -158,9 +158,7 @@ class LDMFT_Sales_Shortcode {
         if( isset( $plugins->plugins ) &&  count($plugins->plugins) > 0 ) {
             $plugins = $plugins->plugins;
             $plugin = $plugins[0];
-
             ob_start();
-
             ?>
                 <div class="ldmft_wrapper">
                     <div class="ldmft_filters">

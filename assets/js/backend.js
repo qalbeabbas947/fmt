@@ -3,13 +3,14 @@
         var LDNFTbackEnd = {
             init: function() {
                 $('.ldnft-success-message').hide();
-                $('.ldnft-dripfeed-settings-mailpoet').on('submit', LDNFTbackEnd.post_mailpoet_form);
+                $('.ldnft-settings-mailpoet').on('submit', LDNFTbackEnd.post_mailpoet_form);
                 $('.ldnft-update-subscriptions').on('click', LDNFTbackEnd.update_subscritions);
                 $('.ldnft-update-sales').on('click', LDNFTbackEnd.update_sales);
             },
             update_sales: function(e) {
                 e.preventDefault();
                 $('#ldnft-sales-import-message').html('').css('display', 'none');
+                $('.ldfmt-data-loader').css('display', 'inline-block');
                 var btn = $(this);
                 btn.attr('disabled', true);
                 var data = {
@@ -18,6 +19,7 @@
                 
                 jQuery.post( LDNFT.ajaxURL, data, function( response ) {
                     $('#ldnft-sales-import-message').html(response.message).css('display', 'block');
+                    $('.ldfmt-data-loader').css('display', 'none');
                     btn.attr('disabled', false);
                    // document.location.reload();
                 } );
@@ -25,6 +27,7 @@
             update_subscritions: function(e) {
                 e.preventDefault();
                 $('#ldnft-subscription-import-message').html('').css('display', 'none');
+                $('.ldfmt-data-loader').css('display', 'inline-block');
                 var btn = $(this);
                 btn.attr('disabled', true);
                 var data = {
@@ -35,6 +38,7 @@
                 jQuery.post( LDNFT.ajaxURL, data, function( response ) {
                     $('#ldnft-subscription-import-message').html(response.message).css('display', 'block');
                     btn.attr('disabled', false);
+                    $('.ldfmt-data-loader').css('display', 'none');
                     document.location.reload();
                 } );
             },

@@ -19,29 +19,68 @@ function ldnft_activation() {
 
     global $wpdb;
 
-    // $table_name = $wpdb->prefix.'ldnft_reset_course_activities';
-    // if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
+    $table_name = $wpdb->prefix.'ldnft_subscription';
+    if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
+        
+        $wpdb->query( "CREATE TABLE $table_name (
+            `id` int(11) NOT NULL,
+            `plugin_id` int(11) NOT NULL,
+            `plugin_title` varchar(255) NOT NULL,
+            `user_id` int(11) NOT NULL,
+            `username` varchar(255) DEFAULT NULL,
+            `useremail` varchar(255) DEFAULT NULL,
+            `install_id` int(11) DEFAULT NULL,
+            `amount_per_cycle` float DEFAULT NULL,
+            `billing_cycle` int(11) DEFAULT NULL,
+            `gross` float DEFAULT NULL,
+            `outstanding_balance` float DEFAULT NULL,
+            `failed_payments` int(11) DEFAULT NULL,
+            `gateway` int(11) DEFAULT NULL,
+            `coupon_id` int(11) DEFAULT NULL,
+            `trial_ends` datetime DEFAULT NULL,
+            `next_payment` datetime DEFAULT NULL,
+            `created` datetime DEFAULT NULL,
+            `updated_at` datetime DEFAULT NULL,
+            `currency` varchar(3) DEFAULT NULL,
+            `external_id` varchar(35) DEFAULT NULL,
+            `plan_id` int(11) DEFAULT NULL,
+            `country_code` varchar(2) DEFAULT NULL,
+            `pricing_id` int(11) DEFAULT NULL,
+            `initial_amount` float DEFAULT NULL,
+            `renewal_amount` float DEFAULT NULL,
+            `renewals_discount` float DEFAULT NULL,
+            `renewals_discount_type` varchar(12) DEFAULT NULL,
+            `license_id` int(11) DEFAULT NULL
+        )" );     
+    }
 
-    //     $wpdb->query( "CREATE TABLE $table_name (
-    //         ID INT PRIMARY KEY AUTO_INCREMENT,
-    //         user_ids VARCHAR(65535),
-    //         user_roles VARCHAR(65535),
-    //         group_ids VARCHAR(65535),
-    //         select_option VARCHAR(255),
-    //         progress_option VARCHAR(255),
-    //         reset_rules VARCHAR(255),
-    //         course_ids VARCHAR(65535),
-    //         lessons_reset VARCHAR(255),
-    //         lesson_ids VARCHAR(65535),
-    //         topics_reset VARCHAR(255),
-    //         topic_ids VARCHAR(65535),
-    //         quiz_ids VARCHAR(65535),
-    //         schedule_date VARCHAR(255),
-    //         next_execution VARCHAR(255),
-    //         recuring VARCHAR(255),
-    //         status_count VARCHAR(255)
-    //     )" );     
-    // }
+    $table_name = $wpdb->prefix.'ldnft_transactions';
+    if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
+        $wpdb->query( "CREATE TABLE $table_name (
+            `id` int(11) NOT NULL,
+            `plugin_id` int(11) NOT NULL,
+            `plugin_title` varchar(255) NOT NULL,
+            `user_id` int(11) NOT NULL,
+            `username` varchar(255) DEFAULT NULL,
+            `useremail` varchar(255) DEFAULT NULL,
+            `install_id` int(11) DEFAULT NULL,
+            `subscription_id` int(11) DEFAULT NULL,
+            `plan_id` int(11) DEFAULT NULL,
+            `gross` float DEFAULT NULL,
+            `gateway_fee` float DEFAULT NULL,
+            `external_id` varchar(50) DEFAULT NULL,
+            `gateway` int(11) DEFAULT NULL,
+            `coupon_id` int(11) DEFAULT NULL,
+            `country_code` varchar(3) DEFAULT NULL,
+            `bound_payment_id` int(11) DEFAULT NULL,
+            `created` datetime DEFAULT NULL,
+            `updated` datetime DEFAULT NULL,
+            `vat` float DEFAULT NULL,
+            `is_renewal` tinyint(1) NOT NULL,
+            `type` varchar(15) NOT NULL,
+            `license_id` int(11) DEFAULT NULL
+        )" );     
+    }
 }
 register_activation_hook( __FILE__, 'ldnft_activation' );
 
@@ -151,7 +190,7 @@ class LdNinjas_Freemius_Toolkit {
         define( 'LDNFT_TEXT_DOMAIN', 'ldninjas-freemius-toolkit' );
 
         $ldnft_settings = get_option( 'ldnft_settings' );
-        $api_scope      = isset( $ldnft_settings['api_scope'] ) ? sanitize_text_field( $ldnft_settings['api_scope'] ) : 'developer';
+        $api_scope      = 'developer';
         $dev_id         = isset( $ldnft_settings['dev_id'] ) ? sanitize_text_field( $ldnft_settings['dev_id'] ) : '';
         $public_key     = isset( $ldnft_settings['public_key'] ) ? sanitize_text_field( $ldnft_settings['public_key'] ): '';
         $secret_key     = isset( $ldnft_settings['secret_key'] ) ? sanitize_text_field( $ldnft_settings['secret_key'] ): '';

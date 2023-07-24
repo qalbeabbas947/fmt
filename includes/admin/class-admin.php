@@ -476,10 +476,15 @@ class FMT_Admin {
      */
     public function ldnft_admin_notice() {
 
-        if( isset( $_GET['message'] ) && sanitize_text_field( $_GET['message'] ) == 'ldnft_updated' ) {
+        if( isset( $_GET['message'] ) ) {
 
             $class = 'notice notice-success is-dismissible';
-            $message = __( 'Settings Updated', DFCE_TEXT_DOMAIN );
+            if( $_GET['message'] == 'ldnft_updated' )
+                $message = __( 'Settings Updated', LDNFT_TEXT_DOMAIN );
+            else {
+                $message = sanitize_text_field( $_GET['message'] );
+                
+            }
             printf ( '<div id="message" class="%s"> <p>%s</p></div>', $class, $message );
         }
     }
@@ -512,6 +517,7 @@ class FMT_Admin {
             }
 
             update_option( 'ldnft_settings', $ldnft_settings_options );
+            
         }
 
         wp_safe_redirect( esc_url_raw( add_query_arg( 'message', 'ldnft_updated', $_POST['_wp_http_referer'] ) ) );
@@ -583,38 +589,48 @@ class FMT_Admin {
             6
         ); 
         
-        add_submenu_page( 
-            'ldninjas-freemius-toolkit',
-            __( 'Subscriptions', LDNFT_TEXT_DOMAIN ),
-            __( 'Subscriptions', LDNFT_TEXT_DOMAIN ),
-            'manage_options',
-            'ldninjas-freemius-toolkit-subscriptions',
-            [ $this,'subscribers_page']
-        );
-        add_submenu_page( 
-            'ldninjas-freemius-toolkit',
-            __( 'Reviews', LDNFT_TEXT_DOMAIN ),
-            __( 'Reviews', LDNFT_TEXT_DOMAIN ),
-            'manage_options',
-            'ldninjas-freemius-toolkit-reviews',
-            [ $this,'reviews_page']
-        );
-        add_submenu_page( 
-            'ldninjas-freemius-toolkit',
-            __( 'Sales', LDNFT_TEXT_DOMAIN ),
-            __( 'Sales', LDNFT_TEXT_DOMAIN ),
-            'manage_options',
-            'ldninjas-freemius-toolkit-sales',
-            [ $this,'sales_page']
-        );
-        add_submenu_page( 
-            'ldninjas-freemius-toolkit',
-            __( 'Customers', LDNFT_TEXT_DOMAIN ),
-            __( 'Customers', LDNFT_TEXT_DOMAIN ),
-            'manage_options',
-            'ldninjas-freemius-toolkit-customers',
-            [ $this,'customers_page']
-        );
+        $api = new Freemius_Api_WordPress( FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
+        try {
+            $plugins = $api->Api('plugins.json?fields=id,title', 'GET', []);
+            if( ! isset( $plugins->error )  ) {
+                add_submenu_page( 
+                    'ldninjas-freemius-toolkit',
+                    __( 'Subscriptions', LDNFT_TEXT_DOMAIN ),
+                    __( 'Subscriptions', LDNFT_TEXT_DOMAIN ),
+                    'manage_options',
+                    'ldninjas-freemius-toolkit-subscriptions',
+                    [ $this,'subscribers_page']
+                );
+                add_submenu_page( 
+                    'ldninjas-freemius-toolkit',
+                    __( 'Reviews', LDNFT_TEXT_DOMAIN ),
+                    __( 'Reviews', LDNFT_TEXT_DOMAIN ),
+                    'manage_options',
+                    'ldninjas-freemius-toolkit-reviews',
+                    [ $this,'reviews_page']
+                );
+                add_submenu_page( 
+                    'ldninjas-freemius-toolkit',
+                    __( 'Sales', LDNFT_TEXT_DOMAIN ),
+                    __( 'Sales', LDNFT_TEXT_DOMAIN ),
+                    'manage_options',
+                    'ldninjas-freemius-toolkit-sales',
+                    [ $this,'sales_page']
+                );
+                add_submenu_page( 
+                    'ldninjas-freemius-toolkit',
+                    __( 'Customers', LDNFT_TEXT_DOMAIN ),
+                    __( 'Customers', LDNFT_TEXT_DOMAIN ),
+                    'manage_options',
+                    'ldninjas-freemius-toolkit-customers',
+                    [ $this,'customers_page']
+                );
+            }
+        } catch(Exception $e) {
+            
+        }
+
+        
         add_submenu_page( 
             'ldninjas-freemius-toolkit',
             __( 'Settings', LDNFT_TEXT_DOMAIN ),
@@ -756,14 +772,31 @@ class FMT_Admin {
         $dev_id         = isset( $ldnft_settings['dev_id'] ) ? sanitize_text_field( $ldnft_settings['dev_id'] ) : '';
         $public_key     = isset( $ldnft_settings['public_key'] ) ? sanitize_text_field( $ldnft_settings['public_key'] ): '';
         $secret_key     = isset( $ldnft_settings['secret_key'] ) ? sanitize_text_field( $ldnft_settings['secret_key'] ): '';
+
+        $api = new Freemius_Api_WordPress( $api_scope, $dev_id, $public_key, $secret_key);
+        $is_connected = false;
+        try {
+            $plugins = $api->Api('plugins.json?fields=id,title', 'GET', ['fields'=>'id,title']);
+            if( isset( $plugins->error ) && isset( $plugins->error->message ) ) {
+                $ldfmt_message = $plugins->error->message;
+                $class = 'notice notice-success is-dismissible';
+                $message = sanitize_text_field( $ldfmt_message );
+                printf ( '<div id="message" class="%s"> <p>%s</p></div>', $class, $message );
+            } else{
+                $is_connected = true;
+            }
+        } catch(Exception $e) {
+            $class = 'notice notice-success is-dismissible';
+            printf ( '<div id="message" class="%s"> <p>%s</p></div>', $class, $e->getMessage() );
+        }
         ?>
-            <form class="ldnft-dripfeed-settings" method="post" action="<?php echo admin_url( 'admin-post.php' ); ?>">
+            <form class="ldnft-general-settings" method="post" action="<?php echo admin_url( 'admin-post.php' ); ?>">
                 <div class="ldnft-wrap">
 
-                    <h3 class="ldnft-dripfeed-heading"><?php _e( 'Freemius Settings', LDNFT_TEXT_DOMAIN ); ?></h3>
+                    <h3 class="ldnft-settings-heading"><?php _e( 'Freemius Settings', LDNFT_TEXT_DOMAIN ); ?></h3>
                     <div class="ldnft-box">
                         <!-- <h3><?php _e( 'Drip-feed Lessons', LDNFT_TEXT_DOMAIN ); ?></h3> -->
-                        <div class="ldnft-post-content">
+                        <!-- <div class="ldnft-post-content">
                             <span class="ldnft-desc"><?php _e( 'API Scope', LDNFT_TEXT_DOMAIN ); ?></span>
                             <label>
                                 <input type="text" id="ldnft_api_scope" name="ldnft_settings[api_scope]" value="<?php echo $api_scope;?>">
@@ -771,7 +804,7 @@ class FMT_Admin {
                             <p>
                                 <?php _e( 'API Scope of the Freemius API', LDNFT_TEXT_DOMAIN ); ?>
                             </p>
-                        </div>
+                        </div> -->
                         <div class="ldnft-post-content">
                             <span class="ldnft-desc"><?php _e( 'Developer ID', LDNFT_TEXT_DOMAIN ); ?></span>
                             <label>
@@ -799,71 +832,72 @@ class FMT_Admin {
                                 <?php _e( 'Scret Key of the Freemius API', LDNFT_TEXT_DOMAIN ); ?>
                             </p>
                         </div>
+                        <div class="ldfmt-button-wrapper">
+                            <?php wp_nonce_field( 'ldnft_nounce', 'ldnft_nounce_field' ); ?>
+                            <input type="hidden" name="action" value="ldnft_submit_action" />
+                            <input type="submit" class="button button-primary ldnft-save-setting" name="ldnft_submit_form" value="<?php _e( 'Test & Save', LDNFT_TEXT_DOMAIN ); ?>">
+                        </div>
+
                     </div>
-                    <div>
-                        <?php wp_nonce_field( 'ldnft_nounce', 'ldnft_nounce_field' ); ?>
-                        <input type="hidden" name="action" value="ldnft_submit_action" />
-                        <input type="submit" class="button button-primary ldnft-save-setting" name="ldnft_submit_form" value="<?php _e( 'Save', LDNFT_TEXT_DOMAIN ); ?>">
-                    </div>
+                    
                 </div>
             </form>
-            <form class="ldnft-dripfeed-settings-mailpoet" method="post" action="<?php echo admin_url( 'admin-post.php' ); ?>">
-                <div class="ldnft-wrap">
-                    <h3 class="ldnft-dripfeed-heading"><?php _e( 'Import Subscribers from Freemius', LDNFT_TEXT_DOMAIN ); ?></h3>
-                    <div class="ldnft-box">
-                        <div id="ldnft-settings-import-mailpoet-message"></div>
-                        <div id="ldnft-settings-import-mailpoet-errmessage"></div>
-                        <div class="ldnft-post-content">
-                            <span class="ldnft-desc"><?php _e( 'Mailpoet List', LDNFT_TEXT_DOMAIN ); ?></span>
-                            <label>
-                                <select id="ldnft_mailpeot_list" name="ldnft_mailpeot_list">
-                                    <?php
-                                        $table_name = $wpdb->prefix.'mailpoet_segments';
-                                        $list = $wpdb->get_results('select id, name from '.$table_name.'');
-                                        foreach( $list as $item ) {
-                                            echo '<option value="'.$item->id.'">'.$item->name.'</option>';
-                                        }
-                                    ?>
+            <?php if( $is_connected ) { ?>
+                <form class="ldnft-settings-mailpoet" method="post" action="<?php echo admin_url( 'admin-post.php' ); ?>">
+                    <div class="ldnft-wrap">
+                        <h3 class="ldnft-settings-heading"><?php _e( 'Import Subscribers from Freemius to Mailpoet', LDNFT_TEXT_DOMAIN ); ?></h3>
+                        <div class="ldnft-box">
+                            <div id="ldnft-settings-import-mailpoet-message"></div>
+                            <div id="ldnft-settings-import-mailpoet-errmessage"></div>
+                            <div class="ldnft-post-content">
+                                <span class="ldnft-desc"><?php _e( 'Mailpoet List', LDNFT_TEXT_DOMAIN ); ?></span>
+                                <label>
+                                    <select id="ldnft_mailpeot_list" name="ldnft_mailpeot_list">
+                                        <?php
+                                            $table_name = $wpdb->prefix.'mailpoet_segments';
+                                            $list = $wpdb->get_results('select id, name from '.$table_name.'');
+                                            foreach( $list as $item ) {
+                                                echo '<option value="'.$item->id.'">'.$item->name.'</option>';
+                                            }
+                                        ?>
+                                        
+                                    </select>
+                                </label>
+                                <p>
+                                    <?php _e( 'Select a list before import the actual subscribers.', LDNFT_TEXT_DOMAIN ); ?>
+                                </p>
+                            </div>
+                            <div class="ldnft-post-content">
+                                <span class="ldnft-desc"><?php _e( 'Plugin', LDNFT_TEXT_DOMAIN ); ?></span>
+                                <label>
                                     
-                                </select>
-                            </label>
-                            <p>
-                                <?php _e( 'Select a list before import the actual subscribers.', LDNFT_TEXT_DOMAIN ); ?>
-                            </p>
-                        </div>
-                        <div class="ldnft-post-content">
-                            <span class="ldnft-desc"><?php _e( 'Plugin', LDNFT_TEXT_DOMAIN ); ?></span>
-                            <label>
-                                <?php
-                                    $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
-                                    $plugins = $api->Api('plugins.json?fields=id,title', 'GET', ['fields'=>'id,title']);
-                                ?>
-                                <select id="ldnft_mailpeot_plugin" name="ldnft_mailpeot_plugin">
-                                    <?php
-                                        foreach( $plugins->plugins as $plugin ) {
-                                            ?>
-                                                <option value="<?php echo $plugin->id; ?>"><?php echo $plugin->title; ?></option>
-                                            <?php   
-                                        }
-                                    ?>
-                                </select>
-                            </label>
-                            <p>
-                                <?php _e( 'Select a plugin whose subscribers needs to be imported.', LDNFT_TEXT_DOMAIN ); ?>
-                            </p>
-                        </div>
-                        <div>
-                            <?php wp_nonce_field( 'ldnft_mailpoet_nounce', 'ldnft_mailpoet_nounce_field' ); ?>
-                            <input type="hidden" name="action" value="ldnft_mailpoet_submit_action" />
-                            <input type="submit" class="button button-primary ldnft-mailpoet-save-setting_import" name="ldnft_mailpoet_submit_form_import" value="<?php _e( 'Import', LDNFT_TEXT_DOMAIN ); ?>">
-                            <div class="ldnft-success-message">
-                                <img class="ldnft-success-loader" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" />
-                                <span class="ldnft-loading-wrap"><?php _e( 'Please wait! Reset is being processed.' ); ?></span>
+                                    <select id="ldnft_mailpeot_plugin" name="ldnft_mailpeot_plugin">
+                                        <?php
+                                            foreach( $plugins->plugins as $plugin ) {
+                                                ?>
+                                                    <option value="<?php echo $plugin->id; ?>"><?php echo $plugin->title; ?></option>
+                                                <?php   
+                                            }
+                                        ?>
+                                    </select>
+                                </label>
+                                <p>
+                                    <?php _e( 'Select a plugin whose subscribers needs to be imported.', LDNFT_TEXT_DOMAIN ); ?>
+                                </p>
+                            </div>
+                            <div class="ldfmt-button-wrapper">
+                                <?php wp_nonce_field( 'ldnft_mailpoet_nounce', 'ldnft_mailpoet_nounce_field' ); ?>
+                                <input type="hidden" name="action" value="ldnft_mailpoet_submit_action" />
+                                <div class="ldnft-success-message">
+                                    <img class="ldnft-success-loader" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" />
+                                    <span class="ldnft-loading-wrap"><?php _e( 'Please wait! Reset is being processed.' ); ?></span>
+                                </div>
+                                <input type="submit" class="button button-primary ldnft-mailpoet-save-setting_import" name="ldnft_mailpoet_submit_form_import" value="<?php _e( 'Import Subscribers', LDNFT_TEXT_DOMAIN ); ?>">
                             </div>
                         </div>
                     </div>
-                </div>
-            </form>
+                </form>
+            <?php } ?>
         <?php
     }
     

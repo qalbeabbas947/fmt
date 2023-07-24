@@ -18,6 +18,8 @@ class LDFMT_Sales extends WP_List_Table {
 
     public $selected_plugin_id;
 
+    public $selected_interval;
+
     public $api;
 
     public $plugins;
@@ -52,6 +54,10 @@ class LDFMT_Sales extends WP_List_Table {
             $this->selected_plugin_id = intval( $_GET['ldfmt_plugins_filter'] ); 
         }
 
+        if( isset($_GET['interval'])  ) {
+            $this->selected_interval = $_GET['interval']; 
+        }
+        
         
         //Set parent defaults
         parent::__construct( array(
@@ -311,9 +317,31 @@ class LDFMT_Sales extends WP_List_Table {
          * be able to use your precisely-queried data immediately.
          */
          // will be used in pagination settings
-         $table_name = $wpdb->prefix.'ldnft_transactions';
-         $where = " where plugin_id='".$this->selected_plugin_id."'";
-         $total_items = $wpdb->get_var("SELECT COUNT(id) FROM $table_name".$where);
+        $table_name = $wpdb->prefix.'ldnft_transactions';
+        $where = " where plugin_id='".$this->selected_plugin_id."'";
+
+        $where_interval = '';
+        if( !empty( $this->selected_interval )) {
+            switch( $this->selected_interval ) {
+                case "current_week":
+                    $where_interval = " and YEARWEEK(created) = YEARWEEK(NOW())";
+                    break;
+                case "last_week":
+                    $where_interval = ' and Date(created) between date_sub(now(),INTERVAL 1 WEEK) and now()';
+                    break;
+                case "current_month":
+                    $where_interval = ' and MONTH(created) = MONTH(now()) and YEAR(created) = YEAR(now())';
+                    break;
+                case "last_month":
+                    $where_interval = ' and Date(created) between Date((now() - interval 1 month)) and Date(now())';
+                    break;
+                default:
+                    $where_interval = " and Date(created) = '".date('Y-m-d')."'";
+                    break;
+            }
+        }
+
+         $total_items = $wpdb->get_var("SELECT COUNT(id) FROM $table_name".$where.$where_interval);
 
          // prepare query params, as usual current page, order by and order direction
         $paged = isset($_REQUEST['paged']) ? max(0, intval($_REQUEST['paged'] - 1) * $per_page) : 0;
@@ -322,7 +350,7 @@ class LDFMT_Sales extends WP_List_Table {
  
          // [REQUIRED] define $items array
          // notice that last argument is ARRAY_A, so we will retrieve array
-         $this->items = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table_name $where ORDER BY $orderby $order LIMIT %d OFFSET %d", $per_page, $paged), ARRAY_A);
+         $this->items = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table_name $where $where_interval ORDER BY $orderby $order LIMIT %d OFFSET %d", $per_page, $paged), ARRAY_A);
  
          // [REQUIRED] configure pagination
          $this->set_pagination_args(array(
@@ -336,9 +364,43 @@ class LDFMT_Sales extends WP_List_Table {
         global $wpdb;
         
         if ( $which == "top" ){
+            $table_name = $wpdb->prefix.'ldnft_transactions';
+            $where = " where plugin_id='".$this->selected_plugin_id."'";
+            $where_interval = '';
+            if( !empty( $this->selected_interval )) {
+                switch( $this->selected_interval ) {
+                    case "current_week":
+                        $where_interval = " and YEARWEEK(created) = YEARWEEK(NOW())";
+                        break;
+                    case "last_week":
+                        $where_interval = ' and Date(created) between date_sub(now(),INTERVAL 1 WEEK) and now()';
+                        break;
+                    case "current_month":
+                        $where_interval = ' and MONTH(created) = MONTH(now()) and YEAR(created) = YEAR(now())';
+                        break;
+                    case "last_month":
+                        $where_interval = ' and Date(created) between Date((now() - interval 1 month)) and Date(now())';
+                        break;
+                    default:
+                        $where_interval = " and Date(created) = '".date('Y-m-d')."'";
+                        break;
+                }
+            }
             ?>
+            <div class="ldfmt-sales-upper-info">
+                <?php $gross = $wpdb->get_var($wpdb->prepare("SELECT sum(gross) FROM $table_name where plugin_id=%d ".$where_interval, $this->selected_plugin_id )); ?>
+                <div class="ldfmt-gross-sales-box ldfmt-sales-box">
+                    <label><?php echo __('Gross Sales', 'mailpoet');?></label>
+                    <div class="ldnft_points"><?php echo number_format( floatval($gross), 2);?></div>
+                </div>
+                <?php $gateway_fee = $wpdb->get_var($wpdb->prepare("SELECT sum(gateway_fee) FROM $table_name where plugin_id=%d ".$where_interval, $this->selected_plugin_id )); ?>
+                <div class="ldfmt-gross-gateway-box ldfmt-sales-box">
+                    <label><?php echo __('Total Gateway Fee', 'mailpoet');?></label>
+                    <div class="ldnft_gateway_fee"><?php echo number_format( floatval($gateway_fee), 2);?></div>
+                </div>
+            </div>
             <div class="alignleft actions bulkactions">
-                <select onchange="document.location='admin.php?page=ldninjas-freemius-toolkit-sales&ldfmt_plugins_filter='+this.value" name="ldfmt-plugins-filter" class="ldfmt-plugins-filter">
+                <select onchange="document.location='admin.php?page=ldninjas-freemius-toolkit-sales&interval=<?php echo $this->selected_interval;?>&ldfmt_plugins_filter='+this.value" name="ldfmt-plugins-filter" class="ldfmt-plugins-filter">
                     <option value=""><?php _e( 'Filter by Plugin', LDNFT_TEXT_DOMAIN ); ?></option>
                     <?php
                         foreach( $this->plugins as $plugin ) {
@@ -353,7 +415,16 @@ class LDFMT_Sales extends WP_List_Table {
                         }
                     ?>
                 </select>
+                <select onchange="document.location='admin.php?page=ldninjas-freemius-toolkit-sales&ldfmt_plugins_filter=<?php echo $this->selected_plugin_id;?>&interval='+this.value" name="ldfmt-sales-interval-filter" class="ldfmt-sales-interval-filter">
+                    <option value=""><?php echo __( 'All Time', LDNFT_TEXT_DOMAIN );?></option>
+                    <option value="today" <?php echo $this->selected_interval=='today'?'selected':'';?>><?php echo __( 'Today', LDNFT_TEXT_DOMAIN );?></option>
+                    <option value="current_week" <?php echo $this->selected_interval=='current_week'?'selected':'';?>><?php echo __( 'Current Week', LDNFT_TEXT_DOMAIN );?></option>
+                    <option value="last_week" <?php echo $this->selected_interval=='last_week'?'selected':'';?>><?php echo __( 'Last Week', LDNFT_TEXT_DOMAIN );?></option>
+                    <option value="current_month" <?php echo $this->selected_interval=='current_month'?'selected':'';?>><?php echo __( 'Current Month', LDNFT_TEXT_DOMAIN );?></option>
+                    <option value="last_month" <?php echo $this->selected_interval=='last_month'?'selected':'';?>><?php echo __( 'Last Month', LDNFT_TEXT_DOMAIN );?></option>
+                </select>
                 <button type="button" id="ldnft-update-sales" class="ldnft-update-sales button action "><?php _e( 'Sync Sales with Freemius', LDNFT_TEXT_DOMAIN ); ?></button>
+                <img style="display:none" width="30px" class="ldfmt-data-loader" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" />
                 <span id="ldnft-sales-import-message"></span>
             </div>
             <?php

@@ -374,6 +374,7 @@ class LDFMT_Subscribers extends WP_List_Table {
                     ?>
                 </select>
                 <button type="button" id="ldnft-update-subscriptions" class="ldnft-update-subscriptions button action"><?php _e( 'Sync Subscription with Freemius', LDNFT_TEXT_DOMAIN ); ?></button>
+                <img style="display:none" width="30px" class="ldfmt-data-loader" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" />
                 <span id="ldnft-subscription-import-message"></span>
             </div>
             <?php
