@@ -70,12 +70,63 @@ class FMT_Admin {
         add_action( 'wp_ajax_ldnft_mailpoet_submit_action', [ $this, 'mailpoet_submit_action' ], 100 );
         add_action( 'wp_ajax_ldnft_update_subscritions', [ $this, 'ldnft_update_subscritions' ], 100 );
         add_action( 'wp_ajax_ldnft_update_sales', [ $this, 'ldnft_update_sales' ], 100 );
+        add_action( 'wp_ajax_ldnft_update_customers', [ $this, 'update_customers' ], 100 );
+    }
+
+    function update_customers(){
+        
+        global $wpdb;
+        $service = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
+        $table_user = $wpdb->prefix.'ldnft_users';
+        $plugins = $service->Api('plugins.json?fields=id,title', 'GET', []);
+        
+        $inserted = 0;
+        $updatednum = 0;
+        if( isset( $plugins->plugins ) &&  count($plugins->plugins) > 0 ) {
+            foreach( $plugins->plugins as $plugin ) {
+               
+                $usrobj = $service->Api('plugins/'.$plugin->id.'/users.json?count=50', 'GET', []);
+                foreach( $usrobj->users as $user ) {
+                    print_r($user);
+                    $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_user." where id=%d", $user->id ));
+                    if( count( $res ) == 0 ) {
+                        $wpdb->insert(
+                            $table_user,
+                            array(
+                                'id'                    => $user->id,
+                                'email'                 => $user->email,
+                                'first'                 => $user->first,
+                                'last'                  => $user->last,
+                                'is_verified'           => $user->is_verified,
+                                'created'               => $user->created,
+                                'plugins'               => implode(',', $user->plugin_ids )
+                            )
+                        );
+                        $inserted++;
+                    } else {
+                        $wpdb->update($table_user, 
+                            array(
+                                'email'                 => $user->email,
+                                'first'                 => $user->first,
+                                'last'                  => $user->last,
+                                'is_verified'           => $user->is_verified,
+                                'created'               => $user->created,
+                                'plugins'               => implode(',', $user->plugin_ids )
+                            ), array('id'=>$user->id));
+                        $updatednum++;
+                    }
+                }
+            }
+        }
+
+        echo json_encode(['inserted' => $inserted, 'updated'=>$updatednum, 'message' => sprintf( __('Inserted: %d, Updated: %d', 'MWC'), $inserted, $updatednum)]);
+        exit;
     }
     function ldnft_update_sales(){
         
         global $wpdb;
         $service = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
-        
+        $table_user = $wpdb->prefix.'ldnft_users';
         $plugins = $service->Api('plugins.json?fields=id,title', 'GET', []);
         $table_name = $wpdb->prefix.'ldnft_transactions';
         $inserted = 0;
@@ -88,9 +139,33 @@ class FMT_Admin {
                     $country_code = $payment->country_code; 
                     $id = $payment->id; 
                     $user_id = $payment->user_id; 
-                    $username = 'none';
-                    $useremail = 'none';
                     
+                    $user = $service->Api('plugins/'.$plugin->id.'/users/'.$user_id.'.json', 'GET', []);
+                    $username = $user->first.' '.$user->last;
+                    $useremail = $user->email;
+                    $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_user." where id=%d", $user_id ));
+                    if( count( $res ) == 0 ) {
+                        $wpdb->insert(
+                            $table_user,
+                            array(
+                                'id'                    => $user_id,
+                                'email'                 => $user->email,
+                                'first'                 => $user->first,
+                                'last'                  => $user->last,
+                                'is_verified'           => $user->is_verified,
+                                'created'               => $user->created
+                            )
+                        );
+                    } else {
+                        $wpdb->update($table_user, 
+                            array(
+                                'email'                 => $user->email,
+                                'first'                 => $user->first,
+                                'last'                  => $user->last,
+                                'is_verified'           => $user->is_verified,
+                                'created'               => $user->created
+                            ), array('id'=>$user_id));
+                    }
                     $plugin_id = $payment->plugin_id; 
                     $install_id = $payment->install_id; 
                     $subscription_id = $payment->subscription_id; 
@@ -183,6 +258,7 @@ class FMT_Admin {
         
         $plugins = $service->Api('plugins.json?fields=id,title', 'GET', ['fields'=>'id,title']);
         $table_name = $wpdb->prefix.'ldnft_subscription';
+        $table_user = $wpdb->prefix.'ldnft_users';
         $inserted = 0;
         $updatednum = 0;
         if( isset( $plugins->plugins ) &&  count($plugins->plugins) > 0 ) {
@@ -219,8 +295,34 @@ class FMT_Admin {
                     $created = $subscription->created; 
                     $updated = $subscription->updated; 
                     $currency = $subscription->currency; 
-                    $username = 'none';
-                    $useremail = 'none';
+                    
+                    $user = $service->Api('plugins/'.$plugin->id.'/users/'.$user_id.'.json', 'GET', []);
+                    $username = $user->first.' '.$user->last;
+                    $useremail = $user->email;
+                    $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_user." where id=%d", $user_id ));
+                    if( count( $res ) == 0 ) {
+                        $wpdb->insert(
+                            $table_user,
+                            array(
+                                'id'                    => $user_id,
+                                'email'                 => $user->email,
+                                'first'                 => $user->first,
+                                'last'                  => $user->last,
+                                'is_verified'           => $user->is_verified,
+                                'created'               => $user->created
+                            )
+                        );
+                    } else {
+                        $wpdb->update($table_user, 
+                            array(
+                                'email'                 => $user->email,
+                                'first'                 => $user->first,
+                                'last'                  => $user->last,
+                                'is_verified'           => $user->is_verified,
+                                'created'               => $user->created
+                            ), array('id'=>$user_id));
+                    }
+                    
                     $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_name." where id=%d", $id ));
                     if( count( $res ) == 0 ) {
                         $wpdb->insert(
@@ -684,7 +786,7 @@ class FMT_Admin {
             <div class="wrap">
                 
                 <div id="icon-users" class="icon32"><br/></div>
-                <h2><?php _e( 'Subscribers', LDNFT_TEXT_DOMAIN ); ?></h2>
+                <h2><?php _e( 'Customers', LDNFT_TEXT_DOMAIN ); ?></h2>
 
                 
                 <!-- Forms are NOT created automatically, so you need to wrap the table in one to use features like bulk actions -->
@@ -745,7 +847,7 @@ class FMT_Admin {
         <div class="wrap">
             
             <div id="icon-users" class="icon32"><br/></div>
-            <h2><?php _e( 'Subscribers', LDNFT_TEXT_DOMAIN ); ?></h2>
+            <h2><?php _e( 'Subscriptions', LDNFT_TEXT_DOMAIN ); ?></h2>
 
             
             <!-- Forms are NOT created automatically, so you need to wrap the table in one to use features like bulk actions -->
@@ -909,10 +1011,11 @@ class FMT_Admin {
     public function admin_enqueue_scripts_callback() {
 
         $screen = get_current_screen();
-        if( $screen ) {   
+        if( $screen ) { 
             if( $screen->id == 'freemius-toolkit_page_ldninjas-freemius-toolkit-settings' 
                 || $screen->id == 'freemius-toolkit_page_ldninjas-freemius-toolkit-subscriptions'
-                || $screen->id == 'freemius-toolkit_page_ldninjas-freemius-toolkit-sales' ) {
+                || $screen->id == 'freemius-toolkit_page_ldninjas-freemius-toolkit-sales' 
+                || $screen->id == 'freemius-toolkit_page_ldninjas-freemius-toolkit-customers' ) {
 
                 /**
                  * enqueue admin css

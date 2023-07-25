@@ -330,14 +330,41 @@ class LDFMT_Customers extends WP_List_Table {
             $status = "&filter=".$this->selected_status;
         }
         $result = $this->api->Api('plugins/'.$this->selected_plugin_id.'/users.json?count=50'.$status, 'GET', []);
-        
+        $table_user = $wpdb->prefix.'ldnft_users';
         $data = [];
         $count = 0;
         foreach( $result->users as $user ) {
             
+            $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_user." where id=%d", $user->id ));
+            $database = array(
+                'email'                 => $user->email,
+                'first'                 => $user->first,
+                'last'                  => $user->last,
+                'is_verified'           => $user->is_verified,
+                'created'               => $user->created,
+                'plugins'               => implode(',', $user->plugin_ids )
+            );
+            if( count( $res ) == 0 ) {
+                $database['id'] = $user->id;
+                if( !empty( $this->selected_status ) ) {
+                    $database['status'] = $this->selected_status;
+                }
+                $wpdb->insert(
+                    $table_user,
+                    $database
+                );
+            } else {
+                if( !empty( $this->selected_status ) ) {
+                    $database['status'] = $this->selected_status;
+                }
+                $wpdb->update($table_user, 
+                $database, array('id'=>$user->id));
+            }
+
             foreach( $user as $key=>$value ) {
                 $data[$count][$key] = $value;
             } 
+            
             $count++;   
         }
         
@@ -447,7 +474,10 @@ class LDFMT_Customers extends WP_List_Table {
                     <option value="paid" <?php echo $this->selected_status=='paid'?'selected':''; ?>><?php _e('Paid', 'ldninjas-freemius-toolkit');?></option>
                     <option value="paying" <?php echo $this->selected_status=='paying'?'selected':''; ?>><?php _e('Paying', 'ldninjas-freemius-toolkit');?></option>
                 </select>
-            </div>
+                <!-- <button type="button" id="ldnft-update-customers" class="ldnft-update-customers button action "><?php _e( 'Sync Customers with Freemius', LDNFT_TEXT_DOMAIN ); ?></button>
+                <img style="display:none" width="30px" class="ldfmt-data-loader" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" />
+                <span id="ldnft-customers-import-message"></span> -->
+                </div>
             <?php
         }
         if ( $which == "bottom" ){

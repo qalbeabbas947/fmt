@@ -81,6 +81,20 @@ function ldnft_activation() {
             `license_id` int(11) DEFAULT NULL
         )" );     
     }
+
+    $table_name = $wpdb->prefix.'ldnft_users';
+    if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
+        $wpdb->query( "CREATE TABLE $table_name (
+            `id` int(11) NOT NULL,
+            `email` varchar(255) DEFAULT NULL,
+            `first` varchar(255) DEFAULT NULL,
+            `last` varchar(255) DEFAULT NULL,
+            `is_verified` tinyint(1) DEFAULT NULL,
+            `created` datetime DEFAULT NULL,
+            `plugins` varchar(255) DEFAULT NULL,
+            `status` varchar(20) DEFAULT NULL
+        )" );     
+    }
 }
 register_activation_hook( __FILE__, 'ldnft_activation' );
 

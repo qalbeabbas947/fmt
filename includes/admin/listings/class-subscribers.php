@@ -55,8 +55,8 @@ class LDFMT_Subscribers extends WP_List_Table {
         
         //Set parent defaults
         parent::__construct( array(
-            'singular'  => 'subscriber',     //singular name of the listed records
-            'plural'    => 'subscribers',    //plural name of the listed records
+            'singular'  => 'subscriptions',     //singular name of the listed records
+            'plural'    => 'subscriptions',    //plural name of the listed records
             'ajax'      => true             //does this table support ajax?
         ) );
         
