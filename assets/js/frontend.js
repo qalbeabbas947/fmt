@@ -8,6 +8,7 @@
             load_sales: function(e) {
                 e.preventDefault();
                 $('.ldmft-filter-sales').html('');
+                $('.ldfmt-loader-div').css('display', 'block');
                 var plugin = $('.ldfmt-sales-plugins-filter').val();
                 var interval = $('.ldfmt-sales-interval-filter').val();
                 var show_type = $('#ldfmt-sales-show-type').val();
@@ -19,6 +20,7 @@
                   })
                 .done(function( html ) {
                     $('.ldmft-filter-sales').html( html );
+                    $('.ldfmt-loader-div').css('display', 'none');
                 });
                
             },
@@ -26,7 +28,7 @@
                 e.preventDefault();
                 $('.ldmft-filter-reviews').html('');
                 var plugin = $('.ldfmt-plugins-filter').val();
-                
+                $('.ldfmt-loader-div').css('display', 'block');
                 $.ajax({
                     method: "POST",
                     url: LDNFT.ajaxURL,
@@ -35,6 +37,7 @@
                   })
                 .done(function( html ) {
                     $('.ldmft-filter-reviews').html( html );
+                    $('.ldfmt-loader-div').css('display', 'none');
                 });
                
             }

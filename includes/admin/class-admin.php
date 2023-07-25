@@ -454,16 +454,16 @@ class FMT_Admin {
         
         $message = '';
         if( $count > 0 ) {
-            $message = sprintf( __('%d subscriber(s) imported.', 'mailpoet'),$count );
+            $message = sprintf( __('%d subscriber(s) imported.', LDNFT_TEXT_DOMAIN),$count );
         }
         
         if( $exists > 0 ) {
-            $message .= sprintf( __('%d subscriber(s) already exists.', 'mailpoet'),$exists );
+            $message .= sprintf( __('%d subscriber(s) already exists.', LDNFT_TEXT_DOMAIN),$exists );
         }
         
         $errormsg = '';
         if( count( $errors ) > 0 ) {
-            $errormsg = __('Errors:', 'mailpoet').implode(' ', $errors );
+            $errormsg = __('Errors:', LDNFT_TEXT_DOMAIN).implode(' ', $errors );
         }
 
         $response = ['added'=>$count, 'exists'=>$exists, 'message'=>$message, 'errors'=> $errors, 'errormsg'=> $errormsg ];

@@ -390,12 +390,12 @@ class LDFMT_Sales extends WP_List_Table {
             <div class="ldfmt-sales-upper-info">
                 <?php $gross = $wpdb->get_var($wpdb->prepare("SELECT sum(gross) FROM $table_name where plugin_id=%d ".$where_interval, $this->selected_plugin_id )); ?>
                 <div class="ldfmt-gross-sales-box ldfmt-sales-box">
-                    <label><?php echo __('Gross Sales', 'mailpoet');?></label>
+                    <label><?php echo __('Gross Sales', LDNFT_TEXT_DOMAIN);?></label>
                     <div class="ldnft_points"><?php echo number_format( floatval($gross), 2);?></div>
                 </div>
                 <?php $gateway_fee = $wpdb->get_var($wpdb->prepare("SELECT sum(gateway_fee) FROM $table_name where plugin_id=%d ".$where_interval, $this->selected_plugin_id )); ?>
                 <div class="ldfmt-gross-gateway-box ldfmt-sales-box">
-                    <label><?php echo __('Total Gateway Fee', 'mailpoet');?></label>
+                    <label><?php echo __('Total Gateway Fee', LDNFT_TEXT_DOMAIN);?></label>
                     <div class="ldnft_gateway_fee"><?php echo number_format( floatval($gateway_fee), 2);?></div>
                 </div>
             </div>

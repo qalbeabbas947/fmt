@@ -1,6 +1,6 @@
 .review-container {
     border: 2px solid #ccc;
-    background-color: #eee;
+    background-color: white;
     border-radius: 5px;
     padding: 16px;
     margin: 16px 0
@@ -27,7 +27,7 @@
     width: 30%;
     height: 100px;
     border: 1px solid #ddd;
-    background: #eee;       
+    background: white;       
     margin: 20px;
 }
 .ldfmt-sales-box label {
@@ -43,7 +43,9 @@
     text-align: center;
     padding:5px;
 }
-
+.ldfmt-clear-div{
+  clear:both;
+}
 .ldfmt-gross-sales-box {
     float: left;
     border-radius: 5px; 
@@ -60,50 +62,63 @@
     text-align: center;
     padding:5px; 
 }
-#customers {
-    font-family: Arial, Helvetica, sans-serif;
-    border-collapse: collapse;
-    width: 100%;
-  }
+.ldfmt-sales-list {
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
   
 .ldfmt-sales-list td, .ldfmt-sales-list th {
     border: 1px solid #ddd;
     padding: 8px;
+    font-size: 1em;
+    background-color: white;
 }
-  
+.ldfmt-plugins-filter{
+  min-width: 15ch;
+  max-width: 30ch;
+ 
+  border-radius: 0.25em;
+  padding: 0.25em 0.5em;
+  font-size: 1.25rem;
+  cursor: pointer;
+  line-height: 1.1;
+  background-color: #fff;
+  background-image: linear-gradient(to top, #f9f9f9, #fff 33%);}
 .ldfmt-sales-list tr:nth-child(even){background-color: #f2f2f2;}
-  
-.ldfmt-sales-list tr:hover { background-color: #ddd; }
+.ldfmt-loader-div{
+  text-align: center;
+}
+.ldfmt-sales-list tr:hover {  }
   
 .ldfmt-sales-list th {
-    padding-top: 12px;
-    padding-bottom: 12px;
-    text-align: left;
-    background-color: #6fa797;
-    color: white;
+  text-align: left;
+  background-color: #ddd;
 }
 .ldmft_filters{
-    width: 100%;
     height: 100px;
     border: 1px solid #ddd;
     border-radius: 5px;
-    background: #eee;       
+    background: white;       
     margin: 20px;  
 }
 .ldmft_filters .ldmft_filter{
     width: 43%;
     height: auto;
     float: left;
+    margin-left: 15px;
 }
-.ldmft_filter label{
-
+.ldmft_wrapper{
+  background-color: #Efefef;
+  padding: 10px;
+    border-radius: 5px;
 }
 .ldmft_filter select{
-
+  display: block;
   width: 100%;
   min-width: 15ch;
   max-width: 30ch;
-  border: 1px solid var(--select-border);
+ 
   border-radius: 0.25em;
   padding: 0.25em 0.5em;
   font-size: 1.25rem;
@@ -113,8 +128,16 @@
   background-image: linear-gradient(to top, #f9f9f9, #fff 33%);
 }
 .ldfmt-no-results{
-    display: block;
-    margin: 10px auto;
+  display: block;
+  margin: 10px auto;
+  text-align: center;
+  background: white;
+  border-radius: 8px;
+  width: 70%;
+}
+.ldmft_filter label{
+  font-weight: 500;
+  display: block;
 }
 .ldmft_filter select::-ms-expand {
     display: none;

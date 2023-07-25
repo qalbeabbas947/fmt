@@ -55,12 +55,12 @@ class ldFMT_Reviews_Shortcode {
                     <h3 class="ldfmt_review_title"><a href="<?php echo $review->sharable_img;?>"><?php echo $review->title;?></a></h3>
                     <p class="ldfmt_review_user"><span><?php echo $review->name;?></span> of <?php echo !empty($review->company)?'<a href="'.$review->company_url.'">'.$review->company.'</a>':''; ?></p>
                     <p class="ldfmt_review_description"><?php echo $review->text;?></p>
-                    <p class="ldfmt_review_time_wrapper"><div class="ldfmt_review_time"><?php echo $review->created;?></div><div class="ldfmt_review_rate"><?php echo __('Rate:', 'mailpoet');?> <?php echo $review->rate;?></div></p>
+                    <p class="ldfmt_review_time_wrapper"><div class="ldfmt_review_time"><?php echo $review->created;?></div><div class="ldfmt_review_rate"><?php echo __('Rate:', LDNFT_TEXT_DOMAIN);?> <?php echo $review->rate;?></div></p>
                 </div>
             <?php
             }
         } else {
-            echo '<div class="no-results">'.__('No review(s) found.', 'mailpoet').'</div>';
+            echo '<div class="ldfmt-no-results">'.__('No review(s) found.', LDNFT_TEXT_DOMAIN).'</div>';
         }
         exit;
     }
@@ -123,7 +123,7 @@ class ldFMT_Reviews_Shortcode {
             ?>
                 <div class="ldmft_wrapper">
                     <div class="filter">
-                        <label><?php echo __( 'select a Plugin:', LDNFT_TEXT_DOMAIN );?></label>
+                        <label><?php echo __( 'Select a Plugin:', LDNFT_TEXT_DOMAIN );?></label>
                         <select name="ldfmt-plugins-filter" class="ldfmt-plugins-filter">
                             <?php
                                 foreach( $plugins as $plugin ) {
@@ -140,6 +140,7 @@ class ldFMT_Reviews_Shortcode {
                             
                         </select>
                     </div>
+                    <div style="display:none" class="ldfmt-loader-div"><img width="30px" class="ldfmt-data-loader" src="<?php echo LDNFT_ASSETS_URL.'images/spinner-2x.gif';?>" /></div>
                     <div class="ldmft-filter-reviews">
                         <!-- <div class="review-container">
                             <img src="/w3images/bandmember.jpg" alt="Avatar" style="width:90px">

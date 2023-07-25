@@ -74,7 +74,7 @@ class LDMFT_Sales_Shortcode {
             $gross = $wpdb->get_var($wpdb->prepare("SELECT sum(gross) FROM $table_name where plugin_id=%d ".$where_interval, $plugin_id ));
             ?>
                 <div class="ldfmt-gross-sales-box ldfmt-sales-box">
-                    <label><?php echo __('Gross Sales', 'mailpoet');?></label>
+                    <label><?php echo __('Gross Sales', LDNFT_TEXT_DOMAIN);?></label>
                     <div class="ldnft_points"><?php echo number_format( floatval($gross), 2);?></div>
                 </div>
             <?php
@@ -82,26 +82,23 @@ class LDMFT_Sales_Shortcode {
             $gateway_fee = $wpdb->get_var($wpdb->prepare("SELECT sum(gateway_fee) FROM $table_name where plugin_id=%d ".$where_interval, $plugin_id ));
             ?>
                 <div class="ldfmt-gross-gateway-box ldfmt-sales-box">
-                    <label><?php echo __('Gateway Fee', 'mailpoet');?></label>
+                    <label><?php echo __('Gateway Fee', LDNFT_TEXT_DOMAIN);?></label>
                     <div class="ldnft_gateway_fee"><?php echo number_format( floatval($gateway_fee), 2);?></div>
                 </div>
             <?php
         }
-        
+        echo '<div class="ldfmt-clear-div">&nbsp;</div>';
         if( $show == 'both' || $show=='listing' ) {
             $results = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table_name where plugin_id=%d ".$where_interval, $plugin_id ));
             if( is_array($results) && count( $results ) > 0 ) {
                 ?>
                     <table class="ldfmt-sales-list">
                         <tr>
-                            <th><?php echo __('Name', 'mailpoet');?></th>
-                            <th><?php echo __('Email', 'mailpoet');?></th>
-                            <th><?php echo __('Gross', 'mailpoet');?></th>
-                            <th><?php echo __('Gateway Fee', 'mailpoet');?></th>
-                            <th><?php echo __('Created', 'mailpoet');?></th>
-                            <th><?php echo __('Renewal?', 'mailpoet');?></th>
-                            <th><?php echo __('Type', 'mailpoet');?></th>
-                            <th><?php echo __('Country', 'mailpoet');?></th>
+                            <th><?php echo __('Name', LDNFT_TEXT_DOMAIN);?></th>
+                            <th><?php echo __('Gross', LDNFT_TEXT_DOMAIN);?></th>
+                            <th><?php echo __('Gateway Fee', LDNFT_TEXT_DOMAIN);?></th>
+                            <th><?php echo __('Created', LDNFT_TEXT_DOMAIN);?></th>
+                            <th><?php echo __('Renewal?', LDNFT_TEXT_DOMAIN);?></th>
                         </tr>
 
                 <?php
@@ -109,20 +106,17 @@ class LDMFT_Sales_Shortcode {
                 foreach($results as $result) {
                     ?>
                         <tr>
-                            <td><?php echo $result->username;?></td>
-                            <td><?php echo $result->useremail;?></td>
+                            <td><?php echo $result->username;?><br>(<?php echo $result->useremail;?>)</td>
                             <td><?php echo $result->gross;?></td>
                             <td><?php echo $result->gateway_fee;?></td>
                             <td><?php echo $result->created;?></td>
                             <td><?php echo $result->is_renewal;?></td>
-                            <td><?php echo $result->type;?></td>
-                            <td><?php echo $result->country_code;?></td>
                         </tr>
                     <?php
                 }
                 echo '<table>';
             } else {
-                echo '<div class="ldfmt-no-results">'.__('No sale record(s) found.', 'mailpoet').'</div>';
+                echo '<div class="ldfmt-no-results">'.__('No sale record(s) found.', LDNFT_TEXT_DOMAIN).'</div>';
             }
         }
         exit;
@@ -199,6 +193,7 @@ class LDMFT_Sales_Shortcode {
                             </select>
                         </div>
                     </div>
+                    <div style="display:none" class="ldfmt-loader-div"><img width="30px" class="ldfmt-data-loader" src="<?php echo LDNFT_ASSETS_URL.'images/spinner-2x.gif';?>" /></div>
                     <div class="ldmft-filter-sales">
                         <!-- <div class="review-container">
                             <img src="/w3images/bandmember.jpg" alt="Avatar" style="width:90px">
