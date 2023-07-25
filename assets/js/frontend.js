@@ -10,10 +10,11 @@
                 $('.ldmft-filter-sales').html('');
                 var plugin = $('.ldfmt-sales-plugins-filter').val();
                 var interval = $('.ldfmt-sales-interval-filter').val();
+                var show_type = $('#ldfmt-sales-show-type').val();
                 $.ajax({
                     method: "POST",
                     url: LDNFT.ajaxURL,
-                    data: { action: 'ldnft_load_sales', plugin_id: plugin, interval: interval },
+                    data: { action: 'ldnft_load_sales', plugin_id: plugin, interval: interval, show: show_type },
                     cache: false,
                   })
                 .done(function( html ) {

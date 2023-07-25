@@ -999,6 +999,29 @@ class FMT_Admin {
                         </div>
                     </div>
                 </form>
+
+                <div class="ldnft-wrap">
+                    <h3 class="ldnft-settings-heading"><?php _e( 'Shortcodes', LDNFT_TEXT_DOMAIN ); ?></h3>
+                    <div class="ldnft-box">
+                        <table>
+                            <tr>
+                                <td><h3><?php _e( 'Shortcode:', LDNFT_TEXT_DOMAIN ); ?> [LDFMT_Reviews]</h3></td>
+                            </tr>
+                            <tr>
+                                <td clss="ldfmt-shortcode-desc"><?php _e( 'Displays plugin reviews on the frontend. User can filter the reviews based on the plugin.', LDNFT_TEXT_DOMAIN ); ?></td>
+                            </tr>
+                            <tr>
+                                <td>&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td><h3><?php _e( 'Shortcode:', LDNFT_TEXT_DOMAIN ); ?> [LDFMT_Sales show="[ summary  |  listing  |  both ]"]</h3></td>
+                            </tr>
+                            <tr>
+                                <td clss="ldfmt-shortcode-desc"><?php _e( 'This shortcode displays the plugin sales summary and listing on the frontend. Show parameter allows the user to control the display. Default value of the show parameter is both.', LDNFT_TEXT_DOMAIN ); ?></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
             <?php } ?>
         <?php
     }
