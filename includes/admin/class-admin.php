@@ -879,6 +879,7 @@ class FMT_Admin {
         $is_connected = false;
         try {
             $plugins = $api->Api('plugins.json?fields=id,title', 'GET', ['fields'=>'id,title']);
+            
             if( isset( $plugins->error ) && isset( $plugins->error->message ) ) {
                 $ldfmt_message = $plugins->error->message;
                 $class = 'notice notice-success is-dismissible';
@@ -992,7 +993,7 @@ class FMT_Admin {
                                 <input type="hidden" name="action" value="ldnft_mailpoet_submit_action" />
                                 <div class="ldnft-success-message">
                                     <img class="ldnft-success-loader" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" />
-                                    <span class="ldnft-loading-wrap"><?php _e( 'Please wait! Reset is being processed.' ); ?></span>
+                                    <span class="ldnft-loading-wrap"><?php _e( 'Please wait! Import is being processed.' ); ?></span>
                                 </div>
                                 <input type="submit" class="button button-primary ldnft-mailpoet-save-setting_import" name="ldnft_mailpoet_submit_form_import" value="<?php _e( 'Import Subscribers', LDNFT_TEXT_DOMAIN ); ?>">
                             </div>
