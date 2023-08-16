@@ -286,8 +286,8 @@ class LDFMT_Reviews extends WP_List_Table {
         /**
          * First, lets decide how many records per page to show
          */
-        $per_page = 10;
-        
+        $per_page = 20;
+        $offset = isset($_REQUEST['offset']) && intval($_REQUEST['offset'])>0?intval($_REQUEST['offset']):0;
         
         /**
          * REQUIRED. Now we need to define our column headers. This includes a complete
@@ -299,7 +299,6 @@ class LDFMT_Reviews extends WP_List_Table {
         $columns = $this->get_columns();
         $hidden = array();
         $sortable = $this->get_sortable_columns();
-        
         
         /**
          * REQUIRED. Finally, we build an array to be used by the class for column 
@@ -327,24 +326,19 @@ class LDFMT_Reviews extends WP_List_Table {
          * be able to use your precisely-queried data immediately.
          */
         // Deploy new version.
-        $results = $this->api->Api('plugins/'.$this->selected_plugin_id.'/reviews.json?count=50', 'GET', ['is_featured'=>'false','is_verified'=>'false', 'enriched'=>'true' ]);
-       
-        ///$reviews = $api->Api('plugins/12667/reviews.json', 'GET', []);
-        
-        //print_r($reviews);
+        $results = $this->api->Api('plugins/'.$this->selected_plugin_id.'/reviews.json?count='.$per_page.'&offset='.$offset, 'GET', ['is_featured'=>'false','is_verified'=>'false', 'enriched'=>'true' ]);
         
         $data = [];
         $count = 0;
-        foreach( $results->reviews as $user ) {
+        foreach( $results->reviews as $review ) {
             
-            foreach( $user as $key=>$value ) {
+            foreach( $review as $key=>$value ) {
                 $data[$count][$key] = $value;
             } 
 
             $count++;   
         }
         
-        //plugins.json?all=true&fields=id%2Cslug&count=10&sort=-id
         /**
          * This checks for sorting input and sorts the data in our array accordingly.
          * 
@@ -391,7 +385,6 @@ class LDFMT_Reviews extends WP_List_Table {
          */
         $total_items = count($data);
         
-        
         /**
          * The WP_List_Table class does not handle pagination for us, so we need
          * to ensure that the data is trimmed to only the current page. We can use
@@ -399,24 +392,163 @@ class LDFMT_Reviews extends WP_List_Table {
          */
         $data = array_slice($data,(($current_page-1)*$per_page),$per_page);
         
-        
-        
         /**
          * REQUIRED. Now we can add our *sorted* data to the items property, where 
          * it can be used by the rest of the class.
          */
         $this->items = $data;
         
-        
         /**
          * REQUIRED. We also have to register our pagination options & calculations.
          */
         $this->set_pagination_args( array(
-            'total_items' => $total_items,                  //WE have to calculate the total number of items
-            'per_page'    => $per_page,                     //WE have to determine how many items to show on a page
-            'total_pages' => ceil($total_items/$per_page)   //WE have to calculate the total number of pages
+            'per_page'      => $per_page,
+            'offset'        => $offset ,
+            'current_recs'  => count($results->reviews)
         ) );
     }
+
+    function display_tablenav( $which ) {
+        
+        if ( 'top' === $which ) {
+            wp_nonce_field( 'bulk-' . $this->_args['plural'] );
+        }
+        ?>
+            <div class="tablenav <?php echo esc_attr( $which ); ?>">
+
+                <?php if ( $this->has_items() ) : ?>
+                <div class="alignleft actions bulkactions">
+                    <?php $this->bulk_actions( $which ); ?>
+                </div>
+                    <?php
+                endif;
+                $this->extra_tablenav( $which );
+                $this->pagination_new( $which );
+                ?>
+
+                <br class="clear" />
+            </div>
+        <?php
+    }
+
+    /**
+	 * Displays the pagination.
+	 *
+	 * @since 3.1.0
+	 *
+	 * @param string $which
+	 */
+	protected function pagination_new( $which ) {
+        
+		if ( empty( $this->_pagination_args ) ) {
+			return;
+		}
+        
+        $per_page       = $this->_pagination_args['per_page'];
+		$offset         = $this->_pagination_args['offset'];
+        $current_recs   = $this->_pagination_args['current_recs'];
+        
+        $result = $this->api->Api('plugins/'.$this->selected_plugin_id.'/reviews.json?count='.$per_page.'&offset='.(intval($offset)+intval($per_page)), 'GET', []);
+        
+		$total_items     = $this->_pagination_args['total_items'];
+		$total_pages     = $this->_pagination_args['total_pages'];
+		$infinite_scroll = false;
+		if ( isset( $this->_pagination_args['infinite_scroll'] ) ) {
+			$infinite_scroll = $this->_pagination_args['infinite_scroll'];
+		}
+
+		$output = '';
+        
+		$current              = $this->get_pagenum();
+		$removable_query_args = wp_removable_query_args();
+
+		$current_url = set_url_scheme( 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
+
+		$current_url = remove_query_arg( $removable_query_args, $current_url );
+
+		$page_links = array();
+
+		$total_pages_before = '<span class="paging-input">';
+		$total_pages_after  = '</span></span>';
+
+		$disable_first = false;
+		$disable_prev  = false;
+		$disable_next  = false;
+
+		if ( 0 == $offset  ) {
+			$disable_first = true;
+			$disable_prev  = true;
+		}
+
+
+		if ( count($result->reviews) == 0 ) {
+			$disable_next = true;
+		}
+
+		if ( $disable_first ) {
+			$page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&laquo;</span>';
+		} else {
+			$page_links[] = sprintf(
+				"<a class='first-page button' href='%s'>" .
+					"<span class='screen-reader-text'>%s</span>" .
+					"<span aria-hidden='true'>%s</span>" .
+				'</a>',
+				esc_url( remove_query_arg( 'offset', $current_url ) ),
+				/* translators: Hidden accessibility text. */
+				__( 'First page' ),
+				'&laquo;'
+			);
+		}
+
+		if ( $disable_prev ) {
+			$page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&lsaquo;</span>';
+		} else {
+			$page_links[] = sprintf(
+				"<a class='prev-page button' href='%s'>" .
+					"<span class='screen-reader-text'>%s</span>" .
+					"<span aria-hidden='true'>%s</span>" .
+				'</a>', 
+				esc_url( add_query_arg( 'offset', (intval($offset)-intval($per_page)), $current_url ) ),
+				/* translators: Hidden accessibility text. */
+				__( 'Previous page' ),
+				'&lsaquo;'
+			);
+		}
+        
+        $page_links[] = $total_pages_before . sprintf(
+			/* translators: 1: Current page, 2: Total pages. */
+			_x( '%1$s to %2$s', 'paging' ),
+			$offset+1,
+			(intval($offset)+intval($current_recs))-1
+		) . $total_pages_after;
+
+
+		if ( $disable_next ) {
+			$page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&rsaquo;</span>';
+		} else {
+			$page_links[] = sprintf(
+				"<a class='next-page button' href='%s'>" .
+					"<span class='screen-reader-text'>%s</span>" .
+					"<span aria-hidden='true'>%s</span>" .
+				'</a>',
+				esc_url( add_query_arg( 'offset', (intval($offset)+intval($per_page)), $current_url ) ),
+				__( 'Next page' ),
+				'&rsaquo;'
+			);
+		}
+
+		$pagination_links_class = 'pagination-links';
+		if ( ! empty( $infinite_scroll ) ) {
+			$pagination_links_class .= ' hide-if-js';
+		}
+		
+        $output .= "\n<span class='$pagination_links_class'>" . implode( "\n", $page_links ) . '</span>';
+
+		
+		$this->_pagination = "<div class='tablenav-pages'>$output</div>";
+
+		echo $this->_pagination;
+	}
 
     function extra_tablenav( $which ) {
         global $wpdb;

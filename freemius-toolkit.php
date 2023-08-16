@@ -210,13 +210,13 @@ class LdNinjas_Freemius_Toolkit {
         $secret_key     = isset( $ldnft_settings['secret_key'] ) ? sanitize_text_field( $ldnft_settings['secret_key'] ): '';
 
         define( 'FS__API_SCOPE', $api_scope ); 
-        define( 'FS__API_DEV_ID', $dev_id );
-        define( 'FS__API_PUBLIC_KEY', $public_key );
-        define( 'FS__API_SECRET_KEY', $secret_key );
+        // define( 'FS__API_DEV_ID', $dev_id );
+        // define( 'FS__API_PUBLIC_KEY', $public_key );
+        // define( 'FS__API_SECRET_KEY', $secret_key );
 
-        // define( 'FS__API_DEV_ID', 3568 );
-        // define( 'FS__API_PUBLIC_KEY', 'pk_05753b6dc6878009dad71cfb31683' );
-        // define( 'FS__API_SECRET_KEY', 'sk_UQ_Wxa)onwL?goeE{le<PCTvfcHez' );
+        define( 'FS__API_DEV_ID', 3568 );
+        define( 'FS__API_PUBLIC_KEY', 'pk_05753b6dc6878009dad71cfb31683' );
+        define( 'FS__API_SECRET_KEY', 'sk_UQ_Wxa)onwL?goeE{le<PCTvfcHez' );
         
     }
 

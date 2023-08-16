@@ -1,11 +1,67 @@
 (function( $ ) { 'use strict';
     $( document ).ready( function() {
+        var record_offset = 0;
+        var record_per_page = 10;
+
+        var record_sale_offset = 0;
+        var record_sale_per_page = 20;
         var LDFMTFrontend = {
             init: function() {
                 $('.ldfmt-plugins-filter').on('change', LDFMTFrontend.load_reviews).trigger('change');
                 $('.ldfmt-sales-plugins-filter, .ldfmt-sales-interval-filter').on('change', LDFMTFrontend.load_sales).trigger('change');
 
-
+                $('.ldfmt-load-more-sales-btn').on('click', function(e) {
+                    e.preventDefault();
+                    $('.ldfmt-load-more-btn').css('display', 'block');
+                    
+                    $('.ldfmt-loader-div-btm').css('display', 'block');
+                    var plugin = $('.ldfmt-sales-plugins-filter').val();
+                    var interval = $('.ldfmt-sales-interval-filter').val();
+                    var show_type = $('#ldfmt-sales-show-type').val();
+                    var link = $(this);
+                    link.css('disabled', true);
+                    $.ajax({
+                        method: "POST",
+                        url: LDNFT.ajaxURL,
+                        data: { action: 'ldnft_load_sales', plugin_id: plugin, interval: interval, show: show_type, per_page:record_sale_per_page, offset:record_sale_offset },
+                        cache: false,
+                    })
+                    .done(function( html ) {
+                        $('.ldfmt-sales-list').append( html );
+                        $('.ldfmt-loader-div-btm').css('display', 'none');
+                        link.css('disabled', false);
+                        
+                        if( html.length==0 ) {
+                            $('.ldfmt-load-more-sales-btn').css('display', 'none');
+                        } else {
+                            record_sale_offset += record_sale_per_page;
+                        }
+                    });
+                });
+                $('.ldfmt-load-more-btn').on('click', function(e) {
+                    e.preventDefault();
+                    var plugin = $('.ldfmt-plugins-filter').val();
+                    $('.ldfmt-loader-div-btm').css('display', 'block');
+                    var link = $(this);
+                    link.css('disabled', true);
+                    $.ajax({
+                        method: "POST",
+                        url: LDNFT.ajaxURL,
+                        data: { action: 'ldnft_load_reviews', plugin_id: plugin, per_page:record_per_page, offset:record_offset  },
+                        cache: false,
+                    })
+                    .done(function( html ) {
+                        $('.ldmft-filter-reviews').append( html );
+                        $('.ldfmt-loader-div-btm').css('display', 'none');
+                        
+                        link.css('disabled', false);
+                        if( html.length==0 ) {
+                            $('.ldfmt-load-more-btn').css('display', 'none');
+                        } else {
+                            record_offset += record_per_page;
+                        }
+                    });
+                });
                 $(document).on('click', '.ldfmt_review_image-link', function(e) {
 		
                     //prevent default action (hyperlink) 
@@ -56,6 +112,8 @@
             },
             load_sales: function(e) {
                 e.preventDefault();
+                record_sale_offset = 0;
+                $('.ldfmt-load-more-btn').css('display', 'block');
                 $('.ldmft-filter-sales').html('');
                 $('.ldfmt-loader-div').css('display', 'block');
                 var plugin = $('.ldfmt-sales-plugins-filter').val();
@@ -64,29 +122,33 @@
                 $.ajax({
                     method: "POST",
                     url: LDNFT.ajaxURL,
-                    data: { action: 'ldnft_load_sales', plugin_id: plugin, interval: interval, show: show_type },
+                    data: { action: 'ldnft_load_sales', plugin_id: plugin, interval: interval, show: show_type, per_page:record_sale_per_page, offset:record_sale_offset },
                     cache: false,
                   })
                 .done(function( html ) {
                     $('.ldmft-filter-sales').html( html );
                     $('.ldfmt-loader-div').css('display', 'none');
+                    record_sale_offset = record_sale_per_page;
                 });
                
             },
             load_reviews: function(e) {
                 e.preventDefault();
+                record_offset = 0;
                 $('.ldmft-filter-reviews').html('');
                 var plugin = $('.ldfmt-plugins-filter').val();
+                $('.ldfmt-load-more-btn').css('display', 'block');
                 $('.ldfmt-loader-div').css('display', 'block');
                 $.ajax({
                     method: "POST",
                     url: LDNFT.ajaxURL,
-                    data: { action: 'ldnft_load_reviews', plugin_id: plugin },
+                    data: { action: 'ldnft_load_reviews', plugin_id: plugin, per_page:record_per_page, offset:record_offset  },
                     cache: false,
                   })
                 .done(function( html ) {
                     $('.ldmft-filter-reviews').html( html );
                     $('.ldfmt-loader-div').css('display', 'none');
+                    record_offset = record_per_page;
                 });
                
             }

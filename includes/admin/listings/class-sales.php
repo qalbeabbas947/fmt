@@ -18,7 +18,7 @@ class LDFMT_Sales extends WP_List_Table {
 
     public $selected_plugin_id;
 
-    public $selected_interval;
+    public $selected_filter;
 
     public $api;
 
@@ -47,15 +47,14 @@ class LDFMT_Sales extends WP_List_Table {
             foreach( $this->plugins as $plugin ) {
                 $this->plugins_short_array[$plugin->id] = $plugin->title;
             }
-            
         }
 
         if( isset($_GET['ldfmt_plugins_filter']) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) {
             $this->selected_plugin_id = intval( $_GET['ldfmt_plugins_filter'] ); 
         }
 
-        if( isset($_GET['interval'])  ) {
-            $this->selected_interval = $_GET['interval']; 
+        if( isset($_GET['filter'])  ) {
+            $this->selected_filter = $_GET['filter']; 
         }
         
         
@@ -161,7 +160,6 @@ class LDFMT_Sales extends WP_List_Table {
     function get_columns(){
         $columns = array(
             'id'                    => 'ID',
-            'plugin_title'          => 'Plugin',
             'user_id'               => 'User ID',
             'username'              => 'Name',
             'useremail'             => 'Email',
@@ -197,7 +195,6 @@ class LDFMT_Sales extends WP_List_Table {
     function get_sortable_columns() {
         $sortable_columns = array(
             'id'                => array('id',false),     //true means it's already sorted
-            'plugin_title'      => array('plugin_title',false),
             'user_id'           => array('user_id',false),
             'username'          => array('username',false),
             'useremail'         => array('useremail',false),
@@ -278,7 +275,8 @@ class LDFMT_Sales extends WP_List_Table {
         /**
          * First, lets decide how many records per page to show
          */
-        $per_page = 10;
+        $per_page = 20;
+        $offset = isset($_REQUEST['offset']) && intval($_REQUEST['offset'])>0?intval($_REQUEST['offset']):0;
         
         /**
          * REQUIRED. Now we need to define our column headers. This includes a complete
@@ -299,7 +297,6 @@ class LDFMT_Sales extends WP_List_Table {
          */
         $this->_column_headers = array($columns, $hidden, $sortable);
         
-        
         /**
          * Optional. You can handle your bulk actions however you see fit. In this
          * case, we'll handle them within our package just to keep things clean.
@@ -317,90 +314,232 @@ class LDFMT_Sales extends WP_List_Table {
          * be able to use your precisely-queried data immediately.
          */
          // will be used in pagination settings
-        $table_name = $wpdb->prefix.'ldnft_transactions';
-        $where = " where plugin_id='".$this->selected_plugin_id."'";
+        
+        $filter_str = '';
+        if( !empty($this->selected_filter) ) {
+           //$filter_str = '&filter='.$this->selected_filter;
+        }
+        $result = $this->api->Api('plugins/'.$this->selected_plugin_id.'/payments.json?count='.$per_page.'&offset='.$offset.$filter_str, 'GET', []);
 
-        $where_interval = '';
-        if( !empty( $this->selected_interval )) {
-            switch( $this->selected_interval ) {
-                case "current_week":
-                    $where_interval = " and YEARWEEK(created) = YEARWEEK(NOW())";
-                    break;
-                case "last_week":
-                    $where_interval = ' and Date(created) between date_sub(now(),INTERVAL 1 WEEK) and now()';
-                    break;
-                case "current_month":
-                    $where_interval = ' and MONTH(created) = MONTH(now()) and YEAR(created) = YEAR(now())';
-                    break;
-                case "last_month":
-                    $where_interval = ' and Date(created) between Date((now() - interval 1 month)) and Date(now())';
-                    break;
-                default:
-                    $where_interval = " and Date(created) = '".date('Y-m-d')."'";
-                    break;
-            }
+        $data = [];
+        $count = 0;
+        foreach( $result->payments as $payment ) {
+            $user_id = 0;
+
+            foreach( $payment as $key => $value ) {
+                $data[$count][$key] = $value;
+                if( 'user_id' == $key ) {
+                    $user_id = $value;
+                }
+            } 
+
+            $user = $this->api->Api('plugins/'.$this->selected_plugin_id.'/users/'.$user_id.'.json', 'GET', []);
+            $data[$count]['username']   = $user->first.' '.$user->last;
+            $data[$count]['useremail']  = $user->email;
+
+            $count++;   
         }
 
-         $total_items = $wpdb->get_var("SELECT COUNT(id) FROM $table_name".$where.$where_interval);
-
-         // prepare query params, as usual current page, order by and order direction
-        $paged = isset($_REQUEST['paged']) ? max(0, intval($_REQUEST['paged'] - 1) * $per_page) : 0;
-        $orderby = (isset($_REQUEST['orderby']) && in_array($_REQUEST['orderby'], array_keys($this->get_sortable_columns()))) ? $_REQUEST['orderby'] : 'id';
-        $order = (isset($_REQUEST['order']) && in_array($_REQUEST['order'], array('asc', 'desc'))) ? $_REQUEST['order'] : 'asc';
+        $this->items = $data;
  
-         // [REQUIRED] define $items array
-         // notice that last argument is ARRAY_A, so we will retrieve array
-         $this->items = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table_name $where $where_interval ORDER BY $orderby $order LIMIT %d OFFSET %d", $per_page, $paged), ARRAY_A);
- 
-         // [REQUIRED] configure pagination
-         $this->set_pagination_args(array(
-             'total_items' => $total_items, // total items defined above
-             'per_page' => $per_page, // per page constant defined at top of method
-             'total_pages' => ceil($total_items / $per_page) // calculate pages count
-         ));
+        // [REQUIRED] configure pagination
+        $this->set_pagination_args( array(
+           'per_page'      => $per_page,
+           'offset'        => $offset ,
+           'current_recs'  => count($result->payments)
+        ) );
     }
+
+    function display_tablenav( $which ) {
+        
+        if ( 'top' === $which ) {
+            wp_nonce_field( 'bulk-' . $this->_args['plural'] );
+        }
+        ?>
+            <div class="tablenav <?php echo esc_attr( $which ); ?>">
+
+                <?php if ( $this->has_items() ) : ?>
+                <div class="alignleft actions bulkactions">
+                    <?php $this->bulk_actions( $which ); ?>
+                </div>
+                    <?php
+                endif;
+                $this->extra_tablenav( $which );
+                $this->pagination_new( $which );
+                ?>
+
+                <br class="clear" />
+            </div>
+        <?php
+    }
+    /**
+	 * Displays the pagination.
+	 *
+	 * @since 3.1.0
+	 *
+	 * @param string $which
+	 */
+	protected function pagination_new( $which ) {
+        
+		if ( empty( $this->_pagination_args ) ) {
+			return;
+		}
+        
+        $per_page       = $this->_pagination_args['per_page'];
+		$offset         = $this->_pagination_args['offset'];
+        $current_recs   = $this->_pagination_args['current_recs'];
+        
+        $filter_str = '';
+        if( !empty($this->selected_filter) ) {
+           // $filter_str = '&filter='.$this->selected_filter;
+        }
+        
+        $result = $this->api->Api('plugins/'.$this->selected_plugin_id.'/payments.json?count='.$per_page.'&offset='.$offset.$filter_str, 'GET', []);
+        
+		$total_items     = $this->_pagination_args['total_items'];
+		$total_pages     = $this->_pagination_args['total_pages'];
+		$infinite_scroll = false;
+		if ( isset( $this->_pagination_args['infinite_scroll'] ) ) {
+			$infinite_scroll = $this->_pagination_args['infinite_scroll'];
+		}
+
+		$output = '';
+        
+		$current              = $this->get_pagenum();
+		$removable_query_args = wp_removable_query_args();
+
+		$current_url = set_url_scheme( 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
+
+		$current_url = remove_query_arg( $removable_query_args, $current_url );
+
+		$page_links = array();
+
+		$total_pages_before = '<span class="paging-input">';
+		$total_pages_after  = '</span></span>';
+
+		$disable_first = false;
+		$disable_prev  = false;
+		$disable_next  = false;
+
+		if ( 0 == $offset  ) {
+			$disable_first = true;
+			$disable_prev  = true;
+		}
+
+
+		if ( count($result->payments) == 0 ) {
+			$disable_next = true;
+		}
+
+		if ( $disable_first ) {
+			$page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&laquo;</span>';
+		} else {
+			$page_links[] = sprintf(
+				"<a class='first-page button' href='%s'>" .
+					"<span class='screen-reader-text'>%s</span>" .
+					"<span aria-hidden='true'>%s</span>" .
+				'</a>',
+				esc_url( remove_query_arg( 'offset', $current_url ) ),
+				/* translators: Hidden accessibility text. */
+				__( 'First page' ),
+				'&laquo;'
+			);
+		}
+
+		if ( $disable_prev ) {
+			$page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&lsaquo;</span>';
+		} else {
+			$page_links[] = sprintf(
+				"<a class='prev-page button' href='%s'>" .
+					"<span class='screen-reader-text'>%s</span>" .
+					"<span aria-hidden='true'>%s</span>" .
+				'</a>', 
+				esc_url( add_query_arg( 'offset', (intval($offset)-intval($per_page)), $current_url ) ),
+				/* translators: Hidden accessibility text. */
+				__( 'Previous page' ),
+				'&lsaquo;'
+			);
+		}
+        
+        $page_links[] = $total_pages_before . sprintf(
+			/* translators: 1: Current page, 2: Total pages. */
+			_x( '%1$s to %2$s', 'paging' ),
+			$offset+1,
+			(intval($offset)+intval($current_recs))-1
+		) . $total_pages_after;
+
+
+		if ( $disable_next ) {
+			$page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&rsaquo;</span>';
+		} else {
+			$page_links[] = sprintf(
+				"<a class='next-page button' href='%s'>" .
+					"<span class='screen-reader-text'>%s</span>" .
+					"<span aria-hidden='true'>%s</span>" .
+				'</a>',
+				esc_url( add_query_arg( 'offset', (intval($offset)+intval($per_page)), $current_url ) ),
+				__( 'Next page' ),
+				'&rsaquo;'
+			);
+		}
+
+		$pagination_links_class = 'pagination-links';
+		if ( ! empty( $infinite_scroll ) ) {
+			$pagination_links_class .= ' hide-if-js';
+		}
+		
+        $output .= "\n<span class='$pagination_links_class'>" . implode( "\n", $page_links ) . '</span>';
+
+		
+		$this->_pagination = "<div class='tablenav-pages'>$output</div>";
+
+		echo $this->_pagination;
+	}
 
     function extra_tablenav( $which ) {
         global $wpdb;
         
         if ( $which == "top" ){
-            $table_name = $wpdb->prefix.'ldnft_transactions';
-            $where = " where plugin_id='".$this->selected_plugin_id."'";
-            $where_interval = '';
-            if( !empty( $this->selected_interval )) {
-                switch( $this->selected_interval ) {
-                    case "current_week":
-                        $where_interval = " and YEARWEEK(created) = YEARWEEK(NOW())";
-                        break;
-                    case "last_week":
-                        $where_interval = ' and Date(created) between date_sub(now(),INTERVAL 1 WEEK) and now()';
-                        break;
-                    case "current_month":
-                        $where_interval = ' and MONTH(created) = MONTH(now()) and YEAR(created) = YEAR(now())';
-                        break;
-                    case "last_month":
-                        $where_interval = ' and Date(created) between Date((now() - interval 1 month)) and Date(now())';
-                        break;
-                    default:
-                        $where_interval = " and Date(created) = '".date('Y-m-d')."'";
-                        break;
+            
+            $filter_str = '';
+            if( !empty($this->selected_filter) ) {
+                //$filter_str = '&filter='.$this->selected_filter;
+            }
+            $tem_per_page = 50;
+            $tem_offset = 0;
+            $result = $this->api->Api('plugins/'.$this->selected_plugin_id.'/payments.json?count='.$tem_per_page.'&offset='.$tem_offset.$filter_str, 'GET', []);
+            $gross_total = 0;
+            $gateway_fee_total = 0;
+            if( count( $result->payments ) > 0 ) {
+                $has_more_records = true;
+                while($has_more_records) {
+                    foreach( $result->payments as $payment ) {
+                        $gross_total += $payment->gross;
+                        $gateway_fee_total += $payment->gateway_fee;
+                    } 
+
+                    $tem_offset += $tem_per_page;
+                    $result = $this->api->Api('plugins/'.$this->selected_plugin_id.'/payments.json?count='.$tem_per_page.'&offset='.$tem_offset.$filter_str, 'GET', []);
+                    if( count( $result->payments ) > 0 ) {
+                        $has_more_records = true;
+                    } else {
+                        $has_more_records = false;
+                    }
                 }
             }
             ?>
             <div class="ldfmt-sales-upper-info">
-                <?php $gross = $wpdb->get_var($wpdb->prepare("SELECT sum(gross) FROM $table_name where plugin_id=%d ".$where_interval, $this->selected_plugin_id )); ?>
                 <div class="ldfmt-gross-sales-box ldfmt-sales-box">
                     <label><?php echo __('Gross Sales', LDNFT_TEXT_DOMAIN);?></label>
-                    <div class="ldnft_points"><?php echo number_format( floatval($gross), 2);?></div>
+                    <div class="ldnft_points"><?php echo number_format( floatval($gross_total), 2);?></div>
                 </div>
-                <?php $gateway_fee = $wpdb->get_var($wpdb->prepare("SELECT sum(gateway_fee) FROM $table_name where plugin_id=%d ".$where_interval, $this->selected_plugin_id )); ?>
                 <div class="ldfmt-gross-gateway-box ldfmt-sales-box">
                     <label><?php echo __('Total Gateway Fee', LDNFT_TEXT_DOMAIN);?></label>
-                    <div class="ldnft_gateway_fee"><?php echo number_format( floatval($gateway_fee), 2);?></div>
+                    <div class="ldnft_gateway_fee"><?php echo number_format( floatval($gateway_fee_total), 2);?></div>
                 </div>
             </div>
             <div class="alignleft actions bulkactions">
-                <select onchange="document.location='admin.php?page=ldninjas-freemius-toolkit-sales&interval=<?php echo $this->selected_interval;?>&ldfmt_plugins_filter='+this.value" name="ldfmt-plugins-filter" class="ldfmt-plugins-filter">
+                <select onchange="document.location='admin.php?page=ldninjas-freemius-toolkit-sales&interval=<?php echo $this->selected_filter;?>&ldfmt_plugins_filter='+this.value" name="ldfmt-plugins-filter" class="ldfmt-plugins-filter">
                     <option value=""><?php _e( 'Filter by Plugin', LDNFT_TEXT_DOMAIN ); ?></option>
                     <?php
                         foreach( $this->plugins as $plugin ) {
@@ -415,15 +554,12 @@ class LDFMT_Sales extends WP_List_Table {
                         }
                     ?>
                 </select>
-                <select onchange="document.location='admin.php?page=ldninjas-freemius-toolkit-sales&ldfmt_plugins_filter=<?php echo $this->selected_plugin_id;?>&interval='+this.value" name="ldfmt-sales-interval-filter" class="ldfmt-sales-interval-filter">
-                    <option value=""><?php echo __( 'All Time', LDNFT_TEXT_DOMAIN );?></option>
-                    <option value="today" <?php echo $this->selected_interval=='today'?'selected':'';?>><?php echo __( 'Today', LDNFT_TEXT_DOMAIN );?></option>
-                    <option value="current_week" <?php echo $this->selected_interval=='current_week'?'selected':'';?>><?php echo __( 'Current Week', LDNFT_TEXT_DOMAIN );?></option>
-                    <option value="last_week" <?php echo $this->selected_interval=='last_week'?'selected':'';?>><?php echo __( 'Last Week', LDNFT_TEXT_DOMAIN );?></option>
-                    <option value="current_month" <?php echo $this->selected_interval=='current_month'?'selected':'';?>><?php echo __( 'Current Month', LDNFT_TEXT_DOMAIN );?></option>
-                    <option value="last_month" <?php echo $this->selected_interval=='last_month'?'selected':'';?>><?php echo __( 'Last Month', LDNFT_TEXT_DOMAIN );?></option>
-                </select>
-                <button type="button" id="ldnft-update-sales" class="ldnft-update-sales button action "><?php _e( 'Sync Sales with Freemius', LDNFT_TEXT_DOMAIN ); ?></button>
+                <!-- <select onchange="document.location='admin.php?page=ldninjas-freemius-toolkit-sales&ldfmt_plugins_filter=<?php echo $this->selected_plugin_id;?>&filter='+this.value" name="ldfmt-sales-filter" class="ldfmt-sales-filter">
+                    <option value="all"><?php echo __( 'All', LDNFT_TEXT_DOMAIN );?></option>
+                    <option value="refunds" <?php echo $this->selected_filter=='refunds'?'selected':'';?>><?php echo __( 'Refunds', LDNFT_TEXT_DOMAIN );?></option>
+                    <option value="not_refunded" <?php echo $this->selected_filter=='not_refunded'?'selected':'';?>><?php echo __( 'Not Refunds', LDNFT_TEXT_DOMAIN );?></option>
+                </select> -->
+                <!-- <button type="button" id="ldnft-update-sales" class="ldnft-update-sales button action "><?php _e( 'Sync Sales with Freemius', LDNFT_TEXT_DOMAIN ); ?></button> -->
                 <img style="display:none" width="30px" class="ldfmt-data-loader" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" />
                 <span id="ldnft-sales-import-message"></span>
             </div>

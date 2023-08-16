@@ -19,7 +19,7 @@ class LDFMT_Subscribers extends WP_List_Table {
     public $selected_plugin_id;
 
     public $api;
-
+    public $selected_interval;
     public $plugins;
     
     public $plugins_short_array;
@@ -51,7 +51,10 @@ class LDFMT_Subscribers extends WP_List_Table {
         if( isset($_GET['ldfmt_plugins_filter']) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) {
             $this->selected_plugin_id = intval( $_GET['ldfmt_plugins_filter'] ); 
         }
-
+        
+        if( isset($_GET['interval'])  ) {
+            $this->selected_interval = $_GET['interval']; 
+        }
         
         //Set parent defaults
         parent::__construct( array(
@@ -156,27 +159,26 @@ class LDFMT_Subscribers extends WP_List_Table {
         $columns = array(
             'id'                    => 'ID',
             //'plugin_id'             => 'Plugin ID',
-            'plugin_title'          => 'Plugin',
             'user_id'               => 'User ID',
             'username'              => 'Name',
             'useremail'             => 'Email',
             //'install_id'            => 'Install ID',
             'amount_per_cycle'      => 'Cycle',
             'billing_cycle'         => 'Billing Cycle',
-            'gross'                 => 'Gross',
+            'total_gross'           => 'Gross',
             'outstanding_balance'   => 'Balance',
             'failed_payments'       => 'Failed',
             'gateway'               => 'Gateway',
-            //'coupon_id'             => 'Coupon ID',
+            //'coupon_id'           => 'Coupon ID',
             'trial_ends'            => 'Trial Ends',
             'next_payment'          => 'Next Payment',
             'created'               => 'Created',
-            //'updated_at'            => 'Updated',
+            //'updated_at'          => 'Updated',
             'currency'              => 'Currency',
-            //'external_id'           => 'External ID',
-            //'plan_id'               => 'Plan ID',
+            //'external_id'         => 'External ID',
+            //'plan_id'             => 'Plan ID',
             'country_code'          => 'Country',
-            //'pricing_id'            => 'Pricing ID',
+            //'pricing_id'          => 'Pricing ID',
             'initial_amount'        => 'Initial',
             'renewal_amount'        => 'Renewal',
             //'renewals_discount'     => 'Discount',
@@ -207,13 +209,12 @@ class LDFMT_Subscribers extends WP_List_Table {
     function get_sortable_columns() {
         $sortable_columns = array(
             'id'     => array('id',false),     //true means it's already sorted
-            'plugin_title'    => array('plugin_title',false),
             'user_id'  => array('user_id',false),
             'username'  => array('username',false),
             'useremail'  => array('useremail',false),
             'amount_per_cycle'    => array('amount_per_cycle',false),
             'billing_cycle'  => array('billing_cycle',false),
-            'gross'  => array('gross',false),
+            'total_gross'  => array('total_gross',false),
             'outstanding_balance'  => array('outstanding_balance',false),
             'failed_payments'    => array('failed_payments',false),
             'gateway'  => array('gateway',false),
@@ -268,7 +269,6 @@ class LDFMT_Subscribers extends WP_List_Table {
         
     }
 
-
     /** ************************************************************************
      * REQUIRED! This is where you prepare your data for display. This method will
      * usually be used to query the database, sort and filter the data, and generally
@@ -291,7 +291,7 @@ class LDFMT_Subscribers extends WP_List_Table {
          * First, lets decide how many records per page to show
          */
         $per_page = 10;
-        
+        $offset = isset($_REQUEST['offset']) && intval($_REQUEST['offset'])>0?intval($_REQUEST['offset']):0;
         
         /**
          * REQUIRED. Now we need to define our column headers. This includes a complete
@@ -331,32 +331,229 @@ class LDFMT_Subscribers extends WP_List_Table {
          * be able to use your precisely-queried data immediately.
          */
          // will be used in pagination settings
-         $table_name = $wpdb->prefix.'ldnft_subscription';
-         $where = " where plugin_id='".$this->selected_plugin_id."'";
-         $total_items = $wpdb->get_var("SELECT COUNT(id) FROM $table_name".$where);
 
-         // prepare query params, as usual current page, order by and order direction
-        $paged = isset($_REQUEST['paged']) ? max(0, intval($_REQUEST['paged'] - 1) * $per_page) : 0;
-        $orderby = (isset($_REQUEST['orderby']) && in_array($_REQUEST['orderby'], array_keys($this->get_sortable_columns()))) ? $_REQUEST['orderby'] : 'id';
-        $order = (isset($_REQUEST['order']) && in_array($_REQUEST['order'], array('asc', 'desc'))) ? $_REQUEST['order'] : 'asc';
- 
-         // [REQUIRED] define $items array
-         // notice that last argument is ARRAY_A, so we will retrieve array
-         $this->items = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table_name $where ORDER BY $orderby $order LIMIT %d OFFSET %d", $per_page, $paged), ARRAY_A);
+        $interval_str = '';
+        if( !empty($this->selected_interval) ) {
+           $interval_str = '&billing_cycle='.$this->selected_interval;
+        }
+        $result = $this->api->Api('plugins/'.$this->selected_plugin_id.'/subscriptions.json?count='.$per_page.'&offset='.$offset.$interval_str, 'GET', []);
+        $data = [];
+        $count = 0;
+        foreach( $result->subscriptions as $subscription ) {
+            $user_id = 0;
+            
+            foreach( $subscription as $key=>$value ) {
+                $data[$count][$key] = $value;
+                if( 'user_id' == $key ) {
+                    $user_id = $value;
+                }
+            } 
+
+            $user = $this->api->Api('plugins/'.$this->selected_plugin_id.'/users/'.$user_id.'.json', 'GET', []);
+            $data[$count]['username']   = $user->first.' '.$user->last;
+            $data[$count]['useremail']  = $user->email;
+
+            $count++;   
+        }
+        
+        $this->items = $data;
  
          // [REQUIRED] configure pagination
-         $this->set_pagination_args(array(
-             'total_items' => $total_items, // total items defined above
-             'per_page' => $per_page, // per page constant defined at top of method
-             'total_pages' => ceil($total_items / $per_page) // calculate pages count
-         ));
+         $this->set_pagination_args( array(
+            'per_page'      => $per_page,
+            'offset'        => $offset ,
+            'current_recs'  => count($result->subscriptions)
+        ) );
     }
+
+    function display_tablenav( $which ) {
+        
+        if ( 'top' === $which ) {
+            wp_nonce_field( 'bulk-' . $this->_args['plural'] );
+        }
+        ?>
+            <div class="tablenav <?php echo esc_attr( $which ); ?>">
+
+                <?php if ( $this->has_items() ) : ?>
+                <div class="alignleft actions bulkactions">
+                    <?php $this->bulk_actions( $which ); ?>
+                </div>
+                    <?php
+                endif;
+                $this->extra_tablenav( $which );
+                $this->pagination_new( $which );
+                ?>
+
+                <br class="clear" />
+            </div>
+        <?php
+    }
+    /**
+	 * Displays the pagination.
+	 *
+	 * @since 3.1.0
+	 *
+	 * @param string $which
+	 */
+	protected function pagination_new( $which ) {
+        
+		if ( empty( $this->_pagination_args ) ) {
+			return;
+		}
+        
+        $per_page       = $this->_pagination_args['per_page'];
+		$offset         = $this->_pagination_args['offset'];
+        $current_recs   = $this->_pagination_args['current_recs'];
+        
+        $interval_str = '';
+        if( !empty($this->selected_interval) ) {
+            $interval_str = '&billing_cycle='.$this->selected_interval;
+        }
+        
+        $result = $this->api->Api('plugins/'.$this->selected_plugin_id.'/subscriptions.json?count='.$per_page.'&offset='.$offset.$interval_str, 'GET', []);
+        
+		$total_items     = $this->_pagination_args['total_items'];
+		$total_pages     = $this->_pagination_args['total_pages'];
+		$infinite_scroll = false;
+		if ( isset( $this->_pagination_args['infinite_scroll'] ) ) {
+			$infinite_scroll = $this->_pagination_args['infinite_scroll'];
+		}
+
+		$output = '';
+        
+		$current              = $this->get_pagenum();
+		$removable_query_args = wp_removable_query_args();
+
+		$current_url = set_url_scheme( 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
+
+		$current_url = remove_query_arg( $removable_query_args, $current_url );
+
+		$page_links = array();
+
+		$total_pages_before = '<span class="paging-input">';
+		$total_pages_after  = '</span></span>';
+
+		$disable_first = false;
+		$disable_prev  = false;
+		$disable_next  = false;
+
+		if ( 0 == $offset  ) {
+			$disable_first = true;
+			$disable_prev  = true;
+		}
+
+
+		if ( count($result->subscriptions) == 0 ) {
+			$disable_next = true;
+		}
+
+		if ( $disable_first ) {
+			$page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&laquo;</span>';
+		} else {
+			$page_links[] = sprintf(
+				"<a class='first-page button' href='%s'>" .
+					"<span class='screen-reader-text'>%s</span>" .
+					"<span aria-hidden='true'>%s</span>" .
+				'</a>',
+				esc_url( remove_query_arg( 'offset', $current_url ) ),
+				/* translators: Hidden accessibility text. */
+				__( 'First page' ),
+				'&laquo;'
+			);
+		}
+
+		if ( $disable_prev ) {
+			$page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&lsaquo;</span>';
+		} else {
+			$page_links[] = sprintf(
+				"<a class='prev-page button' href='%s'>" .
+					"<span class='screen-reader-text'>%s</span>" .
+					"<span aria-hidden='true'>%s</span>" .
+				'</a>', 
+				esc_url( add_query_arg( 'offset', (intval($offset)-intval($per_page)), $current_url ) ),
+				/* translators: Hidden accessibility text. */
+				__( 'Previous page' ),
+				'&lsaquo;'
+			);
+		}
+        
+        $page_links[] = $total_pages_before . sprintf(
+			/* translators: 1: Current page, 2: Total pages. */
+			_x( '%1$s to %2$s', 'paging' ),
+			$offset+1,
+			(intval($offset)+intval($current_recs))-1
+		) . $total_pages_after;
+
+
+		if ( $disable_next ) {
+			$page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&rsaquo;</span>';
+		} else {
+			$page_links[] = sprintf(
+				"<a class='next-page button' href='%s'>" .
+					"<span class='screen-reader-text'>%s</span>" .
+					"<span aria-hidden='true'>%s</span>" .
+				'</a>',
+				esc_url( add_query_arg( 'offset', (intval($offset)+intval($per_page)), $current_url ) ),
+				__( 'Next page' ),
+				'&rsaquo;'
+			);
+		}
+
+		$pagination_links_class = 'pagination-links';
+		if ( ! empty( $infinite_scroll ) ) {
+			$pagination_links_class .= ' hide-if-js';
+		}
+		
+        $output .= "\n<span class='$pagination_links_class'>" . implode( "\n", $page_links ) . '</span>';
+
+		
+		$this->_pagination = "<div class='tablenav-pages'>$output</div>";
+
+		echo $this->_pagination;
+	}
 
     function extra_tablenav( $which ) {
         global $wpdb;
         
         if ( $which == "top" ){
+            $interval_str = '';
+            if( !empty($this->selected_interval) ) {
+                $interval_str = '&billing_cycle='.$this->selected_interval;
+            }
+            $tem_per_page = 50;
+            $tem_offset = 0;
+            $result = $this->api->Api('plugins/'.$this->selected_plugin_id.'/subscriptions.json?count='.$tem_per_page.'&offset='.$tem_offset.$interval_str, 'GET', []);
+            $gross_total = 0;
+            $tax_rate_total = 0;
+            if( count( $result->subscriptions ) > 0 ) {
+                $has_more_records = true;
+                while($has_more_records) {
+                    foreach( $result->subscriptions as $payment ) {
+                        $gross_total += $payment->total_gross;
+                        $tax_rate_total += $payment->tax_rate;
+                    } 
+
+                    $tem_offset += $tem_per_page;
+                    $result = $this->api->Api('plugins/'.$this->selected_plugin_id.'/subscriptions.json?count='.$tem_per_page.'&offset='.$tem_offset.$interval_str, 'GET', []);
+                    if( count( $result->subscriptions ) > 0 ) {
+                        $has_more_records = true;
+                    } else {
+                        $has_more_records = false;
+                    }
+                }
+            }
             ?>
+            <div class="ldfmt-sales-upper-info">
+                <div class="ldfmt-gross-sales-box ldfmt-sales-box">
+                    <label><?php echo __('Gross Sales', LDNFT_TEXT_DOMAIN);?></label>
+                    <div class="ldnft_points"><?php echo number_format( floatval($gross_total), 2);?></div>
+                </div>
+                <div class="ldfmt-gross-gateway-box ldfmt-sales-box">
+                    <label><?php echo __('Total Tax Rate', LDNFT_TEXT_DOMAIN);?></label>
+                    <div class="ldnft_gateway_fee"><?php echo number_format( floatval($tax_rate_total), 2);?></div>
+                </div>
+            </div>
+            <div style="clear:both">&nbsp;</div>
             <div class="alignleft actions bulkactions">
                 <select onchange="document.location='admin.php?page=ldninjas-freemius-toolkit-subscriptions&ldfmt_plugins_filter='+this.value" name="ldfmt-plugins-filter" class="ldfmt-plugins-filter">
                     <option value=""><?php _e( 'Filter by Plugin', LDNFT_TEXT_DOMAIN ); ?></option>
@@ -373,7 +570,12 @@ class LDFMT_Subscribers extends WP_List_Table {
                         }
                     ?>
                 </select>
-                <button type="button" id="ldnft-update-subscriptions" class="ldnft-update-subscriptions button action"><?php _e( 'Sync Subscription with Freemius', LDNFT_TEXT_DOMAIN ); ?></button>
+                <select onchange="document.location='admin.php?page=ldninjas-freemius-toolkit-subscriptions&ldfmt_plugins_filter=<?php echo $this->selected_plugin_id;?>&interval='+this.value" name="ldfmt-sales-interval-filter" class="ldfmt-sales-interval-filter">
+                    <option value=""><?php echo __( 'All Time', LDNFT_TEXT_DOMAIN );?></option>
+                    <option value="1" <?php echo $this->selected_interval=='1'?'selected':'';?>><?php echo __( 'Monthly', LDNFT_TEXT_DOMAIN );?></option>
+                    <option value="12" <?php echo $this->selected_interval=='12'?'selected':'';?>><?php echo __( 'Annual', LDNFT_TEXT_DOMAIN );?></option>
+                </select>
+                <!-- <button type="button" id="ldnft-update-subscriptions" class="ldnft-update-subscriptions button action"><?php _e( 'Sync Subscription with Freemius', LDNFT_TEXT_DOMAIN ); ?></button> -->
                 <img style="display:none" width="30px" class="ldfmt-data-loader" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" />
                 <span id="ldnft-subscription-import-message"></span>
             </div>

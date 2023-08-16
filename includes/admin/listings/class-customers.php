@@ -1,8 +1,6 @@
 <?php
 /**
  * LDFMT Pro admin template
- *
- * Do not allow directly accessing this file.
  */
 
 if( ! defined( 'ABSPATH' ) ) exit;
@@ -38,7 +36,7 @@ class LDFMT_Customers extends WP_List_Table {
         
         $this->plugins = $this->api->Api('plugins.json?fields=id,title', 'GET', ['fields'=>'id,title']);
 
-        if( isset( $this->plugins->plugins ) &&  count($this->plugins->plugins) > 0 ) {
+        if( isset( $this->plugins->plugins ) && count($this->plugins->plugins) > 0 ) {
             $this->plugins = $this->plugins->plugins;
             $plugin = $this->plugins[0];
             if( $this->selected_plugin_id <= 0 ) {
@@ -61,9 +59,9 @@ class LDFMT_Customers extends WP_List_Table {
         
         //Set parent defaults
         parent::__construct( array(
-            'singular'  => 'freemius_customer',     //singular name of the listed records
-            'plural'    => 'freemius_customers',    //plural name of the listed records
-            'ajax'      => false        //does this table support ajax?
+            'singular'      => 'freemius_customer',
+            'plural'        => 'freemius_customers',
+            'ajax'          => false
         ) );
         
     }
@@ -257,7 +255,6 @@ class LDFMT_Customers extends WP_List_Table {
         if( 'delete'===$this->current_action() ) {
             wp_die('Items deleted (or they would be if we had items to delete)!');
         }
-        
     }
 
 
@@ -282,8 +279,8 @@ class LDFMT_Customers extends WP_List_Table {
         /**
          * First, lets decide how many records per page to show
          */
-        $per_page = 10;
-        
+        $per_page = 20;
+        $offset = isset($_REQUEST['offset']) && intval($_REQUEST['offset'])>0?intval($_REQUEST['offset']):0;
         
         /**
          * REQUIRED. Now we need to define our column headers. This includes a complete
@@ -324,47 +321,21 @@ class LDFMT_Customers extends WP_List_Table {
          */
 
         // Deploy new version.
-        $this->api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
+        //$this->api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
         $status = "";
         if( !empty( $this->selected_status ) ) {
             $status = "&filter=".$this->selected_status;
         }
-        $result = $this->api->Api('plugins/'.$this->selected_plugin_id.'/users.json?count=50'.$status, 'GET', []);
-        $table_user = $wpdb->prefix.'ldnft_users';
+        
+        $result = $this->api->Api('plugins/'.$this->selected_plugin_id.'/users.json?count='.$per_page.'&offset='.$offset.$status, 'GET', []);
         $data = [];
         $count = 0;
         foreach( $result->users as $user ) {
-            
-            $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_user." where id=%d", $user->id ));
-            $database = array(
-                'email'                 => $user->email,
-                'first'                 => $user->first,
-                'last'                  => $user->last,
-                'is_verified'           => $user->is_verified,
-                'created'               => $user->created,
-                'plugins'               => implode(',', $user->plugin_ids )
-            );
-            if( count( $res ) == 0 ) {
-                $database['id'] = $user->id;
-                if( !empty( $this->selected_status ) ) {
-                    $database['status'] = $this->selected_status;
-                }
-                $wpdb->insert(
-                    $table_user,
-                    $database
-                );
-            } else {
-                if( !empty( $this->selected_status ) ) {
-                    $database['status'] = $this->selected_status;
-                }
-                $wpdb->update($table_user, 
-                $database, array('id'=>$user->id));
-            }
-
             foreach( $user as $key=>$value ) {
                 $data[$count][$key] = $value;
+                
             } 
-            
+
             $count++;   
         }
         
@@ -385,63 +356,161 @@ class LDFMT_Customers extends WP_List_Table {
         }
         usort($data, 'usort_reorder');
         
-        //echo '</pre>';
-        /***********************************************************************
-         * ---------------------------------------------------------------------
-         * vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-         * 
-         * In a real-world situation, this is where you would place your query.
-         *
-         * For information on making queries in WordPress, see this Codex entry:
-         * http://codex.wordpress.org/Class_Reference/wpdb
-         * 
-         * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-         * ---------------------------------------------------------------------
-         **********************************************************************/
-        
-                
-        /**
-         * REQUIRED for pagination. Let's figure out what page the user is currently 
-         * looking at. We'll need this later, so you should always include it in 
-         * your own package classes.
-         */
-        $current_page = $this->get_pagenum();
-        
-        /**
-         * REQUIRED for pagination. Let's check how many items are in our data array. 
-         * In real-world use, this would be the total number of items in your database, 
-         * without filtering. We'll need this later, so you should always include it 
-         * in your own package classes.
-         */
-        $total_items = count($data);
-        
-        
-        /**
-         * The WP_List_Table class does not handle pagination for us, so we need
-         * to ensure that the data is trimmed to only the current page. We can use
-         * array_slice() to 
-         */
-        $data = array_slice($data,(($current_page-1)*$per_page),$per_page);
-        
-        
-        
         /**
          * REQUIRED. Now we can add our *sorted* data to the items property, where 
          * it can be used by the rest of the class.
          */
         $this->items = $data;
         
-        
-        /**
-         * REQUIRED. We also have to register our pagination options & calculations.
-         */
         $this->set_pagination_args( array(
-            'total_items' => $total_items,                  //WE have to calculate the total number of items
-            'per_page'    => $per_page,                     //WE have to determine how many items to show on a page
-            'total_pages' => ceil($total_items/$per_page)   //WE have to calculate the total number of pages
+            'per_page'      => $per_page,
+            'offset'        => $offset ,
+            'current_recs'  => count($result->users)
         ) );
     }
+    function display_tablenav( $which ) {
+        
+        if ( 'top' === $which ) {
+            wp_nonce_field( 'bulk-' . $this->_args['plural'] );
+        }
+        ?>
+            <div class="tablenav <?php echo esc_attr( $which ); ?>">
 
+                <?php if ( $this->has_items() ) : ?>
+                <div class="alignleft actions bulkactions">
+                    <?php $this->bulk_actions( $which ); ?>
+                </div>
+                    <?php
+                endif;
+                $this->extra_tablenav( $which );
+                $this->pagination_new( $which );
+                ?>
+
+                <br class="clear" />
+            </div>
+        <?php
+    }
+    /**
+	 * Displays the pagination.
+	 *
+	 * @since 3.1.0
+	 *
+	 * @param string $which
+	 */
+	protected function pagination_new( $which ) {
+        
+		if ( empty( $this->_pagination_args ) ) {
+			return;
+		}
+        
+        $per_page       = $this->_pagination_args['per_page'];
+		$offset         = $this->_pagination_args['offset'];
+        $current_recs   = $this->_pagination_args['current_recs'];
+        $status = "";
+        if( !empty( $this->selected_status ) ) {
+            $status = "&filter=".$this->selected_status;
+        }
+        $result = $this->api->Api('plugins/'.$this->selected_plugin_id.'/users.json?count='.$per_page.'&offset='.(intval($offset)+intval($per_page)).$status, 'GET', []);
+        
+		$total_items     = $this->_pagination_args['total_items'];
+		$total_pages     = $this->_pagination_args['total_pages'];
+		$infinite_scroll = false;
+		if ( isset( $this->_pagination_args['infinite_scroll'] ) ) {
+			$infinite_scroll = $this->_pagination_args['infinite_scroll'];
+		}
+
+		$output = '';
+        
+		$current              = $this->get_pagenum();
+		$removable_query_args = wp_removable_query_args();
+
+		$current_url = set_url_scheme( 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
+
+		$current_url = remove_query_arg( $removable_query_args, $current_url );
+
+		$page_links = array();
+
+		$total_pages_before = '<span class="paging-input">';
+		$total_pages_after  = '</span></span>';
+
+		$disable_first = false;
+		$disable_prev  = false;
+		$disable_next  = false;
+
+		if ( 0 == $offset  ) {
+			$disable_first = true;
+			$disable_prev  = true;
+		}
+
+
+		if ( count($result->users) == 0 ) {
+			$disable_next = true;
+		}
+
+		if ( $disable_first ) {
+			$page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&laquo;</span>';
+		} else {
+			$page_links[] = sprintf(
+				"<a class='first-page button' href='%s'>" .
+					"<span class='screen-reader-text'>%s</span>" .
+					"<span aria-hidden='true'>%s</span>" .
+				'</a>',
+				esc_url( remove_query_arg( 'offset', $current_url ) ),
+				/* translators: Hidden accessibility text. */
+				__( 'First page' ),
+				'&laquo;'
+			);
+		}
+
+		if ( $disable_prev ) {
+			$page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&lsaquo;</span>';
+		} else {
+			$page_links[] = sprintf(
+				"<a class='prev-page button' href='%s'>" .
+					"<span class='screen-reader-text'>%s</span>" .
+					"<span aria-hidden='true'>%s</span>" .
+				'</a>', 
+				esc_url( add_query_arg( 'offset', (intval($offset)-intval($per_page)), $current_url ) ),
+				/* translators: Hidden accessibility text. */
+				__( 'Previous page' ),
+				'&lsaquo;'
+			);
+		}
+        
+        $page_links[] = $total_pages_before . sprintf(
+			/* translators: 1: Current page, 2: Total pages. */
+			_x( '%1$s to %2$s', 'paging' ),
+			$offset+1,
+			(intval($offset)+intval($current_recs))-1
+		) . $total_pages_after;
+
+
+		if ( $disable_next ) {
+			$page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&rsaquo;</span>';
+		} else {
+			$page_links[] = sprintf(
+				"<a class='next-page button' href='%s'>" .
+					"<span class='screen-reader-text'>%s</span>" .
+					"<span aria-hidden='true'>%s</span>" .
+				'</a>',
+				esc_url( add_query_arg( 'offset', (intval($offset)+intval($per_page)), $current_url ) ),
+				__( 'Next page' ),
+				'&rsaquo;'
+			);
+		}
+
+		$pagination_links_class = 'pagination-links';
+		if ( ! empty( $infinite_scroll ) ) {
+			$pagination_links_class .= ' hide-if-js';
+		}
+		
+        $output .= "\n<span class='$pagination_links_class'>" . implode( "\n", $page_links ) . '</span>';
+
+		
+		$this->_pagination = "<div class='tablenav-pages'>$output</div>";
+
+		echo $this->_pagination;
+	}
     function extra_tablenav( $which ) {
         global $wpdb;
         

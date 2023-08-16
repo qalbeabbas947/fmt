@@ -11,7 +11,10 @@
     clear: both;
     display: table;
   }
-  
+  .ldfmt-load-more-btn, .ldfmt-load-more-sales-btn{
+    padding: 5px auto;
+    text-align: center;
+  }
   .review-container img {
     float: left;
     margin-right: 20px;

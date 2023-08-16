@@ -6,8 +6,7 @@
  */
 
 if( ! defined( 'ABSPATH' ) ) exit;
-ini_set('display_errors', 'On');
-        error_reporting(E_ALL);
+
 /**
  * ldFMT_Reviews_Shortcode
  */
@@ -41,10 +40,13 @@ class ldFMT_Reviews_Shortcode {
 
     public function load_reviews() {
         
-        $plugin_id = sanitize_text_field($_POST['plugin_id']);
+        $plugin_id  = sanitize_text_field($_POST['plugin_id']);
+        $per_page   = sanitize_text_field($_POST['per_page']);
+        $offset     = sanitize_text_field($_POST['offset']);
+        
         $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
         
-        $results = $api->Api('plugins/'.$plugin_id.'/reviews.json', 'GET', ['is_featured'=>'false','is_verified'=>'false', 'enriched'=>'true', 'count'=>'50' ]);
+        $results = $api->Api('plugins/'.$plugin_id.'/reviews.json?count='.$per_page.'&offset='.$offset, 'GET', ['is_featured'=>'false','is_verified'=>'false', 'enriched'=>'true', 'count'=>'50' ]);
         if( is_array($results->reviews) && count( $results->reviews ) ) {
             foreach($results->reviews as $review) {
             ?>
@@ -59,7 +61,7 @@ class ldFMT_Reviews_Shortcode {
                 </div>
             <?php
             }
-        } else {
+        } else if( $offset == 0 ){
             echo '<div class="ldfmt-no-results">'.__('No review(s) found.', LDNFT_TEXT_DOMAIN).'</div>';
         }
         exit;
@@ -101,12 +103,16 @@ class ldFMT_Reviews_Shortcode {
                         </select>
                     </div>
                     <div style="display:none" class="ldfmt-loader-div"><img width="30px" class="ldfmt-data-loader" src="<?php echo LDNFT_ASSETS_URL.'images/spinner-2x.gif';?>" /></div>
-                    <div class="ldmft-filter-reviews">
+                    <div class="ldmft-filter-reviews">    
                         <!-- <div class="review-container">
                             <img src="/w3images/bandmember.jpg" alt="Avatar" style="width:90px">
                             <p><span>Chris Fox.</span> CEO at Mighty Schools.</p>
                             <p>John Doe saved us from a web disaster.</p>
                         </div> -->
+                    </div>
+                    <div class="ldfmt-load-more-btn"><a href="javascript:;">
+                        <?php echo __( 'Load More', LDNFT_TEXT_DOMAIN );?></a>
+                        <div style="display:none" class="ldfmt-loader-div-btm"><img width="30px" class="ldfmt-data-loader" src="<?php echo LDNFT_ASSETS_URL.'images/spinner-2x.gif';?>" /></div>
                     </div>
                 </div>
                 

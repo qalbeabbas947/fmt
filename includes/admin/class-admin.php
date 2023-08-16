@@ -87,7 +87,7 @@ class FMT_Admin {
                
                 $usrobj = $service->Api('plugins/'.$plugin->id.'/users.json?count=50', 'GET', []);
                 foreach( $usrobj->users as $user ) {
-                    print_r($user);
+                    
                     $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_user." where id=%d", $user->id ));
                     if( count( $res ) == 0 ) {
                         $wpdb->insert(
@@ -455,17 +455,20 @@ class FMT_Admin {
         $message = '';
         if( $count > 0 ) {
             $message = sprintf( __('%d subscriber(s) imported.', LDNFT_TEXT_DOMAIN),$count );
-        }
-        
+        } 
         if( $exists > 0 ) {
             $message .= sprintf( __('%d subscriber(s) already exists.', LDNFT_TEXT_DOMAIN),$exists );
-        }
+        } 
+        
+        
         
         $errormsg = '';
         if( count( $errors ) > 0 ) {
             $errormsg = __('Errors:', LDNFT_TEXT_DOMAIN).implode(' ', $errors );
         }
-
+        if(empty($message) && empty($errormsg)) {
+            $message = __('No available subscriber(s) to import.', LDNFT_TEXT_DOMAIN);
+        }
         $response = ['added'=>$count, 'exists'=>$exists, 'message'=>$message, 'errors'=> $errors, 'errormsg'=> $errormsg ];
         echo json_encode($response);
         die();
@@ -950,8 +953,8 @@ class FMT_Admin {
                     <div class="ldnft-wrap">
                         <h3 class="ldnft-settings-heading"><?php _e( 'Import Subscribers from Freemius to Mailpoet', LDNFT_TEXT_DOMAIN ); ?></h3>
                         <div class="ldnft-box">
-                            <div id="ldnft-settings-import-mailpoet-message"></div>
-                            <div id="ldnft-settings-import-mailpoet-errmessage"></div>
+                            <div id="ldnft-settings-import-mailpoet-message" style="display:none"></div>
+                            <div id="ldnft-settings-import-mailpoet-errmessage" style="display:none"></div>
                             <div class="ldnft-post-content">
                                 <span class="ldnft-desc"><?php _e( 'Mailpoet List', LDNFT_TEXT_DOMAIN ); ?></span>
                                 <label>
@@ -1036,6 +1039,7 @@ class FMT_Admin {
 
         $screen = get_current_screen();
         if( $screen ) { 
+            //echo $screen->id;
             if( $screen->id == 'freemius-toolkit_page_ldninjas-freemius-toolkit-settings' 
                 || $screen->id == 'freemius-toolkit_page_ldninjas-freemius-toolkit-subscriptions'
                 || $screen->id == 'freemius-toolkit_page_ldninjas-freemius-toolkit-sales' 

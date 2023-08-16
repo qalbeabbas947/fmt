@@ -44,7 +44,26 @@
     width: 50%;
     float:right;
 }
-
+#ldnft-settings-import-mailpoet-message{
+    width: 50%;
+    padding: 5px;
+    border-radius: 4px;
+    margin: 10px auto;
+    background-color: green;
+    color: white;
+}
+#ldnft-settings-import-mailpoet-errmessage{
+    width: 50%;
+    padding: 5px;
+    border-radius: 4px;
+    margin: 10px auto;
+    background-color: red;
+    color: white;
+}
+.ldfmt-sales-upper-info{
+    clear: both;
+    display: block;
+}
 .ldnft-wrap {
     margin-top: 36px;
     width: 95%;
