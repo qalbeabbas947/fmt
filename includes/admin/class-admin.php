@@ -119,7 +119,7 @@ class FMT_Admin {
             }
         }
 
-        echo json_encode(['inserted' => $inserted, 'updated'=>$updatednum, 'message' => sprintf( __('Inserted: %d, Updated: %d', 'MWC'), $inserted, $updatednum)]);
+        echo json_encode(['inserted' => $inserted, 'updated'=>$updatednum, 'message' => sprintf( __('Inserted: %d, Updated: %d', LDNFT_TEXT_DOMAIN), $inserted, $updatednum)]);
         exit;
     }
     function ldnft_update_sales(){
@@ -247,7 +247,7 @@ class FMT_Admin {
             }
         }
 
-        echo json_encode(['inserted' => $inserted, 'updated'=>$updatednum, 'message' => sprintf( __('Inserted: %d, Updated: %d', 'MWC'), $inserted, $updatednum)]);
+        echo json_encode(['inserted' => $inserted, 'updated'=>$updatednum, 'message' => sprintf( __('Inserted: %d, Updated: %d', LDNFT_TEXT_DOMAIN), $inserted, $updatednum)]);
         exit;
     }
 
@@ -398,7 +398,7 @@ class FMT_Admin {
             
         }
 
-        echo json_encode(['inserted' => $inserted, 'updated'=>$updatednum, 'message' => sprintf( __('Inserted: %d, Updated: %d', 'MWC'), $inserted, $updatednum)]);
+        echo json_encode(['inserted' => $inserted, 'updated'=>$updatednum, 'message' => sprintf( __('Inserted: %d, Updated: %d', LDNFT_TEXT_DOMAIN), $inserted, $updatednum)]);
         exit;
     }
 
@@ -460,8 +460,6 @@ class FMT_Admin {
             $message .= sprintf( __('%d subscriber(s) already exists.', LDNFT_TEXT_DOMAIN),$exists );
         } 
         
-        
-        
         $errormsg = '';
         if( count( $errors ) > 0 ) {
             $errormsg = __('Errors:', LDNFT_TEXT_DOMAIN).implode(' ', $errors );
@@ -472,108 +470,6 @@ class FMT_Admin {
         $response = ['added'=>$count, 'exists'=>$exists, 'message'=>$message, 'errors'=> $errors, 'errormsg'=> $errormsg ];
         echo json_encode($response);
         die();
-//         'email'         => 'coordinator947'.time().'@gmail.com',
-        //         'first_name'    => 'coordinator947'.time(),
-        //         'last_name'     => 'abbas'.time(),
-        //         'status'        => 'subscribed',
-        //         'segments[]'    => 4
-        // $subscriber_data = array(
-        //     'email' => 'coordinator947'.time().'@gmail.com',
-        //     'first_name' => 'coordinator947'.time(),
-        //     'last_name' => 'abbas'.time()
-        //   );
-          
-        // $options = array(
-        //     'send_confirmation_email' => false // default: true
-        //     //'schedule_welcome_email' => false
-        // );
-
-        // $default_list_id = array(4);
-        // try {
-        //     $subscriber = \MailPoet\API\API::MP('v1')->addSubscriber($subscriber_data, $default_list_id); // Add to default mailing list
-        // } catch(Exception $exception) {
-        //     echo json_encode($exception->getMessage());
-        // }
-        // Check if subscriber exists
-        try {
-            $subscriber = \MailPoet\API\API::MP('v1')->getSubscriber($subscriber_data['email']);
-        } 
-        catch(\MailPoet\API\MP\v1\APIException $exception) {
-            echo json_encode($exception->getMessage());
-            if( $exception->getMessage() == 'This subscriber does not exist.' ) {
-                try {
-                    $subscriber = \MailPoet\API\API::MP('v1')->addSubscriber($subscriber_data, $default_list_id); // Add to default mailing list
-                } 
-                catch(\MailPoet\API\MP\v1\APIException $exception) {
-                    echo json_encode($exception->getMessage());
-                }
-                catch(Exception $exception) {
-                    echo json_encode($exception->getMessage());
-                }
-            }
-        }
-        catch(Exception $exception) {
-            // Subscriber does not yet exist, try to add subscriber
-            try {
-                $subscriber = \MailPoet\API\API::MP('v1')->addSubscriber($subscriber_data, $default_list_id); // Add to default mailing list
-            } 
-            catch(\MailPoet\API\MP\v1\APIException $exception) {
-                echo json_encode($exception->getMessage());
-            }
-            catch(Exception $exception) {
-                echo json_encode($exception->getMessage());
-            }
-        }
-        // Subscriber exists and needs to be added to certain lists
-        if (!empty($_POST["add_to_lists"])) {
-            $add_to_lists = array_map('intval', $_POST['add_to_lists']);
-            try {
-                $subscriber = \MailPoet\API\API::MP('v1')->subscribeToLists($subscriber_data['email'], $add_to_lists, $options);
-            } catch(\MailPoet\API\MP\v1\APIException $exception) {
-                echo json_encode($exception->getMessage());
-            }
-            catch(Exception $exception) {
-                echo json_encode($exception->getMessage());
-            }
-        }
-        // Subscriber exists and needs to be removed from certain lists
-        if (!empty($_POST["remove_from_lists"])) {
-            $remove_from_lists = array_map('intval', $_POST['remove_from_lists']);
-            try {
-                $subscriber = \MailPoet\API\API::MP('v1')->unsubscribeFromLists($subscriber_data['email'], $remove_from_lists, $options);
-            } 
-            catch(\MailPoet\API\MP\v1\APIException $exception) {
-                echo json_encode($exception->getMessage());
-            }
-            catch(Exception $exception) {
-                echo json_encode($exception->getMessage());
-            }
-        }
-        exit;
-        // $request->set_query_params( [ 'per_page' => 12 ] );
-        // $response = rest_do_request( $request );
-        // $server = rest_get_server();
-        // $data = $server->response_to_data( $response, false );
-        // $json = wp_json_encode( $data );
-
-
-        // $subs = new SubscriberSaveController();
-        // $data = [
-        //         'email'         => 'coordinator947'.time().'@gmail.com',
-        //         'first_name'    => 'coordinator947'.time(),
-        //         'last_name'     => 'abbas'.time(),
-        //         'status'        => 'subscribed',
-        //         'segments[]'    => 4
-        //     ];
-        // try {
-        //     $subscriber = $this->saveController->save($data);
-        // } catch (ValidationException $validationException) {
-        //     print_r($validationException);
-        // } catch (ConflictException $conflictException) {
-        //     print_r($conflictException);
-        // };    
-        // $subscriber = $subs->save($data);
-        // print_r($subscribe);
     }
 
     /**
@@ -935,7 +831,7 @@ class FMT_Admin {
                                 <input type="text" id="ldnft_secret_key" name="ldnft_settings[secret_key]" value="<?php echo $secret_key;?>">
                             </label>
                             <p>
-                                <?php _e( 'Scret Key of the Freemius API', LDNFT_TEXT_DOMAIN ); ?>
+                                <?php  _e('Scret Key of the Freemius API', LDNFT_TEXT_DOMAIN ); ?>
                             </p>
                         </div>
                         <div class="ldfmt-button-wrapper">
@@ -996,7 +892,7 @@ class FMT_Admin {
                                 <input type="hidden" name="action" value="ldnft_mailpoet_submit_action" />
                                 <div class="ldnft-success-message">
                                     <img class="ldnft-success-loader" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" />
-                                    <span class="ldnft-loading-wrap"><?php _e( 'Please wait! Import is being processed.' ); ?></span>
+                                    <span class="ldnft-loading-wrap"><?php _e( 'Please wait! Import is being processed.', LDNFT_TEXT_DOMAIN ); ?></span>
                                 </div>
                                 <input type="submit" class="button button-primary ldnft-mailpoet-save-setting_import" name="ldnft_mailpoet_submit_form_import" value="<?php _e( 'Import Subscribers', LDNFT_TEXT_DOMAIN ); ?>">
                             </div>

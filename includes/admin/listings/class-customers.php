@@ -457,7 +457,7 @@ class LDFMT_Customers extends WP_List_Table {
 				'</a>',
 				esc_url( remove_query_arg( 'offset', $current_url ) ),
 				/* translators: Hidden accessibility text. */
-				__( 'First page' ),
+				__( 'First page', LDNFT_TEXT_DOMAIN ),
 				'&laquo;'
 			);
 		}
@@ -472,7 +472,7 @@ class LDFMT_Customers extends WP_List_Table {
 				'</a>', 
 				esc_url( add_query_arg( 'offset', (intval($offset)-intval($per_page)), $current_url ) ),
 				/* translators: Hidden accessibility text. */
-				__( 'Previous page' ),
+				__( 'Previous page', LDNFT_TEXT_DOMAIN ),
 				'&lsaquo;'
 			);
 		}
@@ -494,7 +494,7 @@ class LDFMT_Customers extends WP_List_Table {
 					"<span aria-hidden='true'>%s</span>" .
 				'</a>',
 				esc_url( add_query_arg( 'offset', (intval($offset)+intval($per_page)), $current_url ) ),
-				__( 'Next page' ),
+				__( 'Next page', LDNFT_TEXT_DOMAIN ),
 				'&rsaquo;'
 			);
 		}
@@ -518,7 +518,7 @@ class LDFMT_Customers extends WP_List_Table {
             ?>
             <div class="alignleft actions bulkactions">
                 <select onchange="document.location='admin.php?page=ldninjas-freemius-toolkit-customers&status=<?php echo $this->selected_status;?>&ldfmt_plugins_filter='+this.value" name="ldfmt-plugins-filter" class="ldfmt-plugins-filter">
-                    <option value=""><?php _e('Filter by Plugin', 'ldninjas-freemius-toolkit');?></option>
+                    <option value=""><?php _e('Filter by Plugin', LDNFT_TEXT_DOMAIN);?></option>
                     <?php
                         foreach( $this->plugins as $plugin ) {
                             
@@ -537,11 +537,11 @@ class LDFMT_Customers extends WP_List_Table {
                     ?>
                 </select>&nbsp;&nbsp;
                 <select onchange="document.location='admin.php?page=ldninjas-freemius-toolkit-customers&ldfmt_plugins_filter=<?php echo $this->selected_plugin_id;?>&status='+this.value" name="ldfmt-plugins-status" class="ldfmt-plugins-status">
-                    <option value=""><?php _e('Filter by status', 'ldninjas-freemius-toolkit');?></option>
-                    <option value="active" <?php echo $this->selected_status=='active'?'selected':''; ?>><?php _e('Active', 'ldninjas-freemius-toolkit');?></option>
-                    <option value="never_paid" <?php echo $this->selected_status=='never_paid'?'selected':''; ?>><?php _e('Never Paid', 'ldninjas-freemius-toolkit');?></option>
-                    <option value="paid" <?php echo $this->selected_status=='paid'?'selected':''; ?>><?php _e('Paid', 'ldninjas-freemius-toolkit');?></option>
-                    <option value="paying" <?php echo $this->selected_status=='paying'?'selected':''; ?>><?php _e('Paying', 'ldninjas-freemius-toolkit');?></option>
+                    <option value=""><?php _e('Filter by status', LDNFT_TEXT_DOMAIN);?></option>
+                    <option value="active" <?php echo $this->selected_status=='active'?'selected':''; ?>><?php _e('Active', LDNFT_TEXT_DOMAIN);?></option>
+                    <option value="never_paid" <?php echo $this->selected_status=='never_paid'?'selected':''; ?>><?php _e('Never Paid', LDNFT_TEXT_DOMAIN);?></option>
+                    <option value="paid" <?php echo $this->selected_status=='paid'?'selected':''; ?>><?php _e('Paid', LDNFT_TEXT_DOMAIN);?></option>
+                    <option value="paying" <?php echo $this->selected_status=='paying'?'selected':''; ?>><?php _e('Paying', LDNFT_TEXT_DOMAIN);?></option>
                 </select>
                 <!-- <button type="button" id="ldnft-update-customers" class="ldnft-update-customers button action "><?php _e( 'Sync Customers with Freemius', LDNFT_TEXT_DOMAIN ); ?></button>
                 <img style="display:none" width="30px" class="ldfmt-data-loader" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" />

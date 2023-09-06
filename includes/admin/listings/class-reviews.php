@@ -495,7 +495,7 @@ class LDFMT_Reviews extends WP_List_Table {
 				'</a>',
 				esc_url( remove_query_arg( 'offset', $current_url ) ),
 				/* translators: Hidden accessibility text. */
-				__( 'First page' ),
+				__( 'First page', LDNFT_TEXT_DOMAIN ),
 				'&laquo;'
 			);
 		}
@@ -510,7 +510,7 @@ class LDFMT_Reviews extends WP_List_Table {
 				'</a>', 
 				esc_url( add_query_arg( 'offset', (intval($offset)-intval($per_page)), $current_url ) ),
 				/* translators: Hidden accessibility text. */
-				__( 'Previous page' ),
+				__( 'Previous page', LDNFT_TEXT_DOMAIN ),
 				'&lsaquo;'
 			);
 		}
@@ -532,7 +532,7 @@ class LDFMT_Reviews extends WP_List_Table {
 					"<span aria-hidden='true'>%s</span>" .
 				'</a>',
 				esc_url( add_query_arg( 'offset', (intval($offset)+intval($per_page)), $current_url ) ),
-				__( 'Next page' ),
+				__( 'Next page', LDNFT_TEXT_DOMAIN ),
 				'&rsaquo;'
 			);
 		}

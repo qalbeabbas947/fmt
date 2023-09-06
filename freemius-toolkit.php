@@ -12,100 +12,6 @@
 if( ! defined( 'ABSPATH' ) ) exit;
 
 /**
- * Add cron schedule to reset user courses
- * Makes database ldnft_reset_course_activities table
- */
-function ldnft_activation() {
-
-    global $wpdb;
-
-    // $table_name = $wpdb->prefix.'ldnft_subscription';
-    // if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
-        
-    //     $wpdb->query( "CREATE TABLE $table_name (
-    //         `id` int(11) NOT NULL,
-    //         `plugin_id` int(11) NOT NULL,
-    //         `plugin_title` varchar(255) NOT NULL,
-    //         `user_id` int(11) NOT NULL,
-    //         `username` varchar(255) DEFAULT NULL,
-    //         `useremail` varchar(255) DEFAULT NULL,
-    //         `install_id` int(11) DEFAULT NULL,
-    //         `amount_per_cycle` float DEFAULT NULL,
-    //         `billing_cycle` int(11) DEFAULT NULL,
-    //         `gross` float DEFAULT NULL,
-    //         `outstanding_balance` float DEFAULT NULL,
-    //         `failed_payments` int(11) DEFAULT NULL,
-    //         `gateway` int(11) DEFAULT NULL,
-    //         `coupon_id` int(11) DEFAULT NULL,
-    //         `trial_ends` datetime DEFAULT NULL,
-    //         `next_payment` datetime DEFAULT NULL,
-    //         `created` datetime DEFAULT NULL,
-    //         `updated_at` datetime DEFAULT NULL,
-    //         `currency` varchar(3) DEFAULT NULL,
-    //         `external_id` varchar(35) DEFAULT NULL,
-    //         `plan_id` int(11) DEFAULT NULL,
-    //         `country_code` varchar(2) DEFAULT NULL,
-    //         `pricing_id` int(11) DEFAULT NULL,
-    //         `initial_amount` float DEFAULT NULL,
-    //         `renewal_amount` float DEFAULT NULL,
-    //         `renewals_discount` float DEFAULT NULL,
-    //         `renewals_discount_type` varchar(12) DEFAULT NULL,
-    //         `license_id` int(11) DEFAULT NULL
-    //     )" );     
-    // }
-
-    // $table_name = $wpdb->prefix.'ldnft_transactions';
-    // if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
-    //     $wpdb->query( "CREATE TABLE $table_name (
-    //         `id` int(11) NOT NULL,
-    //         `plugin_id` int(11) NOT NULL,
-    //         `plugin_title` varchar(255) NOT NULL,
-    //         `user_id` int(11) NOT NULL,
-    //         `username` varchar(255) DEFAULT NULL,
-    //         `useremail` varchar(255) DEFAULT NULL,
-    //         `install_id` int(11) DEFAULT NULL,
-    //         `subscription_id` int(11) DEFAULT NULL,
-    //         `plan_id` int(11) DEFAULT NULL,
-    //         `gross` float DEFAULT NULL,
-    //         `gateway_fee` float DEFAULT NULL,
-    //         `external_id` varchar(50) DEFAULT NULL,
-    //         `gateway` int(11) DEFAULT NULL,
-    //         `coupon_id` int(11) DEFAULT NULL,
-    //         `country_code` varchar(3) DEFAULT NULL,
-    //         `bound_payment_id` int(11) DEFAULT NULL,
-    //         `created` datetime DEFAULT NULL,
-    //         `updated` datetime DEFAULT NULL,
-    //         `vat` float DEFAULT NULL,
-    //         `is_renewal` tinyint(1) NOT NULL,
-    //         `type` varchar(15) NOT NULL,
-    //         `license_id` int(11) DEFAULT NULL
-    //     )" );     
-    // }
-
-    // $table_name = $wpdb->prefix.'ldnft_users';
-    // if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
-    //     $wpdb->query( "CREATE TABLE $table_name (
-    //         `id` int(11) NOT NULL,
-    //         `email` varchar(255) DEFAULT NULL,
-    //         `first` varchar(255) DEFAULT NULL,
-    //         `last` varchar(255) DEFAULT NULL,
-    //         `is_verified` tinyint(1) DEFAULT NULL,
-    //         `created` datetime DEFAULT NULL,
-    //         `plugins` varchar(255) DEFAULT NULL,
-    //         `status` varchar(20) DEFAULT NULL
-    //     )" );     
-    // }
-}
-register_activation_hook( __FILE__, 'ldnft_activation' );
-
-/**
- * Clear wp cron schedule hooks
- */
-function ldnft_deactivation() {
-}
-register_deactivation_hook( __FILE__, 'ldnft_deactivation' );
-
-/**
  * LdNinjas_Freemius_Toolkit
  */
 class LdNinjas_Freemius_Toolkit {
@@ -142,12 +48,18 @@ class LdNinjas_Freemius_Toolkit {
     public function enable_freemius() {
 
         if ( ! function_exists( 'test_freemius_addon' ) ) {
-            // Create a helper function for easy SDK access.
+
+            /**
+             * Create a helper function for easy SDK access.
+             */
             function test_freemius_addon() {
                 global $test_freemius_addon;
         
                 if ( ! isset( $test_freemius_addon ) ) {
-                    // Include Freemius SDK.
+                    
+                    /**
+                     * Include Freemius SDK.
+                     */
                     require_once dirname(__FILE__) . '/freemius/start.php';
         
                     $test_freemius_addon = fs_dynamic_init( array(
@@ -167,9 +79,14 @@ class LdNinjas_Freemius_Toolkit {
                 return $test_freemius_addon;
             }
         
-            // Init Freemius.
+            /**
+             * Init Freemius.
+             */
             test_freemius_addon();
-            // Signal that SDK was initiated.
+            
+            /**
+             * Signal that SDK was initiated.
+             */
             do_action( 'test_freemius_addon_loaded' );
         }
     }
@@ -203,6 +120,9 @@ class LdNinjas_Freemius_Toolkit {
          */
         define( 'LDNFT_TEXT_DOMAIN', 'ldninjas-freemius-toolkit' );
 
+        /**
+         * Take the api settings to access the freemius api
+         */
         $ldnft_settings = get_option( 'ldnft_settings' );
         $api_scope      = 'developer';
         $dev_id         = isset( $ldnft_settings['dev_id'] ) ? sanitize_text_field( $ldnft_settings['dev_id'] ) : '';
@@ -264,6 +184,7 @@ class LdNinjas_Freemius_Toolkit {
 }
 
 /**
+ * Retrieve the plugin object
  * @return bool
  */
 function LDNFT() {

@@ -42,6 +42,11 @@
                    // document.location.reload();
                 } );
             },
+
+            /**
+             * Update the subscription via ajax
+             * @param e 
+             */
             update_subscritions: function(e) {
                 e.preventDefault();
                 $('#ldnft-subscription-import-message').html('').css('display', 'none');
@@ -60,6 +65,7 @@
                     document.location.reload();
                 } );
             },
+
             /**
              * Exicute Ajax functionality after error message.
              *
