@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Freemius Toolkit
- * Description: This add-on helps you freemius relaed updates.
+ * Description: This add-on helps you to display subscriptions, sales, reviews and customers on our website.
  * Version: 1.0
  * Author: LDninjas
  * Author URI: ldninjas.com
@@ -19,82 +19,82 @@ function ldnft_activation() {
 
     global $wpdb;
 
-    $table_name = $wpdb->prefix.'ldnft_subscription';
-    if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
+    // $table_name = $wpdb->prefix.'ldnft_subscription';
+    // if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
         
-        $wpdb->query( "CREATE TABLE $table_name (
-            `id` int(11) NOT NULL,
-            `plugin_id` int(11) NOT NULL,
-            `plugin_title` varchar(255) NOT NULL,
-            `user_id` int(11) NOT NULL,
-            `username` varchar(255) DEFAULT NULL,
-            `useremail` varchar(255) DEFAULT NULL,
-            `install_id` int(11) DEFAULT NULL,
-            `amount_per_cycle` float DEFAULT NULL,
-            `billing_cycle` int(11) DEFAULT NULL,
-            `gross` float DEFAULT NULL,
-            `outstanding_balance` float DEFAULT NULL,
-            `failed_payments` int(11) DEFAULT NULL,
-            `gateway` int(11) DEFAULT NULL,
-            `coupon_id` int(11) DEFAULT NULL,
-            `trial_ends` datetime DEFAULT NULL,
-            `next_payment` datetime DEFAULT NULL,
-            `created` datetime DEFAULT NULL,
-            `updated_at` datetime DEFAULT NULL,
-            `currency` varchar(3) DEFAULT NULL,
-            `external_id` varchar(35) DEFAULT NULL,
-            `plan_id` int(11) DEFAULT NULL,
-            `country_code` varchar(2) DEFAULT NULL,
-            `pricing_id` int(11) DEFAULT NULL,
-            `initial_amount` float DEFAULT NULL,
-            `renewal_amount` float DEFAULT NULL,
-            `renewals_discount` float DEFAULT NULL,
-            `renewals_discount_type` varchar(12) DEFAULT NULL,
-            `license_id` int(11) DEFAULT NULL
-        )" );     
-    }
+    //     $wpdb->query( "CREATE TABLE $table_name (
+    //         `id` int(11) NOT NULL,
+    //         `plugin_id` int(11) NOT NULL,
+    //         `plugin_title` varchar(255) NOT NULL,
+    //         `user_id` int(11) NOT NULL,
+    //         `username` varchar(255) DEFAULT NULL,
+    //         `useremail` varchar(255) DEFAULT NULL,
+    //         `install_id` int(11) DEFAULT NULL,
+    //         `amount_per_cycle` float DEFAULT NULL,
+    //         `billing_cycle` int(11) DEFAULT NULL,
+    //         `gross` float DEFAULT NULL,
+    //         `outstanding_balance` float DEFAULT NULL,
+    //         `failed_payments` int(11) DEFAULT NULL,
+    //         `gateway` int(11) DEFAULT NULL,
+    //         `coupon_id` int(11) DEFAULT NULL,
+    //         `trial_ends` datetime DEFAULT NULL,
+    //         `next_payment` datetime DEFAULT NULL,
+    //         `created` datetime DEFAULT NULL,
+    //         `updated_at` datetime DEFAULT NULL,
+    //         `currency` varchar(3) DEFAULT NULL,
+    //         `external_id` varchar(35) DEFAULT NULL,
+    //         `plan_id` int(11) DEFAULT NULL,
+    //         `country_code` varchar(2) DEFAULT NULL,
+    //         `pricing_id` int(11) DEFAULT NULL,
+    //         `initial_amount` float DEFAULT NULL,
+    //         `renewal_amount` float DEFAULT NULL,
+    //         `renewals_discount` float DEFAULT NULL,
+    //         `renewals_discount_type` varchar(12) DEFAULT NULL,
+    //         `license_id` int(11) DEFAULT NULL
+    //     )" );     
+    // }
 
-    $table_name = $wpdb->prefix.'ldnft_transactions';
-    if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
-        $wpdb->query( "CREATE TABLE $table_name (
-            `id` int(11) NOT NULL,
-            `plugin_id` int(11) NOT NULL,
-            `plugin_title` varchar(255) NOT NULL,
-            `user_id` int(11) NOT NULL,
-            `username` varchar(255) DEFAULT NULL,
-            `useremail` varchar(255) DEFAULT NULL,
-            `install_id` int(11) DEFAULT NULL,
-            `subscription_id` int(11) DEFAULT NULL,
-            `plan_id` int(11) DEFAULT NULL,
-            `gross` float DEFAULT NULL,
-            `gateway_fee` float DEFAULT NULL,
-            `external_id` varchar(50) DEFAULT NULL,
-            `gateway` int(11) DEFAULT NULL,
-            `coupon_id` int(11) DEFAULT NULL,
-            `country_code` varchar(3) DEFAULT NULL,
-            `bound_payment_id` int(11) DEFAULT NULL,
-            `created` datetime DEFAULT NULL,
-            `updated` datetime DEFAULT NULL,
-            `vat` float DEFAULT NULL,
-            `is_renewal` tinyint(1) NOT NULL,
-            `type` varchar(15) NOT NULL,
-            `license_id` int(11) DEFAULT NULL
-        )" );     
-    }
+    // $table_name = $wpdb->prefix.'ldnft_transactions';
+    // if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
+    //     $wpdb->query( "CREATE TABLE $table_name (
+    //         `id` int(11) NOT NULL,
+    //         `plugin_id` int(11) NOT NULL,
+    //         `plugin_title` varchar(255) NOT NULL,
+    //         `user_id` int(11) NOT NULL,
+    //         `username` varchar(255) DEFAULT NULL,
+    //         `useremail` varchar(255) DEFAULT NULL,
+    //         `install_id` int(11) DEFAULT NULL,
+    //         `subscription_id` int(11) DEFAULT NULL,
+    //         `plan_id` int(11) DEFAULT NULL,
+    //         `gross` float DEFAULT NULL,
+    //         `gateway_fee` float DEFAULT NULL,
+    //         `external_id` varchar(50) DEFAULT NULL,
+    //         `gateway` int(11) DEFAULT NULL,
+    //         `coupon_id` int(11) DEFAULT NULL,
+    //         `country_code` varchar(3) DEFAULT NULL,
+    //         `bound_payment_id` int(11) DEFAULT NULL,
+    //         `created` datetime DEFAULT NULL,
+    //         `updated` datetime DEFAULT NULL,
+    //         `vat` float DEFAULT NULL,
+    //         `is_renewal` tinyint(1) NOT NULL,
+    //         `type` varchar(15) NOT NULL,
+    //         `license_id` int(11) DEFAULT NULL
+    //     )" );     
+    // }
 
-    $table_name = $wpdb->prefix.'ldnft_users';
-    if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
-        $wpdb->query( "CREATE TABLE $table_name (
-            `id` int(11) NOT NULL,
-            `email` varchar(255) DEFAULT NULL,
-            `first` varchar(255) DEFAULT NULL,
-            `last` varchar(255) DEFAULT NULL,
-            `is_verified` tinyint(1) DEFAULT NULL,
-            `created` datetime DEFAULT NULL,
-            `plugins` varchar(255) DEFAULT NULL,
-            `status` varchar(20) DEFAULT NULL
-        )" );     
-    }
+    // $table_name = $wpdb->prefix.'ldnft_users';
+    // if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
+    //     $wpdb->query( "CREATE TABLE $table_name (
+    //         `id` int(11) NOT NULL,
+    //         `email` varchar(255) DEFAULT NULL,
+    //         `first` varchar(255) DEFAULT NULL,
+    //         `last` varchar(255) DEFAULT NULL,
+    //         `is_verified` tinyint(1) DEFAULT NULL,
+    //         `created` datetime DEFAULT NULL,
+    //         `plugins` varchar(255) DEFAULT NULL,
+    //         `status` varchar(20) DEFAULT NULL
+    //     )" );     
+    // }
 }
 register_activation_hook( __FILE__, 'ldnft_activation' );
 
@@ -210,14 +210,9 @@ class LdNinjas_Freemius_Toolkit {
         $secret_key     = isset( $ldnft_settings['secret_key'] ) ? sanitize_text_field( $ldnft_settings['secret_key'] ): '';
 
         define( 'FS__API_SCOPE', $api_scope ); 
-        // define( 'FS__API_DEV_ID', $dev_id );
-        // define( 'FS__API_PUBLIC_KEY', $public_key );
-        // define( 'FS__API_SECRET_KEY', $secret_key );
-
-        define( 'FS__API_DEV_ID', 3568 );
-        define( 'FS__API_PUBLIC_KEY', 'pk_05753b6dc6878009dad71cfb31683' );
-        define( 'FS__API_SECRET_KEY', 'sk_UQ_Wxa)onwL?goeE{le<PCTvfcHez' );
-        
+        define( 'FS__API_DEV_ID', $dev_id );
+        define( 'FS__API_PUBLIC_KEY', $public_key );
+        define( 'FS__API_SECRET_KEY', $secret_key );
     }
 
     /**

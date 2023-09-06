@@ -64,7 +64,7 @@ class FMT_Admin {
         add_action( 'admin_post_ldnft_submit_action', [ $this, 'ldnft_submit_action' ] );
         add_action( 'admin_notices', [ $this, 'ldnft_admin_notice' ] );
         add_action( 'admin_menu', [ $this, 'add_main_menu_page' ] );
-        add_filter( 'plugin_action_links_'. LDNFT_DIR, [ $this, 'plugin_setting_links' ] ); 
+        add_filter( 'plugin_action_links_'. LDNFT_BASE_DIR, [ $this, 'plugin_setting_links' ] ); 
         add_action( 'in_admin_header', [ $this, 'remove_admin_notices' ], 100 );
 
         add_action( 'wp_ajax_ldnft_mailpoet_submit_action', [ $this, 'mailpoet_submit_action' ], 100 );
@@ -684,14 +684,14 @@ class FMT_Admin {
      */
     public function add_main_menu_page() {
         
-        add_menu_page( 
+        add_menu_page(  
             __( 'Freemius Toolkit', LDNFT_TEXT_DOMAIN ),
             __( 'Freemius Toolkit', LDNFT_TEXT_DOMAIN ),
             'manage_options',
             'ldninjas-freemius-toolkit',
             [$this,'ldninjas_main'],
-            null,
-            6
+            LDNFT_ASSETS_URL.'images/freemius-icon-light-small.png',
+            6 
         ); 
         
         $api = new Freemius_Api_WordPress( FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
