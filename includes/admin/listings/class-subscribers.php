@@ -12,27 +12,45 @@ if(!class_exists('WP_List_Table')){
 }
 
 /**
- * Class LDFMT_Subscribers
+ * Class LDNFT_Subscribers
  */
-class LDFMT_Subscribers extends WP_List_Table {
+class LDNFT_Subscribers extends WP_List_Table {
 
+    /**
+     * Current select Plugin
+     */
     public $selected_plugin_id;
 
+    /**
+     * Freemius API object
+     */
     public $api;
+
+    /**
+     * Interval
+     */
     public $selected_interval;
+
+    /**
+     * Plugins list
+     */
     public $plugins;
     
+    /**
+     * Plugins
+     */
     public $plugins_short_array;
+
     /** ************************************************************************
      * REQUIRED. Set up a constructor that references the parent constructor. We 
      * use the parent reference to set some default configs.
      ***************************************************************************/
-    function __construct(){
+    public function __construct(){
+
         global $status, $page;
 
         $this->selected_plugin_id = 0;  
         $this->api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
-        
         $this->plugins = $this->api->Api('plugins.json?fields=id,title', 'GET', ['fields'=>'id,title']);
 
         if( isset( $this->plugins->plugins ) &&  count($this->plugins->plugins) > 0 ) {
@@ -56,11 +74,13 @@ class LDFMT_Subscribers extends WP_List_Table {
             $this->selected_interval = $_GET['interval']; 
         }
         
-        //Set parent defaults
+        /**
+         * Set parent defaults 
+         */
         parent::__construct( array(
-            'singular'  => 'subscriptions',     //singular name of the listed records
-            'plural'    => 'subscriptions',    //plural name of the listed records
-            'ajax'      => true             //does this table support ajax?
+            'singular'  => 'subscriptions',  
+            'plural'    => 'subscriptions',  
+            'ajax'      => true            
         ) );
         
     }
@@ -87,8 +107,9 @@ class LDFMT_Subscribers extends WP_List_Table {
      * @param array $column_name The name/slug of the column to be processed
      * @return string Text or HTML to be placed inside the column <td>
      **************************************************************************/
-    function column_default($item, $column_name){
-        return $item[$column_name]; //Show the whole array for troubleshooting purposes
+    public function column_default($item, $column_name){
+       
+        return $item[$column_name]; 
     }
     
     /** ************************************************************************
@@ -107,15 +128,19 @@ class LDFMT_Subscribers extends WP_List_Table {
      * @param array $item A singular item (one full row's worth of data)
      * @return string Text to be placed inside the column <td> (movie title only)
      **************************************************************************/
-    function column_title($item){
+    public function column_title($item){
         
-        //Build row actions
+        /**
+         * Build row actions 
+         */
         $actions = array(
             'edit'      => sprintf('<a href="?page=%s&action=%s&movie=%s">Edit</a>',$_REQUEST['page'],'edit',$item['ID']),
             'delete'    => sprintf('<a href="?page=%s&action=%s&movie=%s">Delete</a>',$_REQUEST['page'],'delete',$item['ID']),
         );
         
-        //Return the title contents
+        /**
+         * Return the title contents 
+         */
         return sprintf('%1$s <span style="color:silver">(id:%2$s)</span>%3$s',
             /*$1%s*/ $item['title'],
             /*$2%s*/ $item['ID'],
@@ -133,11 +158,11 @@ class LDFMT_Subscribers extends WP_List_Table {
      * @param array $item A singular item (one full row's worth of data)
      * @return string Text to be placed inside the column <td> (movie title only)
      **************************************************************************/
-    function column_cb($item){
+    public function column_cb($item){
         return sprintf(
             '<input type="checkbox" name="%1$s[]" value="%2$s" />',
-            /*$1%s*/ $this->_args['singular'],  //Let's simply repurpose the table's singular label ("movie")
-            /*$2%s*/ $item['ID']                //The value of the checkbox should be the record's id
+            /*$1%s*/ $this->_args['singular'], 
+            /*$2%s*/ $item['ID']             
         );
     }
 
@@ -155,38 +180,26 @@ class LDFMT_Subscribers extends WP_List_Table {
      * @see WP_List_Table::::single_row_columns()
      * @return array An associative array containing column information: 'slugs'=>'Visible Titles'
      **************************************************************************/
-    function get_columns(){
+    public function get_columns(){
         $columns = array(
             'id'                    => 'ID',
-            //'plugin_id'             => 'Plugin ID',
             'user_id'               => 'User ID',
             'username'              => 'Name',
             'useremail'             => 'Email',
-            //'install_id'            => 'Install ID',
             'amount_per_cycle'      => 'Cycle',
             'billing_cycle'         => 'Billing Cycle',
             'total_gross'           => 'Gross',
             'outstanding_balance'   => 'Balance',
             'failed_payments'       => 'Failed',
             'gateway'               => 'Gateway',
-            //'coupon_id'           => 'Coupon ID',
             'trial_ends'            => 'Trial Ends',
             'next_payment'          => 'Next Payment',
             'created'               => 'Created',
-            //'updated_at'          => 'Updated',
             'currency'              => 'Currency',
-            //'external_id'         => 'External ID',
-            //'plan_id'             => 'Plan ID',
             'country_code'          => 'Country',
-            //'pricing_id'          => 'Pricing ID',
             'initial_amount'        => 'Initial',
-            'renewal_amount'        => 'Renewal',
-            //'renewals_discount'     => 'Discount',
-            //'renewals_discount_type'=> 'Discount Type',
-            //'license_id'            => 'License',
+            'renewal_amount'        => 'Renewal'
         );
-
-        
 
         return $columns;
     }
@@ -206,9 +219,9 @@ class LDFMT_Subscribers extends WP_List_Table {
      * 
      * @return array An associative array containing all the columns that should be sortable: 'slugs'=>array('data_values',bool)
      **************************************************************************/
-    function get_sortable_columns() {
+    public function get_sortable_columns() {
         $sortable_columns = array(
-            'id'     => array('id',false),     //true means it's already sorted
+            'id'     => array('id',false), 
             'user_id'  => array('user_id',false),
             'username'  => array('username',false),
             'useremail'  => array('useremail',false),
@@ -244,12 +257,11 @@ class LDFMT_Subscribers extends WP_List_Table {
      * 
      * @return array An associative array containing all the bulk actions: 'slugs'=>'Visible Titles'
      **************************************************************************/
-    function get_bulk_actions() {
-        // $actions = array(
-        //     'delete'    => 'Delete'
-        // );
+    public function get_bulk_actions() {
+        
         $actions = [];
         return $actions;
+
     }
 
 
@@ -260,9 +272,11 @@ class LDFMT_Subscribers extends WP_List_Table {
      * 
      * @see $this->prepare_items()
      **************************************************************************/
-    function process_bulk_action() {
+    public function process_bulk_action() {
         
-        //Detect when a bulk action is being triggered...
+        /**
+         * Detect when a bulk action is being triggered... 
+         */
         if( 'delete'===$this->current_action() ) {
             wp_die('Items deleted (or they would be if we had items to delete)!');
         }
@@ -284,8 +298,9 @@ class LDFMT_Subscribers extends WP_List_Table {
      * @uses $this->get_pagenum()
      * @uses $this->set_pagination_args()
      **************************************************************************/
-    function prepare_items() {
-        global $wpdb; //This is used only if making any database queries
+    public function prepare_items() {
+        
+        global $wpdb;
 
         /**
          * First, lets decide how many records per page to show
@@ -315,13 +330,6 @@ class LDFMT_Subscribers extends WP_List_Table {
         
         
         /**
-         * Optional. You can handle your bulk actions however you see fit. In this
-         * case, we'll handle them within our package just to keep things clean.
-         */
-       // $this->process_bulk_action();
-        
-        
-        /**
          * Instead of querying a database, we're going to fetch the example data
          * property we created for use in this plugin. This makes this example 
          * package slightly different than one you might build on your own. In 
@@ -330,8 +338,7 @@ class LDFMT_Subscribers extends WP_List_Table {
          * use sort and pagination data to build a custom query instead, as you'll
          * be able to use your precisely-queried data immediately.
          */
-         // will be used in pagination settings
-
+        
         $interval_str = '';
         if( !empty($this->selected_interval) ) {
            $interval_str = '&billing_cycle='.$this->selected_interval;
@@ -358,15 +365,20 @@ class LDFMT_Subscribers extends WP_List_Table {
         
         $this->items = $data;
  
-         // [REQUIRED] configure pagination
-         $this->set_pagination_args( array(
+        $this->set_pagination_args( array(
             'per_page'      => $per_page,
             'offset'        => $offset ,
             'current_recs'  => count($result->subscriptions)
         ) );
+
     }
 
-    function display_tablenav( $which ) {
+    /**
+	 * Displays the pagination.
+	 *
+	 * @param string $which
+	 */
+    public function display_tablenav( $which ) {
         
         if ( 'top' === $which ) {
             wp_nonce_field( 'bulk-' . $this->_args['plural'] );
@@ -387,7 +399,9 @@ class LDFMT_Subscribers extends WP_List_Table {
                 <br class="clear" />
             </div>
         <?php
+
     }
+
     /**
 	 * Displays the pagination.
 	 *
@@ -510,9 +524,16 @@ class LDFMT_Subscribers extends WP_List_Table {
 		$this->_pagination = "<div class='tablenav-pages'>$output</div>";
 
 		echo $this->_pagination;
+
 	}
 
-    function extra_tablenav( $which ) {
+    /**
+	 * Displays the search filter bar.
+	 *
+	 * @param string $which
+	 */
+    public function extra_tablenav( $which ) {
+        
         global $wpdb;
         
         if ( $which == "top" ){
@@ -575,15 +596,11 @@ class LDFMT_Subscribers extends WP_List_Table {
                     <option value="1" <?php echo $this->selected_interval=='1'?'selected':'';?>><?php echo __( 'Monthly', LDNFT_TEXT_DOMAIN );?></option>
                     <option value="12" <?php echo $this->selected_interval=='12'?'selected':'';?>><?php echo __( 'Annual', LDNFT_TEXT_DOMAIN );?></option>
                 </select>
-                <!-- <button type="button" id="ldnft-update-subscriptions" class="ldnft-update-subscriptions button action"><?php _e( 'Sync Subscription with Freemius', LDNFT_TEXT_DOMAIN ); ?></button> -->
                 <img style="display:none" width="30px" class="ldfmt-data-loader" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" />
                 <span id="ldnft-subscription-import-message"></span>
             </div>
             <?php
         }
-        if ( $which == "bottom" ){
-            //The code that goes after the table is there
-    
-        }
+        
     }
 }

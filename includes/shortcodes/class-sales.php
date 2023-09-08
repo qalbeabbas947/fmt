@@ -1,17 +1,18 @@
 <?php
 /**
- * RCPL template for front-end shortcodes
- *
- * Do not allow directly accessing this file.
+ * LDMFT_Sales shortcode class
  */
 
 if( ! defined( 'ABSPATH' ) ) exit;
 
 /**
- * Class LDMFT_Sales_Shortcode
+ * Class LDNFT_Sales_Shortcode
  */
-class LDMFT_Sales_Shortcode {
+class LDNFT_Sales_Shortcode {
 
+    /**
+     * Class instance
+     */
     private static $instance = null;
 
     /**
@@ -20,7 +21,7 @@ class LDMFT_Sales_Shortcode {
      */
     public static function instance() {
 
-        if ( is_null( self::$instance ) && ! ( self::$instance instanceof LDMFT_Sales_Shortcode ) ) {
+        if ( is_null( self::$instance ) && ! ( self::$instance instanceof LDNFT_Sales_Shortcode ) ) {
 
             self::$instance = new self;
 
@@ -35,7 +36,7 @@ class LDMFT_Sales_Shortcode {
      */
     private function hooks() {
         
-        add_shortcode( 'LDFMT_Sales', [ $this, 'sales_shortcode_cb' ] );
+        add_shortcode( 'LDNFT_Sales', [ $this, 'sales_shortcode_cb' ] );
         add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_front_scripts' ] );
         add_action( 'wp_ajax_ldnft_load_sales', [ $this, 'load_sales' ], 100 );
         
@@ -230,7 +231,6 @@ class LDMFT_Sales_Shortcode {
             $content = ob_get_contents();
             ob_get_clean();
         }
-        
 
         return $content;
     }
@@ -239,4 +239,4 @@ class LDMFT_Sales_Shortcode {
 /**
  * Class instance.
  */
-LDMFT_Sales_Shortcode::instance();
+LDNFT_Sales_Shortcode::instance();

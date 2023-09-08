@@ -63,6 +63,7 @@
 .ldfmt-sales-upper-info{
     clear: both;
     display: block;
+    overflow: auto;
 }
 .ldnft-wrap {
     margin-top: 36px;

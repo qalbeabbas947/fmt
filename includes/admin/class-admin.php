@@ -1,12 +1,10 @@
 <?php
-
 /**
- * Admin template for rest course progress for leardash
- * 
- * Do not allow directly accessing this file.
+ * Manages the admin side functionalities of plugin
  */
 
 if( ! defined( 'ABSPATH' ) ) exit;
+
 use MailPoet\API\JSON\ResponseBuilders\SubscribersResponseBuilder;
 use MailPoet\Entities\SegmentEntity;
 use MailPoet\Entities\StatisticsUnsubscribeEntity;
@@ -30,9 +28,9 @@ use MailPoet\WP\Functions as WPFunctions;
 use MailPoetVendor\Carbon\Carbon;
 
 /**
- * FMT_Admin
+ * LDNFT_Admin
  */
-class FMT_Admin {
+class LDNFT_Admin {
 
     /**
      * @var self
@@ -45,7 +43,7 @@ class FMT_Admin {
      */
     public static function instance() {
         
-        if ( is_null( self::$instance ) && ! ( self::$instance instanceof FMT_Admin ) ) {
+        if ( is_null( self::$instance ) && ! ( self::$instance instanceof LDNFT_Admin ) ) {
             self::$instance = new self;
 
             self::$instance->hooks();
@@ -59,7 +57,7 @@ class FMT_Admin {
     */
     private function hooks() {
 
-        add_action( 'upgrader_process_complete', [ $this, 'ldfmt_create_table_when_plugin_update' ], 10, 2 );
+        add_action( 'upgrader_process_complete', [ $this, 'ldnft_create_table_when_plugin_update' ], 10, 2 );
         add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_scripts_callback' ] );
         add_action( 'admin_post_ldnft_submit_action', [ $this, 'ldnft_submit_action' ] );
         add_action( 'admin_notices', [ $this, 'ldnft_admin_notice' ] );
@@ -68,340 +66,9 @@ class FMT_Admin {
         add_action( 'in_admin_header', [ $this, 'remove_admin_notices' ], 100 );
 
         add_action( 'wp_ajax_ldnft_mailpoet_submit_action', [ $this, 'mailpoet_submit_action' ], 100 );
-        add_action( 'wp_ajax_ldnft_update_subscritions', [ $this, 'ldnft_update_subscritions' ], 100 );
-        add_action( 'wp_ajax_ldnft_update_sales', [ $this, 'ldnft_update_sales' ], 100 );
-        add_action( 'wp_ajax_ldnft_update_customers', [ $this, 'update_customers' ], 100 );
     }
-
-    function update_customers(){
-        
-        global $wpdb;
-        $service = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
-        $table_user = $wpdb->prefix.'ldnft_users';
-        $plugins = $service->Api('plugins.json?fields=id,title', 'GET', []);
-        
-        $inserted = 0;
-        $updatednum = 0;
-        if( isset( $plugins->plugins ) &&  count($plugins->plugins) > 0 ) {
-            foreach( $plugins->plugins as $plugin ) {
-               
-                $usrobj = $service->Api('plugins/'.$plugin->id.'/users.json?count=50', 'GET', []);
-                foreach( $usrobj->users as $user ) {
-                    
-                    $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_user." where id=%d", $user->id ));
-                    if( count( $res ) == 0 ) {
-                        $wpdb->insert(
-                            $table_user,
-                            array(
-                                'id'                    => $user->id,
-                                'email'                 => $user->email,
-                                'first'                 => $user->first,
-                                'last'                  => $user->last,
-                                'is_verified'           => $user->is_verified,
-                                'created'               => $user->created,
-                                'plugins'               => implode(',', $user->plugin_ids )
-                            )
-                        );
-                        $inserted++;
-                    } else {
-                        $wpdb->update($table_user, 
-                            array(
-                                'email'                 => $user->email,
-                                'first'                 => $user->first,
-                                'last'                  => $user->last,
-                                'is_verified'           => $user->is_verified,
-                                'created'               => $user->created,
-                                'plugins'               => implode(',', $user->plugin_ids )
-                            ), array('id'=>$user->id));
-                        $updatednum++;
-                    }
-                }
-            }
-        }
-
-        echo json_encode(['inserted' => $inserted, 'updated'=>$updatednum, 'message' => sprintf( __('Inserted: %d, Updated: %d', LDNFT_TEXT_DOMAIN), $inserted, $updatednum)]);
-        exit;
-    }
-    function ldnft_update_sales(){
-        
-        global $wpdb;
-        $service = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
-        $table_user = $wpdb->prefix.'ldnft_users';
-        $plugins = $service->Api('plugins.json?fields=id,title', 'GET', []);
-        $table_name = $wpdb->prefix.'ldnft_transactions';
-        $inserted = 0;
-        $updatednum = 0;
-        if( isset( $plugins->plugins ) &&  count($plugins->plugins) > 0 ) {
-            foreach( $plugins->plugins as $plugin ) {
-                $pmtobj = $service->Api('plugins/'.$plugin->id.'/payments.json?count=50', 'GET', []);
-                foreach( $pmtobj->payments as $payment ) {
-                    
-                    $country_code = $payment->country_code; 
-                    $id = $payment->id; 
-                    $user_id = $payment->user_id; 
-                    
-                    $user = $service->Api('plugins/'.$plugin->id.'/users/'.$user_id.'.json', 'GET', []);
-                    $username = $user->first.' '.$user->last;
-                    $useremail = $user->email;
-                    $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_user." where id=%d", $user_id ));
-                    if( count( $res ) == 0 ) {
-                        $wpdb->insert(
-                            $table_user,
-                            array(
-                                'id'                    => $user_id,
-                                'email'                 => $user->email,
-                                'first'                 => $user->first,
-                                'last'                  => $user->last,
-                                'is_verified'           => $user->is_verified,
-                                'created'               => $user->created
-                            )
-                        );
-                    } else {
-                        $wpdb->update($table_user, 
-                            array(
-                                'email'                 => $user->email,
-                                'first'                 => $user->first,
-                                'last'                  => $user->last,
-                                'is_verified'           => $user->is_verified,
-                                'created'               => $user->created
-                            ), array('id'=>$user_id));
-                    }
-                    $plugin_id = $payment->plugin_id; 
-                    $install_id = $payment->install_id; 
-                    $subscription_id = $payment->subscription_id; 
-                    $plan_id = $payment->plan_id; 
-                    $gross = $payment->gross; 
-                    $license_id = $payment->license_id; 
-                    $bound_payment_id = $payment->bound_payment_id; 
-                    $external_id = $payment->external_id; 
-                    $gateway = $payment->gateway; 
-                    $gateway_fee = $payment->gateway_fee; 
-                    $vat = $payment->vat; 
-                    $vat_id = $payment->vat_id;
-                    $pricing_id = $payment->pricing_id;
-                    $type = $payment->type; 
-                    $is_renewal = $payment->is_renewal;
-                    $coupon_id = $payment->coupon_id; 
-                    $created = $payment->created; 
-                    $updated = $payment->updated; 
-                    
-                    $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_name." where id=%d", $id ));
-                    if( count( $res ) == 0 ) {
-                        $wpdb->insert(
-                            $table_name,
-                            array(
-                                'id'                        => $id,
-                                'plugin_id'                 => $plugin_id,
-                                'plugin_title'              => $plugin->title,
-                                'user_id'                   => $user_id,
-                                'username'                  => $username,
-                                'useremail'                 => $useremail,
-                                'country_code'              => $country_code,
-                                'subscription_id'           => $subscription_id,
-                                'plan_id'                   => $plan_id,
-                                'gross'                     => $gross,
-                                'bound_payment_id'          => $bound_payment_id,
-                                'external_id'               => $external_id,
-                                'gateway'                   => $gateway,
-                                'gateway_fee'               => $gateway_fee,
-                                'vat'                       => $vat,
-                                'type'                      => $type,
-                                'is_renewal'                => $is_renewal,
-                                'coupon_id'                 => $coupon_id,
-                                'install_id'                => $install_id,
-                                'license_id'                => $license_id,
-                                'created'                   => $created,
-                                'updated'                   => $updated,
-                            )
-                        );
-                        $inserted++;
-                    } else {
-                        $wpdb->update($table_name, 
-                            array(
-                                'id'                        => $id,
-                                'plugin_id'                 => $plugin_id,
-                                'plugin_title'              => $plugin->title,
-                                'user_id'                   => $user_id,
-                                'username'                  => $username,
-                                'useremail'                 => $useremail,
-                                'country_code'              => $country_code,
-                                'subscription_id'           => $subscription_id,
-                                'plan_id'                   => $plan_id,
-                                'gross'                     => $gross,
-                                'bound_payment_id'          => $bound_payment_id,
-                                'external_id'               => $external_id,
-                                'gateway'                   => $gateway,
-                                'gateway_fee'               => $gateway_fee,
-                                'vat'                       => $vat,
-                                'type'                      => $type,
-                                'is_renewal'                => $is_renewal,
-                                'coupon_id'                => $coupon_id,
-                                'install_id'                => $install_id,
-                                'license_id'                => $license_id,
-                                'created'                   => $created,
-                                'updated'                   => $updated,
-                            ), array('id'=>$id));
-                        $updatednum++;
-                    }
-                }
-            }
-        }
-
-        echo json_encode(['inserted' => $inserted, 'updated'=>$updatednum, 'message' => sprintf( __('Inserted: %d, Updated: %d', LDNFT_TEXT_DOMAIN), $inserted, $updatednum)]);
-        exit;
-    }
-
-    function ldnft_update_subscritions(){
-
-        global $wpdb;
-        $service = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
-        
-        $plugins = $service->Api('plugins.json?fields=id,title', 'GET', ['fields'=>'id,title']);
-        $table_name = $wpdb->prefix.'ldnft_subscription';
-        $table_user = $wpdb->prefix.'ldnft_users';
-        $inserted = 0;
-        $updatednum = 0;
-        if( isset( $plugins->plugins ) &&  count($plugins->plugins) > 0 ) {
-            foreach( $plugins->plugins as $plugin ) {
-                $subobj = $service->Api('plugins/'.$plugin->id.'/subscriptions.json?count=50', 'GET', []);
-                foreach( $subobj->subscriptions as $subscription ) {
-                    $total_gross = $subscription->total_gross; 
-                    $amount_per_cycle = $subscription->amount_per_cycle; 
-                    $initial_amount = $subscription->initial_amount; 
-                    $renewal_amount = $subscription->renewal_amount; 
-                    $renewals_discount = $subscription->renewals_discount; 
-                    $renewals_discount_type = $subscription->renewals_discount_type; 
-                    $billing_cycle = $subscription->billing_cycle; 
-                    $outstanding_balance = $subscription->outstanding_balance; 
-                    $failed_payments = $subscription->failed_payments; 
-                    $trial_ends = $subscription->trial_ends; 
-                    $next_payment = $subscription->next_payment; 
-                    $user_id = $subscription->user_id; 
-                    $install_id = $subscription->install_id; 
-                    $plan_id = $subscription->plan_id; 
-                    $pricing_id = $subscription->pricing_id; 
-                    $license_id = $subscription->license_id; 
-                    $ip = $subscription->ip; 
-                    $country_code = $subscription->country_code; 
-                    $vat_id = $subscription->vat_id; 
-                    $coupon_id = $subscription->coupon_id; 
-                    $user_card_id = $subscription->user_card_id; 
-                    $source = $subscription->source; 
-                    $plugin_id = $subscription->plugin_id; 
-                    $external_id = $subscription->external_id; 
-                    $gateway = $subscription->gateway; 
-                    $environment = $subscription->environment; 
-                    $id = $subscription->id; 
-                    $created = $subscription->created; 
-                    $updated = $subscription->updated; 
-                    $currency = $subscription->currency; 
-                    
-                    $user = $service->Api('plugins/'.$plugin->id.'/users/'.$user_id.'.json', 'GET', []);
-                    $username = $user->first.' '.$user->last;
-                    $useremail = $user->email;
-                    $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_user." where id=%d", $user_id ));
-                    if( count( $res ) == 0 ) {
-                        $wpdb->insert(
-                            $table_user,
-                            array(
-                                'id'                    => $user_id,
-                                'email'                 => $user->email,
-                                'first'                 => $user->first,
-                                'last'                  => $user->last,
-                                'is_verified'           => $user->is_verified,
-                                'created'               => $user->created
-                            )
-                        );
-                    } else {
-                        $wpdb->update($table_user, 
-                            array(
-                                'email'                 => $user->email,
-                                'first'                 => $user->first,
-                                'last'                  => $user->last,
-                                'is_verified'           => $user->is_verified,
-                                'created'               => $user->created
-                            ), array('id'=>$user_id));
-                    }
-                    
-                    $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_name." where id=%d", $id ));
-                    if( count( $res ) == 0 ) {
-                        $wpdb->insert(
-                            $table_name,
-                            array(
-                                'id'                        => $id,
-                                'plugin_id'                 => $plugin_id,
-                                'plugin_title'              => $plugin->title,
-                                'user_id'                   => $user_id,
-                                'username'                  => $username,
-                                'useremail'                 => $useremail,
-                                'install_id'                => $install_id,
-                                'amount_per_cycle'          => $amount_per_cycle,
-                                'billing_cycle'             => $billing_cycle,
-                                'gross'                     => $total_gross,
-                                'outstanding_balance'       => $outstanding_balance,
-                                'failed_payments'           => $failed_payments,
-                                'gateway'                   => $gateway,
-                                'coupon_id'                 => $coupon_id,
-                                'trial_ends'                => $trial_ends,
-                                'next_payment'              => $next_payment,
-                                'created'                   => $created,
-                                'updated_at'                => $updated,
-                                'currency'                  => $currency,
-                                'pricing_id'                => $pricing_id,
-                                'country_code'              => $country_code,
-                                'plan_id'                   => $plan_id,
-                                'external_id'               => $external_id,
-                                'initial_amount'            => $initial_amount,
-                                'renewal_amount'            => $renewal_amount,
-                                'renewals_discount'         => $renewals_discount,
-                                'renewals_discount_type'    => $renewals_discount_type,
-                                'license_id'               => $license_id,
-                            )
-                        );
-                        $inserted++;
-                    } else {
-                        $wpdb->update($table_name, 
-                            array(
-                                'plugin_id'                 => $plugin_id,
-                                'plugin_title'              => $plugin->title,
-                                'user_id'                   => $user_id,
-                                'username'                  => $username,
-                                'useremail'                 => $useremail,
-                                'install_id'                => $install_id,
-                                'amount_per_cycle'          => $amount_per_cycle,
-                                'billing_cycle'             => $billing_cycle,
-                                'gross'                     => $total_gross,
-                                'outstanding_balance'       => $outstanding_balance,
-                                'failed_payments'           => $failed_payments,
-                                'gateway'                   => $gateway,
-                                'coupon_id'                 => $coupon_id,
-                                'trial_ends'                => $trial_ends,
-                                'next_payment'              => $next_payment,
-                                'created'                   => $created,
-                                'updated_at'                => $updated,
-                                'currency'                  => $currency,
-                                'pricing_id'                => $pricing_id,
-                                'country_code'              => $country_code,
-                                'plan_id'                   => $plan_id,
-                                'external_id'               => $external_id,
-                                'initial_amount'            => $initial_amount,
-                                'renewal_amount'            => $renewal_amount,
-                                'renewals_discount'         => $renewals_discount,
-                                'renewals_discount_type'    => $renewals_discount_type,
-                                'license_id'               => $license_id
-                            ), array('id'=>$id));
-                            $updatednum++;
-                    }
-                    
-                }
-            }
-            
-        }
-
-        echo json_encode(['inserted' => $inserted, 'updated'=>$updatednum, 'message' => sprintf( __('Inserted: %d, Updated: %d', LDNFT_TEXT_DOMAIN), $inserted, $updatednum)]);
-        exit;
-    }
-
+    
+    
     /**
      * display admin notice
      */
@@ -491,7 +158,7 @@ class FMT_Admin {
     }
 
     /**
-     * Save dripfeed settings data using ( Admin Post )
+     * Save settings data using ( Admin Post )
      */
     public function ldnft_submit_action() {
         
@@ -532,21 +199,9 @@ class FMT_Admin {
      * @param $upgrader
      * @param $hook_extra
      */
-    public function ldfmt_create_table_when_plugin_update( $upgrader, $hook_extra ) {
+    public function ldnft_create_table_when_plugin_update( $upgrader, $hook_extra ) {
 
         global $wpdb;
-
-        // $meta_table = $wpdb->prefix.'ldmft_reset_course_activities_meta';
-        // if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$meta_table'" ) ) ) {
-
-        //     $wpdb->query( "CREATE TABLE $meta_table (
-        //         ID INT PRIMARY KEY AUTO_INCREMENT,
-        //         entry_id VARCHAR(65535),
-        //         entry_time VARCHAR(65535),
-        //         meta_key VARCHAR(65535),
-        //         meta_value VARCHAR(65535)
-        //     )" );     
-        // }
     }
 
     /**
@@ -651,7 +306,7 @@ class FMT_Admin {
      */
     public static function sales_page( ) {
         //Create an instance of our package class...
-        $testListTable = new LDFMT_Sales();
+        $testListTable = new LDNFT_Sales();
         //Fetch, prepare, sort, and filter our data...
         $testListTable->prepare_items();
         ?>
@@ -678,7 +333,7 @@ class FMT_Admin {
      */
     public static function customers_page( ) {
         //Create an instance of our package class...
-        $testListTable = new LDFMT_Customers();
+        $testListTable = new LDNFT_Customers();
         //Fetch, prepare, sort, and filter our data...
         $testListTable->prepare_items();
         ?>
@@ -707,7 +362,7 @@ class FMT_Admin {
      */
     public static function reviews_page( ) {
         //Create an instance of our package class...
-        $testListTable = new LDFMT_Reviews();
+        $testListTable = new LDNFT_Reviews();
         //Fetch, prepare, sort, and filter our data...
         $testListTable->prepare_items();
         
@@ -738,7 +393,7 @@ class FMT_Admin {
      */
     public static function subscribers_page( ) {
         //Create an instance of our package class...
-        $testListTable = new LDFMT_Subscribers();
+        $testListTable = new LDNFT_Subscribers();
         //Fetch, prepare, sort, and filter our data...
         $testListTable->prepare_items();
         
@@ -780,9 +435,9 @@ class FMT_Admin {
             $plugins = $api->Api('plugins.json?fields=id,title', 'GET', ['fields'=>'id,title']);
             
             if( isset( $plugins->error ) && isset( $plugins->error->message ) ) {
-                $ldfmt_message = $plugins->error->message;
+                $_message = $plugins->error->message;
                 $class = 'notice notice-success is-dismissible';
-                $message = sanitize_text_field( $ldfmt_message );
+                $message = sanitize_text_field( $_message );
                 printf ( '<div id="message" class="%s"> <p>%s</p></div>', $class, $message );
             } else{
                 $is_connected = true;
@@ -905,7 +560,7 @@ class FMT_Admin {
                     <div class="ldnft-box">
                         <table>
                             <tr>
-                                <td><h3><?php _e( 'Shortcode:', LDNFT_TEXT_DOMAIN ); ?> [LDFMT_Reviews]</h3></td>
+                                <td><h3><?php _e( 'Shortcode:', LDNFT_TEXT_DOMAIN ); ?> [LDNFT_Reviews]</h3></td>
                             </tr>
                             <tr>
                                 <td clss="ldfmt-shortcode-desc"><?php _e( 'Displays plugin reviews on the frontend. User can filter the reviews based on the plugin.', LDNFT_TEXT_DOMAIN ); ?></td>
@@ -914,7 +569,7 @@ class FMT_Admin {
                                 <td>&nbsp;</td>
                             </tr>
                             <tr>
-                                <td><h3><?php _e( 'Shortcode:', LDNFT_TEXT_DOMAIN ); ?> [LDFMT_Sales show="[ summary  |  listing  |  both ]"]</h3></td>
+                                <td><h3><?php _e( 'Shortcode:', LDNFT_TEXT_DOMAIN ); ?> [LDNFT_Sales show="[ summary  |  listing  |  both ]"]</h3></td>
                             </tr>
                             <tr>
                                 <td clss="ldfmt-shortcode-desc"><?php _e( 'This shortcode displays the plugin sales summary and listing on the frontend. Show parameter allows the user to control the display. Default value of the show parameter is both.', LDNFT_TEXT_DOMAIN ); ?></td>
@@ -950,7 +605,7 @@ class FMT_Admin {
                  * add slect2 js
                  */
                 
-                wp_enqueue_script( 'fmt-backend-js', LDNFT_ASSETS_URL . 'js/backend.js', [ 'jquery' ], time(), true ); 
+                wp_enqueue_script( 'fmt-backend-js', LDNFT_ASSETS_URL . 'js/backend.js', [ 'jquery' ], LDNFT_VERSION, true ); 
                     
                 wp_localize_script( 'fmt-backend-js', 'LDNFT', array(  
                     'ajaxURL' => admin_url( 'admin-ajax.php' ),
@@ -961,4 +616,4 @@ class FMT_Admin {
     }
 }
 
-FMT_Admin::instance();
+LDNFT_Admin::instance();

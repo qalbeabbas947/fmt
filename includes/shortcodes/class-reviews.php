@@ -1,17 +1,18 @@
 <?php
 /**
- * Frontend template for reset results
- * 
- * Do not allow directly accessing this file.
+ * LDNFT_Reviews shortcode class
  */
 
 if( ! defined( 'ABSPATH' ) ) exit;
 
 /**
- * ldFMT_Reviews_Shortcode
+ * LDNFT_Reviews_Shortcode
  */
-class ldFMT_Reviews_Shortcode {
+class LDNFT_Reviews_Shortcode {
 
+    /**
+     * Class instance
+     */
     private static $instance = null;
 
     /**
@@ -35,7 +36,7 @@ class ldFMT_Reviews_Shortcode {
      */
     private function hooks() {
         add_action( 'wp_ajax_ldnft_load_reviews', [ $this, 'load_reviews' ], 100 );
-        add_shortcode( 'LDFMT_Reviews', [ $this, 'reviews_shortcode_cb' ] );
+        add_shortcode( 'LDNFT_Reviews', [ $this, 'reviews_shortcode_cb' ] );
     }
 
     public function load_reviews() {
@@ -120,11 +121,10 @@ class ldFMT_Reviews_Shortcode {
             $content = ob_get_contents();
             ob_get_clean();
         }
-        
 
         return $content;
     }
 
 }
 
-ldFMT_Reviews_Shortcode::instance();
+LDNFT_Reviews_Shortcode::instance();

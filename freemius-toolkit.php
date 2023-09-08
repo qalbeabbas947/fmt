@@ -16,6 +16,9 @@ if( ! defined( 'ABSPATH' ) ) exit;
  */
 class LdNinjas_Freemius_Toolkit {
 
+    /**
+     * @var version number
+     */
     const VERSION = '1.0';
 
     /**
@@ -34,7 +37,7 @@ class LdNinjas_Freemius_Toolkit {
 
             self::$instance->setup_constants();
             self::$instance->includes();
-           // self::$instance->enable_freemius();
+            self::$instance->enable_freemius();
         }
         
         return self::$instance;
@@ -113,8 +116,8 @@ class LdNinjas_Freemius_Toolkit {
         /**
          * Plugin version
          */
-        define( 'LDNFT_VERSION', self::VERSION );
-
+        //define( 'LDNFT_VERSION', self::VERSION );
+        define( 'LDNFT_VERSION', time() );
         /**
          * Text Domain
          */
@@ -166,11 +169,6 @@ class LdNinjas_Freemius_Toolkit {
 
         if( file_exists( LDNFT_INCLUDES_DIR .'admin/listings/class-sales.php' ) ) {
             require_once LDNFT_INCLUDES_DIR . 'admin/listings/class-sales.php';
-        }
-
-        
-        if( file_exists( LDNFT_INCLUDES_DIR.'shortcodes/class-main.php' ) ) {
-            require_once LDNFT_INCLUDES_DIR.'shortcodes/class-main.php';
         }
 
         if( file_exists( LDNFT_INCLUDES_DIR.'shortcodes/class-reviews.php' ) ) {

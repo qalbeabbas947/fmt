@@ -1,8 +1,6 @@
 <?php
 /**
- * LDFMT Pro admin template
- *
- * Do not allow directly accessing this file.
+ * LDNFT_Reviews creates admin side listing
  */
 
 if( ! defined( 'ABSPATH' ) ) exit;
@@ -12,22 +10,36 @@ if(!class_exists('WP_List_Table')){
 }
 
 /**
- * Class LDFMT_Reviews
+ * Class LDNFT_Reviews
  */
-class LDFMT_Reviews extends WP_List_Table {
+class LDNFT_Reviews extends WP_List_Table {
 
+    /**
+     * Current select Plugin
+     */
     public $selected_plugin_id;
 
+    /**
+     * Freemius API object
+     */
     public $api;
 
+    /**
+     * Plugins list
+     */
     public $plugins;
     
+    /**
+     * Plugins
+     */
     public $plugins_short_array;
+    
     /** ************************************************************************
      * REQUIRED. Set up a constructor that references the parent constructor. We 
      * use the parent reference to set some default configs.
      ***************************************************************************/
-    function __construct(){
+    public function __construct(){
+        
         global $status, $page;
 
         $this->selected_plugin_id = 0;  
@@ -52,12 +64,13 @@ class LDFMT_Reviews extends WP_List_Table {
             $this->selected_plugin_id = intval( $_GET['ldfmt_plugins_filter'] ); 
         }
 
-        
-        //Set parent defaults
+        /**
+         * Set parent defaults
+         */
         parent::__construct( array(
-            'singular'  => 'freemius_customer',     //singular name of the listed records
-            'plural'    => 'freemius_customers',    //plural name of the listed records
-            'ajax'      => false        //does this table support ajax?
+            'singular'  => 'freemius_customer',
+            'plural'    => 'freemius_customers',
+            'ajax'      => false
         ) );
         
     }
@@ -84,7 +97,8 @@ class LDFMT_Reviews extends WP_List_Table {
      * @param array $column_name The name/slug of the column to be processed
      * @return string Text or HTML to be placed inside the column <td>
      **************************************************************************/
-    function column_default($item, $column_name){
+    public function column_default($item, $column_name){
+        
         switch($column_name){
             case 'title':
             case 'text':
@@ -131,21 +145,8 @@ class LDFMT_Reviews extends WP_List_Table {
      * @param array $item A singular item (one full row's worth of data)
      * @return string Text to be placed inside the column <td> (movie title only)
      **************************************************************************/
-    function column_title($item){
+    public function column_title($item){
         
-        //Build row actions
-        // $actions = array(
-        //     'edit'      => sprintf('<a href="?page=%s&action=%s&movie=%s">Edit</a>',$_REQUEST['page'],'edit',$item['id']),
-        //     'delete'    => sprintf('<a href="?page=%s&action=%s&movie=%s">Delete</a>',$_REQUEST['page'],'delete',$item['id']),
-        // );
-        
-        // //Return the title contents
-        // return sprintf('%1$s <span style="color:silver">(id:%2$s)</span>%3$s',
-        //     /*$1%s*/ $item['title'],
-        //     /*$2%s*/ $item['id'],
-        //     /*$3%s*/ $this->row_actions($actions)
-        // );
-
         return $item['title'];
     }
 
@@ -159,11 +160,12 @@ class LDFMT_Reviews extends WP_List_Table {
      * @param array $item A singular item (one full row's worth of data)
      * @return string Text to be placed inside the column <td> (movie title only)
      **************************************************************************/
-    function column_cb($item){
+    public function column_cb($item){
+        
         return sprintf(
             '<input type="checkbox" name="%1$s[]" value="%2$s" />',
-            /*$1%s*/ $this->_args['singular'],  //Let's simply repurpose the table's singular label ("movie")
-            /*$2%s*/ $item['ID']                //The value of the checkbox should be the record's id
+            /*$1%s*/ $this->_args['singular'], 
+            /*$2%s*/ $item['ID']               
         );
     }
 
@@ -181,7 +183,8 @@ class LDFMT_Reviews extends WP_List_Table {
      * @see WP_List_Table::::single_row_columns()
      * @return array An associative array containing column information: 'slugs'=>'Visible Titles'
      **************************************************************************/
-    function get_columns(){
+    public function get_columns(){
+        
         $columns = array(
             'id'            => 'ID',
             'title'         => 'Title',
@@ -210,9 +213,10 @@ class LDFMT_Reviews extends WP_List_Table {
      * 
      * @return array An associative array containing all the columns that should be sortable: 'slugs'=>array('data_values',bool)
      **************************************************************************/
-    function get_sortable_columns() {
+    public function get_sortable_columns() {
+        
         $sortable_columns = array(
-            'id'     => array('id',false),     //true means it's already sorted
+            'id'     => array('id',false), 
             'title'    => array('title',false),
             'text'  => array('text',false),
             'name'  => array('name',false),
@@ -239,10 +243,8 @@ class LDFMT_Reviews extends WP_List_Table {
      * 
      * @return array An associative array containing all the bulk actions: 'slugs'=>'Visible Titles'
      **************************************************************************/
-    function get_bulk_actions() {
-        // $actions = array(
-        //     'delete'    => 'Delete'
-        // );
+    public function get_bulk_actions() {
+        
         $actions = [];
         return $actions;
     }
@@ -255,9 +257,11 @@ class LDFMT_Reviews extends WP_List_Table {
      * 
      * @see $this->prepare_items()
      **************************************************************************/
-    function process_bulk_action() {
+    public function process_bulk_action() {
         
-        //Detect when a bulk action is being triggered...
+        /**
+         * Detect when a bulk action is being triggered...
+         */
         if( 'delete'===$this->current_action() ) {
             wp_die('Items deleted (or they would be if we had items to delete)!');
         }
@@ -280,8 +284,9 @@ class LDFMT_Reviews extends WP_List_Table {
      * @uses $this->get_pagenum()
      * @uses $this->set_pagination_args()
      **************************************************************************/
-    function prepare_items() {
-        global $wpdb; //This is used only if making any database queries
+    public function prepare_items() {
+       
+        global $wpdb;
 
         /**
          * First, lets decide how many records per page to show
@@ -325,7 +330,6 @@ class LDFMT_Reviews extends WP_List_Table {
          * use sort and pagination data to build a custom query instead, as you'll
          * be able to use your precisely-queried data immediately.
          */
-        // Deploy new version.
         $results = $this->api->Api('plugins/'.$this->selected_plugin_id.'/reviews.json?count='.$per_page.'&offset='.$offset, 'GET', ['is_featured'=>'false','is_verified'=>'false', 'enriched'=>'true' ]);
         
         $data = [];
@@ -348,14 +352,29 @@ class LDFMT_Reviews extends WP_List_Table {
          * sorting technique would be unnecessary.
          */
         function usort_reorder($a,$b){
-            $orderby = (!empty($_REQUEST['orderby'])) ? $_REQUEST['orderby'] : 'id'; //If no sort, default to title
-            $order = (!empty($_REQUEST['order'])) ? $_REQUEST['order'] : 'asc'; //If no order, default to asc
-            $result = strcmp($a[$orderby], $b[$orderby]); //Determine sort order
-            return ($order==='asc') ? $result : -$result; //Send final sort direction to usort
+
+            /**
+             * If no sort, default to title
+             */
+            $orderby = (!empty($_REQUEST['orderby'])) ? $_REQUEST['orderby'] : 'id';
+
+            /**
+             * If no order, default to asc
+             */
+            $order = (!empty($_REQUEST['order'])) ? $_REQUEST['order'] : 'asc';
+
+            /**
+             * Determine sort order
+             */
+            $result = strcmp($a[$orderby], $b[$orderby]);
+
+            /**
+             * Send final sort direction to usort
+             */
+            return ($order==='asc') ? $result : -$result;
         }
         usort($data, 'usort_reorder');
         
-        //echo '</pre>';
         /***********************************************************************
          * ---------------------------------------------------------------------
          * vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
@@ -408,7 +427,12 @@ class LDFMT_Reviews extends WP_List_Table {
         ) );
     }
 
-    function display_tablenav( $which ) {
+    /**
+	 * Displays the pagination.
+	 *
+	 * @param string $which
+	 */
+    public function display_tablenav( $which ) {
         
         if ( 'top' === $which ) {
             wp_nonce_field( 'bulk-' . $this->_args['plural'] );
@@ -550,7 +574,8 @@ class LDFMT_Reviews extends WP_List_Table {
 		echo $this->_pagination;
 	}
 
-    function extra_tablenav( $which ) {
+    public function extra_tablenav( $which ) {
+        
         global $wpdb;
         
         if ( $which == "top" ){
@@ -561,10 +586,6 @@ class LDFMT_Reviews extends WP_List_Table {
                     <?php
                         foreach( $this->plugins as $plugin ) {
                             
-                            if( $this->selected_plugin_id <= 0 ) {
-                               // $this->selected_plugin_id = $plugin->id;  
-                            }
-                                
                             $selected = '';
                             if( $this->selected_plugin_id == $plugin->id ) {
                                 $selected = ' selected = "selected"';   
@@ -579,9 +600,9 @@ class LDFMT_Reviews extends WP_List_Table {
             </div>
             <?php
         }
+        
         if ( $which == "bottom" ){
-            //The code that goes after the table is there
-    
         }
+
     }
 }
