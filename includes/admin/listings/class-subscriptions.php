@@ -1,20 +1,10 @@
 <?php
-/**
- * LDFMT Pro admin template
- *
- * Do not allow directly accessing this file.
- */
 
-if( ! defined( 'ABSPATH' ) ) exit;
-
-if(!class_exists('WP_List_Table')){
+if( ! class_exists( 'WP_List_Table' ) ) {
     require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
 
-/**
- * Class LDNFT_Subscribers
- */
-class LDNFT_Subscribers extends WP_List_Table {
+class LDNFT_Subscriptions extends WP_List_Table {
 
     /**
      * Current select Plugin
@@ -37,11 +27,6 @@ class LDNFT_Subscribers extends WP_List_Table {
     public $plugins;
     
     /**
-     * Hidden columns
-     */
-    public $default_hidden_columns;
-
-    /**
      * Plugins
      */
     public $plugins_short_array;
@@ -53,20 +38,7 @@ class LDNFT_Subscribers extends WP_List_Table {
     public function __construct(){
 
         global $status, $page;
-
-        $this->default_hidden_columns = [ 
-                                        'outstanding_balance'=> __( 'Balance',LDNFT_TEXT_DOMAIN ), 
-                                        'failed_payments'=> __( 'Failed Attempt',LDNFT_TEXT_DOMAIN ), 
-                                        'trial_ends'=> __( 'Trial End',LDNFT_TEXT_DOMAIN ), 
-                                        'created'=> __( 'Payment Date',LDNFT_TEXT_DOMAIN ), 
-                                        'initial_amount'=> __( 'First Payment',LDNFT_TEXT_DOMAIN ), 
-                                        'next_payment'=> __( 'Next Renewal Amount',LDNFT_TEXT_DOMAIN ), 
-                                        'currency'=> __( 'Currency',LDNFT_TEXT_DOMAIN ),
-                                        'country_code'=> __( 'Country',LDNFT_TEXT_DOMAIN ), 
-                                        'id'=> __( 'Transaction ID',LDNFT_TEXT_DOMAIN ), 
-                                        'user_id'=> __( 'User ID',LDNFT_TEXT_DOMAIN ),  
-                                    ];
-
+        
         $this->selected_plugin_id = 0;  
         $this->api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
         $this->plugins = $this->api->Api('plugins.json?fields=id,title', 'GET', ['fields'=>'id,title']);
@@ -209,7 +181,6 @@ class LDNFT_Subscribers extends WP_List_Table {
             'amount_per_cycle'      => __( 'Price',LDNFT_TEXT_DOMAIN ),
             'discount'              => __( 'Discount', LDNFT_TEXT_DOMAIN ),
             'billing_cycle'         => __( 'Billing Cycle',LDNFT_TEXT_DOMAIN ),
-            'billing_cycle_num'     => __( 'Billing Cycle No',LDNFT_TEXT_DOMAIN ),
             'total_gross'           => __( 'Total Amount',LDNFT_TEXT_DOMAIN ),
             'gateway'               => __( 'Gateway',LDNFT_TEXT_DOMAIN ),
             'renewal_amount'        => __( 'Next Renewal Amount', LDNFT_TEXT_DOMAIN ),
@@ -250,7 +221,6 @@ class LDNFT_Subscribers extends WP_List_Table {
             'amount_per_cycle'    => array('amount_per_cycle',false),
             'discount'    => array('discount',false),
             'billing_cycle'  => array('billing_cycle',false),
-            'billing_cycle_num'  => array('billing_cycle_num',false),
             'total_gross'  => array('total_gross',false),
             'gateway'  => array('gateway',false),
             'next_payment'  => array('next_payment',false),
@@ -324,7 +294,15 @@ class LDNFT_Subscribers extends WP_List_Table {
         /**
          * First, lets decide how many records per page to show
          */
-        $per_page = 10;
+        $per_page = get_user_option(
+            'subscriptions_per_page',
+            get_current_user_id()
+        );
+        
+        if( empty($per_page) ) {
+            $per_page = 10;
+        }
+
         $offset = isset($_REQUEST['offset']) && intval($_REQUEST['offset'])>0?intval($_REQUEST['offset']):0;
         
         /**
@@ -335,7 +313,9 @@ class LDNFT_Subscribers extends WP_List_Table {
          * used to build the value for our _column_headers property.
          */
         $columns = $this->get_columns();
-        $hidden = $this->default_hidden_columns;
+        $screen = get_current_screen();
+
+        $hidden   = get_hidden_columns( $screen );
         $sortable = $this->get_sortable_columns();
         
         
@@ -394,7 +374,6 @@ class LDNFT_Subscribers extends WP_List_Table {
                     $data[$count]['discount']  = __( 'Fixed - ', LDNFT_TEXT_DOMAIN ).'('.$subscription->renewals_discount.$subscription->currency.')';
                 }
             }
-            $data[$count]['billing_cycle_num']       = '-';
             $count++;   
         }
         
@@ -433,7 +412,6 @@ class LDNFT_Subscribers extends WP_List_Table {
 
                 <br class="clear" />
             </div>
-            
         <?php
 
     }
@@ -530,7 +508,7 @@ class LDNFT_Subscribers extends WP_List_Table {
         $page_links[] = $total_pages_before . sprintf(
 			/* translators: 1: Current page, 2: Total pages. */
 			_x( '%1$s to %2$s', 'paging' ),
-			$offset+1,
+			($offset==0?1:$offset),
 			(intval($offset)+intval($current_recs))-1
 		) . $total_pages_after;
 
@@ -640,7 +618,19 @@ class LDNFT_Subscribers extends WP_List_Table {
                 <img style="display:none" width="30px" class="ldfmt-data-loader" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" />
                 <span id="ldnft-subscription-import-message"></span>
             </div>
-            
+            <div id="ldnft-admin-modal" class="ldnft-admin-modal">
+                <!-- Modal content -->
+                <div class="ldnft-admin-modal-content">
+                    <div class="ldnft-admin-modal-header">
+                    <span class="ldnft-admin-modal-close">&times;</span>
+                        <h2><?php echo __( 'Subscription Detail', LDNFT_TEXT_DOMAIN );?></h2>
+                    </div>
+                    <div class="ldnft-admin-modal-body">
+                        
+                    </div>
+                    <div class="ldnft-popup-loader"><img class="" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" /></div>
+                </div>
+            </div>
             <?php
         }
         

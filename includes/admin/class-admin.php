@@ -57,6 +57,10 @@ class LDNFT_Admin {
     */
     private function hooks() {
 
+        add_filter( 'set-screen-option', function( $status, $option, $value ){
+            return ( $option == 'subscriptions_per_page' ) ? (int) $value : $status;
+        }, 10, 3 );
+
         add_action( 'upgrader_process_complete', [ $this, 'ldnft_create_table_when_plugin_update' ], 10, 2 );
         add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_scripts_callback' ] );
         add_action( 'admin_post_ldnft_submit_action', [ $this, 'ldnft_submit_action' ] );
@@ -66,8 +70,245 @@ class LDNFT_Admin {
         add_action( 'in_admin_header', [ $this, 'remove_admin_notices' ], 100 );
 
         add_action( 'wp_ajax_ldnft_mailpoet_submit_action', [ $this, 'mailpoet_submit_action' ], 100 );
+        add_action( 'wp_ajax_ldnft_subscriber_check_next', [ $this, 'subscriber_check_next' ], 100 );
+        add_action( 'wp_ajax_ldnft_subscribers_view_detail', [ $this, 'subscribers_view_detail' ], 100 );
+
     }
     
+    /**
+     * Hooked into `screen_settings`.  Adds the field to the settings area
+     *
+     * @access public
+     * @return string The settings fields
+     */
+    // public static function add_screen_fields($rv, $screen)
+    // {
+    //     $val = get_user_option(
+    //         sprintf('default_title_%s', sanitize_key($screen->id)),
+    //         get_current_user_id()
+    //     );
+    //     $rv .= '<div class="pmg-sotut-container">';
+    //     $rv .= '<h5>' . __('Default Title') . '</h5>';
+    //     $rv .= '<p><input type="text" class="normal-text" id="pmg-sotut-field" ' .
+    //         'value="' . esc_attr($val) . '" /></p>';
+    //     //$rv .= wp_nonce_field(self::NONCE, self::NONCE, false, false);
+    //     $rv .= '</div>';
+    //     return $rv;
+    // }
+
+    // function cmi_set_screen_options($status, $option, $value) {
+    //     print_r($_REQUEST);exit;if ( 'cmi_show_columns' == $option ) { 
+    //         print_r($_REQUEST);exit;
+    //         $value = $_POST['cmi_columns'];
+    //     }
+    //     return $value;
+    // }
+    
+     //add_filter('screen_settings', [$this, 'cmi_show_screen_options'], 10, 2 );
+    // add_filter('set-screen-option', [$this, 'cmi_set_screen_options'], 11, 3);
+    // function cmi_show_screen_options( $status, $args ) {
+    //     $return = $status; 
+        
+    //     if ( $args->base == 'freemius-toolkit_page_ldninjas-freemius-toolkit-subscriptions' ) {    
+    //         $button = get_submit_button( __( 'Apply' ), 'button', 'screen-options-apply', false );
+    //         $return .= "
+    //         <fieldset>
+    //         <legend>Show Columns</legend>
+    //         <div class='metabox-prefs'>
+    //         <div><input type='hidden' name='wp_screen_options[option]' value='cmi_show_columns' /></div>
+    //         <div><input type='hidden' name='wp_screen_options[value]' value='yes' /></div>
+    //         <div class='cmi_custom_fields'>
+    //             <label for='cmi_producer'><input type='checkbox' value='on' name='cmi_columns[]' id='cmi_producer' /> Producer</label>
+    //             <label for='cmi_director'><input type='checkbox' value='on' name='cmi_columns[]' id='cmi_director' /> Director</label>
+    //         </div>
+    //         </div>
+    //         </fieldset>
+    //         <br class='clear'>
+    //         $button";
+    //     }
+    //     return $return;
+    // }
+
+    /**
+     * Returns the subscription data.
+     */
+    public function subscribers_view_detail() {
+        ini_set('display_errors', 'On');
+        error_reporting(E_ALL);
+        //header("Content-type: application/json");
+        
+        $user_id        = isset( $_REQUEST['user_id'] ) ?intval( $_REQUEST['user_id'] ):0;
+        $plugin_id      = isset( $_REQUEST['plugin_id'] ) ?intval( $_REQUEST['plugin_id'] ):0;
+        $id             = isset( $_REQUEST['id'] ) ? intval( $_REQUEST['id'] ):0;
+        if( $id == 0 || $plugin_id == 0 )  {
+            echo '<div class="ldnft-error-message">';
+            echo __('Transaction id and plugin id are required fields.', LDNFT_TEXT_DOMAIN);    
+            echo '</div>';
+            exit;    
+        }
+        
+        $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
+        $result = $api->Api('plugins/'.$plugin_id.'/subscriptions/'.$id.'.json', 'GET', []);
+        if($result) {
+
+            $user = $api->Api('plugins/'.$plugin_id.'/users/'.$result->user_id.'.json', 'GET', []);
+            $plan = $api->Api('plugins/'.$plugin_id.'/plans/'.$result->plan_id.'.json', 'GET', []);
+            $coupon = $api->Api('plugins/'.$plugin_id.'/coupons/'.$result->coupon_id.'.json', 'GET', []);
+            
+            //plan_id.json
+
+            $discount  = '';
+            if(!empty($result->renewals_discount) && floatval($result->renewals_discount) > 0 ) {
+                if(strtolower($result->renewals_discount_type) == 'percentage')
+                    $discount  = $result->renewals_discount.'% - (' .number_format(($result->renewals_discount*$result->total_gross)/100, 2).$result->currency.')';
+                else {
+                    $discount  = __( 'Fixed - ', LDNFT_TEXT_DOMAIN ).'('.$result->renewals_discount.$result->currency.')';
+                }
+            }
+
+            //print_r($result);
+            //
+            ob_start();
+                ?>
+
+                    <table id="ldnft-subscriptions" width="100%" cellpadding="5" cellspacing="1">
+                        <tbody>
+                            <tr>
+                                <th><?php _e('Transaction', LDNFT_TEXT_DOMAIN)?></th>
+                                <td><?php echo $result->id;?></td>
+                                <th><?php _e('User ID', LDNFT_TEXT_DOMAIN)?></th>
+                                <td><?php echo $result->user_id;?></td>
+                            </tr>
+                            <tr>
+                                <th><?php _e('Name', LDNFT_TEXT_DOMAIN)?></th>
+                                <td><?php echo $user->first.' '.$user->last;?></td>
+                                <th><?php _e('Email', LDNFT_TEXT_DOMAIN)?></th>
+                                <td><?php echo $user->email;?></td>
+                            </tr>
+                            <tr>
+                                <th><?php _e('Country', LDNFT_TEXT_DOMAIN)?></th>
+                                <td><?php echo LdNinjas_Freemius_Toolkit::get_country_name_by_code( strtoupper($result->country_code) );?></td>
+                                <th><?php _e('Discount', LDNFT_TEXT_DOMAIN)?></th>
+                                <td><?php echo $discount;?></td>
+                            </tr>
+                            <tr>
+                                <th><?php _e('Amount Per Cycle:', LDNFT_TEXT_DOMAIN)?></th>
+                                <td><?php echo $result->amount_per_cycle;?></td>
+                                <th><?php _e('First Payment:', LDNFT_TEXT_DOMAIN)?></th>
+                                <td><?php echo $result->initial_amount;?></td>
+                            </tr>
+                            <tr>
+                                <th><?php _e('Tax Rate:', LDNFT_TEXT_DOMAIN)?></th>
+                                <td><?php echo $result->tax_rate;?></td>
+                                <th><?php _e('Total Amount:', LDNFT_TEXT_DOMAIN)?></th>
+                                <td><?php echo $result->total_gross;?></td>
+                            </tr>
+                            <tr>
+                                <th><?php _e('Renewal Amount:', LDNFT_TEXT_DOMAIN)?></th>
+                                <td><?php echo $result->renewal_amount;?></td>
+                                <th><?php _e('Billing Cycle:', LDNFT_TEXT_DOMAIN)?></th>
+                                <td><?php echo $result->billing_cycle;?></td>
+                            </tr>
+                            <tr>
+                                <th><?php _e('Outstanding Balance:', LDNFT_TEXT_DOMAIN)?></th>
+                                <td><?php echo $result->outstanding_balance;?></td>
+                                <th><?php _e('Failed Payments:', LDNFT_TEXT_DOMAIN)?></th>
+                                <td><?php echo $result->failed_payments;?></td>
+                            </tr>
+                            <tr>
+                                <th><?php _e('Trial Ends:', LDNFT_TEXT_DOMAIN)?></th>
+                                <td><?php echo $result->trial_ends;?></td>
+                                <th><?php _e('Next Payments:', LDNFT_TEXT_DOMAIN)?></th>
+                                <td><?php echo $result->next_payment;?></td>
+                            </tr>
+                            <tr>
+                                <th><?php _e('Cancelled At:', LDNFT_TEXT_DOMAIN)?></th>
+                                <td><?php echo $result->canceled_at;?></td>
+                                <th><?php _e('Install ID:', LDNFT_TEXT_DOMAIN)?></th>
+                                <td><?php echo $result->install_id;?></td>
+                            </tr>
+                            <tr>
+                                <th><?php _e('Plan ID:', LDNFT_TEXT_DOMAIN)?></th>
+                                <td><?php echo $result->plan_id;?></td>
+                                <th><?php _e('Plan:', LDNFT_TEXT_DOMAIN)?></th>
+                                <td><?php echo $plan->title;?></td>
+                            </tr>
+                            <tr>
+                                <th><?php _e('License ID:', LDNFT_TEXT_DOMAIN)?></th>
+                                <td><?php echo $result->license_id;?></td>
+                                <th><?php _e('IP:', LDNFT_TEXT_DOMAIN)?></th>
+                                <td><?php echo $result->ip;?></td>
+                            </tr>
+                            <tr>
+                                <th><?php _e('Zip/Postal Code:', LDNFT_TEXT_DOMAIN)?></th>
+                                <td><?php echo $result->zip_postal_code;?></td>
+                                <th><?php _e('VAT ID:', LDNFT_TEXT_DOMAIN)?></th>
+                                <td><?php echo $result->vat_id;?></td>
+                            </tr>
+                            <?php if($result->coupon_id) { ?>
+                                <tr>
+                                    <th><?php _e('Coupon ID:', LDNFT_TEXT_DOMAIN)?></th>
+                                    <td><?php echo $result->coupon_id;?></td>
+                                    <th><?php _e('Code:', LDNFT_TEXT_DOMAIN)?></th>
+                                    <td><?php echo $coupon->code;?></td>
+                                </tr>
+                                <tr>
+                                    <th><?php _e('Coupon Discount Type:', LDNFT_TEXT_DOMAIN)?></th>
+                                    <td><?php echo $coupon->discount_type;?></td>
+                                    <th><?php _e('Coupon Discount:', LDNFT_TEXT_DOMAIN)?></th>
+                                    <td><?php echo $coupon->discount_type=='percentage'?$coupon->discount.'%':$coupon->discount.$result->currency;?></td>
+                                </tr>
+                            <?php } ?>
+                            <tr>
+                                <th><?php _e('External ID:', LDNFT_TEXT_DOMAIN)?></th>
+                                <td><?php echo $result->external_id;?></td>
+                                <th><?php _e('Gateway', LDNFT_TEXT_DOMAIN)?></th>
+                                <td><?php echo $result->gateway;?></td>
+                            </tr>
+                            <tr>
+                                <th><?php _e('Payment Date:', LDNFT_TEXT_DOMAIN)?></th>
+                                <td><?php echo $result->created;?></td>
+                                <th><?php _e('Gateway', LDNFT_TEXT_DOMAIN)?></th>
+                                <td><?php echo $result->gateway;?></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                <?php
+            $content = ob_get_contents();
+            ob_get_clean();
+            echo $content;
+        } else {   
+            echo '<div class="ldnft-error-message">';
+            echo __('No record(s) found.', LDNFT_TEXT_DOMAIN) ;    
+            echo '</div>';
+        }
+        exit;
+    }
+
+    /**
+     * checks if there are subscribers records
+     */
+    public function subscriber_check_next() {
+        
+        $per_page       = isset($_REQUEST['per_page']) && intval($_REQUEST['per_page'])>0?intval($_REQUEST['per_page']):10;
+        $offset         = isset($_REQUEST['offset']) && intval($_REQUEST['offset'])>0?intval($_REQUEST['offset']):0;
+        $current_recs   = isset($_REQUEST['current_recs']) && intval($_REQUEST['current_recs'])>0?intval($_REQUEST['current_recs']):0;
+
+        $plugin_id      = isset($_REQUEST['plugin_id']) && intval($_REQUEST['plugin_id'])>0?intval($_REQUEST['plugin_id']):0;
+        $interval       = isset($_REQUEST['interval']) && intval($_REQUEST['interval'])>0?intval($_REQUEST['interval']):'';
+        $offset         = intval( $offset ) + intval( $per_page );
+        $interval_str = '';
+        if( !empty($interval) ) {
+           $interval_str = '&billing_cycle='.$this->selected_interval;
+        }
+
+        $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
+        $result = $api->Api('plugins/'.$plugin_id.'/subscriptions.json?count='.$per_page.'&offset='.$offset.$interval_str, 'GET', []);
+        if(count( $result->subscriptions ) == 0) {
+            echo __('No record(s) found.', LDNFT_TEXT_DOMAIN);
+        }
+        exit;
+    }
     
     /**
      * display admin notice
@@ -233,7 +474,9 @@ class LDNFT_Admin {
     /**
      * Add Reset Course Progress submenu page under learndash menus
      */
-    public function add_main_menu_page() {
+    public function add_main_menu_page() { 
+        
+        $user_id = get_current_user_id();
         
         add_menu_page(  
             __( 'Freemius Toolkit', LDNFT_TEXT_DOMAIN ),
@@ -245,11 +488,14 @@ class LDNFT_Admin {
             6 
         ); 
         
+        
+        // WP < 5.4.2. Saving screen option per_page. Must be called before 'admin_menu' event
+        
         $api = new Freemius_Api_WordPress( FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
         try {
             $plugins = $api->Api('plugins.json?fields=id,title', 'GET', []);
             if( ! isset( $plugins->error )  ) {
-                add_submenu_page( 
+                $hook = add_submenu_page( 
                     'ldninjas-freemius-toolkit',
                     __( 'Subscriptions', LDNFT_TEXT_DOMAIN ),
                     __( 'Subscriptions', LDNFT_TEXT_DOMAIN ),
@@ -257,6 +503,51 @@ class LDNFT_Admin {
                     'ldninjas-freemius-toolkit-subscriptions',
                     [ $this,'subscribers_page']
                 );
+                
+                $default_hidden_columns = [ 
+                    'outstanding_balance', 
+                    'failed_payments', 
+                    'trial_ends', 
+                    'created', 
+                    'initial_amount', 
+                    'next_payment', 
+                    'currency',
+                    'country_code', 
+                    'id', 
+                    'user_id',  
+                ];
+                if( get_user_option( 'subscription_hidden_columns_set', $user_id) != 'Yes' ) {
+                    update_user_option( $user_id, 'managefreemius-toolkit_page_ldninjas-freemius-toolkit-subscriptionscolumnshidden', $default_hidden_columns );
+                    update_user_option( $user_id, 'subscription_hidden_columns_set', 'Yes' );
+                }
+
+                add_action( "load-$hook", function () {
+                    
+                    global $ldnftSubscriptionsListTable;
+                    $option = 'per_page';
+                    $args = array(
+                            'label' => 'Subsriptions Per Page',
+                            'default' => 10,
+                            'option' => 'subscriptions_per_page'
+                        );
+                    add_screen_option( $option, $args );
+                    $ldnftSubscriptionsListTable = new LDNFT_Subscriptions();
+                    
+                    // add_screen_option( 'per_page', array(
+                    //     'label' => 'Show on page',
+                    //     'default' => 10,
+                    //     'option' => 'my_page_per_page', // the name of the option will be written in the user's meta-field
+                    // ) );
+
+                    // add_screen_option(
+                    //     'layout_columns',
+                    //     array(
+                    //         'max'     => 2,
+                    //         'default' => 2,
+                    //     )
+                    // );
+                } );
+
                 add_submenu_page( 
                     'ldninjas-freemius-toolkit',
                     __( 'Reviews', LDNFT_TEXT_DOMAIN ),
@@ -393,7 +684,7 @@ class LDNFT_Admin {
      */
     public static function subscribers_page( ) {
         //Create an instance of our package class...
-        $testListTable = new LDNFT_Subscribers();
+        $testListTable = new LDNFT_Subscriptions(); 
         //Fetch, prepare, sort, and filter our data...
         $testListTable->prepare_items();
         

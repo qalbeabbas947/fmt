@@ -125,3 +125,77 @@
     font-size: 15px;
     height: 20px;
 }
+.ldnft-popup-loader{display: none;}
+/* The Modal (background) */
+.ldnft-admin-modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 9999; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  }
+  
+  /* Modal Content */
+  .ldnft-admin-modal-content {
+    position: relative;
+    background-color: #fefefe;
+    margin: auto;
+    padding: 0;
+    border: 1px solid #888;
+    width: 80%;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s
+  }
+  
+  /* Add Animation */
+  @-webkit-keyframes animatetop {
+    from {top:-300px; opacity:0} 
+    to {top:0; opacity:1}
+  }
+  
+  @keyframes animatetop {
+    from {top:-300px; opacity:0}
+    to {top:0; opacity:1}
+  }
+  
+  /* The Close Button */
+  .ldnft-admin-modal-close {
+    color: white;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  
+  .ldnft-admin-modal-close:hover,
+  .ldnft-admin-modal-close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  #ldnft-subscriptions{
+    background-color: #888;
+  }
+  #ldnft-subscriptions td, #ldnft-subscriptions th {
+    background-color: white;
+  }
+  .ldnft-admin-modal-header {
+    padding: 2px 16px;
+    background-color: #9999AF;
+    color: white;
+  }
+  
+  .ldnft-admin-modal-body {padding: 2px 16px;}
+
+  .ldnft-popup-loader {
+    display: none;
+    text-align: center;
+}
