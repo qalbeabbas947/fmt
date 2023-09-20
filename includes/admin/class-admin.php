@@ -291,20 +291,21 @@ class LDNFT_Admin {
     public function subscriber_check_next() {
         
         $per_page       = isset($_REQUEST['per_page']) && intval($_REQUEST['per_page'])>0?intval($_REQUEST['per_page']):10;
-        $offset         = isset($_REQUEST['offset']) && intval($_REQUEST['offset'])>0?intval($_REQUEST['offset']):0;
+        $offset         = isset($_REQUEST['offset']) && intval($_REQUEST['offset'])>0?intval($_REQUEST['offset']):1;
         $current_recs   = isset($_REQUEST['current_recs']) && intval($_REQUEST['current_recs'])>0?intval($_REQUEST['current_recs']):0;
 
         $plugin_id      = isset($_REQUEST['plugin_id']) && intval($_REQUEST['plugin_id'])>0?intval($_REQUEST['plugin_id']):0;
         $interval       = isset($_REQUEST['interval']) && intval($_REQUEST['interval'])>0?intval($_REQUEST['interval']):'';
-        $offset         = intval( $offset ) + intval( $per_page );
+        $offset_rec     = ($offset - 1) * $per_page;
+
         $interval_str = '';
         if( !empty($interval) ) {
-           $interval_str = '&billing_cycle='.$this->selected_interval;
+           $interval_str = '&billing_cycle='.$interval;
         }
 
         $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
         $result = $api->Api('plugins/'.$plugin_id.'/subscriptions.json?count='.$per_page.'&offset='.$offset.$interval_str, 'GET', []);
-        if(count( $result->subscriptions ) == 0) {
+        if( ! is_array( $result->subscriptions ) || count( $result->subscriptions ) == 0) {
             echo __('No record(s) found.', LDNFT_TEXT_DOMAIN);
         }
         exit;
