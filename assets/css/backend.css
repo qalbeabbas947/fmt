@@ -231,3 +231,18 @@
     font-weight: bold;
     padding: 5px;
 }
+
+@media only screen and (max-width: 1000px) {
+    .ldfmt-sales-box {
+        width: 12%;
+        font-size: 1em;
+    }
+    
+}
+
+@media only screen and (max-width: 780px) {
+    .ldfmt-sales-box {
+        width: 12%;
+        font-size: 1em;
+    }
+}
