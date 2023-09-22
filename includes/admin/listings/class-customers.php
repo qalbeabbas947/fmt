@@ -565,10 +565,11 @@ class LDNFT_Customers extends WP_List_Table {
 			$page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&rsaquo;</span>';
 		} else {
 			$page_links[] = sprintf(
-				"<a data-action='ldnft_sales_check_next' data-status='%s' data-per_page='%d' data-offset='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='%s'>" .
+				"<a data-action='ldnft_customers_check_next' data-plugin_id='%d' data-status='%s' data-per_page='%d' data-offset='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='%s'>" .
 					"<span class='screen-reader-text'>%s</span>" .
 					"<span aria-hidden='true'>%s</span>" .
 				'</a>',
+                $this->selected_plugin_id,
                 $this->selected_status,
                 $per_page,
                 $offset+1,

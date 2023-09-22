@@ -84,9 +84,75 @@ class LDNFT_Admin {
         add_action( 'wp_ajax_ldnft_subscriber_check_next',      [ $this, 'subscriber_check_next' ], 100 );
         add_action( 'wp_ajax_ldnft_reviews_check_next',         [ $this, 'reviews_check_next' ], 100 );
         add_action( 'wp_ajax_ldnft_subscribers_view_detail',    [ $this, 'subscribers_view_detail' ], 100 );
-        add_action( 'wp_ajax_ldnft_sales_view_detail',    [ $this, 'sales_view_detail' ], 100 );
+        add_action( 'wp_ajax_ldnft_sales_view_detail',          [ $this, 'sales_view_detail' ], 100 );
+        add_action( 'wp_ajax_ldnft_customers_check_next',       [ $this, 'customers_check_next' ], 100 );
+        add_action( 'wp_ajax_ldnft_sales_check_next',       [ $this, 'sales_check_next' ], 100 );
     }
     
+    /**
+     * checks if there are customers records
+     */
+    public function sales_check_next() {
+        
+        $per_page       = isset($_REQUEST['per_page']) && intval($_REQUEST['per_page'])>0?intval($_REQUEST['per_page']):10;
+        $offset         = isset($_REQUEST['offset']) && intval($_REQUEST['offset'])>0?intval($_REQUEST['offset']):1;
+        $current_recs   = isset($_REQUEST['current_recs']) && intval($_REQUEST['current_recs'])>0?intval($_REQUEST['current_recs']):0;
+
+        $plugin_id      = isset($_REQUEST['plugin_id']) && intval($_REQUEST['plugin_id'])>0?intval($_REQUEST['plugin_id']):0;
+        $status         = isset($_REQUEST['status']) && intval($_REQUEST['status'])>0?intval($_REQUEST['status']):'';
+        $offset_rec     = ($offset-1) * $per_page;
+
+        $interval_str = '';
+        if( !empty($this->selected_interval) ) {
+            $interval_str = '&billing_cycle='.$this->selected_interval;
+        }
+
+        $status_str = '';
+        if( !empty($this->selected_status) ) {
+            $status_str = '&filter='.$this->selected_status;
+        }
+        
+        $plan_str = '';
+        if( !empty($this->selected_plan_id) ) {
+           $plan_str = '&plan_id='.$this->selected_plan_id;
+        }
+        $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
+        $result = $api->Api('plugins/'.$plugin_id.'/payments.json?count='.$per_page.'&offset='.$offset_rec.$interval_str.$status_str.$plan_str, 'GET', []);
+        
+        if( ! is_array( $result->payments ) || count( $result->payments ) == 0) {
+            echo __('No more record(s) found.', LDNFT_TEXT_DOMAIN);
+        }
+        exit;
+    }
+
+    /**
+     * checks if there are customers records
+     */
+    public function customers_check_next() {
+        
+        $per_page       = isset($_REQUEST['per_page']) && intval($_REQUEST['per_page'])>0?intval($_REQUEST['per_page']):10;
+        $offset         = isset($_REQUEST['offset']) && intval($_REQUEST['offset'])>0?intval($_REQUEST['offset']):1;
+        $current_recs   = isset($_REQUEST['current_recs']) && intval($_REQUEST['current_recs'])>0?intval($_REQUEST['current_recs']):0;
+
+        $plugin_id      = isset($_REQUEST['plugin_id']) && intval($_REQUEST['plugin_id'])>0?intval($_REQUEST['plugin_id']):0;
+        $status         = isset($_REQUEST['status']) && intval($_REQUEST['status'])>0?intval($_REQUEST['status']):'';
+        $offset_rec     = ($offset-1) * $per_page;
+
+        $status_str = "";
+        if( !empty( $status ) ) {
+            $status_str = "&filter=".$status;
+        }
+
+        $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
+        $result = $api->Api('plugins/'.$plugin_id.'/users.json?count='.$per_page.'&offset='.$offset_rec.$status_str, 'GET', []);
+        
+        if( ! is_array( $result->users ) || count( $result->users ) == 0) {
+            echo __('No more record(s) found.', LDNFT_TEXT_DOMAIN);
+        }
+        exit;
+    }
+
+
     /**
      * Returns the subscription data.
      */
@@ -396,10 +462,10 @@ class LDNFT_Admin {
 
         $plugin_id      = isset($_REQUEST['plugin_id']) && intval($_REQUEST['plugin_id'])>0?intval($_REQUEST['plugin_id']):0;
         $interval       = isset($_REQUEST['interval']) && intval($_REQUEST['interval'])>0?intval($_REQUEST['interval']):'';
-        $offset_rec     = ($offset - 1) * $per_page;
+        $offset_rec     = ($offset-1)  * $per_page;
 
         $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
-        $result = $api->Api('plugins/'.$plugin_id.'/reviews.json?count='.$per_page.'&offset='.$offset, 'GET', []);
+        $result = $api->Api('plugins/'.$plugin_id.'/reviews.json?count='.$per_page.'&offset='.$offset_rec, 'GET', []);
         if( ! is_array( $result->reviews ) || count( $result->reviews ) == 0) {
             echo __('No more record(s) found.', LDNFT_TEXT_DOMAIN);
         }
@@ -417,7 +483,7 @@ class LDNFT_Admin {
 
         $plugin_id      = isset($_REQUEST['plugin_id']) && intval($_REQUEST['plugin_id'])>0?intval($_REQUEST['plugin_id']):0;
         $interval       = isset($_REQUEST['interval']) && intval($_REQUEST['interval'])>0?intval($_REQUEST['interval']):'';
-        $offset_rec     = ($offset - 1) * $per_page;
+        $offset_rec     = ($offset-1) * $per_page;
 
         $interval_str = '';
         if( !empty($interval) ) {
@@ -425,7 +491,7 @@ class LDNFT_Admin {
         }
 
         $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
-        $result = $api->Api('plugins/'.$plugin_id.'/subscriptions.json?count='.$per_page.'&offset='.$offset.$interval_str, 'GET', []);
+        $result = $api->Api('plugins/'.$plugin_id.'/subscriptions.json?count='.$per_page.'&offset='.$offset_rec.$interval_str, 'GET', []);
         if( ! is_array( $result->subscriptions ) || count( $result->subscriptions ) == 0) {
             echo __('No more record(s) found.', LDNFT_TEXT_DOMAIN);
         }
