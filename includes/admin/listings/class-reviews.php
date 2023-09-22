@@ -102,7 +102,15 @@ class LDNFT_Reviews extends WP_List_Table {
         switch($column_name){
             case 'title':
             case 'text':
-            
+            case 'user_id':
+            case 'useremail':
+            case 'job_title':
+            case 'company_url':
+            case 'picture':
+            case 'profile_url':
+            case 'is_verified':
+            case 'is_featured':
+            case 'sharable_img':
             case 'created':
             case 'id':
                 return $item[$column_name];
@@ -184,15 +192,24 @@ class LDNFT_Reviews extends WP_List_Table {
      * @return array An associative array containing column information: 'slugs'=>'Visible Titles'
      **************************************************************************/
     public function get_columns(){
-        
+
         $columns = array(
-            'id'            => 'ID',
-            'title'         => 'Title',
-            'text'          => 'Comment',
-            'name'          => 'Name',
-            'rate'          => 'Rating',
-            'company'       => 'Company',
-            'created'       => 'Joined',
+            'id'                => __( 'ID', LDNFT_TEXT_DOMAIN ),
+            'user_id'           => __( 'User ID', LDNFT_TEXT_DOMAIN ),
+            'useremail'         => __( 'Email',LDNFT_TEXT_DOMAIN ),
+            'job_title'         => __( 'Job Title', LDNFT_TEXT_DOMAIN ),
+            'company_url'       => __( 'Company URL', LDNFT_TEXT_DOMAIN ),
+            'picture'           => __( 'Picture', LDNFT_TEXT_DOMAIN ),
+            'profile_url'       => __( 'Profile URL', LDNFT_TEXT_DOMAIN ),
+            'is_verified'       => __( 'Is Verified', LDNFT_TEXT_DOMAIN ),
+            'is_featured'       => __( 'Is Featured', LDNFT_TEXT_DOMAIN ),
+            'sharable_img'      => __( 'Sharable Image', LDNFT_TEXT_DOMAIN ),
+            'title'             => __( 'Review Title', LDNFT_TEXT_DOMAIN ),
+            'text'              => __( 'Comment', LDNFT_TEXT_DOMAIN ),
+            'name'              => __( 'Name', LDNFT_TEXT_DOMAIN ),
+            'rate'              => __( 'Rating', LDNFT_TEXT_DOMAIN ),
+            'company'           => __( 'Company', LDNFT_TEXT_DOMAIN ),
+            'created'           => __( 'Joined', LDNFT_TEXT_DOMAIN ),
         );
         
         return $columns;
@@ -216,13 +233,22 @@ class LDNFT_Reviews extends WP_List_Table {
     public function get_sortable_columns() {
         
         $sortable_columns = array(
-            'id'     => array('id',false), 
-            'title'    => array('title',false),
-            'text'  => array('text',false),
-            'name'  => array('name',false),
-            'rate'  => array('rate',false),
-            'company'  => array('company',false),
-            'created'  => array('created',false)
+            // 'id'                 => array('id', true ), 
+            // 'user_id'            => array( 'user_id', false ),
+            // 'useremail'          => array( 'useremail', false ),
+            // 'job_title'          => array( 'job_title', false ),
+            // 'company_url'        => array( 'company_url', false ),
+            // 'picture'            => array( 'picture', false ),
+            // 'profile_url'        => array( 'profile_url', false ),
+            // 'is_verified'        => array( 'is_verified', false ),
+            // 'is_featured'        => array( 'is_featured', false ),
+            // 'sharable_img'       => array( 'sharable_img', false ),
+            // 'title'              => array( 'title', false ),
+            // 'text'               => array( 'text', false ),
+            // 'name'               => array( 'name', false ),
+            // 'rate'               => array( 'rate', false ),
+            // 'company'            => array( 'company', false ),
+            // 'created'            => array( 'created', false )
         );
  
         return $sortable_columns;
@@ -291,8 +317,16 @@ class LDNFT_Reviews extends WP_List_Table {
         /**
          * First, lets decide how many records per page to show
          */
-        $per_page = 20;
-        $offset = isset($_REQUEST['offset']) && intval($_REQUEST['offset'])>0?intval($_REQUEST['offset']):0;
+        $per_page = get_user_option(
+            'reviews_per_page',
+            get_current_user_id()
+        );
+        
+        if( empty($per_page) ) {
+            $per_page = 10;
+        }
+        $offset = isset($_REQUEST['offset']) && intval($_REQUEST['offset'])>0?intval($_REQUEST['offset']):1;
+        $offset_rec = ($offset - 1) * $per_page;
         
         /**
          * REQUIRED. Now we need to define our column headers. This includes a complete
@@ -302,7 +336,8 @@ class LDNFT_Reviews extends WP_List_Table {
          * used to build the value for our _column_headers property.
          */
         $columns = $this->get_columns();
-        $hidden = array();
+        $screen = get_current_screen();
+        $hidden   = get_hidden_columns( $screen );
         $sortable = $this->get_sortable_columns();
         
         /**
@@ -330,15 +365,30 @@ class LDNFT_Reviews extends WP_List_Table {
          * use sort and pagination data to build a custom query instead, as you'll
          * be able to use your precisely-queried data immediately.
          */
-        $results = $this->api->Api('plugins/'.$this->selected_plugin_id.'/reviews.json?count='.$per_page.'&offset='.$offset, 'GET', ['is_featured'=>'false','is_verified'=>'false', 'enriched'=>'true' ]);
-        
+        $results = $this->api->Api('plugins/'.$this->selected_plugin_id.'/reviews.json?count='.$per_page.'&offset='.$offset_rec, 'GET', ['is_featured'=>'false','is_verified'=>'false', 'enriched'=>'true' ]);
         $data = [];
         $count = 0;
         foreach( $results->reviews as $review ) {
             
             foreach( $review as $key=>$value ) {
+                
+                if( empty( $value ) ) 
+                    $value = '-';
+                
                 $data[$count][$key] = $value;
+                
+                if( 'user_id' == $key ) {
+                    $user_id = $value;
+                }
             } 
+
+            $user = $this->api->Api('plugins/'.$this->selected_plugin_id.'/users/'.$user_id.'.json', 'GET', []);
+            if( $user ) {
+                $data[$count]['useremail']      = $user->email;
+                if(empty(trim($data[$count]['useremail']))) {
+                    $data[$count]['useremail'] = '-';
+                }
+            }
 
             $count++;   
         }
@@ -422,7 +472,8 @@ class LDNFT_Reviews extends WP_List_Table {
          */
         $this->set_pagination_args( array(
             'per_page'      => $per_page,
-            'offset'        => $offset ,
+            'offset'        => $offset,
+            'offset_rec'    => $offset_rec,
             'current_recs'  => count($results->reviews)
         ) );
     }
@@ -470,9 +521,12 @@ class LDNFT_Reviews extends WP_List_Table {
         
         $per_page       = $this->_pagination_args['per_page'];
 		$offset         = $this->_pagination_args['offset'];
+        $offset_rec     = $this->_pagination_args['offset_rec'];
         $current_recs   = $this->_pagination_args['current_recs'];
+        $offset_rec1    = ($offset) * $per_page;
         
-        $result = $this->api->Api('plugins/'.$this->selected_plugin_id.'/reviews.json?count='.$per_page.'&offset='.(intval($offset)+intval($per_page)), 'GET', []);
+        
+        $result = $this->api->Api('plugins/'.$this->selected_plugin_id.'/reviews.json?count='.$per_page.'&offset='.$offset_rec1, 'GET', []);
         
 		$total_items     = $this->_pagination_args['total_items'];
 		$total_pages     = $this->_pagination_args['total_pages'];
@@ -499,14 +553,14 @@ class LDNFT_Reviews extends WP_List_Table {
 		$disable_prev  = false;
 		$disable_next  = false;
 
-		if ( 0 == $offset  ) {
+		if ( 1 == $offset  ) {
 			$disable_first = true;
 			$disable_prev  = true;
 		}
 
 
-		if ( count($result->reviews) == 0 ) {
-			$disable_next = true;
+		if ( is_array($result->reviews) && count($result->reviews) == 0 ) {
+			//$disable_next = true;
 		}
 
 		if ( $disable_first ) {
@@ -527,40 +581,53 @@ class LDNFT_Reviews extends WP_List_Table {
 		if ( $disable_prev ) {
 			$page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&lsaquo;</span>';
 		} else {
+
 			$page_links[] = sprintf(
 				"<a class='prev-page button' href='%s'>" .
 					"<span class='screen-reader-text'>%s</span>" .
 					"<span aria-hidden='true'>%s</span>" .
 				'</a>', 
-				esc_url( add_query_arg( 'offset', (intval($offset)-intval($per_page)), $current_url ) ),
+				esc_url( add_query_arg( 'offset', intval($offset)>1?intval($offset)-1:1, $current_url ) ),
 				/* translators: Hidden accessibility text. */
 				__( 'Previous page', LDNFT_TEXT_DOMAIN ),
 				'&lsaquo;'
 			);
 		}
         
-        $page_links[] = $total_pages_before . sprintf(
-			/* translators: 1: Current page, 2: Total pages. */
-			_x( '%1$s to %2$s', 'paging' ),
-			$offset+1,
-			(intval($offset)+intval($current_recs))-1
-		) . $total_pages_after;
-
+        if( $offset == 1 && $current_recs == 0 ) {
+            $page_links[] = $total_pages_before . sprintf(
+                /* translators: 1: Current page, 2: Total pages. */
+                _x( '%1$s to %2$s', 'paging' ),
+                0,
+                0
+            ) . $total_pages_after;
+        } else {
+            $page_links[] = $total_pages_before . sprintf(
+                /* translators: 1: Current page, 2: Total pages. */
+                _x( 'From %1$s to %2$s', 'paging' ),
+                $offset_rec>0?$offset_rec+1:1,
+                (intval($offset_rec)+intval($current_recs))
+                ) . $total_pages_after;
+        }
 
 		if ( $disable_next ) {
 			$page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&rsaquo;</span>';
 		} else {
 			$page_links[] = sprintf(
-				"<a class='next-page button' href='%s'>" .
+				"<a data-action='ldnft_reviews_check_next' data-plugin_id='%d' data-per_page='%d' data-offset='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='%s'>" .
 					"<span class='screen-reader-text'>%s</span>" .
 					"<span aria-hidden='true'>%s</span>" .
 				'</a>',
-				esc_url( add_query_arg( 'offset', (intval($offset)+intval($per_page)), $current_url ) ),
+                $this->selected_plugin_id,
+                $per_page,
+                $offset+1,
+                $current_recs,
+				esc_url( add_query_arg( 'offset', intval($offset)+1, $current_url ) ),
 				__( 'Next page', LDNFT_TEXT_DOMAIN ),
 				'&rsaquo;'
 			);
 		}
-
+        
 		$pagination_links_class = 'pagination-links';
 		if ( ! empty( $infinite_scroll ) ) {
 			$pagination_links_class .= ' hide-if-js';

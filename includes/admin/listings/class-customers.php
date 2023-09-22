@@ -115,6 +115,7 @@ class LDNFT_Customers extends WP_List_Table {
             case 'last':
             case 'is_verified':
             case 'id':
+            case 'is_marketing_allowed':
             case 'created':
                 return $item[$column_name];
             case 'plugin_ids':
@@ -205,13 +206,14 @@ class LDNFT_Customers extends WP_List_Table {
     public function get_columns(){
         
         $columns = array(
-            'id'            => 'ID',
-            'email'         => 'Email',
-            'first'         => 'First Name',
-            'last'          => 'Last Name',
-            'is_verified'   => 'Verified?',
-            'created'       => 'Joined',
-            'plugin_ids'    => 'Plugins'
+            'id'                        => __( 'ID', LDNFT_TEXT_DOMAIN ),
+            'email'                     => __( 'Email', LDNFT_TEXT_DOMAIN ),
+            'first'                     => __( 'First Name', LDNFT_TEXT_DOMAIN ),
+            'last'                      => __( 'Last Name', LDNFT_TEXT_DOMAIN ),
+            'is_verified'               => __( 'Verified?', LDNFT_TEXT_DOMAIN ),
+            'created'                   => __( 'Joined', LDNFT_TEXT_DOMAIN ),
+            'plugin_ids'                => __( 'Plugins', LDNFT_TEXT_DOMAIN ),
+            'is_marketing_allowed'      => __( 'Is Marketing Allowed?', LDNFT_TEXT_DOMAIN )
         );
 
         return $columns;
@@ -235,12 +237,12 @@ class LDNFT_Customers extends WP_List_Table {
     public function get_sortable_columns() {
         
         $sortable_columns = array(
-            'id'     => array('id',false), 
-            'email'    => array('email',false),
-            'first'  => array('first',false),
-            'last'  => array('last',false),
-            'is_verified'  => array('is_verified',false),
-            'created'  => array('created',false)
+            // 'id'     => array('id',false), 
+            // 'email'    => array('email',false),
+            // 'first'  => array('first',false),
+            // 'last'  => array('last',false),
+            // 'is_verified'  => array('is_verified',false),
+            // 'created'  => array('created',false)
         );
         
         return $sortable_columns;
@@ -308,8 +310,17 @@ class LDNFT_Customers extends WP_List_Table {
         /**
          * First, lets decide how many records per page to show
          */
-        $per_page = 20;
-        $offset = isset($_REQUEST['offset']) && intval($_REQUEST['offset'])>0?intval($_REQUEST['offset']):0;
+        $per_page = get_user_option(
+            'customers_per_page',
+            get_current_user_id()
+        );
+        
+        if( empty($per_page) ) {
+            $per_page = 10;
+        }
+
+        $offset = isset($_REQUEST['offset']) && intval($_REQUEST['offset'])>0?intval($_REQUEST['offset']):1;
+        $offset_rec = ($offset - 1) * $per_page;
         
         /**
          * REQUIRED. Now we need to define our column headers. This includes a complete
@@ -319,7 +330,8 @@ class LDNFT_Customers extends WP_List_Table {
          * used to build the value for our _column_headers property.
          */
         $columns = $this->get_columns();
-        $hidden = array();
+        $screen = get_current_screen();
+        $hidden   = get_hidden_columns( $screen );
         $sortable = $this->get_sortable_columns();
         
         
@@ -357,15 +369,17 @@ class LDNFT_Customers extends WP_List_Table {
         $result = $this->api->Api('plugins/'.$this->selected_plugin_id.'/users.json?count='.$per_page.'&offset='.$offset.$status, 'GET', []);
         $data = [];
         $count = 0;
-        foreach( $result->users as $user ) {
-            foreach( $user as $key=>$value ) {
-                $data[$count][$key] = $value;
-                
-            } 
+        $total_recs = 0;
+        if( isset($result->users) && is_array($result->users) && count($result->users) > 0 ) {
+            $total_recs = count($result->users);
+            foreach( $result->users as $user ) {
+                foreach( $user as $key=>$value ) {
+                    $data[$count][$key] = $value;
+                } 
 
-            $count++;   
+                $count++;   
+            }
         }
-        
         /**
          * This checks for sorting input and sorts the data in our array accordingly.
          * 
@@ -406,8 +420,9 @@ class LDNFT_Customers extends WP_List_Table {
         
         $this->set_pagination_args( array(
             'per_page'      => $per_page,
-            'offset'        => $offset ,
-            'current_recs'  => count($result->users)
+            'offset'        => $offset,
+            'offset_rec'    => $offset_rec,
+            'current_recs'  => $total_recs
         ) );
     }
 
@@ -453,14 +468,19 @@ class LDNFT_Customers extends WP_List_Table {
         
         $per_page       = $this->_pagination_args['per_page'];
 		$offset         = $this->_pagination_args['offset'];
+        $offset_rec     = $this->_pagination_args['offset_rec'];
         $current_recs   = $this->_pagination_args['current_recs'];
+        $offset_rec1    = ($offset) * $per_page;
+        
+        
         $status = "";
         if( !empty( $this->selected_status ) ) {
             $status = "&filter=".$this->selected_status;
         }
-        $result = $this->api->Api('plugins/'.$this->selected_plugin_id.'/users.json?count='.$per_page.'&offset='.(intval($offset)+intval($per_page)).$status, 'GET', []);
-        
-		$total_items     = $this->_pagination_args['total_items'];
+
+        $result = $this->api->Api('plugins/'.$this->selected_plugin_id.'/users.json?count='.$per_page.'&offset='.$offset_rec1.$status, 'GET', []);
+
+        $total_items     = $this->_pagination_args['total_items'];
 		$total_pages     = $this->_pagination_args['total_pages'];
 		$infinite_scroll = false;
 		if ( isset( $this->_pagination_args['infinite_scroll'] ) ) {
@@ -485,13 +505,12 @@ class LDNFT_Customers extends WP_List_Table {
 		$disable_prev  = false;
 		$disable_next  = false;
 
-		if ( 0 == $offset  ) {
+		if ( 1 == $offset  ) {
 			$disable_first = true;
 			$disable_prev  = true;
 		}
 
-
-		if ( count($result->users) == 0 ) {
+		if ( isset($result->users) && is_array( $result->users ) && count($result->users) == 0 ) {
 			$disable_next = true;
 		}
 
@@ -513,40 +532,53 @@ class LDNFT_Customers extends WP_List_Table {
 		if ( $disable_prev ) {
 			$page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&lsaquo;</span>';
 		} else {
+
 			$page_links[] = sprintf(
 				"<a class='prev-page button' href='%s'>" .
 					"<span class='screen-reader-text'>%s</span>" .
 					"<span aria-hidden='true'>%s</span>" .
 				'</a>', 
-				esc_url( add_query_arg( 'offset', (intval($offset)-intval($per_page)), $current_url ) ),
+				esc_url( add_query_arg( 'offset', intval($offset)>1?intval($offset)-1:1, $current_url ) ),
 				/* translators: Hidden accessibility text. */
 				__( 'Previous page', LDNFT_TEXT_DOMAIN ),
 				'&lsaquo;'
 			);
 		}
         
-        $page_links[] = $total_pages_before . sprintf(
-			/* translators: 1: Current page, 2: Total pages. */
-			_x( '%1$s to %2$s', 'paging' ),
-			$offset+1,
-			(intval($offset)+intval($current_recs))-1
-		) . $total_pages_after;
-
+        if( $offset == 1 && $current_recs == 0 ) {
+            $page_links[] = $total_pages_before . sprintf(
+                /* translators: 1: Current page, 2: Total pages. */
+                _x( '%1$s to %2$s', 'paging' ),
+                0,
+                0
+            ) . $total_pages_after;
+        } else {
+            $page_links[] = $total_pages_before . sprintf(
+                /* translators: 1: Current page, 2: Total pages. */
+                _x( 'From %1$s to %2$s', 'paging' ),
+                $offset_rec>0?$offset_rec+1:1,
+                (intval($offset_rec)+intval($current_recs))
+                ) . $total_pages_after;
+        }
 
 		if ( $disable_next ) {
 			$page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&rsaquo;</span>';
 		} else {
 			$page_links[] = sprintf(
-				"<a class='next-page button' href='%s'>" .
+				"<a data-action='ldnft_sales_check_next' data-status='%s' data-per_page='%d' data-offset='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='%s'>" .
 					"<span class='screen-reader-text'>%s</span>" .
 					"<span aria-hidden='true'>%s</span>" .
 				'</a>',
-				esc_url( add_query_arg( 'offset', (intval($offset)+intval($per_page)), $current_url ) ),
+                $this->selected_status,
+                $per_page,
+                $offset+1,
+                $current_recs,
+				esc_url( add_query_arg( 'offset', intval($offset)+1, $current_url ) ),
 				__( 'Next page', LDNFT_TEXT_DOMAIN ),
 				'&rsaquo;'
 			);
 		}
-
+        
 		$pagination_links_class = 'pagination-links';
 		if ( ! empty( $infinite_scroll ) ) {
 			$pagination_links_class .= ' hide-if-js';
@@ -558,6 +590,7 @@ class LDNFT_Customers extends WP_List_Table {
 		$this->_pagination = "<div class='tablenav-pages'>$output</div>";
 
 		echo $this->_pagination;
+
 	}
 
     /**

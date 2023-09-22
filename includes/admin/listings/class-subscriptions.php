@@ -240,16 +240,16 @@ class LDNFT_Subscriptions extends WP_List_Table {
      **************************************************************************/
     public function get_sortable_columns() {
         $sortable_columns = array(
-            'username'  => array('username',false),
-            'useremail'  => array('useremail',false),
-            'amount_per_cycle'    => array('amount_per_cycle',false),
-            'discount'    => array('discount',false),
-            'billing_cycle'  => array('billing_cycle',false),
-            'total_gross'  => array('total_gross',false),
-            'gateway'  => array('gateway',false),
-            'next_payment'  => array('next_payment',false),
-            'renewal_amount'  => array('renewal_amount',false),
-            'view'              => array('view',false),
+            // 'username'  => array('username',false),
+            // 'useremail'  => array('useremail',false),
+            // 'amount_per_cycle'    => array('amount_per_cycle',false),
+            // 'discount'    => array('discount',false),
+            // 'billing_cycle'  => array('billing_cycle',false),
+            // 'total_gross'  => array('total_gross',false),
+            // 'gateway'  => array('gateway',false),
+            // 'next_payment'  => array('next_payment',false),
+            // 'renewal_amount'  => array('renewal_amount',false),
+            // 'view'              => array('view',false),
         );
 
         return $sortable_columns;
@@ -567,7 +567,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
 			$page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&rsaquo;</span>';
 		} else {
 			$page_links[] = sprintf(
-				"<a data-action='ldnft_subscriber_check_next' data-plugin_id='%d' data-status='%s' data-plan_id='%s' data-interval='%d' data-per_page='%d' data-offset='%d' data-current_recs='%d' class='next-page button ldnft_subscriber_load_next' href='%s'>" .
+				"<a data-action='ldnft_subscriber_check_next' data-plugin_id='%d' data-status='%s' data-plan_id='%s' data-interval='%d' data-per_page='%d' data-offset='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='%s'>" .
 					"<span class='screen-reader-text'>%s</span>" .
 					"<span aria-hidden='true'>%s</span>" .
 				'</a>',
@@ -727,7 +727,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
                         </div>
                         <div class="ldfmt-new-sales-box ldfmt-sales-box">
                             <label><?php echo __('Total Sales Count', LDNFT_TEXT_DOMAIN);?></label>
-                            <div class="ldnft_new_sales_count"><?php echo $total_new_subscriptions;?></div>
+                            <div class="ldnft_new_sales_count"><?php echo $total_number_of_sales;?></div>
                         </div>
                         <div class="ldfmt-new-subscriptions-box ldfmt-sales-box">
                             <label><?php echo __('New subscriptions', LDNFT_TEXT_DOMAIN);?></label>
