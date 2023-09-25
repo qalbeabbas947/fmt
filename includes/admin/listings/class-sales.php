@@ -216,7 +216,6 @@ class LDNFT_Sales extends WP_List_Table {
             'currency'              => __( 'Currency',LDNFT_TEXT_DOMAIN ), 
             'username'              => __( 'User Name',LDNFT_TEXT_DOMAIN ), 
             'useremail'             => __( 'Email',LDNFT_TEXT_DOMAIN ), 
-            // 'view'                  => __( 'View', LDNFT_TEXT_DOMAIN ),
         );
         
         return $columns;
@@ -238,23 +237,7 @@ class LDNFT_Sales extends WP_List_Table {
      * @return array An associative array containing all the columns that should be sortable: 'slugs'=>array('data_values',bool)
      **************************************************************************/
     public function get_sortable_columns() {
-        $sortable_columns = array(
-            // 'id'                => array('id',false), 
-            // 'user_id'           => array('user_id',false),
-            // 'username'          => array('username',false),
-            // 'useremail'         => array('useremail',false),
-            // 'subscription_id'   => array('subscription_id',false),
-            // 'gateway_fee'       => array('gateway_fee',false),
-            // 'gross'             => array('gross',false),
-            // 'gateway'           => array('gateway',false),
-            // 'license_id'        => array('license_id',false),
-            // 'gateway'           => array('gateway',false),
-            // 'country_code'      => array('country_code',false),
-            // 'created'           => array('created',false),
-            // 'is_renewal'        => array('is_renewal',false),
-            // 'type'              => array('type',false),
-            
-        );
+        $sortable_columns = array();
 
         return $sortable_columns;
     }
@@ -307,7 +290,6 @@ class LDNFT_Sales extends WP_List_Table {
      * $this->set_pagination_args(), although the following properties and methods
      * are frequently interacted with here...
      * 
-     * @global WPDB $wpdb
      * @uses $this->_column_headers
      * @uses $this->items
      * @uses $this->get_columns()
@@ -413,10 +395,6 @@ class LDNFT_Sales extends WP_List_Table {
             'current_recs'  => $total_recs
         ) );
     }
-
-    // public function column_view($item){
-    //     return '<a data-action="ldnft_sales_view_detail" data-user_id="'.$item['user_id'].'" data-plugin_id="'.$item['plugin_id'].'" data-id="'.$item['id'].'" class="ldnft_sales_view_detail" href="javascript:;">Get More</a>';
-    // }
 
     /**
 	 * Displays the pagination.

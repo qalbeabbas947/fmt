@@ -152,7 +152,6 @@ class LDNFT_Admin {
         exit;
     }
 
-
     /**
      * Returns the subscription data.
      */
@@ -291,8 +290,10 @@ class LDNFT_Admin {
                         </tbody>
                     </table>
                 <?php
+            
             $content = ob_get_contents();
             ob_get_clean();
+            
             echo $content;
         } else {   
             echo '<div class="ldnft-error-message">';
@@ -442,6 +443,7 @@ class LDNFT_Admin {
                 <?php
             $content = ob_get_contents();
             ob_get_clean();
+            
             echo $content;
         } else {   
             echo '<div class="ldnft-error-message">';
@@ -676,12 +678,11 @@ class LDNFT_Admin {
             6 
         ); 
         
-        
-        // WP < 5.4.2. Saving screen option per_page. Must be called before 'admin_menu' event
-        
         $api = new Freemius_Api_WordPress( FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
         try {
+            
             $plugins = $api->Api('plugins.json?fields=id,title', 'GET', []);
+            
             if( ! isset( $plugins->error )  ) {
                 $hook = add_submenu_page( 
                     'ldninjas-freemius-toolkit',
@@ -712,6 +713,7 @@ class LDNFT_Admin {
                 add_action( "load-$hook", function () {
                     
                     global $ldnftSubscriptionsListTable;
+                    
                     $option = 'per_page';
                     $args = array(
                             'label' => 'Subsriptions Per Page',
@@ -751,6 +753,7 @@ class LDNFT_Admin {
                 add_action( "load-$review_hook", function () {
                     
                     global $ldnftReviewsListTable;
+                    
                     $option = 'per_page';
                     $args = array(
                             'label' => 'Subsriptions Per Page',
@@ -798,6 +801,7 @@ class LDNFT_Admin {
                 add_action( "load-$sales_hook", function () {
                     
                     global $ldnftSalesListTable;
+                    
                     $option = 'per_page';
                     $args = array(
                             'label' => 'Sales Per Page',
@@ -830,6 +834,7 @@ class LDNFT_Admin {
                 add_action( "load-$customers_hook", function () {
                     
                     global $ldnftCustomersListTable;
+                    
                     $option = 'per_page';
                     $args = array(
                             'label' => 'Customers Per Page',
@@ -845,7 +850,6 @@ class LDNFT_Admin {
             
         }
 
-        
         add_submenu_page( 
             'ldninjas-freemius-toolkit',
             __( 'Settings', LDNFT_TEXT_DOMAIN ),
@@ -864,9 +868,15 @@ class LDNFT_Admin {
      * @param $current
      */
     public static function sales_page( ) {
-        //Create an instance of our package class...
+        
+        /**
+         * Create an instance of our package class... 
+         */
         $testListTable = new LDNFT_Sales();
-        //Fetch, prepare, sort, and filter our data...
+        
+        /**
+         * Fetch, prepare, sort, and filter our data... 
+         */
         $testListTable->prepare_items();
         ?>
             <div class="wrap">
@@ -891,9 +901,15 @@ class LDNFT_Admin {
      * @param $current
      */
     public static function customers_page( ) {
-        //Create an instance of our package class...
+
+        /**
+         * Create an instance of our package class... 
+         */
         $testListTable = new LDNFT_Customers();
-        //Fetch, prepare, sort, and filter our data...
+
+        /**
+         * Fetch, prepare, sort, and filter our data... 
+         */
         $testListTable->prepare_items();
         ?>
             <div class="wrap">
@@ -920,9 +936,15 @@ class LDNFT_Admin {
      * @param $current
      */
     public static function reviews_page( ) {
-        //Create an instance of our package class...
+        
+        /**
+         * Create an instance of our package class... 
+         */
         $testListTable = new LDNFT_Reviews();
-        //Fetch, prepare, sort, and filter our data...
+        
+        /**
+         * Fetch, prepare, sort, and filter our data... 
+         */
         $testListTable->prepare_items();
         
         ?>
@@ -951,11 +973,16 @@ class LDNFT_Admin {
      * @param $current
      */
     public static function subscribers_page( ) {
-        //Create an instance of our package class...
-        $testListTable = new LDNFT_Subscriptions(); 
-        //Fetch, prepare, sort, and filter our data...
-        $testListTable->prepare_items();
         
+        /**
+         * Create an instance of our package class... 
+         */
+        $testListTable = new LDNFT_Subscriptions(); 
+        
+        /**
+         * Fetch, prepare, sort, and filter our data... 
+         */
+        $testListTable->prepare_items();
         ?>
         <div class="wrap">
             
@@ -981,7 +1008,9 @@ class LDNFT_Admin {
      * @param $current
      */
     public static function settings_page( $current ) {
+        
         global $wpdb;
+        
         $ldnft_settings = get_option( 'ldnft_settings' );
         $api_scope      = isset( $ldnft_settings['api_scope'] ) ? sanitize_text_field( $ldnft_settings['api_scope'] ) : 'developer';
         $dev_id         = isset( $ldnft_settings['dev_id'] ) ? sanitize_text_field( $ldnft_settings['dev_id'] ) : '';

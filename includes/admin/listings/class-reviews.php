@@ -153,7 +153,7 @@ class LDNFT_Reviews extends WP_List_Table {
      * @param array $item A singular item (one full row's worth of data)
      * @return string Text to be placed inside the column <td> (movie title only)
      **************************************************************************/
-    public function column_title($item){
+    public function column_title( $item ) {
         
         return $item['title'];
     }
@@ -232,24 +232,7 @@ class LDNFT_Reviews extends WP_List_Table {
      **************************************************************************/
     public function get_sortable_columns() {
         
-        $sortable_columns = array(
-            // 'id'                 => array('id', true ), 
-            // 'user_id'            => array( 'user_id', false ),
-            // 'useremail'          => array( 'useremail', false ),
-            // 'job_title'          => array( 'job_title', false ),
-            // 'company_url'        => array( 'company_url', false ),
-            // 'picture'            => array( 'picture', false ),
-            // 'profile_url'        => array( 'profile_url', false ),
-            // 'is_verified'        => array( 'is_verified', false ),
-            // 'is_featured'        => array( 'is_featured', false ),
-            // 'sharable_img'       => array( 'sharable_img', false ),
-            // 'title'              => array( 'title', false ),
-            // 'text'               => array( 'text', false ),
-            // 'name'               => array( 'name', false ),
-            // 'rate'               => array( 'rate', false ),
-            // 'company'            => array( 'company', false ),
-            // 'created'            => array( 'created', false )
-        );
+        $sortable_columns = array();
  
         return $sortable_columns;
     }
@@ -302,7 +285,6 @@ class LDNFT_Reviews extends WP_List_Table {
      * $this->set_pagination_args(), although the following properties and methods
      * are frequently interacted with here...
      * 
-     * @global WPDB $wpdb
      * @uses $this->_column_headers
      * @uses $this->items
      * @uses $this->get_columns()
@@ -312,8 +294,6 @@ class LDNFT_Reviews extends WP_List_Table {
      **************************************************************************/
     public function prepare_items() {
        
-        global $wpdb;
-
         /**
          * First, lets decide how many records per page to show
          */
@@ -643,8 +623,6 @@ class LDNFT_Reviews extends WP_List_Table {
 
     public function extra_tablenav( $which ) {
         
-        global $wpdb;
-        
         if ( $which == "top" ){
             ?>
             <div class="alignleft actions bulkactions">
@@ -666,9 +644,6 @@ class LDNFT_Reviews extends WP_List_Table {
                 
             </div>
             <?php
-        }
-        
-        if ( $which == "bottom" ){
         }
 
     }

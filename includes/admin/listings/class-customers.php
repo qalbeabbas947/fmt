@@ -295,7 +295,6 @@ class LDNFT_Customers extends WP_List_Table {
      * $this->set_pagination_args(), although the following properties and methods
      * are frequently interacted with here...
      * 
-     * @global WPDB $wpdb
      * @uses $this->_column_headers
      * @uses $this->items
      * @uses $this->get_columns()
@@ -305,8 +304,6 @@ class LDNFT_Customers extends WP_List_Table {
      **************************************************************************/
     public function prepare_items() {
         
-        global $wpdb; 
-
         /**
          * First, lets decide how many records per page to show
          */
@@ -601,8 +598,6 @@ class LDNFT_Customers extends WP_List_Table {
 	 */
     public function extra_tablenav( $which ) {
         
-        global $wpdb;
-        
         if ( $which == "top" ){
             ?>
             <div class="alignleft actions bulkactions">
@@ -632,9 +627,6 @@ class LDNFT_Customers extends WP_List_Table {
                 </div>
             <?php
         }
-        if ( $which == "bottom" ){
-            
-    
-        }
+        
     }
 }

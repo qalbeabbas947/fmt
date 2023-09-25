@@ -65,6 +65,7 @@ class LDNFT_Reviews_Shortcode {
         } else if( $offset == 0 ){
             echo '<div class="ldfmt-no-results">'.__('No review(s) found.', LDNFT_TEXT_DOMAIN).'</div>';
         }
+        
         exit;
     }
 
@@ -81,6 +82,7 @@ class LDNFT_Reviews_Shortcode {
         $plugins = $api->Api('plugins.json?fields=id,title', 'GET', ['fields'=>'id,title']);
         $content = '';
         if( isset( $plugins->plugins ) &&  count($plugins->plugins) > 0 ) {
+            
             $plugins = $plugins->plugins;
             $plugin = $plugins[0];
             ob_start();
@@ -118,6 +120,7 @@ class LDNFT_Reviews_Shortcode {
                 </div>
                 
             <?php
+            
             $content = ob_get_contents();
             ob_get_clean();
         }

@@ -185,6 +185,7 @@ class LdNinjas_Freemius_Toolkit {
     }
 
     public static function get_country_name_by_code( $country_code ) {
+        
         $countries = array(
             'AX' => __( 'Åland Islands', LDNFT_TEXT_DOMAIN ),
             'AF' => __( 'Afghanistan', LDNFT_TEXT_DOMAIN ),
@@ -447,42 +448,3 @@ function LDNFT() {
     return LdNinjas_Freemius_Toolkit::instance();
 }
 add_action( 'plugins_loaded', 'LDNFT' );
-
-
-
-
-// add_filter('set-screen-option', 'cmi_set_screen_options', 11, 3);
-// function cmi_set_screen_options($status, $option, $value) {
-// 	if ( 'cmi_show_columns' == $option ) { 
-// 		$value = $_POST['cmi_columns'];
-// 	}
-// 	return $value;
-// }
-
-// add_filter('set-screen-option', 'cmi_set_option', 10, 3);
- 
-// function cmi_set_option($status, $option, $value) {
-//     return $value;
-// }
-// add_filter('screen_settings', 'cmi_show_screen_options', 10, 2 );
-// function cmi_show_screen_options( $status, $args ) {
-//     $return = $status;
-//         if ( $args->base == 'freemius-toolkit_page_ldninjas-freemius-toolkit-subscriptions' ) {    
-//             $button = get_submit_button( __( 'Apply' ), 'button', 'screen-options-apply', false );
-//             $return .= "
-//             <fieldset>
-//             <legend>Show Columns</legend>
-//             <div class='metabox-prefs'>
-//             <div><input type='hidden' name='wp_screen_options[option]' value='cmi_show_columns' /></div>
-//             <div><input type='hidden' name='wp_screen_options[value]' value='yes' /></div>
-//             <div class='cmi_custom_fields'>
-//                 <label for='cmi_producer'><input type='checkbox' value='on' name='cmi_columns[]' id='cmi_producer' /> Producer</label>
-//                 <label for='cmi_director'><input type='checkbox' value='on' name='cmi_columns[]' id='cmi_director' /> Director</label>
-//             </div>
-//             </div>
-//             </fieldset>
-//             <br class='clear'>
-//             $button";
-//         }
-//         return $return;
-// }

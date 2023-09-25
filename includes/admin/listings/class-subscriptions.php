@@ -80,11 +80,11 @@ class LDNFT_Subscriptions extends WP_List_Table {
             $this->selected_interval = $_GET['interval']; 
         }
         
-        if( isset($_GET['status'])  ) {
+        if( isset( $_GET['status'] )  ) {
             $this->selected_status = $_GET['status']; 
         }
         
-        if( isset($_GET['plan_id'])  ) {
+        if( isset( $_GET['plan_id'] ) ) {
             $this->selected_plan_id = $_GET['plan_id']; 
         }
 
@@ -180,9 +180,13 @@ class LDNFT_Subscriptions extends WP_List_Table {
         );
     }
 
+    /**
+     * Will display a link to show popup for the subscription detail.
+     */
     public function column_view($item){
         return '<a data-action="ldnft_subscribers_view_detail" data-user_id="'.$item['user_id'].'" data-plugin_id="'.$item['plugin_id'].'" data-id="'.$item['id'].'" class="ldnft_subscribers_view_detail" href="javascript:;">Get More</a>';
     }
+
     /** ************************************************************************
      * REQUIRED! This method dictates the table's columns and titles. This should
      * return an array where the key is the column slug (and class) and the value 
@@ -239,18 +243,8 @@ class LDNFT_Subscriptions extends WP_List_Table {
      * @return array An associative array containing all the columns that should be sortable: 'slugs'=>array('data_values',bool)
      **************************************************************************/
     public function get_sortable_columns() {
-        $sortable_columns = array(
-            // 'username'  => array('username',false),
-            // 'useremail'  => array('useremail',false),
-            // 'amount_per_cycle'    => array('amount_per_cycle',false),
-            // 'discount'    => array('discount',false),
-            // 'billing_cycle'  => array('billing_cycle',false),
-            // 'total_gross'  => array('total_gross',false),
-            // 'gateway'  => array('gateway',false),
-            // 'next_payment'  => array('next_payment',false),
-            // 'renewal_amount'  => array('renewal_amount',false),
-            // 'view'              => array('view',false),
-        );
+        
+        $sortable_columns = array();
 
         return $sortable_columns;
     }
@@ -273,8 +267,8 @@ class LDNFT_Subscriptions extends WP_List_Table {
     public function get_bulk_actions() {
         
         $actions = [];
+        
         return $actions;
-
     }
 
 
@@ -303,7 +297,6 @@ class LDNFT_Subscriptions extends WP_List_Table {
      * $this->set_pagination_args(), although the following properties and methods
      * are frequently interacted with here...
      * 
-     * @global WPDB $wpdb
      * @uses $this->_column_headers
      * @uses $this->items
      * @uses $this->get_columns()
@@ -313,8 +306,6 @@ class LDNFT_Subscriptions extends WP_List_Table {
      **************************************************************************/
     public function prepare_items() {
         
-        global $wpdb;
-
         /**
          * First, lets decide how many records per page to show
          */
@@ -605,8 +596,6 @@ class LDNFT_Subscriptions extends WP_List_Table {
 	 */
     public function extra_tablenav( $which ) {
         
-        global $wpdb;
-        
         if ( $which == "top" ){
             $interval_str = '';
             if( !empty($this->selected_interval) ) {
@@ -737,8 +726,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
                             <label><?php echo __('Total Renewals', LDNFT_TEXT_DOMAIN);?></label>
                             <div class="ldnft_renewals_count"><?php echo $total_new_renewals;?></div>
                         </div>
-                </div>
-                    
+                    </div>
                 </div>
                 <div id="ldnft-admin-modal" class="ldnft-admin-modal">
                     <!-- Modal content -->
@@ -747,9 +735,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
                         <span class="ldnft-admin-modal-close">&times;</span>
                             <h2><?php echo __( 'Subscription Detail', LDNFT_TEXT_DOMAIN );?></h2>
                         </div>
-                        <div class="ldnft-admin-modal-body">
-                            
-                        </div>
+                        <div class="ldnft-admin-modal-body"></div>
                         <div class="ldnft-popup-loader"><img class="" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" /></div>
                     </div>
                 </div>

@@ -43,7 +43,9 @@ class LDNFT_Sales_Shortcode {
     }
 
     public function load_sales() {
+        
         global $wpdb;
+
         $plugin_id  = sanitize_text_field($_POST['plugin_id']);
         $interval   = sanitize_text_field($_POST['interval']);
         $show       = sanitize_text_field($_POST['show']);
@@ -86,7 +88,7 @@ class LDNFT_Sales_Shortcode {
                 }
             }
 
-            $gross = 0;//$wpdb->get_var($wpdb->prepare("SELECT sum(gross) FROM $table_name where plugin_id=%d ".$where_interval, $plugin_id ));
+            $gross = 0;
             ?>
                 <div class="ldfmt-gross-sales-box ldfmt-sales-box">
                     <label><?php echo __('Gross Sales', LDNFT_TEXT_DOMAIN);?></label>
@@ -94,7 +96,7 @@ class LDNFT_Sales_Shortcode {
                 </div>
             <?php
     
-            $gateway_fee = 0;//$wpdb->get_var($wpdb->prepare("SELECT sum(gateway_fee) FROM $table_name where plugin_id=%d ".$where_interval, $plugin_id ));
+            $gateway_fee = 0;
             ?>
                 <div class="ldfmt-gross-gateway-box ldfmt-sales-box">
                     <label><?php echo __('Tax Rate', LDNFT_TEXT_DOMAIN);?></label>
@@ -138,7 +140,9 @@ class LDNFT_Sales_Shortcode {
                 if(  $offset == 0 ) {
                     echo '<table>';
                 }
+
             } elseif(  $offset == 0 ) {
+
                 echo '<div class="ldfmt-no-results">'.__('No sale record(s) found.', LDNFT_TEXT_DOMAIN).'</div>';
             }
         }
@@ -174,6 +178,7 @@ class LDNFT_Sales_Shortcode {
      * @param $atts
      */
     public function sales_shortcode_cb( $atts ) {
+        
         $user_id = isset( $atts['user_id'] ) ? $atts['user_id'] : get_current_user_id();
         $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
         
@@ -215,19 +220,14 @@ class LDNFT_Sales_Shortcode {
                         </div>
                     </div>
                     <div style="display:none" class="ldfmt-loader-div"><img width="30px" class="ldfmt-data-loader" src="<?php echo LDNFT_ASSETS_URL.'images/spinner-2x.gif';?>" /></div>
-                    <div class="ldmft-filter-sales">
-                        <!-- <div class="review-container">
-                            <img src="/w3images/bandmember.jpg" alt="Avatar" style="width:90px">
-                            <p><span>Chris Fox.</span> CEO at Mighty Schools.</p>
-                            <p>John Doe saved us from a web disaster.</p>
-                        </div> -->
-                    </div>
+                    <div class="ldmft-filter-sales"></div>
                     <div class="ldfmt-load-more-sales-btn"><a href="javascript:;">
                         <?php echo __( 'Load More', LDNFT_TEXT_DOMAIN );?></a>
                         <div style="display:none" class="ldfmt-loader-div-btm"><img width="30px" class="ldfmt-data-loader" src="<?php echo LDNFT_ASSETS_URL.'images/spinner-2x.gif';?>" /></div>
                     </div>
                 </div>
             <?php
+
             $content = ob_get_contents();
             ob_get_clean();
         }
