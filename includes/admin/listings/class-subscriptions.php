@@ -217,7 +217,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
             'trial_ends'            => __( 'Trial End',LDNFT_TEXT_DOMAIN ), 
             'created'               => __( 'Payment Date',LDNFT_TEXT_DOMAIN ), 
             'initial_amount'        => __( 'First Payment',LDNFT_TEXT_DOMAIN ), 
-            'next_payment'          => __( 'Next Renewal Amount',LDNFT_TEXT_DOMAIN ), 
+            'next_payment'          => __( 'Next Renewal Date',LDNFT_TEXT_DOMAIN ), 
             'currency'              => __( 'Currency',LDNFT_TEXT_DOMAIN ),
             'country_code'          => __( 'Country',LDNFT_TEXT_DOMAIN ), 
             'view'                  => __( 'View', LDNFT_TEXT_DOMAIN ),
