@@ -79,6 +79,19 @@
     background-color: green;
     color: white;
 }
+.mailpoet_unable_to_import{
+    color:red;
+}
+#ldnft-settings-import-mailpoet-general{
+    width: 80%;
+    padding: 5px;
+    border-radius: 4px;
+    margin: 10px auto;
+    background-color: #ddd;
+    font-weight: bold;
+    text-align: center;
+    color: black;
+}
 #ldnft-settings-import-mailpoet-errmessage{
     width: 50%;
     padding: 5px;
