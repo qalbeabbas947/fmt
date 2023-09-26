@@ -1178,7 +1178,6 @@ class LDNFT_Admin {
 
         $screen = get_current_screen();
         if( $screen ) { 
-            echo $screen->id;
             if( $screen->id == 'freemius-toolkit_page_freemius-settings' 
                 || $screen->id == 'freemius-toolkit_page_freemius-subscriptions'
                 || $screen->id == 'freemius-toolkit_page_freemius-sales' 

@@ -57,7 +57,6 @@ class LDNFT_Reviews extends WP_List_Table {
             foreach( $this->plugins as $plugin ) {
                 $this->plugins_short_array[$plugin->id] = $plugin->title;
             }
-            
         }
 
         if( isset($_GET['ldfmt_plugins_filter']) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) {
@@ -335,7 +334,6 @@ class LDNFT_Reviews extends WP_List_Table {
          */
         $this->process_bulk_action();
         
-        
         /**
          * Instead of querying a database, we're going to fetch the example data
          * property we created for use in this plugin. This makes this example 
@@ -345,7 +343,8 @@ class LDNFT_Reviews extends WP_List_Table {
          * use sort and pagination data to build a custom query instead, as you'll
          * be able to use your precisely-queried data immediately.
          */
-        $results = $this->api->Api('plugins/'.$this->selected_plugin_id.'/reviews.json?count='.$per_page.'&offset='.$offset_rec, 'GET', ['is_featured'=>'false','is_verified'=>'false', 'enriched'=>'true' ]);
+        $results = $this->api->Api('plugins/'.$this->selected_plugin_id.'/reviews.json?is_featured=true&count='.$per_page.'&offset='.$offset_rec, 'GET', ['is_featured'=>'false','is_verified'=>'false', 'enriched'=>'true' ]);
+        
         $data = [];
         $count = 0;
         foreach( $results->reviews as $review ) {
@@ -506,7 +505,7 @@ class LDNFT_Reviews extends WP_List_Table {
         $offset_rec1    = ($offset) * $per_page;
         
         
-        $result = $this->api->Api('plugins/'.$this->selected_plugin_id.'/reviews.json?count='.$per_page.'&offset='.$offset_rec1, 'GET', []);
+        $result = $this->api->Api('plugins/'.$this->selected_plugin_id.'/reviews.json?is_featured=true&count='.$per_page.'&offset='.$offset_rec1, 'GET', []);
         
 		$total_items     = $this->_pagination_args['total_items'];
 		$total_pages     = $this->_pagination_args['total_pages'];
