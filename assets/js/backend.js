@@ -9,7 +9,7 @@
                 $('.ldnft_subscribers_view_detail').on('click', LDNFTbackEnd.subscribers_view_detail);
                 $('.ldnft_sales_view_detail').on('click', LDNFTbackEnd.sales_view_detail);
                 $('.ldnft-admin-modal-close').on('click', LDNFTbackEnd.ldnft_subsciber_modal_close);
-             },
+            },
             /**
              * closes the popup
              *

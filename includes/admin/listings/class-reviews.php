@@ -626,7 +626,7 @@ class LDNFT_Reviews extends WP_List_Table {
         if ( $which == "top" ){
             ?>
             <div class="alignleft actions bulkactions">
-                <select onchange="document.location='admin.php?page=ldninjas-freemius-toolkit-reviews&ldfmt_plugins_filter='+this.value" name="ldfmt-plugins-filter" class="ldfmt-plugins-filter">
+                <select onchange="document.location='admin.php?page=freemius-reviews&ldfmt_plugins_filter='+this.value" name="ldfmt-plugins-filter" class="ldfmt-plugins-filter">
                     <option value="">Filter by Plugin</option>
                     <?php
                         foreach( $this->plugins as $plugin ) {

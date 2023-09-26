@@ -12,9 +12,9 @@
 if( ! defined( 'ABSPATH' ) ) exit;
 
 /**
- * LdNinjas_Freemius_Toolkit
+ * LDNFT_Freemius
  */
-class LdNinjas_Freemius_Toolkit {
+class LDNFT_Freemius {
     
     /**
      * @var version number
@@ -32,7 +32,7 @@ class LdNinjas_Freemius_Toolkit {
      */
     public static function instance() {
 
-        if ( is_null( self::$instance ) && ! ( self::$instance instanceof LdNinjas_Freemius_Toolkit ) ) {
+        if ( is_null( self::$instance ) && ! ( self::$instance instanceof LDNFT_Freemius ) ) {
             self::$instance = new self;
 
             self::$instance->setup_constants();
@@ -445,6 +445,6 @@ class LdNinjas_Freemius_Toolkit {
  */
 function LDNFT() {
 
-    return LdNinjas_Freemius_Toolkit::instance();
+    return LDNFT_Freemius::instance();
 }
 add_action( 'plugins_loaded', 'LDNFT' );

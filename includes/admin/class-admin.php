@@ -203,7 +203,7 @@ class LDNFT_Admin {
                             </tr>
                             <tr>
                                 <th><?php _e('Country', LDNFT_TEXT_DOMAIN)?></th>
-                                <td><?php echo LdNinjas_Freemius_Toolkit::get_country_name_by_code( strtoupper($result->country_code) );?></td>
+                                <td><?php echo LDNFT_Freemius::get_country_name_by_code( strtoupper($result->country_code) );?></td>
                                 <th><?php _e('Discount', LDNFT_TEXT_DOMAIN)?></th>
                                 <td><?php echo $discount;?></td>
                             </tr>
@@ -354,7 +354,7 @@ class LDNFT_Admin {
                             </tr>
                             <tr>
                                 <th><?php _e('Country', LDNFT_TEXT_DOMAIN)?></th>
-                                <td><?php echo LdNinjas_Freemius_Toolkit::get_country_name_by_code( strtoupper($result->country_code) );?></td>
+                                <td><?php echo LDNFT_Freemius::get_country_name_by_code( strtoupper($result->country_code) );?></td>
                                 <th><?php _e('Discount', LDNFT_TEXT_DOMAIN)?></th>
                                 <td><?php echo $discount;?></td>
                             </tr>
@@ -641,7 +641,7 @@ class LDNFT_Admin {
     public function remove_admin_notices() {
 
         $screen = get_current_screen();
-        if( $screen && $screen->id == 'freemius-toolkit_page_ldninjas-freemius-toolkit-settings' ) {
+        if( $screen && $screen->id == 'freemius-toolkit_page_freemius-settings' ) {
 
             remove_all_actions( 'admin_notices' );
         }
@@ -655,7 +655,7 @@ class LDNFT_Admin {
      */
     public function plugin_setting_links( $links ) {
 
-        $settings_link = '<a href="'. admin_url( 'admin.php?page=ldninjas-freemius-toolkit-settings' ) .'">'. __( 'Settings', LDNFT_TEXT_DOMAIN ) .'</a>';
+        $settings_link = '<a href="'. admin_url( 'admin.php?page=freemius-settings' ) .'">'. __( 'Settings', LDNFT_TEXT_DOMAIN ) .'</a>';
         array_unshift( $links, $settings_link );
 
         return $links;
@@ -672,7 +672,7 @@ class LDNFT_Admin {
             __( 'Freemius Toolkit', LDNFT_TEXT_DOMAIN ),
             __( 'Freemius Toolkit', LDNFT_TEXT_DOMAIN ),
             'manage_options',
-            'ldninjas-freemius-toolkit',
+            'ldnft-freemius',
             [$this,'ldninjas_main'],
             LDNFT_ASSETS_URL.'images/freemius-icon-light-small.png',
             6 
@@ -685,11 +685,11 @@ class LDNFT_Admin {
             
             if( ! isset( $plugins->error )  ) {
                 $hook = add_submenu_page( 
-                    'ldninjas-freemius-toolkit',
+                    'ldnft-freemius',
                     __( 'Subscriptions', LDNFT_TEXT_DOMAIN ),
                     __( 'Subscriptions', LDNFT_TEXT_DOMAIN ),
                     'manage_options',
-                    'ldninjas-freemius-toolkit-subscriptions',
+                    'freemius-subscriptions',
                     [ $this,'subscribers_page']
                 );
                 
@@ -706,7 +706,7 @@ class LDNFT_Admin {
                     'user_id',  
                 ];
                 if( get_user_option( 'subscription_hidden_columns_set', $user_id) != 'Yes' ) {
-                    update_user_option( $user_id, 'managefreemius-toolkit_page_ldninjas-freemius-toolkit-subscriptionscolumnshidden', $default_hidden_columns );
+                    update_user_option( $user_id, 'managefreemius-toolkit_page_freemius-subscriptionscolumnshidden', $default_hidden_columns );
                     update_user_option( $user_id, 'subscription_hidden_columns_set', 'Yes' );
                 }
 
@@ -725,11 +725,11 @@ class LDNFT_Admin {
                 } );
 
                 $review_hook = add_submenu_page( 
-                    'ldninjas-freemius-toolkit',
+                    'ldnft-freemius',
                     __( 'Reviews', LDNFT_TEXT_DOMAIN ),
                     __( 'Reviews', LDNFT_TEXT_DOMAIN ),
                     'manage_options',
-                    'ldninjas-freemius-toolkit-reviews',
+                    'freemius-reviews',
                     [ $this,'reviews_page']
                 );
 
@@ -746,7 +746,7 @@ class LDNFT_Admin {
                     'sharable_img',
                 ];
                 if( get_user_option( 'reviews_hidden_columns_set', $user_id) != 'Yes' ) {
-                    update_user_option( $user_id, 'managefreemius-toolkit_page_ldninjas-freemius-toolkit-reviewscolumnshidden', $reviews_hidden_columns );
+                    update_user_option( $user_id, 'managefreemius-toolkit_page_freemius-reviewscolumnshidden', $reviews_hidden_columns );
                     update_user_option( $user_id, 'reviews_hidden_columns_set', 'Yes' );
                 }
 
@@ -766,11 +766,11 @@ class LDNFT_Admin {
 
 
                 $sales_hook = add_submenu_page( 
-                    'ldninjas-freemius-toolkit',
+                    'ldnft-freemius',
                     __( 'Sales', LDNFT_TEXT_DOMAIN ),
                     __( 'Sales', LDNFT_TEXT_DOMAIN ),
                     'manage_options',
-                    'ldninjas-freemius-toolkit-sales',
+                    'freemius-sales',
                     [ $this,'sales_page']
                 );
                 
@@ -794,7 +794,7 @@ class LDNFT_Admin {
                     'external_id'
                 ];
                 if( get_user_option( 'sales_hidden_columns_set', $user_id) != 'Yes' ) {
-                    update_user_option( $user_id, 'managefreemius-toolkit_page_ldninjas-freemius-toolkit-salescolumnshidden', $sales_hidden_columns );
+                    update_user_option( $user_id, 'managefreemius-toolkit_page_freemius-salescolumnshidden', $sales_hidden_columns );
                     update_user_option( $user_id, 'sales_hidden_columns_set', 'Yes' );
                 }
 
@@ -814,11 +814,11 @@ class LDNFT_Admin {
                 
 
                 $customers_hook = add_submenu_page( 
-                    'ldninjas-freemius-toolkit',
+                    'ldnft-freemius',
                     __( 'Customers', LDNFT_TEXT_DOMAIN ),
                     __( 'Customers', LDNFT_TEXT_DOMAIN ),
                     'manage_options',
-                    'ldninjas-freemius-toolkit-customers',
+                    'freemius-customers',
                     [ $this,'customers_page']
                 );
 
@@ -827,7 +827,7 @@ class LDNFT_Admin {
                     'is_verified'
                 ];
                 if( get_user_option( 'customers_hidden_columns_set', $user_id) != 'Yes' ) {
-                    update_user_option( $user_id, 'managefreemius-toolkit_page_ldninjas-freemius-toolkit-customerscolumnshidden', $customers_hidden_columns );
+                    update_user_option( $user_id, 'managefreemius-toolkit_page_freemius-customerscolumnshidden', $customers_hidden_columns );
                     update_user_option( $user_id, 'customers_hidden_columns_set', 'Yes' );
                 }
 
@@ -851,15 +851,15 @@ class LDNFT_Admin {
         }
 
         add_submenu_page( 
-            'ldninjas-freemius-toolkit',
+            'ldnft-freemius',
             __( 'Settings', LDNFT_TEXT_DOMAIN ),
             __( 'Settings', LDNFT_TEXT_DOMAIN ),
             'manage_options',
-            'ldninjas-freemius-toolkit-settings',
+            'freemius-settings',
             [ $this,'settings_page']
         );
 
-        remove_submenu_page('ldninjas-freemius-toolkit','ldninjas-freemius-toolkit'); // pay a attention
+        remove_submenu_page('ldnft-freemius','ldnft-freemius');
     }
 
    /**
@@ -1178,12 +1178,12 @@ class LDNFT_Admin {
 
         $screen = get_current_screen();
         if( $screen ) { 
-            
-            if( $screen->id == 'freemius-toolkit_page_ldninjas-freemius-toolkit-settings' 
-                || $screen->id == 'freemius-toolkit_page_ldninjas-freemius-toolkit-subscriptions'
-                || $screen->id == 'freemius-toolkit_page_ldninjas-freemius-toolkit-sales' 
-                || $screen->id == 'freemius-toolkit_page_ldninjas-freemius-toolkit-customers' 
-                || $screen->id == 'freemius-toolkit_page_ldninjas-freemius-toolkit-reviews' ) {
+            echo $screen->id;
+            if( $screen->id == 'freemius-toolkit_page_freemius-settings' 
+                || $screen->id == 'freemius-toolkit_page_freemius-subscriptions'
+                || $screen->id == 'freemius-toolkit_page_freemius-sales' 
+                || $screen->id == 'freemius-toolkit_page_freemius-customers' 
+                || $screen->id == 'freemius-toolkit_page_freemius-reviews' ) {
 
                 /**
                  * enqueue admin css

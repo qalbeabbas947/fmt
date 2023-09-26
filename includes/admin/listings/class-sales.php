@@ -376,7 +376,7 @@ class LDNFT_Sales extends WP_List_Table {
                         $user_id = $value;
                     }
                 } 
-                $data[$count]['country_code']   = LdNinjas_Freemius_Toolkit::get_country_name_by_code( strtoupper($payment->country_code) );
+                $data[$count]['country_code']   = LDNFT_Freemius::get_country_name_by_code( strtoupper($payment->country_code) );
                 $user = $this->api->Api('plugins/'.$this->selected_plugin_id.'/users/'.$user_id.'.json', 'GET', []);
                 $data[$count]['username']   = $user->first.' '.$user->last;
                 $data[$count]['useremail']  = $user->email;
@@ -631,7 +631,7 @@ class LDNFT_Sales extends WP_List_Table {
             ?>
             <div class="ldnft_filters_top">
                 <div class="alignleft actions bulkactions">
-                    <select onchange="document.location='admin.php?page=ldninjas-freemius-toolkit-sales&interval=<?php echo $this->selected_filter;?>&ldfmt_plugins_filter='+this.value" name="ldfmt-plugins-filter" class="ldfmt-plugins-filter">
+                    <select onchange="document.location='admin.php?page=freemius-sales&interval=<?php echo $this->selected_filter;?>&ldfmt_plugins_filter='+this.value" name="ldfmt-plugins-filter" class="ldfmt-plugins-filter">
                         <option value=""><?php _e( 'Filter by Plugin', LDNFT_TEXT_DOMAIN ); ?></option>
                         <?php
                             foreach( $this->plugins as $plugin ) {
@@ -646,12 +646,12 @@ class LDNFT_Sales extends WP_List_Table {
                             }
                         ?>
                     </select>
-                    <select onchange="document.location='admin.php?page=ldninjas-freemius-toolkit-sales&ldfmt_plugins_filter=<?php echo $this->selected_plugin_id;?>&filter=<?php echo $this->selected_filter;?>&interval='+this.value" name="ldfmt-sales-interval-filter" class="ldfmt-sales-interval-filter">
+                    <select onchange="document.location='admin.php?page=freemius-sales&ldfmt_plugins_filter=<?php echo $this->selected_plugin_id;?>&filter=<?php echo $this->selected_filter;?>&interval='+this.value" name="ldfmt-sales-interval-filter" class="ldfmt-sales-interval-filter">
                         <option value=""><?php echo __( 'All Time', LDNFT_TEXT_DOMAIN );?></option>
                         <option value="1" <?php echo $this->selected_interval=='1'?'selected':'';?>><?php echo __( 'Monthly', LDNFT_TEXT_DOMAIN );?></option>
                         <option value="12" <?php echo $this->selected_interval=='12'?'selected':'';?>><?php echo __( 'Annual', LDNFT_TEXT_DOMAIN );?></option>
                     </select>
-                    <select onchange="document.location='admin.php?page=ldninjas-freemius-toolkit-sales&ldfmt_plugins_filter=<?php echo $this->selected_plugin_id;?>&interval=<?php echo $this->selected_interval;?>&filter='+this.value" name="ldfmt-sales-filter" class="ldfmt-sales-filter">
+                    <select onchange="document.location='admin.php?page=freemius-sales&ldfmt_plugins_filter=<?php echo $this->selected_plugin_id;?>&interval=<?php echo $this->selected_interval;?>&filter='+this.value" name="ldfmt-sales-filter" class="ldfmt-sales-filter">
                         <option value="all"><?php echo __( 'All Status', LDNFT_TEXT_DOMAIN );?></option>
                         <option value="not_refunded" <?php echo $this->selected_filter=='not_refunded'?'selected':'';?>><?php echo __( 'Not Refunded', LDNFT_TEXT_DOMAIN );?></option>
                         <option value="refunds" <?php echo $this->selected_filter=='refunds'?'selected':'';?>><?php echo __( 'Refunds', LDNFT_TEXT_DOMAIN );?></option>
