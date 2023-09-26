@@ -467,7 +467,7 @@ class LDNFT_Admin {
         $offset_rec     = ($offset-1)  * $per_page;
 
         $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
-        $result = $api->Api('plugins/'.$plugin_id.'/reviews.json?count='.$per_page.'&offset='.$offset_rec, 'GET', []);
+        $result = $api->Api('plugins/'.$plugin_id.'/reviews.json?is_featured=true&count='.$per_page.'&offset='.$offset_rec, 'GET', []);
         if( ! is_array( $result->reviews ) || count( $result->reviews ) == 0) {
             echo __('No more record(s) found.', LDNFT_TEXT_DOMAIN);
         }
@@ -1148,10 +1148,10 @@ class LDNFT_Admin {
                     <div class="ldnft-box">
                         <table>
                             <tr>
-                                <td><h3><?php _e( 'Shortcode:', LDNFT_TEXT_DOMAIN ); ?> [LDNFT_Reviews]</h3></td>
+                                <td><h3><?php _e( 'Shortcode:', LDNFT_TEXT_DOMAIN ); ?> [LDNFT_Reviews product_id="?"]</h3></td>
                             </tr>
                             <tr>
-                                <td clss="ldfmt-shortcode-desc"><?php _e( 'Displays plugin reviews on the frontend. User can filter the reviews based on the plugin.', LDNFT_TEXT_DOMAIN ); ?></td>
+                                <td clss="ldfmt-shortcode-desc"><?php _e( "Displays attached product's reviews on the frontend. User can filter the reviews based on the plugin.", LDNFT_TEXT_DOMAIN ); ?></td>
                             </tr>
                             <tr>
                                 <td>&nbsp;</td>

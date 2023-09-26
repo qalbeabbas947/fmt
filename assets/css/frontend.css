@@ -5,7 +5,9 @@
     padding: 16px;
     margin: 16px 0
   }
-  
+  .ldnft-checked {
+    color: orange;
+  }
   .review-container::after {
     content: "";
     clear: both;

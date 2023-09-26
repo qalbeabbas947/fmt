@@ -47,7 +47,7 @@ class LDNFT_Reviews_Shortcode {
         
         $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
         
-        $results = $api->Api('plugins/'.$plugin_id.'/reviews.json?count='.$per_page.'&offset='.$offset, 'GET', ['is_featured'=>'false','is_verified'=>'false', 'enriched'=>'true', 'count'=>'50' ]);
+        $results = $api->Api('plugins/'.$plugin_id.'/reviews.json?is_featured=true&count='.$per_page.'&offset='.$offset, 'GET', ['is_featured'=>'false','is_verified'=>'false', 'enriched'=>'true', 'count'=>'50' ]);
         if( is_array($results->reviews) && count( $results->reviews ) ) {
             foreach($results->reviews as $review) {
             ?>
@@ -58,7 +58,24 @@ class LDNFT_Reviews_Shortcode {
                     <h3 class="ldfmt_review_title"><a class="ldfmt_review_title-link" href="<?php echo $review->sharable_img;?>" data-lightbox="ldfmt-set" data-title="<?php echo $review->title;?>"><?php echo $review->title;?></a></h3>
                     <p class="ldfmt_review_user"><span><?php echo $review->name;?></span> of <?php echo !empty($review->company)?'<a href="'.$review->company_url.'">'.$review->company.'</a>':''; ?></p>
                     <p class="ldfmt_review_description"><?php echo $review->text;?></p>
-                    <p class="ldfmt_review_time_wrapper"><div class="ldfmt_review_time"><?php echo $review->created;?></div><div class="ldfmt_review_rate"><?php echo __('Rate:', LDNFT_TEXT_DOMAIN);?> <?php echo $review->rate;?></div></p>
+                    <p class="ldfmt_review_time_wrapper">
+                        <div class="ldfmt_review_time"><?php echo $review->created;?></div>
+                        <div class="ldfmt_review_rate">
+                            <?php echo __('Rate:', LDNFT_TEXT_DOMAIN);?> 
+                            <div class="ldnft-rating-div">
+                                <?php 
+                                    $rates = $review->rate;
+                                    for($i=1; $i<=5; $i++) {
+                                        $selected = '';
+                                        if( $i*20 <= $rates ) {
+                                            $selected = 'ldnft-checked';
+                                        }
+                                        echo '<span class="fa fa-star '.$selected.'"></span>';
+                                    }
+                                ?>
+                            </div>    
+                        </div>
+                    </p>
                 </div>
             <?php
             }
@@ -77,33 +94,18 @@ class LDNFT_Reviews_Shortcode {
     public function reviews_shortcode_cb( $atts ) {
         
         $user_id = isset( $atts['user_id'] ) ? $atts['user_id'] : get_current_user_id();
-        $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
-        
-        $plugins = $api->Api('plugins.json?fields=id,title', 'GET', ['fields'=>'id,title']);
+        $product_id = isset( $atts['product_id'] ) ? $atts['product_id'] : 0;
         $content = '';
-        if( isset( $plugins->plugins ) &&  count($plugins->plugins) > 0 ) {
-            
-            $plugins = $plugins->plugins;
-            $plugin = $plugins[0];
-            ob_start();
+        ob_start();
+        if( $product_id > 0 ) {
             ?>
                 <link rel="stylesheet" href="<?php echo LDNFT_ASSETS_URL;?>lightbox/css/lightbox.min.css">
                 <script src="<?php echo LDNFT_ASSETS_URL;?>lightbox/js/lightbox-plus-jquery.min.js"></script>
+                <!-- Add icon library -->
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
                 <div class="ldmft_wrapper">
                     <div class="filter">
-                        <label><?php echo __( 'Select a Plugin:', LDNFT_TEXT_DOMAIN );?></label>
-                        <select name="ldfmt-plugins-filter" class="ldfmt-plugins-filter">
-                            <?php
-                                foreach( $plugins as $plugin ) {
-                                        
-                                    $selected = '';
-                                    ?>
-                                        <option value="<?php echo $plugin->id; ?>" <?php echo $selected; ?>><?php echo $plugin->title; ?></option>
-                                    <?php   
-                                }
-                            ?>
-                            
-                        </select>
+                        <input type="hidden" value="<?php echo $product_id;?>" name="ldfmt-plugins-filter" class="ldfmt-plugins-filter">
                     </div>
                     <div style="display:none" class="ldfmt-loader-div"><img width="30px" class="ldfmt-data-loader" src="<?php echo LDNFT_ASSETS_URL.'images/spinner-2x.gif';?>" /></div>
                     <div class="ldmft-filter-reviews">    
@@ -113,17 +115,27 @@ class LDNFT_Reviews_Shortcode {
                             <p>John Doe saved us from a web disaster.</p>
                         </div> -->
                     </div>
-                    <div class="ldfmt-load-more-btn"><a href="javascript:;">
-                        <?php echo __( 'Load More', LDNFT_TEXT_DOMAIN );?></a>
+                    <div class="ldfmt-load-more-btn">
+                        <a href="javascript:;"><?php echo __( 'Load More', LDNFT_TEXT_DOMAIN );?></a>
                         <div style="display:none" class="ldfmt-loader-div-btm"><img width="30px" class="ldfmt-data-loader" src="<?php echo LDNFT_ASSETS_URL.'images/spinner-2x.gif';?>" /></div>
                     </div>
                 </div>
                 
             <?php
             
-            $content = ob_get_contents();
-            ob_get_clean();
+            
+        } else {
+            ?>
+                <div class="ldmft_wrapper">
+                    <div class="ldmft-filter-reviews">    
+                        <?php echo __( 'To display product reviews, you need to attach product id with the shortcode', LDNFT_TEXT_DOMAIN );?>
+                    </div>
+                </div>
+            <?php
         }
+
+        $content = ob_get_contents();
+        ob_get_clean();
 
         return $content;
     }
