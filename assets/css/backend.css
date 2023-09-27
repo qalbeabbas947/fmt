@@ -232,7 +232,9 @@
     background-color: #9999AF;
     color: white;
   }
-  
+  .ldnft_renewals_count, .ldnft_points, .ldnft_tax_fee, .ldnft_new_sales_count, .ldnft_new_subscriptions_count {
+    text-align: center;
+  }
   .ldnft-admin-modal-body {padding: 2px 16px;}
 
   .ldnft-popup-loader {

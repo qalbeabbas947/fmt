@@ -30,7 +30,7 @@ use MailPoetVendor\Carbon\Carbon;
 /**
  * LDNFT_Admin
  */
-class LDNFT_Admin {
+class LDNFT_Admin {  
 
     /**
      * @var self
@@ -50,6 +50,15 @@ class LDNFT_Admin {
         }
 
         return self::$instance;
+    }
+
+    /**
+     * @since 1.0
+     * @return $this
+     */
+    public static function get_bar_preloader() {
+        
+        return '<img width="30px" class="ldnft-subssummary-loader" src="'.LDNFT_ASSETS_URL .'images/bar-preloader.gif" />';
     }
 
     /**
@@ -989,6 +998,29 @@ class LDNFT_Admin {
          */
         $testListTable = new LDNFT_Subscriptions(); 
         
+        $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
+        $plugins = $api->Api('plugins.json?fields=id,title', 'GET', ['fields'=>'id,title']);
+        
+        $selected_plugin_id = 0;
+        if( isset($_GET['ldfmt_plugins_filter']) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) {
+            $selected_plugin_id = intval( $_GET['ldfmt_plugins_filter'] ); 
+        }
+
+        $selected_interval = '';
+        if( isset($_GET['interval'])  ) {
+            $selected_interval = $_GET['interval']; 
+        }
+        
+        $selected_status = '';
+        if( isset( $_GET['status'] )  ) {
+            $selected_status = $_GET['status']; 
+        }
+        
+        $selected_plan_id = '';
+        if( isset( $_GET['plan_id'] ) ) {
+            $selected_plan_id = $_GET['plan_id']; 
+        }
+
         /**
          * Fetch, prepare, sort, and filter our data... 
          */
@@ -1003,9 +1035,119 @@ class LDNFT_Admin {
             <!-- Forms are NOT created automatically, so you need to wrap the table in one to use features like bulk actions -->
             <form id="movies-filter" method="get">
                 <!-- For plugins, we also need to ensure that the form posts back to our current page -->
-                <input type="hidden" name="page" value="<?php echo $_REQUEST['page'] ?>" />
+                <input type="hidden" class="ldnft-freemius-page" name="page" value="1" />
                 <!-- Now we can render the completed list table -->
-                <?php $testListTable->display() ?>
+                <div class="ldnft_filters_top">
+                    <div class="alignleft actions bulkactions">
+                        <span class="ldnft_filter_labels"><?php _e( 'Filters:', LDNFT_TEXT_DOMAIN ); ?></span>
+                        <select name="ldfmt-plugins-filter" class="ldfmt-plugins-filter">
+                            <option value=""><?php _e( 'Filter by Plugin', LDNFT_TEXT_DOMAIN ); ?></option>
+                            <?php
+                                foreach( $plugins->plugins as $plugin ) {
+                                    if( $selected_plugin_id == 0 ) {
+                                        $selected_plugin_id = $plugin->id;
+                                    }
+                                    $selected = '';
+                                    if( $selected_plugin_id == $plugin->id ) {
+                                        $selected = ' selected = "selected"';   
+                                    }
+                                    ?>
+                                        <option value="<?php echo $plugin->id; ?>" <?php echo $selected; ?>><?php echo $plugin->title; ?></option>
+                                    <?php   
+                                }
+                            ?>
+                        </select>
+                        <?php
+                            $plans = $api->Api('plugins/'.$selected_plugin_id.'/plans.json?count=50', 'GET', []);
+                        ?>
+                        <select name="ldfmt-sales-plan_id-filter" class="ldfmt-sales-plan_id-filter">
+                            <option value=""><?php _e( 'Filter by Plan', LDNFT_TEXT_DOMAIN ); ?></option>
+                            <?php
+                                foreach( $plans->plans as $plan ) {
+                                    
+                                    $selected = '';
+                                    if( $selected_plan_id == $plan->id ) {
+                                        $selected = ' selected = "selected"';   
+                                    }
+                                    ?>
+                                        <option value="<?php echo $plan->id; ?>" <?php echo $selected; ?>><?php echo $plan->title; ?></option>
+                                    <?php   
+                                }
+                            ?>
+                        </select>
+                        
+                        <select name="ldfmt-sales-interval-filter" class="ldfmt-sales-interval-filter">
+                            <option value=""><?php echo __( 'All Time', LDNFT_TEXT_DOMAIN );?></option>
+                            <option value="1" <?php echo $selected_interval=='1'?'selected':'';?>><?php echo __( 'Monthly', LDNFT_TEXT_DOMAIN );?></option>
+                            <option value="12" <?php echo $selected_interval=='12'?'selected':'';?>><?php echo __( 'Annual', LDNFT_TEXT_DOMAIN );?></option>
+                        </select>
+                        <select name="ldfmt-sales-interval-filter" class="ldfmt-sales-status-filter">
+                            <option value="all"><?php echo __( 'All Status', LDNFT_TEXT_DOMAIN );?></option>
+                            <option value="active" <?php echo $selected_status=='active'?'selected':'';?>><?php echo __( 'Active', LDNFT_TEXT_DOMAIN );?></option>
+                            <option value="cancelled" <?php echo $selected_status=='cancelled'?'selected':'';?>><?php echo __( 'Cancelled', LDNFT_TEXT_DOMAIN );?></option>
+                        </select>
+                        <img style="display:none" width="30px" class="ldfmt-data-loader" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" />
+                        <span id="ldnft-subscription-import-message"></span>
+                    </div>
+                    <div style="clear:both">&nbsp;</div> 
+                    <div class="ldfmt-sales-upper-info">
+                        <div class="ldfmt-gross-sales-box ldfmt-sales-box">
+                            <label><?php echo __('Gross Sales', LDNFT_TEXT_DOMAIN);?></label>
+                            <div class="ldnft_points">
+                                <span class="ldnft_subscription_points"></span><?php //echo number_format( floatval($gross_total), 2);?>
+                                <img width="30px" class="ldnft-subssummary-loader" src="<?php echo LDNFT_ASSETS_URL .'images/bar-preloader.gif'; ?>" />
+                            </div>
+                        </div>
+                        <div class="ldfmt-gross-gateway-box ldfmt-sales-box">
+                            <label><?php echo __('Total Tax Rate', LDNFT_TEXT_DOMAIN);?></label>
+                            <div class="ldnft_tax_fee">
+                                <?php //echo number_format( floatval( $tax_rate_total ), 2);?>
+                                <span class="ldnft_subscription_tax_fee"></span>
+                                <img width="30px" class="ldnft-subssummary-loader" src="<?php echo LDNFT_ASSETS_URL .'images/bar-preloader.gif'; ?>" />
+                            </div>
+                            
+                        </div>
+                        <div class="ldfmt-new-sales-box ldfmt-sales-box">
+                            <label><?php echo __('Total Sales Count', LDNFT_TEXT_DOMAIN);?></label>
+                            <div class="ldnft_new_sales_count">
+                                <span class="ldnft_subscription_new_sales_count"></span>
+                                <img width="30px" class="ldnft-subssummary-loader" src="<?php echo LDNFT_ASSETS_URL .'images/bar-preloader.gif'; ?>" />
+                                <?php //echo $total_number_of_sales;?>
+                            </div>
+                        </div>
+                        <div class="ldfmt-new-subscriptions-box ldfmt-sales-box">
+                            <label><?php echo __('New subscriptions', LDNFT_TEXT_DOMAIN);?></label>
+                            <div class="ldnft_new_subscriptions_count">
+                                <span class="ldnft_subscription_new_subscriptions_count"></span>
+                                <img width="30px" class="ldnft-subssummary-loader" src="<?php echo LDNFT_ASSETS_URL .'images/bar-preloader.gif'; ?>" />
+                                
+                                <?php // echo $total_new_subscriptions;?>
+                            </div>
+                        </div>
+                        <div class="ldfmt-renewals-count-box ldfmt-sales-box">
+                            <label><?php echo __('Total Renewals', LDNFT_TEXT_DOMAIN);?></label>
+                            <div class="ldnft_renewals_count">
+                                <span class="ldnft_subscription_renewals_count"></span>
+                                <img width="30px" class="ldnft-subssummary-loader" src="<?php echo LDNFT_ASSETS_URL .'images/bar-preloader.gif'; ?>" />
+                                <?php //echo $total_new_renewals;?>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="ldnft-admin-modal" class="ldnft-admin-modal">
+                        <!-- Modal content -->
+                        <div class="ldnft-admin-modal-content">
+                            <div class="ldnft-admin-modal-header">
+                            <span class="ldnft-admin-modal-close">&times;</span>
+                                <h2><?php echo __( 'Subscription Detail', LDNFT_TEXT_DOMAIN );?></h2>
+                            </div>
+                            <div class="ldnft-admin-modal-body"></div>
+                            <div class="ldnft-popup-loader"><img class="" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" /></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="ldnft_subscriptions_data">
+                    <?php $testListTable->display() ?>
+                </div>
             </form>
             
         </div>

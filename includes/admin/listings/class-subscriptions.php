@@ -3,7 +3,7 @@
  * LDNFT_Subscriptions class manages the admin side listing of freemius subscriptions.
  */
 
-if( ! class_exists( 'WP_List_Table' ) ) {
+ if( ! class_exists( 'WP_List_Table' ) ) {
     require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
 
@@ -12,7 +12,7 @@ if( ! class_exists( 'WP_List_Table' ) ) {
  */
 class LDNFT_Subscriptions extends WP_List_Table {
 
-    /**
+	/**
      * Current Selected Plugin
      */
     public $selected_plugin_id;
@@ -51,9 +51,10 @@ class LDNFT_Subscriptions extends WP_List_Table {
      * REQUIRED. Set up a constructor that references the parent constructor. We 
      * use the parent reference to set some default configs.
      ***************************************************************************/
-    public function __construct(){
 
-        global $status, $page;
+	function __construct() {
+
+		global $status, $page;
         
         $this->selected_plugin_id = 0;  
         $this->api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
@@ -69,7 +70,6 @@ class LDNFT_Subscriptions extends WP_List_Table {
             foreach( $this->plugins as $plugin ) {
                 $this->plugins_short_array[$plugin->id] = $plugin->title;
             }
-            
         }
 
         if( isset($_GET['ldfmt_plugins_filter']) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) {
@@ -84,124 +84,42 @@ class LDNFT_Subscriptions extends WP_List_Table {
             $this->selected_status = $_GET['status']; 
         }
         
-        if( isset( $_GET['plan_id'] ) ) {
+        if( isset( $_GET['plan_id'] ) && intval($_GET['plan_id']) > 0 ) {
             $this->selected_plan_id = $_GET['plan_id']; 
         }
 
-        /**
-         * Set parent defaults 
-         */
-        parent::__construct( array(
-            'singular'  => 'subscriptions',  
-            'plural'    => 'subscriptions',  
-            'ajax'      => true            
-        ) );
-        
-    }
+		parent::__construct(
+			array(
+				'singular'  => '60s hit',
+				'plural'    => '60s hits',
+				'ajax'      => true
+			)
+		);
 
+	}
 
-    /** ************************************************************************
-     * Recommended. This method is called when the parent class can't find a method
-     * specifically build for a given column. Generally, it's recommended to include
-     * one method for each column you want to render, keeping your package class
-     * neat and organized. For example, if the class needs to process a column
-     * named 'title', it would first see if a method named $this->column_title() 
-     * exists - if it does, that method will be used. If it doesn't, this one will
-     * be used. Generally, you should try to use custom column methods as much as 
-     * possible. 
-     * 
-     * Since we have defined a column_title() method later on, this method doesn't
-     * need to concern itself with any column with a name of 'title'. Instead, it
-     * needs to handle everything else.
-     * 
-     * For more detailed insight into how columns are handled, take a look at 
-     * WP_List_Table::single_row_columns()
-     * 
-     * @param array $item A singular item (one full row's worth of data)
-     * @param array $column_name The name/slug of the column to be processed
-     * @return string Text or HTML to be placed inside the column <td>
-     **************************************************************************/
-    public function column_default($item, $column_name){
-       
-        return $item[$column_name]; 
-    }
-    
-    /** ************************************************************************
-     * Recommended. This is a custom column method and is responsible for what
-     * is rendered in any column with a name/slug of 'title'. Every time the class
-     * needs to render a column, it first looks for a method named 
-     * column_{$column_title} - if it exists, that method is run. If it doesn't
-     * exist, column_default() is called instead.
-     * 
-     * This example also illustrates how to implement rollover actions. Actions
-     * should be an associative array formatted as 'slug'=>'link html' - and you
-     * will need to generate the URLs yourself. You could even ensure the links
-     * 
-     * 
-     * @see WP_List_Table::::single_row_columns()
-     * @param array $item A singular item (one full row's worth of data)
-     * @return string Text to be placed inside the column <td> (movie title only)
-     **************************************************************************/
-    public function column_title($item){
-        
-        /**
-         * Build row actions 
-         */
-        $actions = array(
-            'edit'      => sprintf('<a href="?page=%s&action=%s&movie=%s">Edit</a>',$_REQUEST['page'],'edit',$item['ID']),
-            'delete'    => sprintf('<a href="?page=%s&action=%s&movie=%s">Delete</a>',$_REQUEST['page'],'delete',$item['ID']),
-        );
-        
-        /**
-         * Return the title contents 
-         */
-        return sprintf('%1$s <span style="color:silver">(id:%2$s)</span>%3$s',
-            /*$1%s*/ $item['title'],
-            /*$2%s*/ $item['ID'],
-            /*$3%s*/ $this->row_actions($actions)
-        );
-    }
-
-
-    /** ************************************************************************
-     * REQUIRED if displaying checkboxes or using bulk actions! The 'cb' column
-     * is given special treatment when columns are processed. It ALWAYS needs to
-     * have it's own method.
-     * 
-     * @see WP_List_Table::::single_row_columns()
-     * @param array $item A singular item (one full row's worth of data)
-     * @return string Text to be placed inside the column <td> (movie title only)
-     **************************************************************************/
-    public function column_cb($item){
-        return sprintf(
-            '<input type="checkbox" name="%1$s[]" value="%2$s" />',
-            /*$1%s*/ $this->_args['singular'], 
-            /*$2%s*/ $item['ID']             
-        );
-    }
-
-    /**
+	/**
      * Will display a link to show popup for the subscription detail.
      */
     public function column_view($item){
-        return '<a data-action="ldnft_subscribers_view_detail" data-user_id="'.$item['user_id'].'" data-plugin_id="'.$item['plugin_id'].'" data-id="'.$item['id'].'" class="ldnft_subscribers_view_detail" href="javascript:;">Get More</a>';
+        if( !empty( intval(strip_tags($item['id'])) ) )
+            return '<a data-action="ldnft_subscribers_view_detail" data-user_id="'.$item['user_id'].'" data-plugin_id="'.$item['plugin_id'].'" data-id="'.$item['id'].'" class="ldnft_subscribers_view_detail" href="javascript:;">Get More</a>';
+        else
+            return LDNFT_Admin::get_bar_preloader();
     }
 
-    /** ************************************************************************
-     * REQUIRED! This method dictates the table's columns and titles. This should
-     * return an array where the key is the column slug (and class) and the value 
-     * is the column's title text. If you need a checkbox for bulk actions, refer
-     * to the $columns array below.
-     * 
-     * The 'cb' column is treated differently than the rest. If including a checkbox
-     * column in your table you must create a column_cb() method. If you don't need
-     * bulk actions or checkboxes, simply leave the 'cb' entry out of your array.
-     * 
-     * @see WP_List_Table::::single_row_columns()
-     * @return array An associative array containing column information: 'slugs'=>'Visible Titles'
-     **************************************************************************/
-    public function get_columns(){
-        $columns = array(
+	/**
+	 * @return array
+	 *
+	 * The array is associative :
+	 * keys are slug columns
+	 * values are description columns
+	 *
+	 */
+
+	function get_columns() {
+
+		$columns = array(
             'id'                    => __( 'Transaction ID',LDNFT_TEXT_DOMAIN ), 
             'user_id'               => __( 'User ID',LDNFT_TEXT_DOMAIN ),  
             'username'              => __( 'Name',LDNFT_TEXT_DOMAIN ),
@@ -223,88 +141,45 @@ class LDNFT_Subscriptions extends WP_List_Table {
             'view'                  => __( 'View', LDNFT_TEXT_DOMAIN ),
         );
         
-        
         return $columns;
-    }
+	}
 
+	/**
+	 * @param $item
+	 * @param $column_name
+	 *
+	 * @return mixed
+	 *
+	 * Method column_default let at your choice the rendering of everyone of column
+	 *
+	 */
 
-    /** ************************************************************************
-     * Optional. If you want one or more columns to be sortable (ASC/DESC toggle), 
-     * you will need to register it here. This should return an array where the 
-     * key is the column that needs to be sortable, and the value is db column to 
-     * sort by. Often, the key and value will be the same, but this is not always
-     * the case (as the value is a column name from the database, not the list table).
-     * 
-     * This method merely defines which columns should be sortable and makes them
-     * clickable - it does not handle the actual sorting. You still need to detect
-     * the ORDERBY and ORDER querystring variables within prepare_items() and sort
-     * your data accordingly (usually by modifying your query).
-     * 
-     * @return array An associative array containing all the columns that should be sortable: 'slugs'=>array('data_values',bool)
-     **************************************************************************/
-    public function get_sortable_columns() {
-        
-        $sortable_columns = array();
+	function column_default( $item, $column_name ) {
+		return $item[$column_name]; 
+	}
+	
+	/**
+	 * @return array
+	 *
+	 * The array is associative :
+	 * keys are slug columns
+	 * values are array of slug and a boolean that indicates if is sorted yet
+	 *
+	 */
+
+	function get_sortable_columns() {
+
+		$sortable_columns = array();
 
         return $sortable_columns;
-    }
+	}
 
+	/**
+	 * @Override of prepare_items method
+	 *
+	 */
 
-    /** ************************************************************************
-     * Optional. If you need to include bulk actions in your list table, this is
-     * the place to define them. Bulk actions are an associative array in the format
-     * 'slug'=>'Visible Title'
-     * 
-     * If this method returns an empty value, no bulk action will be rendered. If
-     * you specify any bulk actions, the bulk actions box will be rendered with
-     * the table automatically on display().
-     * 
-     * Also note that list tables are not automatically wrapped in <form> elements,
-     * so you will need to create those manually in order for bulk actions to function.
-     * 
-     * @return array An associative array containing all the bulk actions: 'slugs'=>'Visible Titles'
-     **************************************************************************/
-    public function get_bulk_actions() {
-        
-        $actions = [];
-        
-        return $actions;
-    }
-
-
-    /** ************************************************************************
-     * Optional. You can handle your bulk actions anywhere or anyhow you prefer.
-     * For this example package, we will handle it in the class to keep things
-     * clean and organized.
-     * 
-     * @see $this->prepare_items()
-     **************************************************************************/
-    public function process_bulk_action() {
-        
-        /**
-         * Detect when a bulk action is being triggered... 
-         */
-        if( 'delete'===$this->current_action() ) {
-            wp_die('Items deleted (or they would be if we had items to delete)!');
-        }
-        
-    }
-
-    /** ************************************************************************
-     * REQUIRED! This is where you prepare your data for display. This method will
-     * usually be used to query the database, sort and filter the data, and generally
-     * get it ready to be displayed. At a minimum, we should set $this->items and
-     * $this->set_pagination_args(), although the following properties and methods
-     * are frequently interacted with here...
-     * 
-     * @uses $this->_column_headers
-     * @uses $this->items
-     * @uses $this->get_columns()
-     * @uses $this->get_sortable_columns()
-     * @uses $this->get_pagenum()
-     * @uses $this->set_pagination_args()
-     **************************************************************************/
-    public function prepare_items() {
+	function prepare_items() {
         
         /**
          * First, lets decide how many records per page to show
@@ -318,6 +193,44 @@ class LDNFT_Subscriptions extends WP_List_Table {
             $per_page = 10;
         }
 
+		if( !wp_doing_ajax() ) {
+            
+            $this->items = [
+                [
+                    'id'                    => LDNFT_Admin::get_bar_preloader(), 
+                    'user_id'               => LDNFT_Admin::get_bar_preloader(), 
+                    'username'              => LDNFT_Admin::get_bar_preloader(), 
+                    'useremail'             => LDNFT_Admin::get_bar_preloader(), 
+                    'amount_per_cycle'      => LDNFT_Admin::get_bar_preloader(), 
+                    'discount'              => LDNFT_Admin::get_bar_preloader(), 
+                    'billing_cycle'         => LDNFT_Admin::get_bar_preloader(), 
+                    'total_gross'           => LDNFT_Admin::get_bar_preloader(), 
+                    'gateway'               => LDNFT_Admin::get_bar_preloader(), 
+                    'renewal_amount'        => LDNFT_Admin::get_bar_preloader(), 
+                    'outstanding_balance'   => LDNFT_Admin::get_bar_preloader(), 
+                    'failed_payments'       => LDNFT_Admin::get_bar_preloader(), 
+                    'trial_ends'            => LDNFT_Admin::get_bar_preloader(), 
+                    'created'               => LDNFT_Admin::get_bar_preloader(), 
+                    'initial_amount'        => LDNFT_Admin::get_bar_preloader(),  
+                    'next_payment'          => LDNFT_Admin::get_bar_preloader(), 
+                    'currency'              => LDNFT_Admin::get_bar_preloader(), 
+                    'country_code'          => LDNFT_Admin::get_bar_preloader(),  
+                    'view'                  => LDNFT_Admin::get_bar_preloader(),     
+                ]
+            ];
+
+            $this->set_pagination_args( array(
+                'per_page'      => $per_page,
+                'offset'        => 1,
+                'offset_rec'    => 1,
+                'current_recs'  => 1
+            ) );
+
+			return;
+		}
+
+		
+
         $offset = isset($_REQUEST['offset']) && intval($_REQUEST['offset'])>0?intval($_REQUEST['offset']):1;
         $offset_rec = ($offset - 1) * $per_page;
         
@@ -329,7 +242,8 @@ class LDNFT_Subscriptions extends WP_List_Table {
          * used to build the value for our _column_headers property.
          */
         $columns = $this->get_columns();
-        $screen = get_current_screen();
+        
+        $screen = WP_Screen::get( 'freemius-toolkit_page_freemius-subscriptions' );
 
         $hidden   = get_hidden_columns( $screen );
         $sortable = $this->get_sortable_columns();
@@ -345,7 +259,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
         
         
         $interval_str = '';
-        if( !empty($this->selected_interval) ) {
+        if( !empty($this->selected_interval) && !empty( $this->selected_interval ) ) {
            $interval_str = '&billing_cycle='.$this->selected_interval;
         }
 
@@ -355,46 +269,52 @@ class LDNFT_Subscriptions extends WP_List_Table {
         }
 
         $plan_str = '';
-        if( !empty($this->selected_plan_id) ) {
+        if( !empty($this->selected_plan_id) && intval($this->selected_plan_id) > 0 ) {  
            $plan_str = '&plan_id='.$this->selected_plan_id;
         }
-
+        
         $result = $this->api->Api('plugins/'.$this->selected_plugin_id.'/subscriptions.json?count='.$per_page.'&offset='.$offset_rec.$interval_str.$status_str.$plan_str, 'GET', []);
         $data = [];
         $count = 0;
-        foreach( $result->subscriptions as $subscription ) {
-            $user_id = 0;
-            
-            foreach( $subscription as $key=>$value ) {
-                if( empty( $value ) ) 
-                    $value = '-';
-                $data[$count][$key] = $value;
-                if( 'user_id' == $key ) {
-                    $user_id = $value;
+        
+        $subscriptions_total = 0;
+        if( isset($result) && isset($result->subscriptions) ) {
+            $subscriptions_total = count($result->subscriptions);
+            foreach( $result->subscriptions as $subscription ) {
+                $user_id = 0;
+                
+                foreach( $subscription as $key=>$value ) {
+                    if( empty( $value ) ) 
+                        $value = '-';
+                    $data[$count][$key] = $value;
+                    if( 'user_id' == $key ) {
+                        $user_id = $value;
+                    }
+                } 
+                
+                $user = $this->api->Api('plugins/'.$this->selected_plugin_id.'/users/'.$user_id.'.json', 'GET', []);
+                if( $user ) {
+                    $data[$count]['username']   = $user->first.' '.$user->last;
+                    if(empty(trim($data[$count]['username']))) {
+                        $data[$count]['username'] = '-';
+                    }
                 }
-            } 
-            
-            $user = $this->api->Api('plugins/'.$this->selected_plugin_id.'/users/'.$user_id.'.json', 'GET', []);
-            if( $user ) {
-                $data[$count]['username']   = $user->first.' '.$user->last;
-                if(empty(trim($data[$count]['username']))) {
-                    $data[$count]['username'] = '-';
+    
+                $data[$count]['country_code']   = LDNFT_Freemius::get_country_name_by_code( strtoupper($subscription->country_code) );
+                $data[$count]['useremail']      = $user->email;
+                $data[$count]['discount']       = '-';
+    
+                if(!empty($subscription->renewals_discount) && floatval($subscription->renewals_discount) > 0 ) {
+                    if(strtolower($subscription->renewals_discount_type) == 'percentage')
+                        $data[$count]['discount']  = ''.$subscription->renewals_discount.'% - (' .number_format(($subscription->renewals_discount*$subscription->total_gross)/100, 2).$subscription->currency.')';
+                    else {
+                        $data[$count]['discount']  = __( 'Fixed - ', LDNFT_TEXT_DOMAIN ).'('.$subscription->renewals_discount.$subscription->currency.')';
+                    }
                 }
+                $count++;   
             }
-
-            $data[$count]['country_code']   = LDNFT_Freemius::get_country_name_by_code( strtoupper($subscription->country_code) );
-            $data[$count]['useremail']      = $user->email;
-            $data[$count]['discount']       = '-';
-
-            if(!empty($subscription->renewals_discount) && floatval($subscription->renewals_discount) > 0 ) {
-                if(strtolower($subscription->renewals_discount_type) == 'percentage')
-                    $data[$count]['discount']  = ''.$subscription->renewals_discount.'% - (' .number_format(($subscription->renewals_discount*$subscription->total_gross)/100, 2).$subscription->currency.')';
-                else {
-                    $data[$count]['discount']  = __( 'Fixed - ', LDNFT_TEXT_DOMAIN ).'('.$subscription->renewals_discount.$subscription->currency.')';
-                }
-            }
-            $count++;   
         }
+        
         
         $this->items = $data;
  
@@ -402,12 +322,71 @@ class LDNFT_Subscriptions extends WP_List_Table {
             'per_page'      => $per_page,
             'offset'        => $offset,
             'offset_rec'    => $offset_rec,
-            'current_recs'  => count($result->subscriptions)
+            'current_recs'  => $subscriptions_total
         ) );
+	}
 
-    }
+	/**
+	 * @Override of display method
+	 */
 
-    /**
+	function display() {
+
+		/**
+		 * Adds a nonce field
+		 */
+		//wp_nonce_field( 'ajax-custom-list-nonce', '_ajax_custom_list_nonce' );
+
+		parent::display();
+	}
+
+	/**
+	 * @Override ajax_response method
+	 */
+
+	function ajax_response() {
+
+		$this->prepare_items();
+
+		extract( $this->_args );
+		extract( $this->_pagination_args, EXTR_SKIP );
+
+		ob_start();
+		if ( ! empty( $_REQUEST['no_placeholder'] ) )
+			$this->display_rows();
+		else
+			$this->display_rows_or_placeholder();
+		$rows = ob_get_clean();
+
+		ob_start();
+		$this->print_column_headers();
+		$headers = ob_get_clean();
+
+		ob_start();
+		$this->pagination('top');
+		$pagination_top = ob_get_clean();
+
+		ob_start();
+		$this->pagination('bottom');
+		$pagination_bottom = ob_get_clean();
+
+		$response = array( 'rows' => $rows );
+		$response['pagination']['top'] = $pagination_top;
+		$response['pagination']['bottom'] = $pagination_bottom;
+		$response['column_headers'] = $headers;
+
+		if ( isset( $total_items ) )
+			$response['total_items_i18n'] = sprintf( _n( '1 item', '%s items', $total_items ), number_format_i18n( $total_items ) );
+
+		if ( isset( $total_pages ) ) {
+			$response['total_pages'] = $total_pages;
+			$response['total_pages_i18n'] = number_format_i18n( $total_pages );
+		}
+
+		die( json_encode( $response ) );
+	}
+
+	/**
 	 * Displays the pagination.
 	 *
 	 * @param string $which
@@ -456,7 +435,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
         $offset_rec1    = ($offset) * $per_page;
         
         $interval_str = '';
-        if( !empty($this->selected_interval) ) {
+        if( !empty($this->selected_interval) && !empty( $this->selected_interval ) ) {
             $interval_str = '&billing_cycle='.$this->selected_interval;
         }
 
@@ -466,7 +445,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
         }
         
         $plan_str = '';
-        if( !empty($this->selected_plan_id) ) {
+        if( !empty($this->selected_plan_id) && intval($this->selected_plan_id) > 0 ) {
            $plan_str = '&plan_id='.$this->selected_plan_id;
         }
 
@@ -502,20 +481,20 @@ class LDNFT_Subscriptions extends WP_List_Table {
 			$disable_prev  = true;
 		}
 
-
-		if ( count($result->subscriptions) == 0 ) {
-			$disable_next = true;
-		}
-
+        if( isset($result) && isset($result->subscriptions) ) {
+            if ( count($result->subscriptions) == 0 ) {
+                $disable_next = true;
+            }
+        }
 		if ( $disable_first ) {
 			$page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&laquo;</span>';
 		} else {
 			$page_links[] = sprintf(
-				"<a class='first-page button' href='%s'>" .
+				"<a class='first-page button' data-offset='1' href='javascript:;'>" .
 					"<span class='screen-reader-text'>%s</span>" .
 					"<span aria-hidden='true'>%s</span>" .
 				'</a>',
-				esc_url( remove_query_arg( 'offset', $current_url ) ),
+				//esc_url( remove_query_arg( 'offset', $current_url ) ),
 				/* translators: Hidden accessibility text. */
 				__( 'First page', LDNFT_TEXT_DOMAIN ),
 				'&laquo;'
@@ -527,11 +506,11 @@ class LDNFT_Subscriptions extends WP_List_Table {
 		} else {
 
 			$page_links[] = sprintf(
-				"<a class='prev-page button' href='%s'>" .
+				"<a class='prev-page button' data-offset='%d' href='javascript:;'>" .
 					"<span class='screen-reader-text'>%s</span>" .
 					"<span aria-hidden='true'>%s</span>" .
 				'</a>', 
-				esc_url( add_query_arg( 'offset', intval($offset)>1?intval($offset)-1:1, $current_url ) ),
+				intval($offset)>1?intval($offset)-1:1,
 				/* translators: Hidden accessibility text. */
 				__( 'Previous page', LDNFT_TEXT_DOMAIN ),
 				'&lsaquo;'
@@ -558,7 +537,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
 			$page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&rsaquo;</span>';
 		} else {
 			$page_links[] = sprintf(
-				"<a data-action='ldnft_subscriber_check_next' data-plugin_id='%d' data-status='%s' data-plan_id='%s' data-interval='%d' data-per_page='%d' data-offset='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='%s'>" .
+				"<a data-action='ldnft_subscriber_check_next' data-plugin_id='%d' data-status='%s' data-plan_id='%s' data-interval='%d' data-per_page='%d' data-offset='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
 					"<span class='screen-reader-text'>%s</span>" .
 					"<span aria-hidden='true'>%s</span>" .
 				'</a>',
@@ -569,7 +548,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
                 $per_page,
                 $offset+1,
                 $current_recs,
-				esc_url( add_query_arg( 'offset', intval($offset)+1, $current_url ) ),
+				//esc_url( add_query_arg( 'offset', intval($offset)+1, $current_url ) ),
 				__( 'Next page', LDNFT_TEXT_DOMAIN ),
 				'&rsaquo;'
 			);
@@ -597,149 +576,110 @@ class LDNFT_Subscriptions extends WP_List_Table {
     public function extra_tablenav( $which ) {
         
         if ( $which == "top" ){
-            $interval_str = '';
-            if( !empty($this->selected_interval) ) {
-                $interval_str = '&billing_cycle='.$this->selected_interval;
-            }
-
-            $status_str = '';
-            if( !empty($this->selected_status) ) {
-                $status_str = '&filter='.$this->selected_status;
-            }
-            
-            $plan_str = '';
-            if( !empty($this->selected_plan_id) ) {
-                $plan_str = '&plan_id='.$this->selected_plan_id;
-            }
-
-            $tem_per_page = 50;
-            $tem_offset = 0;
-            $result = $this->api->Api('plugins/'.$this->selected_plugin_id.'/subscriptions.json?count='.$tem_per_page.'&offset='.$tem_offset.$interval_str.$status_str.$plan_str, 'GET', []);
-            $gross_total = 0;
-            $tax_rate_total = 0;
-            $total_number_of_sales = 0;
-            $total_new_subscriptions = 0;
-            $total_new_renewals = 0;
-
-            if( count( $result->subscriptions ) > 0 ) {
-                $has_more_records = true;
-                while($has_more_records) {
-                    foreach( $result->subscriptions as $payment ) {
-                        
-                        $pmts = $this->api->Api('plugins/'.$this->selected_plugin_id.'/subscriptions/'.$payment->id.'/payments.json?count='.$tem_per_page.'&offset='.$tem_offset.$interval_str, 'GET', []);
-                        // if($payment->id == '420406') {
-                        //     print_r($pmts);
-                        // }
-                        foreach($pmts->payments as $pmt) {
-                            $gross_total += $pmt->gross;
-                            $tax_rate_total += $pmt->vat;
-                            $total_number_of_sales++;
-                            if( $pmt->is_renewal == '1' || $pmt->is_renewal == 1 ) {
-                                $total_new_renewals++;
-                            } else {
-                                $total_new_subscriptions++;
-                            }
-                        }
-                        
-                    } 
-
-                    $tem_offset += $tem_per_page;
-                    $result = $this->api->Api('plugins/'.$this->selected_plugin_id.'/subscriptions.json?count='.$tem_per_page.'&offset='.$tem_offset.$interval_str, 'GET', []);
-                    if( count( $result->subscriptions ) > 0 ) {
-                        $has_more_records = true;
-                    } else {
-                        $has_more_records = false;
-                    }
-                }
-            }
-            ?>
-                <div class="ldnft_filters_top">
-                    
-                    <div class="alignleft actions bulkactions">
-                        <span class="ldnft_filter_labels"><?php _e( 'Filters:', LDNFT_TEXT_DOMAIN ); ?></span>
-                        <select onchange="document.location='admin.php?page=freemius-subscriptions&ldfmt_plugins_filter='+this.value" name="ldfmt-plugins-filter" class="ldfmt-plugins-filter">
-                            <option value=""><?php _e( 'Filter by Plugin', LDNFT_TEXT_DOMAIN ); ?></option>
-                            <?php
-                                foreach( $this->plugins as $plugin ) {
-                                    
-                                    $selected = '';
-                                    if( $this->selected_plugin_id == $plugin->id ) {
-                                        $selected = ' selected = "selected"';   
-                                    }
-                                    ?>
-                                        <option value="<?php echo $plugin->id; ?>" <?php echo $selected; ?>><?php echo $plugin->title; ?></option>
-                                    <?php   
-                                }
-                            ?>
-                        </select>
-                        <?php
-                            $plans = $this->api->Api('plugins/'.$this->selected_plugin_id.'/plans.json?count=50', 'GET', []);
-                        ?>
-                        <select onchange="document.location='admin.php?page=freemius-subscriptions&ldfmt_plugins_filter=<?php echo $this->selected_plugin_id;?>&status=<?php echo $this->selected_status;?>&interval=<?php echo $this->selected_interval;?>&plan_id='+this.value" name="ldfmt-sales-plan_id-filter" class="ldfmt-sales-plan_id-filter">
-                            <option value=""><?php _e( 'Filter by Plan', LDNFT_TEXT_DOMAIN ); ?></option>
-                            <?php
-                                foreach( $plans->plans as $plan ) {
-                                    
-                                    $selected = '';
-                                    if( $this->selected_plan_id == $plan->id ) {
-                                        $selected = ' selected = "selected"';   
-                                    }
-                                    ?>
-                                        <option value="<?php echo $plan->id; ?>" <?php echo $selected; ?>><?php echo $plan->title; ?></option>
-                                    <?php   
-                                }
-                            ?>
-                        </select>
-                        
-                        <select onchange="document.location='admin.php?page=freemius-subscriptions&ldfmt_plugins_filter=<?php echo $this->selected_plugin_id;?>&status=<?php echo $this->selected_status;?>&plan_id=<?php echo $this->selected_plan_id;?>&interval='+this.value" name="ldfmt-sales-interval-filter" class="ldfmt-sales-interval-filter">
-                            <option value=""><?php echo __( 'All Time', LDNFT_TEXT_DOMAIN );?></option>
-                            <option value="1" <?php echo $this->selected_interval=='1'?'selected':'';?>><?php echo __( 'Monthly', LDNFT_TEXT_DOMAIN );?></option>
-                            <option value="12" <?php echo $this->selected_interval=='12'?'selected':'';?>><?php echo __( 'Annual', LDNFT_TEXT_DOMAIN );?></option>
-                        </select>
-                        <select onchange="document.location='admin.php?page=freemius-subscriptions&ldfmt_plugins_filter=<?php echo $this->selected_plugin_id;?>&interval=<?php echo $this->selected_interval;?>&plan_id=<?php echo $this->selected_plan_id;?>&status='+this.value" name="ldfmt-sales-interval-filter" class="ldfmt-sales-status-filter">
-                            <option value="all"><?php echo __( 'All Status', LDNFT_TEXT_DOMAIN );?></option>
-                            <option value="active" <?php echo $this->selected_status=='active'?'selected':'';?>><?php echo __( 'Active', LDNFT_TEXT_DOMAIN );?></option>
-                            <option value="cancelled" <?php echo $this->selected_status=='cancelled'?'selected':'';?>><?php echo __( 'Cancelled', LDNFT_TEXT_DOMAIN );?></option>
-                        </select>
-                        <img style="display:none" width="30px" class="ldfmt-data-loader" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" />
-                        <span id="ldnft-subscription-import-message"></span>
-                    </div>
-                    <div style="clear:both">&nbsp;</div>
-                    <div class="ldfmt-sales-upper-info">
-                        <div class="ldfmt-gross-sales-box ldfmt-sales-box">
-                            <label><?php echo __('Gross Sales', LDNFT_TEXT_DOMAIN);?></label>
-                            <div class="ldnft_points"><?php echo number_format( floatval($gross_total), 2);?></div>
-                        </div>
-                        <div class="ldfmt-gross-gateway-box ldfmt-sales-box">
-                            <label><?php echo __('Total Tax Rate', LDNFT_TEXT_DOMAIN);?></label>
-                            <div class="ldnft_tax_fee"><?php echo number_format( floatval( $tax_rate_total ), 2);?></div>
-                        </div>
-                        <div class="ldfmt-new-sales-box ldfmt-sales-box">
-                            <label><?php echo __('Total Sales Count', LDNFT_TEXT_DOMAIN);?></label>
-                            <div class="ldnft_new_sales_count"><?php echo $total_number_of_sales;?></div>
-                        </div>
-                        <div class="ldfmt-new-subscriptions-box ldfmt-sales-box">
-                            <label><?php echo __('New subscriptions', LDNFT_TEXT_DOMAIN);?></label>
-                            <div class="ldnft_new_subscriptions_count"><?php echo $total_new_subscriptions;?></div>
-                        </div>
-                        <div class="ldfmt-renewals-count-box ldfmt-sales-box">
-                            <label><?php echo __('Total Renewals', LDNFT_TEXT_DOMAIN);?></label>
-                            <div class="ldnft_renewals_count"><?php echo $total_new_renewals;?></div>
-                        </div>
-                    </div>
-                </div>
-                <div id="ldnft-admin-modal" class="ldnft-admin-modal">
-                    <!-- Modal content -->
-                    <div class="ldnft-admin-modal-content">
-                        <div class="ldnft-admin-modal-header">
-                        <span class="ldnft-admin-modal-close">&times;</span>
-                            <h2><?php echo __( 'Subscription Detail', LDNFT_TEXT_DOMAIN );?></h2>
-                        </div>
-                        <div class="ldnft-admin-modal-body"></div>
-                        <div class="ldnft-popup-loader"><img class="" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" /></div>
-                    </div>
-                </div>
-            <?php
+        
         }
     }
+
 }
+
+/**
+ * Action wp_ajax for fetching ajax_response
+ */
+
+function ldnft_subscriptions_summary_callback() {
+    
+    $selected_plugin_id = 0;
+    if( isset($_GET['ldfmt_plugins_filter']) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) {
+        $selected_plugin_id = intval( $_GET['ldfmt_plugins_filter'] ); 
+    }
+   
+
+    $interval_str = '';
+    if( isset($_GET['interval']) && !empty( $_GET['interval'] ) ) {
+        $interval_str = '&billing_cycle='.$_GET['interval'];
+    }
+
+    $status_str = '';
+    if( isset( $_GET['status'] )  ) {
+        $status_str = '&filter='.$_GET['status'];
+    }
+    
+    $plan_str = '';
+    if( isset( $_GET['plan_id'] ) && intval($_GET['plan_id']) > 0 ) {
+        $plan_str = '&plan_id='.$_GET['plan_id']; 
+    }
+
+    $tem_per_page = 50;
+    $tem_offset = 0;
+    $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
+    $result = $api->Api('plugins/'.$selected_plugin_id.'/subscriptions.json?count='.$tem_per_page.'&offset='.$tem_offset.$interval_str.$status_str.$plan_str, 'GET', []);
+    $gross_total = 0;
+    $tax_rate_total = 0;
+    $total_number_of_sales = 0;
+    $total_new_subscriptions = 0;
+    $total_new_renewals = 0;
+    print_r($result);
+    if( isset($result) && isset($result->subscriptions) ) {
+        $has_more_records = true;
+        while($has_more_records) {
+            foreach( $result->subscriptions as $payment ) {
+                
+                $pmts = $api->Api('plugins/'.$selected_plugin_id.'/subscriptions/'.$payment->id.'/payments.json?count='.$tem_per_page.'&offset='.$tem_offset.$interval_str, 'GET', []);
+                foreach($pmts->payments as $pmt) {
+                    $gross_total += $pmt->gross;
+                    $tax_rate_total += $pmt->vat;
+                    $total_number_of_sales++;
+                    if( $pmt->is_renewal == '1' || $pmt->is_renewal == 1 ) {
+                        $total_new_renewals++;
+                    } else {
+                        $total_new_subscriptions++;
+                    }
+                }
+            } 
+
+            $tem_offset += $tem_per_page;
+            $result = $api->Api('plugins/'.$selected_plugin_id.'/subscriptions.json?count='.$tem_per_page.'&offset='.$tem_offset.$interval_str, 'GET', []);
+            if( count( $result->subscriptions ) > 0 ) {
+                $has_more_records = true;
+            } else {
+                $has_more_records = false;
+            }
+        }
+    }
+
+    $data = [
+        'gross_total' => $gross_total,
+        'tax_rate_total' => $tax_rate_total,
+        'total_number_of_sales' => $total_number_of_sales,
+        'total_new_subscriptions' => $total_new_subscriptions,
+        'total_new_renewals' => $total_new_renewals
+    ];
+	
+    die(
+		json_encode($data)
+	);
+}
+
+add_action( 'wp_ajax_ldnft_subscriptions_summary', 'ldnft_subscriptions_summary_callback' );
+
+/**
+ * Action wp_ajax for fetching the first time table structure
+ */
+
+function ldnft_subscriptions_display() {
+    
+	$wp_list_table = new LDNFT_Subscriptions();
+	$wp_list_table->prepare_items();
+
+	ob_start();
+	$wp_list_table->display();
+	$display = ob_get_clean();
+
+	die(
+		json_encode(array(
+			"display" => $display
+		))
+	);
+}
+
+add_action('wp_ajax_ldnft_subscriptions_display', 'ldnft_subscriptions_display');
