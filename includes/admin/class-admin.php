@@ -527,6 +527,12 @@ class LDNFT_Admin {
             $response = ['added'=>0, 'exists'=>0, 'message'=>'', 'errors'=> [$errormsg], 'errormsg'=> $errormsg ];
             echo json_encode($response);exit;
         }
+        
+        if (!is_plugin_active('mailpoet/mailpoet.php')) {
+            $errormsg = __('This section requires MailPoet to be installed and configured.', LDNFT_TEXT_DOMAIN);
+            $response = ['added'=>0, 'exists'=>0, 'message'=>'', 'errors'=> [$errormsg], 'errormsg'=> $errormsg ];
+            echo json_encode($response);exit;
+        }
 
         $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
         $results = $api->Api('plugins/'.$ldnft_mailpeot_plugin.'/users.json', 'GET', []);
@@ -1245,84 +1251,82 @@ class LDNFT_Admin {
                         <h3 class="ldnft-settings-heading"><?php _e( 'Import Subscribers from Freemius to Mailpoet', LDNFT_TEXT_DOMAIN ); ?></h3>
                         <div class="ldnft-box">
                             <?php 
+                                $mail_not_active = false;
                                 if (!is_plugin_active('mailpoet/mailpoet.php')) {
-                                    ?>
-                                        <div id="ldnft-settings-import-mailpoet-general">
-                                            <?php _e( 'This section requires MailPoet to be installed and configured.', LDNFT_TEXT_DOMAIN ); ?>
-                                        </div>    
-                                    <?php
-                                } else {
-                                    $allow_import = true;
-                                    ?>
-                                    <div id="ldnft-settings-import-mailpoet-message" style="display:none"></div>
-                                    <div id="ldnft-settings-import-mailpoet-errmessage" style="display:none"></div>
-                                    <div class="ldnft-post-content">
-                                        <span class="ldnft-desc"><?php _e( 'Mailpoet List', LDNFT_TEXT_DOMAIN ); ?></span>
-                                        <label>
-                                            <?php
-                                                $table_name = $wpdb->prefix.'mailpoet_segments';
-                                                $list = $wpdb->get_results('select id, name from '.$table_name.'');
-                                                $is_list_available = true;
-                                                if( is_array($list) && count( $list ) > 0 ) {
-                                                    echo '<select id="ldnft_mailpeot_list" name="ldnft_mailpeot_list">';
-                                                    foreach( $list as $item ) {
-                                                        echo '<option value="'.$item->id.'">'.$item->name.'</option>';
-                                                    }
-                                                    echo '</select>';
-                                                } else {
-                                                    echo '<span class="mailpoet_unable_to_import">'.__( 'No mailpoet list for import.', LDNFT_TEXT_DOMAIN ).'</span>';
-                                                    $allow_import = false;
-                                                    $is_list_available = false;
-                                                }
-                                            ?>
-                                        </label>
-                                        <?php if($is_list_available) { ?>
-                                            <p>
-                                                <?php _e( 'Select a list before import the actual subscribers.', LDNFT_TEXT_DOMAIN ); ?>
-                                            </p>
-                                        <?php } ?>
-                                    </div>
-                                    <div class="ldnft-post-content">
-                                        <span class="ldnft-desc"><?php _e( 'Plugin:', LDNFT_TEXT_DOMAIN ); ?></span>
-                                        <label>
-                                            <?php
-                                                $is_plugins_available = true;
-                                                if( is_array($plugins->plugins) && count( $plugins->plugins ) > 0 ) {
-                                                    echo '<select id="ldnft_mailpeot_plugin" name="ldnft_mailpeot_plugin">';
-                                                    foreach( $plugins->plugins as $plugin ) {
-                                                        ?>
-                                                            <option value="<?php echo $plugin->id; ?>"><?php echo $plugin->title; ?></option>
-                                                        <?php   
-                                                    }
-                                                    echo '</select>';
-                                                } else {
-                                                    echo '<span class="mailpoet_unable_to_import">'.__( 'No freemius product available for import.', LDNFT_TEXT_DOMAIN ).'</span>';
-                                                    $allow_import = false;
-                                                    $is_plugins_available = false;
-                                                }
-                                            ?>
-                                        </label>
-                                        <?php if($is_plugins_available) { ?>
-                                            <p>
-                                                <?php _e( 'Select a product whose subscribers needs to be imported.', LDNFT_TEXT_DOMAIN ); ?>
-                                            </p>
-                                        <?php } ?>    
-                                    </div>
-                                    
-                                        <div class="ldfmt-button-wrapper">
-                                            <?php wp_nonce_field( 'ldnft_mailpoet_nounce', 'ldnft_mailpoet_nounce_field' ); ?>
-                                            <input type="hidden" name="action" value="ldnft_mailpoet_submit_action" />
-                                            <div class="ldnft-success-message">
-                                                <img class="ldnft-success-loader" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" />
-                                                <span class="ldnft-loading-wrap"><?php _e( 'Please wait! Import is being processed.', LDNFT_TEXT_DOMAIN ); ?></span>
-                                            </div>
-                                            <input type="submit" <?php if(!$allow_import) { ?> disabled="disabled" <?php } ?> class="button button-primary ldnft-mailpoet-save-setting_import" name="ldnft_mailpoet_submit_form_import" value="<?php _e( 'Import Subscribers', LDNFT_TEXT_DOMAIN ); ?>">
-                                        </div>
-                                    
-                                    <?php  
-                                }
+                                    $mail_not_active = true;
+                                }  
+                                
+                                $allow_import = true;
                             ?>
+                            <div id="ldnft-settings-import-mailpoet-message" style="display:none"></div>
+                            <div id="ldnft-settings-import-mailpoet-errmessage" style="display:none"></div>
+                            <div class="ldnft-post-content">
+                                <span class="ldnft-desc"><?php _e( 'Mailpoet List', LDNFT_TEXT_DOMAIN ); ?></span>
+                                <label>
+                                    <?php
+                                        $table_name = $wpdb->prefix.'mailpoet_segments';
+                                        $list = $wpdb->get_results('select id, name from '.$table_name.'');
+                                        $is_list_available = true;
+                                        if( is_array($list) && count( $list ) > 0 ) {
+                                            echo '<select id="ldnft_mailpeot_list" name="ldnft_mailpeot_list">';
+                                            foreach( $list as $item ) {
+                                                echo '<option value="'.$item->id.'">'.$item->name.'</option>';
+                                            }
+                                            echo '</select>';
+                                        } else {
+                                            echo '<span class="mailpoet_unable_to_import">'.__( 'No mailpoet list for import.', LDNFT_TEXT_DOMAIN ).'</span>';
+                                            $allow_import = false;
+                                            $is_list_available = false;
+                                        }
+                                    ?>
+                                </label>
+                                <?php if($is_list_available) { ?>
+                                    <p>
+                                        <?php _e( 'Select a list before import the actual subscribers.', LDNFT_TEXT_DOMAIN ); ?>
+                                    </p>
+                                <?php } ?>
+                            </div>
+                            <div class="ldnft-post-content">
+                                <span class="ldnft-desc"><?php _e( 'Plugin:', LDNFT_TEXT_DOMAIN ); ?></span>
+                                <label>
+                                    <?php
+                                        $is_plugins_available = true;
+                                        if( is_array($plugins->plugins) && count( $plugins->plugins ) > 0 ) {
+                                            echo '<select id="ldnft_mailpeot_plugin" name="ldnft_mailpeot_plugin">';
+                                            foreach( $plugins->plugins as $plugin ) {
+                                                ?>
+                                                    <option value="<?php echo $plugin->id; ?>"><?php echo $plugin->title; ?></option>
+                                                <?php   
+                                            }
+                                            echo '</select>';
+                                        } else {
+                                            echo '<span class="mailpoet_unable_to_import">'.__( 'No freemius product available for import.', LDNFT_TEXT_DOMAIN ).'</span>';
+                                            $allow_import = false;
+                                            $is_plugins_available = false;
+                                        }
+                                    ?>
+                                </label>
+                                <?php if($is_plugins_available) { ?>
+                                    <p>
+                                        <?php _e( 'Select a product whose subscribers needs to be imported.', LDNFT_TEXT_DOMAIN ); ?>
+                                    </p>
+                                <?php } ?>    
+                            </div>
                             
+                            <div class="ldfmt-button-wrapper">
+                                <?php wp_nonce_field( 'ldnft_mailpoet_nounce', 'ldnft_mailpoet_nounce_field' ); ?>
+                                <input type="hidden" name="action" value="ldnft_mailpoet_submit_action" />
+                                <div class="ldnft-success-message">
+                                    <img class="ldnft-success-loader" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" />
+                                    <span class="ldnft-loading-wrap"><?php _e( 'Please wait! Import is being processed.', LDNFT_TEXT_DOMAIN ); ?></span>
+                                </div>
+                                <?php if (!is_plugin_active('mailpoet/mailpoet.php')) { ?>
+                                    <div id="ldnft-settings-import-mailpoet-general">
+                                        <?php _e( 'This section requires MailPoet to be installed and configured.', LDNFT_TEXT_DOMAIN ); ?>
+                                    </div>    
+                                <?php } ?>
+                                <input type="submit" <?php if(!$allow_import || $mail_not_active) { ?> disabled="disabled" <?php } ?> class="button button-primary ldnft-mailpoet-save-setting_import" name="ldnft_mailpoet_submit_form_import" value="<?php _e( 'Import Subscribers', LDNFT_TEXT_DOMAIN ); ?>">
+                            </div>
                         </div>
                     </div>
                 </form>
