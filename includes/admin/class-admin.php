@@ -38,6 +38,8 @@ class LDNFT_Admin {
     private static $instance = null;
 
     /**
+     * Contructor Class
+     * 
      * @since 1.0
      * @return $this
      */
@@ -53,12 +55,20 @@ class LDNFT_Admin {
     }
 
     /**
+     * Return loader image
+     * 
      * @since 1.0
      * @return $this
      */
-    public static function get_bar_preloader() {
+    public static function get_bar_preloader( $class = '' ) {
         
-        return '<img width="30px" class="ldnft-subssummary-loader" src="'.LDNFT_ASSETS_URL .'images/bar-preloader.gif" />';
+        Ob_start();
+        ?>
+        <img width="30px" class="ldnft-subssummary-loader" src="<?php echo LDNFT_ASSETS_URL  . 'images/bar-preloader.gif'; ?>" />
+        <?php
+        $return  = ob_get_contents();
+        ob_end_clean();
+        return $return;
     }
 
     /**
@@ -84,8 +94,11 @@ class LDNFT_Admin {
 
         add_action( 'upgrader_process_complete',                [ $this, 'ldnft_create_table_when_plugin_update' ], 10, 2 );
         add_action( 'admin_enqueue_scripts',                    [ $this, 'admin_enqueue_scripts_callback' ] );
+        
+        // API settings: need to shift it to it's template.
         add_action( 'admin_post_ldnft_submit_action',           [ $this, 'ldnft_submit_action' ] );
         add_action( 'admin_notices',                            [ $this, 'ldnft_admin_notice' ] );
+        
         add_action( 'admin_menu',                               [ $this, 'add_main_menu_page' ] );
         add_filter( 'plugin_action_links_'. LDNFT_BASE_DIR,     [ $this, 'plugin_setting_links' ] ); 
         add_action( 'in_admin_header',                          [ $this, 'remove_admin_notices' ], 100 );
@@ -657,7 +670,7 @@ class LDNFT_Admin {
      */
     public function ldnft_create_table_when_plugin_update( $upgrader, $hook_extra ) {
 
-        global $wpdb;
+        // updation code will be here.
     }
 
     /**
@@ -698,7 +711,7 @@ class LDNFT_Admin {
             __( 'Freemius Toolkit', LDNFT_TEXT_DOMAIN ),
             'manage_options',
             'ldnft-freemius',
-            [$this,'ldninjas_main'],
+            [],
             LDNFT_ASSETS_URL.'images/freemius-icon-light-small.png',
             6 
         ); 
@@ -730,7 +743,8 @@ class LDNFT_Admin {
                     'id', 
                     'user_id',  
                 ];
-                if( get_user_option( 'subscription_hidden_columns_set', $user_id) != 'Yes' ) {
+                
+                if( get_user_option( 'subscription_hidden_columns_set', $user_id ) != 'Yes' ) {
                     update_user_option( $user_id, 'managefreemius-toolkit_page_freemius-subscriptionscolumnshidden', $default_hidden_columns );
                     update_user_option( $user_id, 'subscription_hidden_columns_set', 'Yes' );
                 }
@@ -770,6 +784,7 @@ class LDNFT_Admin {
                     'is_featured',
                     'sharable_img',
                 ];
+
                 if( get_user_option( 'reviews_hidden_columns_set', $user_id) != 'Yes' ) {
                     update_user_option( $user_id, 'managefreemius-toolkit_page_freemius-reviewscolumnshidden', $reviews_hidden_columns );
                     update_user_option( $user_id, 'reviews_hidden_columns_set', 'Yes' );
@@ -884,7 +899,7 @@ class LDNFT_Admin {
             [ $this,'settings_page']
         );
 
-        remove_submenu_page('ldnft-freemius','ldnft-freemius');
+        remove_submenu_page( 'ldnft-freemius','ldnft-freemius' );
     }
 
    /**
@@ -997,7 +1012,7 @@ class LDNFT_Admin {
      *
      * @param $current
      */
-    public static function subscribers_page( ) {
+    public function subscribers_page( ) {
         
         /**
          * Create an instance of our package class... 
@@ -1012,12 +1027,12 @@ class LDNFT_Admin {
             $selected_plugin_id = intval( $_GET['ldfmt_plugins_filter'] ); 
         }
 
-        $selected_interval = '';
+        $selected_interval = '12';
         if( isset($_GET['interval'])  ) {
             $selected_interval = $_GET['interval']; 
         }
         
-        $selected_status = '';
+        $selected_status = 'active';
         if( isset( $_GET['status'] )  ) {
             $selected_status = $_GET['status']; 
         }
@@ -1034,25 +1049,20 @@ class LDNFT_Admin {
         ?>
         <div class="wrap">
             
-            <div id="icon-users" class="icon32"><br/></div>
             <h2><?php _e( 'Subscriptions', LDNFT_TEXT_DOMAIN ); ?></h2>
 
-            
-            <!-- Forms are NOT created automatically, so you need to wrap the table in one to use features like bulk actions -->
-            <form id="movies-filter" method="get">
-                <!-- For plugins, we also need to ensure that the form posts back to our current page -->
-                <input type="hidden" class="ldnft-freemius-page" name="page" value="1" />
-                <!-- Now we can render the completed list table -->
+            <form id="ldnft-subscription-filter" method="get">
+                
                 <div class="ldnft_filters_top">
                     <div class="alignleft actions bulkactions">
                         <span class="ldnft_filter_labels"><?php _e( 'Filters:', LDNFT_TEXT_DOMAIN ); ?></span>
                         <select name="ldfmt-plugins-filter" class="ldfmt-plugins-filter">
-                            <option value=""><?php _e( 'Filter by Plugin', LDNFT_TEXT_DOMAIN ); ?></option>
                             <?php
                                 foreach( $plugins->plugins as $plugin ) {
                                     if( $selected_plugin_id == 0 ) {
                                         $selected_plugin_id = $plugin->id;
                                     }
+
                                     $selected = '';
                                     if( $selected_plugin_id == $plugin->id ) {
                                         $selected = ' selected = "selected"';   
@@ -1076,7 +1086,7 @@ class LDNFT_Admin {
                                         $selected = ' selected = "selected"';   
                                     }
                                     ?>
-                                        <option value="<?php echo $plan->id; ?>" <?php echo $selected; ?>><?php echo $plan->title; ?></option>
+                                    <option value="<?php echo $plan->id; ?>" <?php echo $selected; ?>><?php echo $plan->title; ?></option>
                                     <?php   
                                 }
                             ?>
@@ -1092,13 +1102,11 @@ class LDNFT_Admin {
                             <option value="active" <?php echo $selected_status=='active'?'selected':'';?>><?php echo __( 'Active', LDNFT_TEXT_DOMAIN );?></option>
                             <option value="cancelled" <?php echo $selected_status=='cancelled'?'selected':'';?>><?php echo __( 'Cancelled', LDNFT_TEXT_DOMAIN );?></option>
                         </select>
-                        <img style="display:none" width="30px" class="ldfmt-data-loader" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" />
-                        <span id="ldnft-subscription-import-message"></span>
                     </div>
                     <div style="clear:both">&nbsp;</div> 
                     <div class="ldfmt-sales-upper-info">
                         <div class="ldfmt-gross-sales-box ldfmt-sales-box">
-                            <label><?php echo __('Gross Sales', LDNFT_TEXT_DOMAIN);?></label>
+                            <label><?php echo __( 'Gross Sales', LDNFT_TEXT_DOMAIN );?></label>
                             <div class="ldnft_points">
                                 <span class="ldnft_subscription_points"></span><?php //echo number_format( floatval($gross_total), 2);?>
                                 <img width="30px" class="ldnft-subssummary-loader" src="<?php echo LDNFT_ASSETS_URL .'images/bar-preloader.gif'; ?>" />
@@ -1152,8 +1160,9 @@ class LDNFT_Admin {
                     </div>
                 </div>
                 <div id="ldnft_subscriptions_data">
-                    <?php $testListTable->display() ?>
+                    <?php $testListTable->display(); ?>
                 </div>
+                <input type="hidden" class="ldnft-freemius-page" name="page" value="1" />
             </form>
             
         </div>
@@ -1168,7 +1177,7 @@ class LDNFT_Admin {
     public static function settings_page( $current ) {
         
         global $wpdb;
-        
+
         $ldnft_settings = get_option( 'ldnft_settings' );
         $api_scope      = isset( $ldnft_settings['api_scope'] ) ? sanitize_text_field( $ldnft_settings['api_scope'] ) : 'developer';
         $dev_id         = isset( $ldnft_settings['dev_id'] ) ? sanitize_text_field( $ldnft_settings['dev_id'] ) : '';
@@ -1238,6 +1247,7 @@ class LDNFT_Admin {
                         <div class="ldfmt-button-wrapper">
                             <?php wp_nonce_field( 'ldnft_nounce', 'ldnft_nounce_field' ); ?>
                             <input type="hidden" name="action" value="ldnft_submit_action" />
+                            <input type="hidden" id="ldnft_api_scope" name="ldnft_settings[api_scope]" value="developer">
                             <input type="submit" class="button button-primary ldnft-save-setting" name="ldnft_submit_form" value="<?php _e( 'Test & Save', LDNFT_TEXT_DOMAIN ); ?>">
                         </div>
 
@@ -1378,9 +1388,8 @@ class LDNFT_Admin {
                 wp_enqueue_style( 'fmt-backend-css', LDNFT_ASSETS_URL . 'css/backend.css', [], LDNFT_VERSION, null );
                 
                 /**
-                 * add slect2 js
+                 * enqueue admin js
                  */
-                
                 wp_enqueue_script( 'fmt-backend-js', LDNFT_ASSETS_URL . 'js/backend.js', [ 'jquery' ], LDNFT_VERSION, true ); 
                     
                 wp_localize_script( 'fmt-backend-js', 'LDNFT', [  
