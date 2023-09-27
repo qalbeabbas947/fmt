@@ -89,11 +89,11 @@ class LDNFT_Subscriptions extends WP_List_Table {
         }
 
 		parent::__construct(
-			array(
+			[
 				'singular'  => '60s hit',
 				'plural'    => '60s hits',
 				'ajax'      => true
-			)
+            ]
 		);
 
 	}
@@ -119,7 +119,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
 
 	function get_columns() {
 
-		$columns = array(
+		$columns = [
             'id'                    => __( 'Transaction ID',LDNFT_TEXT_DOMAIN ), 
             'user_id'               => __( 'User ID',LDNFT_TEXT_DOMAIN ),  
             'username'              => __( 'Name',LDNFT_TEXT_DOMAIN ),
@@ -139,7 +139,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
             'currency'              => __( 'Currency',LDNFT_TEXT_DOMAIN ),
             'country_code'          => __( 'Country',LDNFT_TEXT_DOMAIN ), 
             'view'                  => __( 'View', LDNFT_TEXT_DOMAIN ),
-        );
+        ];
         
         return $columns;
 	}
@@ -169,9 +169,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
 
 	function get_sortable_columns() {
 
-		$sortable_columns = array();
-
-        return $sortable_columns;
+        return [];
 	}
 
 	/**
@@ -219,12 +217,12 @@ class LDNFT_Subscriptions extends WP_List_Table {
                 ]
             ];
 
-            $this->set_pagination_args( array(
+            $this->set_pagination_args( [
                 'per_page'      => $per_page,
                 'offset'        => 1,
                 'offset_rec'    => 1,
                 'current_recs'  => 1
-            ) );
+            ] );
 
 			return;
 		}
@@ -255,7 +253,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
          * 3 other arrays. One for all columns, one for hidden columns, and one
          * for sortable columns.
          */
-        $this->_column_headers = array($columns, $hidden, $sortable);
+        $this->_column_headers = [ $columns, $hidden, $sortable ];
         
         
         $interval_str = '';
@@ -318,12 +316,12 @@ class LDNFT_Subscriptions extends WP_List_Table {
         
         $this->items = $data;
  
-        $this->set_pagination_args( array(
+        $this->set_pagination_args( [
             'per_page'      => $per_page,
             'offset'        => $offset,
             'offset_rec'    => $offset_rec,
             'current_recs'  => $subscriptions_total
-        ) );
+        ] );
 	}
 
 	/**
@@ -370,7 +368,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
 		$this->pagination('bottom');
 		$pagination_bottom = ob_get_clean();
 
-		$response = array( 'rows' => $rows );
+		$response = [ 'rows' => $rows ];
 		$response['pagination']['top'] = $pagination_top;
 		$response['pagination']['bottom'] = $pagination_bottom;
 		$response['column_headers'] = $headers;
@@ -467,7 +465,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
 
 		$current_url = remove_query_arg( $removable_query_args, $current_url );
 
-		$page_links = array();
+		$page_links = [];
 
 		$total_pages_before = '<span class="paging-input">';
 		$total_pages_after  = '</span></span>';
@@ -676,9 +674,9 @@ function ldnft_subscriptions_display() {
 	$display = ob_get_clean();
 
 	die(
-		json_encode(array(
+		json_encode([
 			"display" => $display
-		))
+		])
 	);
 }
 

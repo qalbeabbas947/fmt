@@ -97,7 +97,7 @@ class LDNFT_Reviews_Shortcode {
         $product_id = isset( $atts['product_id'] ) ? $atts['product_id'] : 0;
         $content = '';
         ob_start();
-        if( $product_id > 0 ) {
+        if( intval( $product_id ) > 0 ) {
             ?>
                 <link rel="stylesheet" href="<?php echo LDNFT_ASSETS_URL;?>lightbox/css/lightbox.min.css">
                 <script src="<?php echo LDNFT_ASSETS_URL;?>lightbox/js/lightbox-plus-jquery.min.js"></script>

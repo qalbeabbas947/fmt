@@ -66,11 +66,11 @@ class LDNFT_Reviews extends WP_List_Table {
         /**
          * Set parent defaults
          */
-        parent::__construct( array(
+        parent::__construct( [
             'singular'  => 'freemius_customer',
             'plural'    => 'freemius_customers',
             'ajax'      => false
-        ) );
+        ] );
         
     }
 
@@ -192,7 +192,7 @@ class LDNFT_Reviews extends WP_List_Table {
      **************************************************************************/
     public function get_columns(){
 
-        $columns = array(
+        $columns = [
             'id'                => __( 'ID', LDNFT_TEXT_DOMAIN ),
             'user_id'           => __( 'User ID', LDNFT_TEXT_DOMAIN ),
             'useremail'         => __( 'Email',LDNFT_TEXT_DOMAIN ),
@@ -209,7 +209,7 @@ class LDNFT_Reviews extends WP_List_Table {
             'rate'              => __( 'Rating', LDNFT_TEXT_DOMAIN ),
             'company'           => __( 'Company', LDNFT_TEXT_DOMAIN ),
             'created'           => __( 'Joined', LDNFT_TEXT_DOMAIN ),
-        );
+        ];
         
         return $columns;
     }
@@ -231,9 +231,7 @@ class LDNFT_Reviews extends WP_List_Table {
      **************************************************************************/
     public function get_sortable_columns() {
         
-        $sortable_columns = array();
- 
-        return $sortable_columns;
+        return [];
     }
 
 
@@ -325,7 +323,7 @@ class LDNFT_Reviews extends WP_List_Table {
          * 3 other arrays. One for all columns, one for hidden columns, and one
          * for sortable columns.
          */
-        $this->_column_headers = array($columns, $hidden, $sortable);
+        $this->_column_headers = [ $columns, $hidden, $sortable ];
         
         
         /**
@@ -449,12 +447,12 @@ class LDNFT_Reviews extends WP_List_Table {
         /**
          * REQUIRED. We also have to register our pagination options & calculations.
          */
-        $this->set_pagination_args( array(
+        $this->set_pagination_args( [
             'per_page'      => $per_page,
             'offset'        => $offset,
             'offset_rec'    => $offset_rec,
             'current_recs'  => count($results->reviews)
-        ) );
+        ] );
     }
 
     /**
@@ -523,7 +521,7 @@ class LDNFT_Reviews extends WP_List_Table {
 
 		$current_url = remove_query_arg( $removable_query_args, $current_url );
 
-		$page_links = array();
+		$page_links = [];
 
 		$total_pages_before = '<span class="paging-input">';
 		$total_pages_after  = '</span></span>';

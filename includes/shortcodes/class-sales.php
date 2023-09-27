@@ -167,9 +167,9 @@ class LDNFT_Sales_Shortcode {
         wp_enqueue_script('ldnft-jqueryui-js', 'https://code.jquery.com/ui/1.10.4/jquery-ui.js', ['jquery'], LDNFT_VERSION, true);
         wp_enqueue_script( 'ldnft-frontend-js', LDNFT_ASSETS_URL . 'js/frontend.js', [ 'jquery' ], LDNFT_VERSION, true ); 
         
-        wp_localize_script( 'ldnft-frontend-js', 'LDNFT', array( 
+        wp_localize_script( 'ldnft-frontend-js', 'LDNFT', [ 
             'ajaxURL' => admin_url( 'admin-ajax.php' ),
-        ) );
+        ] );
     }
 
     /**

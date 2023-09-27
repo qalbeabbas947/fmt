@@ -541,16 +541,16 @@ class LDNFT_Admin {
         $exists = 0;
         $errors = [];
         foreach( $results->users as $user ) {
-            $subscriber_data = array(
+            $subscriber_data = [
                 'email' => $user->email,
                 'first_name' => $user->first,
                 'last_name' => $user->last,
-            );
+            ];
               
-            $options = array(
+            $options = [
                 'send_confirmation_email' => false // default: true
                 //'schedule_welcome_email' => false
-            );
+            ];
             try {
                 $subscriber = \MailPoet\API\API::MP('v1')->getSubscriber($subscriber_data['email']);
                 $exists++;
@@ -740,11 +740,11 @@ class LDNFT_Admin {
                     global $ldnftSubscriptionsListTable;
                     
                     $option = 'per_page';
-                    $args = array(
+                    $args = [
                             'label' => 'Subsriptions Per Page',
                             'default' => 10,
                             'option' => 'subscriptions_per_page'
-                        );
+                        ];
                     add_screen_option( $option, $args );
                     $ldnftSubscriptionsListTable = new LDNFT_Subscriptions();
                 } );
@@ -780,11 +780,11 @@ class LDNFT_Admin {
                     global $ldnftReviewsListTable;
                     
                     $option = 'per_page';
-                    $args = array(
+                    $args = [
                             'label' => 'Subsriptions Per Page',
                             'default' => 10,
                             'option' => 'reviews_per_page'
-                        );
+                        ];
                     add_screen_option( $option, $args );
                     $ldnftReviewsListTable = new LDNFT_Reviews();
                 } );
@@ -828,11 +828,11 @@ class LDNFT_Admin {
                     global $ldnftSalesListTable;
                     
                     $option = 'per_page';
-                    $args = array(
+                    $args = [
                             'label' => 'Sales Per Page',
                             'default' => 10,
                             'option' => 'sales_per_page'
-                        );
+                        ];
                     add_screen_option( $option, $args );
                     $ldnftSalesListTable = new LDNFT_Sales();
                 } );
@@ -861,11 +861,11 @@ class LDNFT_Admin {
                     global $ldnftCustomersListTable;
                     
                     $option = 'per_page';
-                    $args = array(
+                    $args = [
                             'label' => 'Customers Per Page',
                             'default' => 10,
                             'option' => 'customers_per_page'
-                        );
+                        ];
                     add_screen_option( $option, $args );
                     $ldnftCustomersListTable = new LDNFT_Customers();
                 } );
@@ -1383,9 +1383,9 @@ class LDNFT_Admin {
                 
                 wp_enqueue_script( 'fmt-backend-js', LDNFT_ASSETS_URL . 'js/backend.js', [ 'jquery' ], LDNFT_VERSION, true ); 
                     
-                wp_localize_script( 'fmt-backend-js', 'LDNFT', array(  
+                wp_localize_script( 'fmt-backend-js', 'LDNFT', [  
                     'ajaxURL' => admin_url( 'admin-ajax.php' ),
-                ) );
+                ] );
                 
             }
         }  

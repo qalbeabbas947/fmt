@@ -65,7 +65,7 @@ class LDNFT_Freemius {
                      */
                     require_once dirname(__FILE__) . '/freemius/start.php';
         
-                    $test_freemius_addon = fs_dynamic_init( array(
+                    $test_freemius_addon = fs_dynamic_init( [
                         'id'                  => '12667',
                         'slug'                => 'coordinator-course-reset',
                         'type'                => 'plugin',
@@ -73,10 +73,10 @@ class LDNFT_Freemius {
                         'is_premium'          => false,
                         'has_addons'          => true,
                         'has_paid_plans'      => false,
-                        'menu'                => array(
+                        'menu'                => [
                             'first-path'     => 'plugins.php',
-                        ),
-                    ) );
+                        ],
+                    ] );
                 }
         
                 return $test_freemius_addon;
@@ -186,7 +186,7 @@ class LDNFT_Freemius {
 
     public static function get_country_name_by_code( $country_code ) {
         
-        $countries = array(
+        $countries = [
             'AX' => __( 'Åland Islands', LDNFT_TEXT_DOMAIN ),
             'AF' => __( 'Afghanistan', LDNFT_TEXT_DOMAIN ),
             'AL' => __( 'Albania', LDNFT_TEXT_DOMAIN ),
@@ -431,7 +431,7 @@ class LDNFT_Freemius {
             'YE' => __( 'Yemen', LDNFT_TEXT_DOMAIN ),
             'ZM' => __( 'Zambia', LDNFT_TEXT_DOMAIN ),
             'ZW' => __( 'Zimbabwe', LDNFT_TEXT_DOMAIN ),
-        );
+        ];
 
         $countries = apply_filters( 'ldnft_countries', $countries,  $country_code );
 
