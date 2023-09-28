@@ -108,8 +108,108 @@ class LDNFT_Admin {
         add_action( 'wp_ajax_ldnft_sales_view_detail',          [ $this, 'sales_view_detail' ], 100 );
         add_action( 'wp_ajax_ldnft_customers_check_next',       [ $this, 'customers_check_next' ], 100 );
         add_action( 'wp_ajax_ldnft_sales_check_next',       [ $this, 'sales_check_next' ], 100 );
+
+        add_action('wp_ajax_ldnft_subscriptions_display', [ $this, 'ldnft_subscriptions_display' ], 100 );
+        add_action( 'wp_ajax_ldnft_subscriptions_summary', [ $this, 'ldnft_subscriptions_summary_callback' ], 100 );
+    }
+
+    /**
+     * Action wp_ajax for fetching ajax_response
+     */
+
+    public function ldnft_subscriptions_summary_callback() {
+        
+        $selected_plugin_id = 0;
+        if( isset($_GET['ldfmt_plugins_filter']) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) {
+            $selected_plugin_id = intval( $_GET['ldfmt_plugins_filter'] ); 
+        }
+    
+
+        $interval_str = '';
+        if( isset($_GET['interval']) && !empty( $_GET['interval'] ) ) {
+            $interval_str = '&billing_cycle='.$_GET['interval'];
+        }
+
+        $status_str = '';
+        if( isset( $_GET['status'] )  ) {
+            $status_str = '&filter='.$_GET['status'];
+        }
+        
+        $plan_str = '';
+        if( isset( $_GET['plan_id'] ) && intval($_GET['plan_id']) > 0 ) {
+            $plan_str = '&plan_id='.$_GET['plan_id']; 
+        }
+
+        $tem_per_page = 50;
+        $tem_offset = 0;
+        $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
+        $result = $api->Api('plugins/'.$selected_plugin_id.'/subscriptions.json?count='.$tem_per_page.'&offset='.$tem_offset.$interval_str.$status_str.$plan_str, 'GET', []);
+        $gross_total = 0;
+        $tax_rate_total = 0;
+        $total_number_of_sales = 0;
+        $total_new_subscriptions = 0;
+        $total_new_renewals = 0;
+        
+        if( isset($result) && isset($result->subscriptions) ) {
+            $has_more_records = true;
+            while($has_more_records) {
+                foreach( $result->subscriptions as $payment ) {
+                    
+                    $pmts = $api->Api('plugins/'.$selected_plugin_id.'/subscriptions/'.$payment->id.'/payments.json?count='.$tem_per_page.'&offset='.$tem_offset.$interval_str, 'GET', []);
+                    foreach($pmts->payments as $pmt) {
+                        $gross_total += $pmt->gross;
+                        $tax_rate_total += $pmt->vat;
+                        $total_number_of_sales++;
+                        if( $pmt->is_renewal == '1' || $pmt->is_renewal == 1 ) {
+                            $total_new_renewals++;
+                        } else {
+                            $total_new_subscriptions++;
+                        }
+                    }
+                } 
+
+                $tem_offset += $tem_per_page;
+                $result = $api->Api('plugins/'.$selected_plugin_id.'/subscriptions.json?count='.$tem_per_page.'&offset='.$tem_offset.$interval_str, 'GET', []);
+                if( count( $result->subscriptions ) > 0 ) {
+                    $has_more_records = true;
+                } else {
+                    $has_more_records = false;
+                }
+            }
+        }
+
+        $data = [
+            'gross_total' => number_format($gross_total, 2),
+            'tax_rate_total' => number_format($tax_rate_total, 2),
+            'total_number_of_sales' => $total_number_of_sales,
+            'total_new_subscriptions' => $total_new_subscriptions,
+            'total_new_renewals' => $total_new_renewals
+        ];
+        
+        die(
+            json_encode($data)
+        );
     }
     
+    /**
+     * Action wp_ajax for fetching the first time table structure
+     */
+    public function ldnft_subscriptions_display() {
+        
+        $wp_list_table = new LDNFT_Subscriptions();
+        $wp_list_table->prepare_items();
+
+        ob_start();
+        $wp_list_table->display();
+        $display = ob_get_clean();
+
+        die(
+            json_encode([
+                "display" => $display
+            ])
+        );
+    }
+
     /**
      * checks if there are customers records
      */
@@ -547,12 +647,13 @@ class LDNFT_Admin {
         }
 
         $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
-        $results = $api->Api('plugins/'.$ldnft_mailpeot_plugin.'/users.json', 'GET', []);
+        $results = $api->Api('plugins/'.$ldnft_mailpeot_plugin.'/users.json?filter=paid', 'GET', []);
         $response = [];
         $count = 0;
         $exists = 0;
         $errors = [];
-        foreach( $results->users as $user ) {
+        foreach( $results->users as $user ) { 
+            
             $subscriber_data = [
                 'email' => $user->email,
                 'first_name' => $user->first,

@@ -93,7 +93,7 @@
                         status: ldnftstatus,
                         plan_id: ldnftplan_id,
                     },
-                    success: function (response) {
+                    success: function ( response ) {
 
                         $('.ldnft_subscription_points').html(response.gross_total).css('display', 'block');
                         $('.ldnft_subscription_tax_fee').html(response.tax_rate_total).css('display', 'block');
