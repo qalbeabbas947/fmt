@@ -14,10 +14,9 @@ class LDNFT_Subscriptions_Menu {
 
     private $default_hidden_columns;
 
-    /** ************************************************************************
-     * REQUIRED. Set up a constructor.
-     ***************************************************************************/
-
+    /**
+     * Constructor class
+     */
 	function __construct() {
 
         $this->default_hidden_columns = [ 
@@ -42,45 +41,36 @@ class LDNFT_Subscriptions_Menu {
     public function admin_menu_page() { 
         
         $user_id = get_current_user_id();
-        
-        $api = new Freemius_Api_WordPress( FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
-        try {
-            
-            $plugins = $api->Api('plugins.json?fields=id,title', 'GET', []);
-            
-            if( ! isset( $plugins->error )  ) {
+        if( FS__API_CONNECTION  ) {
                 
-                $hook = add_submenu_page( 
-                    'ldnft-freemius',
-                    __( 'Subscriptions', LDNFT_TEXT_DOMAIN ),
-                    __( 'Subscriptions', LDNFT_TEXT_DOMAIN ),
-                    'manage_options',
-                    'freemius-subscriptions',
-                    [ $this,'subscribers_page'],
-                    0
-                );
-                
-                if( get_user_option( 'subscription_hidden_columns_set', $user_id ) != 'Yes' ) {
-                    update_user_option( $user_id, 'managefreemius-toolkit_page_freemius-subscriptionscolumnshidden', $this->default_hidden_columns );
-                    update_user_option( $user_id, 'subscription_hidden_columns_set', 'Yes' );
-                }
-
-                add_action( "load-$hook", function () {
-                    
-                    global $ldnftSubscriptionsListTable;
-                    
-                    $option = 'per_page';
-                    $args = [
-                            'label' => 'Subsriptions Per Page',
-                            'default' => 10,
-                            'option' => 'subscriptions_per_page'
-                        ];
-                    add_screen_option( $option, $args );
-                    $ldnftSubscriptionsListTable = new LDNFT_Subscriptions();
-                } );
+            $hook = add_submenu_page( 
+                'ldnft-freemius',
+                __( 'Subscriptions', LDNFT_TEXT_DOMAIN ),
+                __( 'Subscriptions', LDNFT_TEXT_DOMAIN ),
+                'manage_options',
+                'freemius-subscriptions',
+                [ $this, 'subscribers_page' ],
+                0
+            );
+            
+            if( get_user_option( 'subscription_hidden_columns_set', $user_id ) != 'Yes' ) {
+                update_user_option( $user_id, 'managefreemius-toolkit_page_freemius-subscriptionscolumnshidden', $this->default_hidden_columns );
+                update_user_option( $user_id, 'subscription_hidden_columns_set', 'Yes' );
             }
-        } catch(Exception $e) {
-            
+
+            add_action( "load-$hook", function () {
+                
+                global $ldnftSubscriptionsListTable;
+                
+                $option = 'per_page';
+                $args = [
+                        'label' => 'Subsriptions Per Page',
+                        'default' => 10,
+                        'option' => 'subscriptions_per_page'
+                    ];
+                add_screen_option( $option, $args );
+                $ldnftSubscriptionsListTable = new LDNFT_Subscriptions();
+            } );
         }
     }
 
@@ -97,18 +87,19 @@ class LDNFT_Subscriptions_Menu {
         $ListTable = new LDNFT_Subscriptions(); 
         
         $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
-        $plugins = $api->Api('plugins.json?fields=id,title', 'GET', ['fields'=>'id,title']);
+        $products = LDNFT_Freemius::$products;
         
-        if( is_array( $plugins->plugins ) && count($plugins->plugins) == 0 ) {
+        if( !FS__HAS_PLUGINS ) {
             ?>
                 <div class="wrap">
                     <h2><?php _e( 'Subscriptions', LDNFT_TEXT_DOMAIN ); ?></h2>
-                    <p><?php _e( 'No product(s) exists in your freemius account. Please, add a product on freemius and the reload the page.', LDNFT_TEXT_DOMAIN ); ?></p>
+                    <p><?php _e( 'No product(s) exists in your freemius account. Please, add a product on freemius and reload the page.', LDNFT_TEXT_DOMAIN ); ?></p>
                 </div>
             <?php
 
             return;
         }
+
         $selected_plugin_id = 0;
         if( isset($_GET['ldfmt_plugins_filter']) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) {
             $selected_plugin_id = intval( $_GET['ldfmt_plugins_filter'] ); 
@@ -145,7 +136,7 @@ class LDNFT_Subscriptions_Menu {
                         <span class="ldnft_filter_labels"><?php _e( 'Filters:', LDNFT_TEXT_DOMAIN ); ?></span>
                         <select name="ldfmt-plugins-filter" class="ldfmt-plugins-filter">
                             <?php
-                                foreach( $plugins->plugins as $plugin ) {
+                                foreach( $products->plugins as $plugin ) {
                                     if( $selected_plugin_id == 0 ) {
                                         $selected_plugin_id = $plugin->id;
                                     }
@@ -160,12 +151,11 @@ class LDNFT_Subscriptions_Menu {
                                 }
                             ?>
                         </select>
-                        <?php
-                            $plans = $api->Api('plugins/'.$selected_plugin_id.'/plans.json?count=50', 'GET', []);
-                        ?>
+                        <?php $plans = $api->Api('plugins/'.$selected_plugin_id.'/plans.json?count=50', 'GET', []); ?>
                         <select name="ldfmt-sales-plan_id-filter" class="ldfmt-sales-plan_id-filter">
                             <option value=""><?php _e( 'Filter by Plan', LDNFT_TEXT_DOMAIN ); ?></option>
                             <?php
+                            if( isset( $plans->plans ) && is_array( $plans->plans ) ) {
                                 foreach( $plans->plans as $plan ) {
                                     
                                     $selected = '';
@@ -176,6 +166,7 @@ class LDNFT_Subscriptions_Menu {
                                     <option value="<?php echo $plan->id; ?>" <?php echo $selected; ?>><?php echo $plan->title; ?></option>
                                     <?php   
                                 }
+                            }
                             ?>
                         </select>
                         

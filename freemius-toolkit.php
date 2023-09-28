@@ -27,6 +27,11 @@ class LDNFT_Freemius {
     private static $instance = null;
 
     /**
+     * @var self
+     */
+    public static $products = null;
+
+    /**
      * @since 1.0
      * @return $this
      */
@@ -35,9 +40,11 @@ class LDNFT_Freemius {
         if ( is_null( self::$instance ) && ! ( self::$instance instanceof LDNFT_Freemius ) ) {
             self::$instance = new self;
 
-            self::$instance->setup_constants();
-            self::$instance->includes();
             self::$instance->enable_freemius();
+            self::$instance->setup_constants();
+            self::$instance->connect_freemius();
+            self::$instance->includes();
+            
         }
         
         return self::$instance;
@@ -95,6 +102,54 @@ class LDNFT_Freemius {
     }
 
     /**
+     * Freemius connection constants.
+     */
+    private function connect_freemius () {
+
+        if( file_exists( LDNFT_DIR.'freemius/includes/sdk/FreemiusBase.php' ) ) {
+            require_once LDNFT_DIR.'freemius/includes/sdk/FreemiusBase.php';
+        }        
+       
+        if( file_exists( LDNFT_DIR.'freemius/includes/sdk/FreemiusWordPress.php' ) ) {
+            require_once LDNFT_DIR.'freemius/includes/sdk/FreemiusWordPress.php';
+        } 
+
+        /**
+         * Take the api settings to access the freemius api
+         */
+        $ldnft_settings = get_option( 'ldnft_settings' );
+        $api_scope      = 'developer';
+        $dev_id         = isset( $ldnft_settings['dev_id'] ) ? sanitize_text_field( $ldnft_settings['dev_id'] ) : '';
+        $public_key     = isset( $ldnft_settings['public_key'] ) ? sanitize_text_field( $ldnft_settings['public_key'] ): '';
+        $secret_key     = isset( $ldnft_settings['secret_key'] ) ? sanitize_text_field( $ldnft_settings['secret_key'] ): '';
+
+        define( 'FS__API_SCOPE', $api_scope ); 
+        define( 'FS__API_DEV_ID', $dev_id );
+        define( 'FS__API_PUBLIC_KEY', $public_key );
+        define( 'FS__API_SECRET_KEY', $secret_key );
+
+        $api = new Freemius_Api_WordPress( FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY );
+        $fs_connection = false;
+        $fs_has_plugins = false;
+        try {
+            $products = $api->Api('plugins.json?fields=id,title', 'GET', []);
+            if( ! isset( $products->error )  ) {
+
+                self::$products = $products;
+                $fs_connection = true;
+                if( is_array( $products->plugins ) && count( $products->plugins ) > 0 ) {
+                    $fs_has_plugins = true;
+                }
+            }
+        } catch( Exception $e ) {
+            
+        }
+
+        define( 'FS__API_CONNECTION', $fs_connection );
+        define( 'FS__HAS_PLUGINS', $fs_has_plugins );
+    }
+
+    /**
      * Plugin Constants
     */
     private function setup_constants() {
@@ -122,34 +177,12 @@ class LDNFT_Freemius {
          * Text Domain
          */
         define( 'LDNFT_TEXT_DOMAIN', 'ldninjas-freemius-toolkit' );
-
-        /**
-         * Take the api settings to access the freemius api
-         */
-        $ldnft_settings = get_option( 'ldnft_settings' );
-        $api_scope      = 'developer';
-        $dev_id         = isset( $ldnft_settings['dev_id'] ) ? sanitize_text_field( $ldnft_settings['dev_id'] ) : '';
-        $public_key     = isset( $ldnft_settings['public_key'] ) ? sanitize_text_field( $ldnft_settings['public_key'] ): '';
-        $secret_key     = isset( $ldnft_settings['secret_key'] ) ? sanitize_text_field( $ldnft_settings['secret_key'] ): '';
-
-        define( 'FS__API_SCOPE', $api_scope ); 
-        define( 'FS__API_DEV_ID', $dev_id );
-        define( 'FS__API_PUBLIC_KEY', $public_key );
-        define( 'FS__API_SECRET_KEY', $secret_key );
     }
 
     /**
      * Plugin requiered files
      */
-    private function includes() {
-        
-        if( file_exists( LDNFT_DIR.'freemius/includes/sdk/FreemiusBase.php' ) ) {
-            require_once LDNFT_DIR.'freemius/includes/sdk/FreemiusBase.php';
-        }        
-       
-        if( file_exists( LDNFT_DIR.'freemius/includes/sdk/FreemiusWordPress.php' ) ) {
-            require_once LDNFT_DIR.'freemius/includes/sdk/FreemiusWordPress.php';
-        }        
+    private function includes() {       
 
         if( file_exists( LDNFT_INCLUDES_DIR .'admin/class-admin.php' ) ) {
             require_once LDNFT_INCLUDES_DIR . 'admin/class-admin.php';
