@@ -162,13 +162,13 @@ class LDNFT_Freemius {
         if( file_exists( LDNFT_INCLUDES_DIR .'admin/listings/class-reviews.php' ) ) {
             require_once LDNFT_INCLUDES_DIR . 'admin/listings/class-reviews.php';
         }
+        
+        if( file_exists( LDNFT_INCLUDES_DIR .'admin/subscriptions/class-menu.php' ) ) {
+            require_once LDNFT_INCLUDES_DIR . 'admin/subscriptions/class-menu.php';
+        }
 
-        // if( file_exists( LDNFT_INCLUDES_DIR .'admin/listings/class-subscribers.php' ) ) {
-        //     require_once LDNFT_INCLUDES_DIR . 'admin/listings/class-subscribers.php';
-        // }
-
-        if( file_exists( LDNFT_INCLUDES_DIR .'admin/listings/class-subscriptions.php' ) ) {
-            require_once LDNFT_INCLUDES_DIR . 'admin/listings/class-subscriptions.php';
+        if( file_exists( LDNFT_INCLUDES_DIR .'admin/subscriptions/class-subscriptions.php' ) ) {
+            require_once LDNFT_INCLUDES_DIR . 'admin/subscriptions/class-subscriptions.php';
         }
 
         if( file_exists( LDNFT_INCLUDES_DIR .'admin/listings/class-sales.php' ) ) {
