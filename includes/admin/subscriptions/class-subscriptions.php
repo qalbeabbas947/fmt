@@ -618,7 +618,7 @@ function ldnft_subscriptions_summary_callback() {
     $total_number_of_sales = 0;
     $total_new_subscriptions = 0;
     $total_new_renewals = 0;
-    print_r($result);
+    
     if( isset($result) && isset($result->subscriptions) ) {
         $has_more_records = true;
         while($has_more_records) {
@@ -648,8 +648,8 @@ function ldnft_subscriptions_summary_callback() {
     }
 
     $data = [
-        'gross_total' => $gross_total,
-        'tax_rate_total' => $tax_rate_total,
+        'gross_total' => number_format($gross_total, 2),
+        'tax_rate_total' => number_format($tax_rate_total, 2),
         'total_number_of_sales' => $total_number_of_sales,
         'total_new_subscriptions' => $total_new_subscriptions,
         'total_new_renewals' => $total_new_renewals

@@ -35,7 +35,7 @@
                 } else {
                     $('#ldnft_subscriptions_data table tbody').html( LDNFTbackEnd.default_table_row );
                 }
-                console.log(LDNFTbackEnd.default_table_row);
+               
                 $('.ldnft-subssummary-loader').css('display', 'inline');
                 $('.ldnft_subscription_points').css('display', 'none');
                 $('.ldnft_subscription_tax_fee').css('display', 'none');
@@ -101,17 +101,7 @@
                         $('.ldnft_subscription_new_subscriptions_count').html(response.total_new_subscriptions).css('display', 'block');
                         $('.ldnft_subscription_renewals_count').html(response.total_new_renewals).css('display', 'block');
                         $('.ldnft-subssummary-loader').css('display', 'none');
-                        console.log(response);
-                        // if (response.rows.length)
-                        //     $('#the-list').html(response.rows);
-                        // if (response.column_headers.length)
-                        //     $('thead tr, tfoot tr').html(response.column_headers);
-                        // if (response.pagination.bottom.length)
-                        //     $('.tablenav.top .tablenav-pages').html($(response.pagination.top).html());
-                        // if (response.pagination.top.length)
-                        //     $('.tablenav.bottom .tablenav-pages').html($(response.pagination.bottom).html());
-
-                        // list.init();
+                        
                     }
                 });
             },
