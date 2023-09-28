@@ -98,7 +98,7 @@ class LDNFT_Subscriptions_Menu {
         
         $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
         $plugins = $api->Api('plugins.json?fields=id,title', 'GET', ['fields'=>'id,title']);
-        $plugins->plugins = [];
+        
         if( is_array( $plugins->plugins ) && count($plugins->plugins) == 0 ) {
             ?>
                 <div class="wrap">

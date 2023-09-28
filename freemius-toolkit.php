@@ -155,12 +155,20 @@ class LDNFT_Freemius {
             require_once LDNFT_INCLUDES_DIR . 'admin/class-admin.php';
         }        
         
-        if( file_exists( LDNFT_INCLUDES_DIR .'admin/listings/class-customers.php' ) ) {
-            require_once LDNFT_INCLUDES_DIR . 'admin/listings/class-customers.php';
+        if( file_exists( LDNFT_INCLUDES_DIR .'admin/customers/class-menu.php' ) ) {
+            require_once LDNFT_INCLUDES_DIR . 'admin/customers/class-menu.php';
         }
 
-        if( file_exists( LDNFT_INCLUDES_DIR .'admin/listings/class-reviews.php' ) ) {
-            require_once LDNFT_INCLUDES_DIR . 'admin/listings/class-reviews.php';
+        if( file_exists( LDNFT_INCLUDES_DIR .'admin/customers/class-customers.php' ) ) {
+            require_once LDNFT_INCLUDES_DIR . 'admin/customers/class-customers.php';
+        }
+
+        if( file_exists( LDNFT_INCLUDES_DIR .'admin/reviews/class-menu.php' ) ) {
+            require_once LDNFT_INCLUDES_DIR . 'admin/reviews/class-menu.php';
+        }
+
+        if( file_exists( LDNFT_INCLUDES_DIR .'admin/reviews/class-reviews.php' ) ) {
+            require_once LDNFT_INCLUDES_DIR . 'admin/reviews/class-reviews.php';
         }
         
         if( file_exists( LDNFT_INCLUDES_DIR .'admin/subscriptions/class-menu.php' ) ) {
@@ -171,8 +179,12 @@ class LDNFT_Freemius {
             require_once LDNFT_INCLUDES_DIR . 'admin/subscriptions/class-subscriptions.php';
         }
 
-        if( file_exists( LDNFT_INCLUDES_DIR .'admin/listings/class-sales.php' ) ) {
-            require_once LDNFT_INCLUDES_DIR . 'admin/listings/class-sales.php';
+        if( file_exists( LDNFT_INCLUDES_DIR .'admin/sales/class-menu.php' ) ) {
+            require_once LDNFT_INCLUDES_DIR . 'admin/sales/class-menu.php';
+        }
+
+        if( file_exists( LDNFT_INCLUDES_DIR .'admin/sales/class-sales.php' ) ) {
+            require_once LDNFT_INCLUDES_DIR . 'admin/sales/class-sales.php';
         }
 
         if( file_exists( LDNFT_INCLUDES_DIR.'shortcodes/class-reviews.php' ) ) {
