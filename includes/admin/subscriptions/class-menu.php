@@ -98,7 +98,17 @@ class LDNFT_Subscriptions_Menu {
         
         $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
         $plugins = $api->Api('plugins.json?fields=id,title', 'GET', ['fields'=>'id,title']);
-        
+        $plugins->plugins = [];
+        if( is_array( $plugins->plugins ) && count($plugins->plugins) == 0 ) {
+            ?>
+                <div class="wrap">
+                    <h2><?php _e( 'Subscriptions', LDNFT_TEXT_DOMAIN ); ?></h2>
+                    <p><?php _e( 'No product(s) exists in your freemius account. Please, add a product on freemius and the reload the page.', LDNFT_TEXT_DOMAIN ); ?></p>
+                </div>
+            <?php
+
+            return;
+        }
         $selected_plugin_id = 0;
         if( isset($_GET['ldfmt_plugins_filter']) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) {
             $selected_plugin_id = intval( $_GET['ldfmt_plugins_filter'] ); 
