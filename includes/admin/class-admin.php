@@ -184,7 +184,7 @@ class LDNFT_Admin {
         $id             = isset( $_REQUEST['id'] ) ? intval( $_REQUEST['id'] ):0;
         if( $id == 0 || $plugin_id == 0 )  {
             echo '<div class="ldnft-error-message">';
-            echo __('Transaction id and plugin id are required fields.', LDNFT_TEXT_DOMAIN);    
+            echo __('Transaction id and Product id are required fields.', LDNFT_TEXT_DOMAIN);    
             echo '</div>';
             exit;    
         }
@@ -335,7 +335,7 @@ class LDNFT_Admin {
         $id             = isset( $_REQUEST['id'] ) ? intval( $_REQUEST['id'] ):0;
         if( $id == 0 || $plugin_id == 0 )  {
             echo '<div class="ldnft-error-message">';
-            echo __('Transaction id and plugin id are required fields.', LDNFT_TEXT_DOMAIN);    
+            echo __('Transaction id and Product id are required fields.', LDNFT_TEXT_DOMAIN);    
             echo '</div>';
             exit;    
         }

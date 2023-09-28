@@ -5725,7 +5725,7 @@
                 throw new Freemius_Exception( array(
                     'error' => array(
                         'type'    => 'ParameterNotSet',
-                        'message' => 'Plugin id parameter is not set.',
+                        'message' => 'Product id parameter is not set.',
                         'code'    => 'plugin_id_not_set',
                         'http'    => 500,
                     )
@@ -6241,7 +6241,7 @@
          * @author Vova Feldman (@svovaf)
          * @since  1.0.6
          *
-         * @param number $parent_plugin_id The parent plugin ID
+         * @param number $parent_plugin_id The parent Product ID
          */
         function init_addon( $parent_plugin_id ) {
             $this->_plugin->parent_plugin_id = $parent_plugin_id;
@@ -10102,7 +10102,7 @@
          * IMPORTANT:
          *      Custom event tracking is currently only supported for specific clients.
          *      If you are not one of them, please don't use this method. If you will,
-         *      the API will simply ignore your request based on the plugin ID.
+         *      the API will simply ignore your request based on the Product ID.
          *
          * Need custom tracking for your plugin or theme?
          *      If you are interested in custom event tracking please contact yo@freemius.com
@@ -10161,7 +10161,7 @@
          * IMPORTANT:
          *      Custom event tracking is currently only supported for specific clients.
          *      If you are not one of them, please don't use this method. If you will,
-         *      the API will simply ignore your request based on the plugin ID.
+         *      the API will simply ignore your request based on the Product ID.
          *
          * Need custom tracking for your plugin or theme?
          *      If you are interested in custom event tracking please contact yo@freemius.com
@@ -10469,7 +10469,7 @@
          * @author Vova Feldman (@svovaf)
          * @since  1.0.1
          *
-         * @return number Plugin ID.
+         * @return number Product ID.
          */
         function get_id() {
             return $this->_plugin->id;
@@ -10535,7 +10535,7 @@
          * @author Vova Feldman (@svovaf)
          * @since  1.2.1.5
          *
-         * @return number Parent plugin ID (if parent exist).
+         * @return number Parent Product ID (if parent exist).
          */
         function get_parent_id() {
             return $this->is_addon() ?
@@ -14881,11 +14881,11 @@
         }
 
         /**
-         * Get Plugin ID under which we will track affiliate application.
+         * Get Product ID under which we will track affiliate application.
          *
-         * This could either be the Bundle ID or the main plugin ID.
+         * This could either be the Bundle ID or the main Product ID.
          *
-         * @return number Bundle ID if developer has provided one, else the main plugin ID.
+         * @return number Bundle ID if developer has provided one, else the main Product ID.
          */
         private function get_plugin_id_for_affiliate_terms() {
             return $this->has_bundle_context() ?
@@ -26201,7 +26201,7 @@
             }
 
             /**
-             * Find all plugin IDs that were installed by the current admin.
+             * Find all Product IDs that were installed by the current admin.
              */
             $plugin_ids_map = self::get_user_opted_in_module_ids_map( $current_fs_user->id );
 

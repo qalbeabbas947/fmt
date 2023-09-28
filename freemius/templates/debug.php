@@ -617,7 +617,7 @@
             <thead>
             <tr>
                 <th><?php fs_esc_html_echo_inline( 'ID', 'id' ) ?></th>
-                <th><?php fs_esc_html_echo_inline( 'Plugin ID' ) ?></th>
+                <th><?php fs_esc_html_echo_inline( 'Product ID' ) ?></th>
                 <th><?php fs_esc_html_echo_inline( 'User ID' ) ?></th>
                 <th><?php fs_esc_html_echo_inline( 'Plan ID' ) ?></th>
                 <th><?php fs_esc_html_echo_inline( 'Quota' ) ?></th>

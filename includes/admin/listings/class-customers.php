@@ -212,7 +212,7 @@ class LDNFT_Customers extends WP_List_Table {
             'last'                      => __( 'Last Name', LDNFT_TEXT_DOMAIN ),
             'is_verified'               => __( 'Verified?', LDNFT_TEXT_DOMAIN ),
             'created'                   => __( 'Joined', LDNFT_TEXT_DOMAIN ),
-            'plugin_ids'                => __( 'Plugins', LDNFT_TEXT_DOMAIN ),
+            'plugin_ids'                => __( 'Products', LDNFT_TEXT_DOMAIN ),
             'is_marketing_allowed'      => __( 'Is Marketing Allowed?', LDNFT_TEXT_DOMAIN )
         ];
 

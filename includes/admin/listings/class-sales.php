@@ -212,7 +212,7 @@ class LDNFT_Sales extends WP_List_Table {
             'vat_id'                => __( 'VAT ID',LDNFT_TEXT_DOMAIN ), 
             'coupon_id'             => __( 'Coupon ID',LDNFT_TEXT_DOMAIN ), 
             'user_card_id'          => __( 'Card ID',LDNFT_TEXT_DOMAIN ), 
-            'plugin_id'             => __( 'Plugin ID',LDNFT_TEXT_DOMAIN ), 
+            'plugin_id'             => __( 'Product ID',LDNFT_TEXT_DOMAIN ), 
             'external_id'           => __( 'External ID',LDNFT_TEXT_DOMAIN ), 
             'currency'              => __( 'Currency',LDNFT_TEXT_DOMAIN ), 
             'username'              => __( 'User Name',LDNFT_TEXT_DOMAIN ), 

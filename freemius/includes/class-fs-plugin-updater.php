@@ -1279,7 +1279,7 @@ if ( !isset($info->error) ) {
          */
         function install_and_activate_plugin( $plugin_id = false ) {
             if ( ! empty( $plugin_id ) && ! FS_Plugin::is_valid_id( $plugin_id ) ) {
-                // Invalid plugin ID.
+                // Invalid Product ID.
                 return array(
                     'message' => $this->_fs->get_text_inline( 'Invalid module ID.', 'auto-install-error-invalid-id' ),
                     'code'    => 'invalid_module_id',
