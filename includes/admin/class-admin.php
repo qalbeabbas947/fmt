@@ -124,7 +124,7 @@ class LDNFT_Admin {
         $status         = isset($_REQUEST['status']) && intval($_REQUEST['status'])>0?intval($_REQUEST['status']):'';
         $offset_rec     = ($offset-1) * $per_page;
 
-        $interval_str = '';
+        $interval_str = '12';
         if( !empty($this->selected_interval) ) {
             $interval_str = '&billing_cycle='.$this->selected_interval;
         }
@@ -564,6 +564,7 @@ class LDNFT_Admin {
                 'send_confirmation_email' => false // default: true
                 //'schedule_welcome_email' => false
             ];
+
             try {
                 $subscriber = \MailPoet\API\API::MP('v1')->getSubscriber($subscriber_data['email']);
                 $exists++;

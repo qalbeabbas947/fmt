@@ -76,10 +76,12 @@ class LDNFT_Subscriptions extends WP_List_Table {
             $this->selected_plugin_id = intval( $_GET['ldfmt_plugins_filter'] ); 
         }
         
+        $this->selected_interval = 12; 
         if( isset($_GET['interval'])  ) {
             $this->selected_interval = $_GET['interval']; 
         }
         
+        $this->selected_status = 'active'; 
         if( isset( $_GET['status'] )  ) {
             $this->selected_status = $_GET['status']; 
         }
@@ -261,7 +263,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
            $interval_str = '&billing_cycle='.$this->selected_interval;
         }
 
-        $status_str = '';
+        $status_str = 'active';
         if( !empty($this->selected_status) ) {
            $status_str = '&filter='.$this->selected_status;
         }
@@ -432,12 +434,12 @@ class LDNFT_Subscriptions extends WP_List_Table {
         $current_recs   = $this->_pagination_args['current_recs'];
         $offset_rec1    = ($offset) * $per_page;
         
-        $interval_str = '';
+        $interval_str = '12';
         if( !empty($this->selected_interval) && !empty( $this->selected_interval ) ) {
             $interval_str = '&billing_cycle='.$this->selected_interval;
         }
 
-        $status_str = '';
+        $status_str = 'active';
         if( !empty($this->selected_status) ) {
             $status_str = '&filter='.$this->selected_status;
         }

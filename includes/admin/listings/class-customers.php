@@ -593,7 +593,6 @@ class LDNFT_Customers extends WP_List_Table {
             ?>
             <div class="alignleft actions bulkactions">
                 <select onchange="document.location='admin.php?page=freemius-customers&status=<?php echo $this->selected_status;?>&ldfmt_plugins_filter='+this.value" name="ldfmt-plugins-filter" class="ldfmt-plugins-filter">
-                    <option value=""><?php _e('Filter by Plugin', LDNFT_TEXT_DOMAIN);?></option>
                     <?php
                         foreach( $this->plugins as $plugin ) {
                             

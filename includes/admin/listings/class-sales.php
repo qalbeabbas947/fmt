@@ -78,6 +78,7 @@ class LDNFT_Sales extends WP_List_Table {
             $this->selected_filter = $_GET['filter']; 
         }
         
+        $this->selected_interval = 12; 
         if( isset($_GET['interval'])  ) {
             $this->selected_interval = $_GET['interval']; 
         }
@@ -354,7 +355,7 @@ class LDNFT_Sales extends WP_List_Table {
            $filter_str = '&filter='.$this->selected_filter;
         }
 
-        $interval_str = '';
+        $interval_str = '12';
         if( !empty($this->selected_interval) ) {
            $interval_str = '&billing_cycle='.$this->selected_interval;
         }
@@ -442,7 +443,7 @@ class LDNFT_Sales extends WP_List_Table {
         $current_recs   = $this->_pagination_args['current_recs'];
         $offset_rec1    = ($offset) * $per_page;
         
-        $interval_str = '';
+        $interval_str = '12';
         if( !empty($this->selected_interval) ) {
             $interval_str = '&billing_cycle='.$this->selected_interval;
         }
@@ -589,7 +590,7 @@ class LDNFT_Sales extends WP_List_Table {
                 $filter_str = '&filter='.$this->selected_filter;
             }
             
-            $interval_str = '';
+            $interval_str = '12';
             if( !empty($this->selected_interval) ) {
                 $interval_str = '&billing_cycle='.$this->selected_interval;
             }
@@ -631,7 +632,6 @@ class LDNFT_Sales extends WP_List_Table {
             <div class="ldnft_filters_top">
                 <div class="alignleft actions bulkactions">
                     <select onchange="document.location='admin.php?page=freemius-sales&interval=<?php echo $this->selected_filter;?>&ldfmt_plugins_filter='+this.value" name="ldfmt-plugins-filter" class="ldfmt-plugins-filter">
-                        <option value=""><?php _e( 'Filter by Plugin', LDNFT_TEXT_DOMAIN ); ?></option>
                         <?php
                             foreach( $this->plugins as $plugin ) {
                                 
