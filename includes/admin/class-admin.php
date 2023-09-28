@@ -60,11 +60,11 @@ class LDNFT_Admin {
      * @since 1.0
      * @return $this
      */
-    public static function get_bar_preloader( $class = '' ) {
+    public static function get_bar_preloader( $class = 'ldnft-subssummary-loader' ) {
         
         Ob_start();
         ?>
-        <img width="30px" class="ldnft-subssummary-loader" src="<?php echo LDNFT_ASSETS_URL  . 'images/bar-preloader.gif'; ?>" />
+            <img width="30px" class="<?php echo $class; ?>" src="<?php echo LDNFT_ASSETS_URL  . 'images/bar-preloader.gif'; ?>" />
         <?php
         $return  = ob_get_contents();
         ob_end_clean();
@@ -1109,16 +1109,15 @@ class LDNFT_Admin {
                         <div class="ldfmt-gross-sales-box ldfmt-sales-box">
                             <label><?php echo __( 'Gross Sales', LDNFT_TEXT_DOMAIN );?></label>
                             <div class="ldnft_points">
-                                <span class="ldnft_subscription_points"></span><?php //echo number_format( floatval($gross_total), 2);?>
-                                <img width="30px" class="ldnft-subssummary-loader" src="<?php echo LDNFT_ASSETS_URL .'images/bar-preloader.gif'; ?>" />
+                                <span class="ldnft_subscription_points"></span>
+                                <?php echo LDNFT_Admin::get_bar_preloader("ldnft-subssummary-loader");?>
                             </div>
                         </div>
                         <div class="ldfmt-gross-gateway-box ldfmt-sales-box">
                             <label><?php echo __('Total Tax Rate', LDNFT_TEXT_DOMAIN);?></label>
                             <div class="ldnft_tax_fee">
-                                <?php //echo number_format( floatval( $tax_rate_total ), 2);?>
                                 <span class="ldnft_subscription_tax_fee"></span>
-                                <img width="30px" class="ldnft-subssummary-loader" src="<?php echo LDNFT_ASSETS_URL .'images/bar-preloader.gif'; ?>" />
+                                <?php echo LDNFT_Admin::get_bar_preloader("ldnft-subssummary-loader");?>
                             </div>
                             
                         </div>
@@ -1126,25 +1125,21 @@ class LDNFT_Admin {
                             <label><?php echo __('Total Sales Count', LDNFT_TEXT_DOMAIN);?></label>
                             <div class="ldnft_new_sales_count">
                                 <span class="ldnft_subscription_new_sales_count"></span>
-                                <img width="30px" class="ldnft-subssummary-loader" src="<?php echo LDNFT_ASSETS_URL .'images/bar-preloader.gif'; ?>" />
-                                <?php //echo $total_number_of_sales;?>
+                                <?php echo LDNFT_Admin::get_bar_preloader("ldnft-subssummary-loader");?>
                             </div>
                         </div>
                         <div class="ldfmt-new-subscriptions-box ldfmt-sales-box">
                             <label><?php echo __('New subscriptions', LDNFT_TEXT_DOMAIN);?></label>
                             <div class="ldnft_new_subscriptions_count">
                                 <span class="ldnft_subscription_new_subscriptions_count"></span>
-                                <img width="30px" class="ldnft-subssummary-loader" src="<?php echo LDNFT_ASSETS_URL .'images/bar-preloader.gif'; ?>" />
-                                
-                                <?php // echo $total_new_subscriptions;?>
+                                <?php echo LDNFT_Admin::get_bar_preloader("ldnft-subssummary-loader");?>
                             </div>
                         </div>
                         <div class="ldfmt-renewals-count-box ldfmt-sales-box">
                             <label><?php echo __('Total Renewals', LDNFT_TEXT_DOMAIN);?></label>
                             <div class="ldnft_renewals_count">
                                 <span class="ldnft_subscription_renewals_count"></span>
-                                <img width="30px" class="ldnft-subssummary-loader" src="<?php echo LDNFT_ASSETS_URL .'images/bar-preloader.gif'; ?>" />
-                                <?php //echo $total_new_renewals;?>
+                                <?php echo LDNFT_Admin::get_bar_preloader("ldnft-subssummary-loader");?>
                             </div>
                         </div>
                     </div>
