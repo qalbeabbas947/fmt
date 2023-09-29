@@ -223,7 +223,7 @@ class Tickera_Customization_Settings {
 		
 			<div class="nav-tab-wrapper">
 				<?php foreach( $settings_sections as $key => $section ) { ?>
-						<a href="?page=freemius-settings-page&tab=<?php echo $key; ?>"
+						<a href="?page=freemius-settings&tab=<?php echo $key; ?>"
 							class="nav-tab <?php echo $this->page_tab == $key ? 'nav-tab-active' : ''; ?>">
 							<i class="fa <?php echo $section['icon']; ?>" aria-hidden="true"></i>
 							<?php _e( $section['title'], LDNFT_TEXT_DOMAIN ); ?>
