@@ -243,10 +243,16 @@
     display: none;
     text-align: center;
 }
+
 .ldnft_filter_labels{
     float: left;
     font-weight: bold;
     padding: 5px;
+}
+
+.setting-table-wrapper{
+	width: 100%;
+	padding: 20px;
 }
 
 @media only screen and (max-width: 1000px) {

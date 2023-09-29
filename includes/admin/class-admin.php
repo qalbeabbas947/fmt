@@ -729,14 +729,14 @@ class LDNFT_Admin {
        
         add_submenu_page( 
             'ldnft-freemius',
-            __( 'Settings', LDNFT_TEXT_DOMAIN ),
-            __( 'Settings', LDNFT_TEXT_DOMAIN ),
+            __( 'Settings1', LDNFT_TEXT_DOMAIN ),
+            __( 'Settings1', LDNFT_TEXT_DOMAIN ),
             'manage_options',
             'freemius-settings',
             [ $this,'settings_page'], 
             5
         );
-
+        
         remove_submenu_page( 'ldnft-freemius','ldnft-freemius' );
     }
 
@@ -949,6 +949,7 @@ class LDNFT_Admin {
         $screen = get_current_screen();
         if( $screen ) { 
             if( $screen->id == 'freemius-toolkit_page_freemius-settings' 
+                || $screen->id == 'freemius-toolkit_page_freemius-settings-page'
                 || $screen->id == 'freemius-toolkit_page_freemius-subscriptions'
                 || $screen->id == 'freemius-toolkit_page_freemius-sales' 
                 || $screen->id == 'freemius-toolkit_page_freemius-customers' 
