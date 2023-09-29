@@ -526,6 +526,8 @@ class LDNFT_Admin {
      */
     public function mailpoet_submit_action() {
        
+        global $wpdb;
+
         $ldnft_mailpeot_plugin  = sanitize_text_field($_POST['ldnft_mailpeot_plugin']);
         if( ! isset( $_POST['ldnft_mailpeot_plugin'] ) || empty($ldnft_mailpeot_plugin) ) {
             $errormsg = __('Freemius product is required for import.', LDNFT_TEXT_DOMAIN);
@@ -572,20 +574,26 @@ class LDNFT_Admin {
             catch(\MailPoet\API\MP\v1\APIException $exception) {
                 if( $exception->getMessage() == 'This subscriber does not exist.' ) {
                     try {
-                        $subscriber = \MailPoet\API\API::MP('v1')->addSubscriber($subscriber_data, [$ldnft_mailpeot_list]); // Add to default mailing list
+                        $subscriber = \MailPoet\API\API::MP('v1')->addSubscriber($subscriber_data, [$ldnft_mailpeot_list], $options); // Add to default mailing list
+                        
+                        if( !empty( $subscriber['id'] ) ) {
+                            $sql = "update `".$wpdb->prefix."mailpoet_subscribers` set status='".SubscriberEntity::STATUS_SUBSCRIBED."' WHERE id='".$subscriber['id']."'";
+                            $wpdb->query( $sql );
+                        }
+                        
                         $count++;
                     } 
                     catch(\MailPoet\API\MP\v1\APIException $exception) {
-                        $errors[] = $exception->getMessage();
+                        $errors[$exception->getMessage()] = $exception->getMessage();
                         
                     }
-                    catch(Exception $exception) {
-                        $errors[] = $exception->getMessage();
+                    catch( Exception $exception ) {
+                        $errors[$exception->getMessage()] = $exception->getMessage();
                     }
                 }
             }
-            catch(Exception $exception) {
-                $errors[] = $exception->getMessage();
+            catch( Exception $exception ) {
+                $errors[$exception->getMessage()] = $exception->getMessage();
             }
         }
         
@@ -599,13 +607,15 @@ class LDNFT_Admin {
         
         $errormsg = '';
         if( count( $errors ) > 0 ) {
-            $errormsg = __('Errors:', LDNFT_TEXT_DOMAIN).implode(' ', $errors );
+            $errormsg = __('Errors:', LDNFT_TEXT_DOMAIN).'<br>'.implode('<br>', $errors );
         }
-        if(empty($message) && empty($errormsg)) {
+
+        if( empty( $message ) && empty( $errormsg ) ) {
             $message = __('No available subscriber(s) to import.', LDNFT_TEXT_DOMAIN);
         }
-        $response = ['added'=>$count, 'exists'=>$exists, 'message'=>$message, 'errors'=> $errors, 'errormsg'=> $errormsg ];
-        echo json_encode($response);
+
+        $response = [ 'added' => $count, 'exists' => $exists, 'message' => $message, 'errors' => $errors, 'errormsg' => $errormsg ];
+        echo json_encode( $response );
         die();
     }
 
