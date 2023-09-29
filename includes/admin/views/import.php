@@ -6,107 +6,100 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-
-$args = array( 'post_type' => 'page', 'post_status' => 'publish', 'posts_per_page' => -1 );
-$pages = new WP_Query( $args );
-
-$tc_roundtable_main_page 	= get_option( 'tc_roundtable_main_page' );
-$tc_roundtable_sub_page 	= get_option( 'tc_roundtable_sub_page' );
-$tc_roundtable_form_page	= get_option( 'tc_roundtable_form_page' );
+global $wpdb;
+$api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
+$plugins = LDNFT_Freemius::$products;
 ?>
 <div id="general_settings" class="cs_ld_tabs"> 
-    <form method="post" action="<?php echo admin_url('admin-post.php'); ?>">
-        <table class="setting-table-wrapper">
+    <form class="ldnft-settings-mailpoet" method="post" action="<?php echo admin_url( 'admin-post.php' ); ?>">
+        <?php 
+            $mail_not_active = false;
+            if (!is_plugin_active('mailpoet/mailpoet.php')) {
+                $mail_not_active = true;
+            }  
+            
+            $allow_import = true;
+        ?>
+        
+        <table class="setting-table-wrapper" width="100%">
             <tbody>
+                <tr>
+                    <td colspan="2">
+                        <div id="ldnft-settings-import-mailpoet-message" style="display:none"></div>
+                        <div id="ldnft-settings-import-mailpoet-errmessage" style="display:none"></div>
+                    </td>
+                </tr>
                 <tr> 
-                    <td width="30%" align="left" valign="top">
-						<strong><label align="left" for="ld-cms-schedule-excluded-roles"><?php _e( 'Round Table Main Page', LDNFT_TEXT_DOMAIN ); ?></label></strong>
+                    <td width="20%" align="left" valign="top">
+						<strong><label align="left" for="ldnft_dev_id"><?php _e( 'Mailpoet List', LDNFT_TEXT_DOMAIN ); ?></label></strong>
 					</td>
-                    <td width="70%">
-                       <select id="tc_roundtable_main_page" name="tc_roundtable_main_page">
-							<option value=""><?php _e('Select Page', LDNFT_TEXT_DOMAIN); ?></option>
-							<?php 
-                                if( $pages->have_posts() ) {
-                                    
-                                    foreach( $pages->posts as $page ) { ?>
-                                        <?php if( $tc_roundtable_main_page == $page->ID ) { ?>
-                                        <option value="<?php echo $page->ID; ?>" selected><?php echo $page->post_title; ?></option>
-                                        <?php } else { ?>
-                                        <option value="<?php echo $page->ID; ?>"><?php echo $page->post_title; ?></option>
-                                        <?php } ?>
-                                    <?php }	
-                                } ?>
-						</select>
-                        <p class="description" style="font-weight: normal;">
-                            <?php echo __('The Selected page will list users purchase round tables.', LDNFT_TEXT_DOMAIN ); ?>
-                        </p>
-                    </td>    
-                </tr>    
-				<tr> 
-                    <td align="left" valign="top">
-						<strong><label align = "left" for="ld-cms-schedule-excluded-roles"><?php _e( 'Round Table Sub Page', LDNFT_TEXT_DOMAIN ); ?></label></strong>
-					</td>
-                    <td>
-                        <select id="tc_roundtable_sub_page" name="tc_roundtable_sub_page">
-							<option value=""><?php _e('Select Page', 'csld_general_settings_field'); ?></option>
-							<?php 
-                            
-                                if( $pages->have_posts() ) {
-
-                                    foreach( $pages->posts as $page ) { ?>
-                                        <?php if( $tc_roundtable_sub_page == $page->ID ) { ?>
-                                        <option value="<?php echo $page->ID; ?>" selected><?php echo $page->post_title; ?></option>
-                                        <?php } else { ?>
-                                        <option value="<?php echo $page->ID; ?>"><?php echo $page->post_title; ?></option>
-                                        <?php } ?>
-                                    <?php }	
-                                } ?>
-						</select>
-                        <p class="description" style="font-weight: normal;">
-                            <?php echo __('The Selected page will show the attendees list.', LDNFT_TEXT_DOMAIN ); ?>
-                        </p>
-                    </td>    
-                </tr>   
-				<tr> 
-                    <td align="left" valign="top">
-						<strong><label align = "left" for="tc_roundtable_form_page"><?php _e( 'Round Table Form Page', LDNFT_TEXT_DOMAIN ); ?></label></strong>
-					</td>
-                    <td>
-                        <select id="tc_roundtable_form_page" name="tc_roundtable_form_page">
-							<option value=""><?php _e( 'Select Page', LDNFT_TEXT_DOMAIN ); ?></option>
-							<?php 
-                            if( $pages->have_posts() ) {
-
-                                foreach( $pages->posts as $page ) { ?>
-                                    <?php if( $tc_roundtable_form_page == $page->ID ) { ?>
-                                    <option value="<?php echo $page->ID; ?>" selected><?php echo $page->post_title; ?></option>
-                                    <?php } else { ?>
-                                    <option value="<?php echo $page->ID; ?>"><?php echo $page->post_title; ?></option>
-                                    <?php } ?>
-                                <?php }
-                            } ?>
-						</select>
-                        <p class="description" style="font-weight: normal;">
-                            <?php echo __( 'The Selected page will show the attendees update form.', LDNFT_TEXT_DOMAIN ); ?>
-                        </p>
+                    <td width="80%">
+                        <?php
+                            $table_name = $wpdb->prefix.'mailpoet_segments';
+                            $list = $wpdb->get_results('select id, name from '.$table_name.'');
+                            $is_list_available = true;
+                            if( is_array($list) && count( $list ) > 0 ) {
+                                echo '<select id="ldnft_mailpeot_list" name="ldnft_mailpeot_list">';
+                                foreach( $list as $item ) {
+                                    echo '<option value="'.$item->id.'">'.$item->name.'</option>';
+                                }
+                                echo '</select>';
+                            } else {
+                                echo '<span class="mailpoet_unable_to_import">'.__( 'No mailpoet list for import.', LDNFT_TEXT_DOMAIN ).'</span>';
+                                $allow_import = false;
+                                $is_list_available = false;
+                            }
+                        ?>
+                        <?php if($is_list_available) { ?>
+                            <p>
+                                <?php _e( 'Select a list before import the actual subscribers.', LDNFT_TEXT_DOMAIN ); ?>
+                            </p>
+                        <?php } ?>
                     </td>    
                 </tr>
 				<tr> 
                     <td align="left" valign="top">
-						<strong><label align = "left" for="ld-cms-schedule-excluded-roles"><?php _e( 'Token Generator Shortcode', LDNFT_TEXT_DOMAIN ); ?></label></strong>
+						<strong><label align = "left" for="ldnft_public_key"><?php _e( 'Plugin:', LDNFT_TEXT_DOMAIN ); ?></label></strong>
 					</td>
                     <td>
-                        [Ticket_Token_Generator]
+                        <?php
+                            $is_plugins_available = true;
+                            if( is_array($plugins->plugins) && count( $plugins->plugins ) > 0 ) {
+                                echo '<select id="ldnft_mailpeot_plugin" name="ldnft_mailpeot_plugin">';
+                                foreach( $plugins->plugins as $plugin ) {
+                                    ?>
+                                        <option value="<?php echo $plugin->id; ?>"><?php echo $plugin->title; ?></option>
+                                    <?php   
+                                }
+                                echo '</select>';
+                            } else {
+                                echo '<span class="mailpoet_unable_to_import">'.__( 'No freemius product available for import.', LDNFT_TEXT_DOMAIN ).'</span>';
+                                $allow_import = false;
+                                $is_plugins_available = false;
+                            }
+                        ?>
+                        <?php if($is_plugins_available) { ?>
+                            <p>
+                                <?php _e( 'Select a product whose subscribers needs to be imported.', LDNFT_TEXT_DOMAIN ); ?>
+                            </p>
+                        <?php } ?> 
                     </td>    
-                </tr>            
+                </tr>
             </tbody>
         </table>
-        
         <div class="submit-button" style="padding-top:10px">
-            <input type="hidden" value="general" name="tc_current_tab">
-            <input type="hidden" name="action" value="save_tc_settings">
-            <input type="submit" name="save_tc_settings" class="button-primary" value="<?php _e('Update Settings', 'cs_ld_addon' ); ?>">
+            <?php wp_nonce_field( 'ldnft_mailpoet_nounce', 'ldnft_mailpoet_nounce_field' ); ?>
+            <input type="hidden" name="action" value="ldnft_mailpoet_submit_action" />
+            <div class="ldnft-success-message">
+                <img class="ldnft-success-loader" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" />
+                <span class="ldnft-loading-wrap"><?php _e( 'Please wait! Import is being processed.', LDNFT_TEXT_DOMAIN ); ?></span>
+            </div>
+            <?php if (!is_plugin_active('mailpoet/mailpoet.php')) { ?>
+                <div id="ldnft-settings-import-mailpoet-general">
+                    <?php _e( 'This section requires MailPoet to be installed and configured.', LDNFT_TEXT_DOMAIN ); ?>
+                </div>    
+            <?php } ?>
+            <input type="submit" <?php if(!$allow_import || $mail_not_active) { ?> disabled="disabled" <?php } ?> class="button button-primary ldnft-mailpoet-save-setting_import" name="ldnft_mailpoet_submit_form_import" value="<?php _e( 'Import Subscribers', LDNFT_TEXT_DOMAIN ); ?>">
         </div>
-        <?php wp_nonce_field( 'save_tc_settings_nonce' ); ?>
     </form>
 </div>

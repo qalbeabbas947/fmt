@@ -15,98 +15,21 @@ $tc_roundtable_sub_page 	= get_option( 'tc_roundtable_sub_page' );
 $tc_roundtable_form_page	= get_option( 'tc_roundtable_form_page' );
 ?>
 <div id="general_settings" class="cs_ld_tabs"> 
-    <form method="post" action="<?php echo admin_url('admin-post.php'); ?>">
-        <table class="setting-table-wrapper">
-            <tbody>
-                <tr> 
-                    <td width="30%" align="left" valign="top">
-						<strong><label align="left" for="ld-cms-schedule-excluded-roles"><?php _e( 'Round Table Main Page', LDNFT_TEXT_DOMAIN ); ?></label></strong>
-					</td>
-                    <td width="70%">
-                       <select id="tc_roundtable_main_page" name="tc_roundtable_main_page">
-							<option value=""><?php _e('Select Page', LDNFT_TEXT_DOMAIN); ?></option>
-							<?php 
-                                if( $pages->have_posts() ) {
-                                    
-                                    foreach( $pages->posts as $page ) { ?>
-                                        <?php if( $tc_roundtable_main_page == $page->ID ) { ?>
-                                        <option value="<?php echo $page->ID; ?>" selected><?php echo $page->post_title; ?></option>
-                                        <?php } else { ?>
-                                        <option value="<?php echo $page->ID; ?>"><?php echo $page->post_title; ?></option>
-                                        <?php } ?>
-                                    <?php }	
-                                } ?>
-						</select>
-                        <p class="description" style="font-weight: normal;">
-                            <?php echo __('The Selected page will list users purchase round tables.', LDNFT_TEXT_DOMAIN ); ?>
-                        </p>
-                    </td>    
-                </tr>    
-				<tr> 
-                    <td align="left" valign="top">
-						<strong><label align = "left" for="ld-cms-schedule-excluded-roles"><?php _e( 'Round Table Sub Page', LDNFT_TEXT_DOMAIN ); ?></label></strong>
-					</td>
-                    <td>
-                        <select id="tc_roundtable_sub_page" name="tc_roundtable_sub_page">
-							<option value=""><?php _e('Select Page', 'csld_general_settings_field'); ?></option>
-							<?php 
-                            
-                                if( $pages->have_posts() ) {
-
-                                    foreach( $pages->posts as $page ) { ?>
-                                        <?php if( $tc_roundtable_sub_page == $page->ID ) { ?>
-                                        <option value="<?php echo $page->ID; ?>" selected><?php echo $page->post_title; ?></option>
-                                        <?php } else { ?>
-                                        <option value="<?php echo $page->ID; ?>"><?php echo $page->post_title; ?></option>
-                                        <?php } ?>
-                                    <?php }	
-                                } ?>
-						</select>
-                        <p class="description" style="font-weight: normal;">
-                            <?php echo __('The Selected page will show the attendees list.', LDNFT_TEXT_DOMAIN ); ?>
-                        </p>
-                    </td>    
-                </tr>   
-				<tr> 
-                    <td align="left" valign="top">
-						<strong><label align = "left" for="tc_roundtable_form_page"><?php _e( 'Round Table Form Page', LDNFT_TEXT_DOMAIN ); ?></label></strong>
-					</td>
-                    <td>
-                        <select id="tc_roundtable_form_page" name="tc_roundtable_form_page">
-							<option value=""><?php _e( 'Select Page', LDNFT_TEXT_DOMAIN ); ?></option>
-							<?php 
-                            if( $pages->have_posts() ) {
-
-                                foreach( $pages->posts as $page ) { ?>
-                                    <?php if( $tc_roundtable_form_page == $page->ID ) { ?>
-                                    <option value="<?php echo $page->ID; ?>" selected><?php echo $page->post_title; ?></option>
-                                    <?php } else { ?>
-                                    <option value="<?php echo $page->ID; ?>"><?php echo $page->post_title; ?></option>
-                                    <?php } ?>
-                                <?php }
-                            } ?>
-						</select>
-                        <p class="description" style="font-weight: normal;">
-                            <?php echo __( 'The Selected page will show the attendees update form.', LDNFT_TEXT_DOMAIN ); ?>
-                        </p>
-                    </td>    
-                </tr>
-				<tr> 
-                    <td align="left" valign="top">
-						<strong><label align = "left" for="ld-cms-schedule-excluded-roles"><?php _e( 'Token Generator Shortcode', LDNFT_TEXT_DOMAIN ); ?></label></strong>
-					</td>
-                    <td>
-                        [Ticket_Token_Generator]
-                    </td>    
-                </tr>            
-            </tbody>
-        </table>
-        
-        <div class="submit-button" style="padding-top:10px">
-            <input type="hidden" value="general" name="tc_current_tab">
-            <input type="hidden" name="action" value="save_tc_settings">
-            <input type="submit" name="save_tc_settings" class="button-primary" value="<?php _e('Update Settings', 'cs_ld_addon' ); ?>">
-        </div>
-        <?php wp_nonce_field( 'save_tc_settings_nonce' ); ?>
-    </form>
+    <table>
+        <tr>
+            <td><h3><?php _e( 'Shortcode:', LDNFT_TEXT_DOMAIN ); ?> [LDNFT_Reviews product_id="?"]</h3></td>
+        </tr>
+        <tr>
+            <td clss="ldfmt-shortcode-desc"><?php _e( "Displays attached product's reviews on the frontend. User can filter the reviews based on the plugin.", LDNFT_TEXT_DOMAIN ); ?></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td><h3><?php _e( 'Shortcode:', LDNFT_TEXT_DOMAIN ); ?> [LDNFT_Sales show="[ summary  |  listing  |  both ]"]</h3></td>
+        </tr>
+        <tr>
+            <td clss="ldfmt-shortcode-desc"><?php _e( 'This shortcode displays the plugin sales summary and listing on the frontend. Show parameter allows the user to control the display. Default value of the show parameter is both.', LDNFT_TEXT_DOMAIN ); ?></td>
+        </tr>
+    </table>
 </div>

@@ -6,107 +6,60 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-
-$args = array( 'post_type' => 'page', 'post_status' => 'publish', 'posts_per_page' => -1 );
-$pages = new WP_Query( $args );
-
-$tc_roundtable_main_page 	= get_option( 'tc_roundtable_main_page' );
-$tc_roundtable_sub_page 	= get_option( 'tc_roundtable_sub_page' );
-$tc_roundtable_form_page	= get_option( 'tc_roundtable_form_page' );
+$ldnft_settings = get_option( 'ldnft_settings' ); 
+$api_scope      = isset( $ldnft_settings['api_scope'] ) ? sanitize_text_field( $ldnft_settings['api_scope'] ) : 'developer';
+$dev_id         = isset( $ldnft_settings['dev_id'] ) ? sanitize_text_field( $ldnft_settings['dev_id'] ) : '';
+$public_key     = isset( $ldnft_settings['public_key'] ) ? sanitize_text_field( $ldnft_settings['public_key'] ): '';
+$secret_key     = isset( $ldnft_settings['secret_key'] ) ? sanitize_text_field( $ldnft_settings['secret_key'] ): '';
 ?>
 <div id="general_settings" class="cs_ld_tabs"> 
     <form method="post" action="<?php echo admin_url('admin-post.php'); ?>">
         <table class="setting-table-wrapper">
             <tbody>
                 <tr> 
-                    <td width="30%" align="left" valign="top">
-						<strong><label align="left" for="ld-cms-schedule-excluded-roles"><?php _e( 'Round Table Main Page', LDNFT_TEXT_DOMAIN ); ?></label></strong>
+                    <td width="20%" align="left" valign="top">
+						<strong><label align="left" for="ldnft_dev_id"><?php _e( 'Developer ID', LDNFT_TEXT_DOMAIN ); ?></label></strong>
 					</td>
-                    <td width="70%">
-                       <select id="tc_roundtable_main_page" name="tc_roundtable_main_page">
-							<option value=""><?php _e('Select Page', LDNFT_TEXT_DOMAIN); ?></option>
-							<?php 
-                                if( $pages->have_posts() ) {
-                                    
-                                    foreach( $pages->posts as $page ) { ?>
-                                        <?php if( $tc_roundtable_main_page == $page->ID ) { ?>
-                                        <option value="<?php echo $page->ID; ?>" selected><?php echo $page->post_title; ?></option>
-                                        <?php } else { ?>
-                                        <option value="<?php echo $page->ID; ?>"><?php echo $page->post_title; ?></option>
-                                        <?php } ?>
-                                    <?php }	
-                                } ?>
-						</select>
+                    <td width="80%">
+                        <input type="text" size="60" id="ldnft_dev_id" name="ldnft_settings[dev_id]" value="<?php echo $dev_id;?>">
                         <p class="description" style="font-weight: normal;">
-                            <?php echo __('The Selected page will list users purchase round tables.', LDNFT_TEXT_DOMAIN ); ?>
-                        </p>
-                    </td>    
-                </tr>    
-				<tr> 
-                    <td align="left" valign="top">
-						<strong><label align = "left" for="ld-cms-schedule-excluded-roles"><?php _e( 'Round Table Sub Page', LDNFT_TEXT_DOMAIN ); ?></label></strong>
-					</td>
-                    <td>
-                        <select id="tc_roundtable_sub_page" name="tc_roundtable_sub_page">
-							<option value=""><?php _e('Select Page', 'csld_general_settings_field'); ?></option>
-							<?php 
-                            
-                                if( $pages->have_posts() ) {
-
-                                    foreach( $pages->posts as $page ) { ?>
-                                        <?php if( $tc_roundtable_sub_page == $page->ID ) { ?>
-                                        <option value="<?php echo $page->ID; ?>" selected><?php echo $page->post_title; ?></option>
-                                        <?php } else { ?>
-                                        <option value="<?php echo $page->ID; ?>"><?php echo $page->post_title; ?></option>
-                                        <?php } ?>
-                                    <?php }	
-                                } ?>
-						</select>
-                        <p class="description" style="font-weight: normal;">
-                            <?php echo __('The Selected page will show the attendees list.', LDNFT_TEXT_DOMAIN ); ?>
+                        <?php _e( 'Developer ID of the Freemius API', LDNFT_TEXT_DOMAIN ); ?>
                         </p>
                     </td>    
                 </tr>   
 				<tr> 
                     <td align="left" valign="top">
-						<strong><label align = "left" for="tc_roundtable_form_page"><?php _e( 'Round Table Form Page', LDNFT_TEXT_DOMAIN ); ?></label></strong>
+						<strong><label align = "left" for="ldnft_public_key"><?php _e( 'Public Key', LDNFT_TEXT_DOMAIN ); ?></label></strong>
 					</td>
                     <td>
-                        <select id="tc_roundtable_form_page" name="tc_roundtable_form_page">
-							<option value=""><?php _e( 'Select Page', LDNFT_TEXT_DOMAIN ); ?></option>
-							<?php 
-                            if( $pages->have_posts() ) {
-
-                                foreach( $pages->posts as $page ) { ?>
-                                    <?php if( $tc_roundtable_form_page == $page->ID ) { ?>
-                                    <option value="<?php echo $page->ID; ?>" selected><?php echo $page->post_title; ?></option>
-                                    <?php } else { ?>
-                                    <option value="<?php echo $page->ID; ?>"><?php echo $page->post_title; ?></option>
-                                    <?php } ?>
-                                <?php }
-                            } ?>
-						</select>
+                        <input type="text" size="60" id="ldnft_public_key" name="ldnft_settings[public_key]" value="<?php echo $public_key;?>">
                         <p class="description" style="font-weight: normal;">
-                            <?php echo __( 'The Selected page will show the attendees update form.', LDNFT_TEXT_DOMAIN ); ?>
+                            <?php _e( 'Public Key of the Freemius API', LDNFT_TEXT_DOMAIN ); ?>
                         </p>
                     </td>    
                 </tr>
+                
 				<tr> 
                     <td align="left" valign="top">
-						<strong><label align = "left" for="ld-cms-schedule-excluded-roles"><?php _e( 'Token Generator Shortcode', LDNFT_TEXT_DOMAIN ); ?></label></strong>
+						<strong><label align = "left" for="ldnft_secret_key"><?php _e( 'Secret Key', LDNFT_TEXT_DOMAIN ); ?></label></strong>
 					</td>
                     <td>
-                        [Ticket_Token_Generator]
+                        <input type="text" size="60" id="ldnft_secret_key" name="ldnft_settings[secret_key]" value="<?php echo $secret_key;?>">
+                        <p class="description" style="font-weight: normal;">
+                        <?php  _e('Scret Key of the Freemius API', LDNFT_TEXT_DOMAIN ); ?>
+                        </p>
                     </td>    
-                </tr>            
+                </tr>
+				       
+                
             </tbody>
         </table>
         
         <div class="submit-button" style="padding-top:10px">
-            <input type="hidden" value="general" name="tc_current_tab">
-            <input type="hidden" name="action" value="save_tc_settings">
-            <input type="submit" name="save_tc_settings" class="button-primary" value="<?php _e('Update Settings', 'cs_ld_addon' ); ?>">
+            <?php wp_nonce_field( 'ldnft_nounce', 'ldnft_nounce_field' ); ?>
+            <input type="hidden" name="action" value="ldnft_submit_action" />
+            <input type="hidden" id="ldnft_api_scope" name="ldnft_settings[api_scope]" value="developer">
+            <input type="submit" class="button button-primary ldnft-save-setting" name="ldnft_submit_form" value="<?php _e( 'Test & Save', LDNFT_TEXT_DOMAIN ); ?>">
         </div>
-        <?php wp_nonce_field( 'save_tc_settings_nonce' ); ?>
     </form>
 </div>

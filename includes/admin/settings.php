@@ -14,10 +14,163 @@ class Tickera_Customization_Settings {
     public function __construct() {
 
         $this->page_tab = isset( $_GET['tab'] ) ? $_GET['tab'] : 'freemius-api';
-        add_action( 'admin_menu', [ $this, 'setting_menu' ], 1001 );
-        add_action( 'admin_post_save_tc_settings', [ $this, 'save_custom_settings' ] );
+        add_action( 'admin_menu',                               [ $this, 'setting_menu' ], 1001 );
+        add_action( 'admin_post_ldnft_submit_action',           [ $this, 'save_settings' ] );
+        add_action( 'admin_notices',                            [ $this, 'ldnft_admin_notice' ] );
+        add_action( 'wp_ajax_ldnft_mailpoet_submit_action',     [ $this, 'mailpoet_submit_action' ], 100 );
+    }
+
+    /**
+     * display admin notice
+     */
+    public function mailpoet_submit_action() {
+       
+        global $wpdb;
+
+        $ldnft_mailpeot_plugin  = sanitize_text_field($_POST['ldnft_mailpeot_plugin']);
+        if( ! isset( $_POST['ldnft_mailpeot_plugin'] ) || empty($ldnft_mailpeot_plugin) ) {
+            $errormsg = __('Freemius product is required for import.', LDNFT_TEXT_DOMAIN);
+            $response = ['added'=>0, 'exists'=>0, 'message'=>'', 'errors'=> [$errormsg], 'errormsg'=> $errormsg ];
+            echo json_encode($response);exit;
+        }
+
+        $ldnft_mailpeot_list    = sanitize_text_field($_POST['ldnft_mailpeot_list']);
+        if( ! isset( $_POST['ldnft_mailpeot_list'] ) || empty($ldnft_mailpeot_list) ) {
+            $errormsg = __('Mailpoet list is required for import.', LDNFT_TEXT_DOMAIN);
+            $response = ['added'=>0, 'exists'=>0, 'message'=>'', 'errors'=> [$errormsg], 'errormsg'=> $errormsg ];
+            echo json_encode($response);exit;
+        }
+        
+        if (!is_plugin_active('mailpoet/mailpoet.php')) {
+            $errormsg = __('This section requires MailPoet to be installed and configured.', LDNFT_TEXT_DOMAIN);
+            $response = ['added'=>0, 'exists'=>0, 'message'=>'', 'errors'=> [$errormsg], 'errormsg'=> $errormsg ];
+            echo json_encode($response);exit;
+        }
+
+        $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
+        $results = $api->Api('plugins/'.$ldnft_mailpeot_plugin.'/users.json?filter=paid', 'GET', []);
+        $response = [];
+        $count = 0;
+        $exists = 0;
+        $errors = [];
+        foreach( $results->users as $user ) { 
+            
+            $subscriber_data = [
+                'email' => $user->email,
+                'first_name' => $user->first,
+                'last_name' => $user->last,
+            ];
+              
+            $options = [
+                'send_confirmation_email' => false // default: true
+                //'schedule_welcome_email' => false
+            ];
+
+            try {
+                $subscriber = \MailPoet\API\API::MP('v1')->getSubscriber($subscriber_data['email']);
+                $exists++;
+            } 
+            catch(\MailPoet\API\MP\v1\APIException $exception) {
+                if( $exception->getMessage() == 'This subscriber does not exist.' ) {
+                    try {
+                        $subscriber = \MailPoet\API\API::MP('v1')->addSubscriber($subscriber_data, [$ldnft_mailpeot_list], $options); // Add to default mailing list
+                        
+                        if( !empty( $subscriber['id'] ) ) {
+                            $sql = "update `".$wpdb->prefix."mailpoet_subscribers` set status='".SubscriberEntity::STATUS_SUBSCRIBED."' WHERE id='".$subscriber['id']."'";
+                            $wpdb->query( $sql );
+                        }
+                        
+                        $count++;
+                    } 
+                    catch(\MailPoet\API\MP\v1\APIException $exception) {
+                        $errors[$exception->getMessage()] = $exception->getMessage();
+                        
+                    }
+                    catch( Exception $exception ) {
+                        $errors[$exception->getMessage()] = $exception->getMessage();
+                    }
+                }
+            }
+            catch( Exception $exception ) {
+                $errors[$exception->getMessage()] = $exception->getMessage();
+            }
+        }
+        
+        $message = '';
+        if( $count > 0 ) {
+            $message = sprintf( __('%d subscriber(s) imported.', LDNFT_TEXT_DOMAIN),$count );
+        } 
+        if( $exists > 0 ) {
+            $message .= sprintf( __('%d subscriber(s) already exists.', LDNFT_TEXT_DOMAIN),$exists );
+        } 
+        
+        $errormsg = '';
+        if( count( $errors ) > 0 ) {
+            $errormsg = __('Errors:', LDNFT_TEXT_DOMAIN).'<br>'.implode('<br>', $errors );
+        }
+
+        if( empty( $message ) && empty( $errormsg ) ) {
+            $message = __('No available subscriber(s) to import.', LDNFT_TEXT_DOMAIN);
+        }
+
+        $response = [ 'added' => $count, 'exists' => $exists, 'message' => $message, 'errors' => $errors, 'errormsg' => $errormsg ];
+        echo json_encode( $response );
+        die();
     }
     
+    /**
+     * display admin notice
+     */
+    public function ldnft_admin_notice() {
+
+        if( isset( $_GET['message'] ) ) {
+
+            $class = 'notice notice-success is-dismissible';
+            if( $_GET['message'] == 'ldnft_updated' )
+                $message = __( 'Settings Updated', LDNFT_TEXT_DOMAIN );
+            else {
+                $message = sanitize_text_field( $_GET['message'] );
+                
+            }
+            printf ( '<div id="message" class="%s"> <p>%s</p></div>', $class, $message );
+        }
+    }
+
+    /**
+     * Save settings data using ( Admin Post )
+     */
+    public function save_settings() {
+        
+        if( isset( $_POST['ldnft_settings'] ) 
+            && check_admin_referer( 'ldnft_nounce', 'ldnft_nounce_field' ) 
+            && current_user_can( 'manage_options' ) ) {
+            
+            $ldnft_settings_options = [];
+            $ldnft_settings = $_POST['ldnft_settings'];
+            if( isset( $ldnft_settings['api_scope'] ) && !empty( $ldnft_settings['api_scope'] ) ) {
+                $ldnft_settings_options['api_scope'] = sanitize_text_field( $ldnft_settings['api_scope'] );
+            }
+
+            if( isset( $ldnft_settings['dev_id'] ) && !empty( $ldnft_settings['dev_id'] ) ) {
+                $ldnft_settings_options['dev_id'] = sanitize_text_field( $ldnft_settings['dev_id'] );
+            }
+
+            if( isset( $ldnft_settings['public_key'] ) && !empty( $ldnft_settings['public_key'] ) ) {
+                $ldnft_settings_options['public_key'] = sanitize_text_field( $ldnft_settings['public_key'] );
+            }
+
+            if( isset( $ldnft_settings['secret_key'] ) && !empty( $ldnft_settings['secret_key'] ) ) {
+                $ldnft_settings_options['secret_key'] = sanitize_text_field( $ldnft_settings['secret_key'] );
+            }
+
+            update_option( 'ldnft_settings', $ldnft_settings_options );
+            
+        }
+
+        wp_safe_redirect( esc_url_raw( add_query_arg( 'message', 'ldnft_updated', $_POST['_wp_http_referer'] ) ) );
+        exit();
+    }
+
     /**
      * Add new setting menu under WooCommerce menu
      */
@@ -31,59 +184,13 @@ class Tickera_Customization_Settings {
             __( 'Settings', LDNFT_TEXT_DOMAIN ),
             __( 'Settings', LDNFT_TEXT_DOMAIN ),
             'manage_options',
-            'freemius-settings-page',
+            'freemius-settings',
             [ $this, 'load_setting_menu' ]
         );
+
+        remove_submenu_page( 'ldnft-freemius','ldnft-freemius' );
     }
 	
-
-	/**
-     * Save custom settings
-     */
-    public function save_custom_settings() {
-
-        $url = admin_url('admin.php');
-        $url = add_query_arg( 'page', 'tc-customization-settngs', $url );
-        
-        if( check_admin_referer('save_tc_settings_nonce') ) {
-
-            $current_tab = isset( $_POST['tc_current_tab'] ) ? $_POST['tc_current_tab'] : '';
-            
-            if( $current_tab === 'round_table_email' ) {
-
-                $tc_round_table_subject = isset( $_POST['tc_round_table_subject'] ) ? sanitize_textarea_field( stripslashes_deep( $_POST['tc_round_table_subject'] ) ) : '';
-                $tc_round_table_body = isset( $_POST['tc_round_table_body'] ) ? wp_kses_post( stripslashes_deep( $_POST['tc_round_table_body'] ) ) : '';
-
-                update_option( 'tc_round_table_subject', $tc_round_table_subject );
-                update_option( 'tc_round_table_body', $tc_round_table_body );
-                $url = add_query_arg( 'tab', 'round_table_email', $url );
-            }
-
-            if( $current_tab === 'token_email' ) {
-
-                $tc_token_generation_subject = isset( $_POST['tc_token_generation_subject'] ) ? sanitize_textarea_field( stripslashes_deep( $_POST['tc_token_generation_subject'] ) ) : '';
-                $tc_token_generation_body = isset( $_POST['tc_token_generation_body'] ) ? wp_kses_post( stripslashes_deep( $_POST['tc_token_generation_body'] ) ) : '';
-
-                update_option( 'tc_token_generation_subject', $tc_token_generation_subject );
-                update_option( 'tc_token_generation_body', $tc_token_generation_body );
-                $url = add_query_arg( 'tab', 'token_email', $url );
-            }
-
-            if( $current_tab === 'freemius-api' ) {
-
-                update_option( 'tc_roundtable_main_page', sanitize_text_field( $_POST['tc_roundtable_main_page'] ) );
-			    update_option( 'tc_roundtable_sub_page', sanitize_text_field( $_POST['tc_roundtable_sub_page'] ) );
-			    update_option( 'tc_roundtable_form_page', sanitize_text_field( $_POST['tc_roundtable_form_page'] ) );
-                $url = add_query_arg( 'tab', 'freemius-api', $url );
-            }
-
-            $url = add_query_arg( 'updated', 1, $url );
-        }
-
-        wp_redirect( $url );
-        exit;
-    }
-
     /**
      * Load settings page content
      */
@@ -95,18 +202,20 @@ class Tickera_Customization_Settings {
                 'icon' => 'fa-cog',
             ),
         );
+        if( FS__API_CONNECTION ) {
+            $settings_sections['import'] =  array (
+                'title' => __( 'Import', LDNFT_TEXT_DOMAIN ),
+                'icon' => 'fa-info',
+            );
+
+            $settings_sections['shortcodes'] =  array(
+                'title' => __( 'Shortcodes', LDNFT_TEXT_DOMAIN ),
+                'icon' => 'fa-info',
+            );
+
+            $settings_sections = apply_filters( 'ldnft_settings_sections', $settings_sections );
+        }
         
-        $settings_sections['import'] =  array (
-                                        'title' => __( 'Import', LDNFT_TEXT_DOMAIN ),
-                                        'icon' => 'fa-info',
-                                    );
-
-        $settings_sections['shortcodes'] =  array(
-                                        'title' => __( 'Shortcodes', LDNFT_TEXT_DOMAIN ),
-                                        'icon' => 'fa-info',
-                                    );
-
-		$settings_sections = apply_filters( 'ldnft_settings_sections', $settings_sections );
         ?>
 		<div class="wrap">
 			<div id="icon-options-freemius-api" class="icon32"></div>
