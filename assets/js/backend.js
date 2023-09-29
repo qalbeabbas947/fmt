@@ -26,8 +26,7 @@
             },
             /** added method display
              * for getting first sets of data
-             **/
-
+             */
             display_subscriptions: function() {
                 
                 if( LDNFTbackEnd.default_table_row == '' ) {
@@ -36,13 +35,6 @@
                     $('#ldnft_subscriptions_data table tbody').html( LDNFTbackEnd.default_table_row );
                 }
                
-                $('.ldnft-subssummary-loader').css('display', 'inline');
-                $('.ldnft_subscription_points').css('display', 'none');
-                $('.ldnft_subscription_tax_fee').css('display', 'none');
-                $('.ldnft_subscription_new_sales_count').css('display', 'none');
-                $('.ldnft_subscription_new_subscriptions_count').css('display', 'none');
-                $('.ldnft_subscription_renewals_count').css('display', 'none');
-
                 var ldnftpage       = $('.ldnft-freemius-page').val();
                 var ldnftplugin     = $('.ldfmt-plugins-filter').val();
                 var ldnftinterval   = $('.ldfmt-sales-interval-filter').val();
@@ -68,13 +60,17 @@
                             
                             $(this).closest("tr").toggleClass("is-expanded")
                         });
-
                     }
                 });
-                
-                
             },
             load_subscription_summary: function() {
+
+                $('.ldnft-subssummary-loader').css('display', 'inline');
+                $('.ldnft_subscription_points').css('display', 'none');
+                $('.ldnft_subscription_tax_fee').css('display', 'none');
+                $('.ldnft_subscription_new_sales_count').css('display', 'none');
+                $('.ldnft_subscription_new_subscriptions_count').css('display', 'none');
+                $('.ldnft_subscription_renewals_count').css('display', 'none');
 
                 var ldnftpage       = $('.ldnft-freemius-page').val();
                 var ldnftplugin     = $('.ldfmt-plugins-filter').val();
