@@ -183,7 +183,7 @@
                     }
                     
                     if( JSON.parse(response).errormsg!='' ) {
-                        $('#ldnft-settings-import-mailpoet-errmessage').html(JSON.parse(response).errormsg).css('display', 'block');
+                        $('#ldnft-settings-import-mailpoet-message').html(JSON.parse(response).errormsg).css('display', 'block');
                     }
                     
                     $('#ldnft_mailpeot_list, #ldnft_mailpeot_plugin, .ldnft-mailpoet-save-setting_import').attr('disabled', false);
