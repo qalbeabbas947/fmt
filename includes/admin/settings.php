@@ -26,8 +26,7 @@ class Tickera_Customization_Settings {
     public function mailpoet_submit_action() {
        
         global $wpdb;
-        ini_set('display_errors', 'On');
-        error_reporting(E_ALL);
+
         $ldnft_mailpeot_plugin  = sanitize_text_field($_POST['ldnft_mailpeot_plugin']);
         if( ! isset( $_POST['ldnft_mailpeot_plugin'] ) || empty($ldnft_mailpeot_plugin) ) {
             $errormsg = __('Freemius product is required for import.', LDNFT_TEXT_DOMAIN);
@@ -47,9 +46,8 @@ class Tickera_Customization_Settings {
             $response = ['added'=>0, 'exists'=>0, 'message'=>'', 'errors'=> [$errormsg], 'errormsg'=> $errormsg ];
             echo json_encode($response);exit;
         }
-
-        /////////////////////
-        $tem_per_page = 5;
+        
+        $tem_per_page = 25;
         $tem_offset = 0;
         $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
         $result =  $api->Api('plugins/'.$ldnft_mailpeot_plugin.'/users.json?count='.$tem_per_page.'&offset='.$tem_offset.'&filter=paid', 'GET', []);
@@ -59,161 +57,77 @@ class Tickera_Customization_Settings {
         $total = 0;
         $errors = [];
         
-        // if( isset($result) && isset($result->users) ) {
-        //     $has_more_records = true;
-        //     while($has_more_records) {
-        //         foreach( $result->users as $user ) {
-        //             $total++;
-        //             $subscriber_data = [
-        //                 'email' => $user->email,
-        //                 'first_name' => $user->first,
-        //                 'last_name' => $user->last,
-        //             ];
+        if( isset($result) && isset($result->users) ) {
+            $has_more_records = true;
+            while($has_more_records) {
+                foreach( $result->users as $user ) {
+                    $total++;
+                    $subscriber_data = [
+                        'email' => $user->email,
+                        'first_name' => $user->first,
+                        'last_name' => $user->last,
+                    ];
                       
-        //             $options = [
-        //                 'send_confirmation_email' => false // default: true
-        //                 //'schedule_welcome_email' => false
-        //             ];
-        
-        //             try {
-        //                 $subscriber = \MailPoet\API\API::MP('v1')->addSubscriber($subscriber_data, [$ldnft_mailpeot_list], $options); // Add to default mailing list
-        //                 $sql = "update `".$wpdb->prefix."mailpoet_subscribers` set status='subscribed' WHERE id='".$subscriber['id']."'";
-        //                 $wpdb->query( $sql );
-        //                 $count++;
-                        
-        //             } 
-        //             catch(\MailPoet\API\MP\v1\APIException $exception) {
-        //                 $exists++;
-        //                 $errors[$exception->getMessage()] = $exception->getMessage();
-        //             }
+                    $options = [
+                        'send_confirmation_email' => false // default: true
+                        //'schedule_welcome_email' => false
+                    ];
 
-        //             // try {
-        //             //     $subscriber = \MailPoet\API\API::MP('v1')->getSubscriber($subscriber_data['email']);
-        //             //     $exists++;echo '==========='; print_r($subscriber);echo '-------------';
-        //             // } 
-        //             // catch(\MailPoet\API\MP\v1\APIException $exception) {
-        //             //     echo "===|".$exception->getMessage();
-        //             //     try {
-                            
-        //             //         $subscriber = \MailPoet\API\API::MP('v1')->addSubscriber($subscriber_data, [$ldnft_mailpeot_list], $options); // Add to default mailing list
-        //             //         echo 'hel:'.$subscriber['id'];
-        //             //         if( isset( $subscriber['id'] ) ) {
-        //             //            echo  $sql = "update `".$wpdb->prefix."mailpoet_subscribers` set status='subscribed' WHERE id='".$subscriber['id']."'";
-        //             //             $wpdb->query( $sql );
-        //             //         }
-                            
-        //             //         $count++;
-        //             //     } 
-        //             //     catch(\MailPoet\API\MP\v1\APIException $exception) {
-        //             //         $errors[$exception->getMessage()] = $exception->getMessage();
-        //             //         echo "===1|".$subscriber['id'].'=='.$exception->getMessage();
-        //             //     }
-        //             //     catch( Exception $exception ) {
-        //             //         $errors[$exception->getMessage()] = $exception->getMessage();
-        //             //         echo "===2|".$exception->getMessage();
-        //             //     }
-        //             //     if( $exception->getMessage() == 'This subscriber does not exist.' ) {
-                            
-        //             //     }
-        //             // } catch( Exception $exception ) {
-        //             //     echo "===3|";
-        //             //     $errors[$exception->getMessage()] = $exception->getMessage();
-        //             // }
-        //         } 
-
-        //         $tem_offset += $tem_per_page;
-        //         $result = $api->Api('plugins/'.$ldnft_mailpeot_plugin.'/users.json?count='.$tem_per_page.'&offset='.$tem_offset.'&filter=paid', 'GET', []);
-        //         if( count( $result->users ) > 0 ) {
-        //             $has_more_records = true;
-        //         } else {
-        //             $has_more_records = false;
-        //         }
-        //         $has_more_records = false;
-        //     }
-        // }
-        ///////////////////////
-        $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
-        $results = $api->Api('plugins/'.$ldnft_mailpeot_plugin.'/users.json?count='.$tem_per_page.'&offset='.$tem_offset.'&filter=paid', 'GET', []);
-        $response = [];
-        $count = 0;
-        $exists = 0;
-        $errors = [];
-        foreach( $results->users as $user ) { 
-            
-            $subscriber_data = [
-                'email' => $user->email,
-                'first_name' => $user->first,
-                'last_name' => $user->last,
-            ];
-              
-            $options = [
-                'send_confirmation_email' => false // default: true
-                //'schedule_welcome_email' => false
-            ];
-            $subscriber_id = 0;
-            try {
-                $subscriber = \MailPoet\API\API::MP('v1')->getSubscriber($subscriber_data['email']);
-                if( !empty( $subscriber['id'] ) ) {
-                    $list_ids = $wpdb->get_results( $wpdb->prepare("select id from `".$wpdb->prefix."mailpoet_subscriber_segment` where subscriber_id=%d and segment_id=%d", $subscriber['id'], $ldnft_mailpeot_list) );
-                    if( count($list_ids) == 0 ) {
-                        $sql = "insert into `".$wpdb->prefix."mailpoet_subscriber_segment`(subscriber_id, segment_id, status, created_at, updated_at) values('".$subscriber['id']."', '".$ldnft_mailpeot_list."', 'subscribed', now(), now() )";
-                        $wpdb->query( $sql );
-                    }
-                }
-                $exists++;
-            } 
-            catch(\MailPoet\API\MP\v1\APIException $exception) {
-                if($exception->getCode() == 4 || $exception->getCode() == '4' ) {
+                    $subscriber_id = 0;
                     try {
-                        $subscriber = \MailPoet\API\API::MP('v1')->addSubscriber($subscriber_data, [], $options); // Add to default mailing list
-                        
+                        $subscriber = \MailPoet\API\API::MP('v1')->getSubscriber($subscriber_data['email']);
                         if( !empty( $subscriber['id'] ) ) {
-                            $sql = "update `".$wpdb->prefix."mailpoet_subscribers` set status='subscribed' WHERE id='".$subscriber['id']."'";
-                            $wpdb->query( $sql );
-
-                            $sql = "insert into `".$wpdb->prefix."mailpoet_subscriber_segment`(subscriber_id, segment_id, status, created_at, updated_at) values('".$subscriber['id']."', '".$ldnft_mailpeot_list."', 'subscribed', now(), now() )";
-                            $wpdb->query( $sql );
+                            $list_ids = $wpdb->get_results( $wpdb->prepare("select id from `".$wpdb->prefix."mailpoet_subscriber_segment` where subscriber_id=%d and segment_id=%d", $subscriber['id'], $ldnft_mailpeot_list) );
+                            if( count($list_ids) == 0 ) {
+                                $sql = "insert into `".$wpdb->prefix."mailpoet_subscriber_segment`(subscriber_id, segment_id, status, created_at, updated_at) values('".$subscriber['id']."', '".$ldnft_mailpeot_list."', 'subscribed', now(), now() )";
+                                $wpdb->query( $sql );
+                            }
                         }
-                        
-                        $count++;
+
+                        $exists++;
                     } 
                     catch(\MailPoet\API\MP\v1\APIException $exception) {
-                        if($exception->getCode() == 6 || $exception->getCode() == '6' ) {
-                            $exists++;
-                            
-                            $errors[$exception->getMessage()] = $exception->getMessage();
+                        if($exception->getCode() == 4 || $exception->getCode() == '4' ) {
+                            try {
+                                $subscriber = \MailPoet\API\API::MP('v1')->addSubscriber($subscriber_data, [], $options); // Add to default mailing list
+                                
+                                if( !empty( $subscriber['id'] ) ) {
+                                    $sql = "update `".$wpdb->prefix."mailpoet_subscribers` set status='subscribed' WHERE id='".$subscriber['id']."'";
+                                    $wpdb->query( $sql );
+        
+                                    $sql = "insert into `".$wpdb->prefix."mailpoet_subscriber_segment`(subscriber_id, segment_id, status, created_at, updated_at) values('".$subscriber['id']."', '".$ldnft_mailpeot_list."', 'subscribed', now(), now() )";
+                                    $wpdb->query( $sql );
+                                }
+                                
+                                $count++;
+                            } 
+                            catch(\MailPoet\API\MP\v1\APIException $exception) {
+                                if($exception->getCode() == 6 || $exception->getCode() == '6' ) {
+                                    $exists++;
+                                    
+                                    $errors[$exception->getMessage()] = $exception->getMessage();
+                                }
+                            }
+                            catch( Exception $exception ) {
+                                $errors[$exception->getMessage()] = $exception->getMessage();
+                            }
                         }
                     }
                     catch( Exception $exception ) {
                         $errors[$exception->getMessage()] = $exception->getMessage();
                     }
+                } 
+
+                $tem_offset += $tem_per_page;
+                $result = $api->Api('plugins/'.$ldnft_mailpeot_plugin.'/users.json?count='.$tem_per_page.'&offset='.$tem_offset.'&filter=paid', 'GET', []);
+                if( count( $result->users ) > 0 ) {
+                    $has_more_records = true;
+                } else {
+                    $has_more_records = false;
                 }
-                
-                // if( $exception->getMessage() == 'This subscriber does not exist.' ) {
-                //     try {
-                //         $subscriber = \MailPoet\API\API::MP('v1')->addSubscriber($subscriber_data, [$ldnft_mailpeot_list], $options); // Add to default mailing list
-                        
-                //         if( !empty( $subscriber['id'] ) ) {
-                //             $sql = "update `".$wpdb->prefix."mailpoet_subscribers` set status='".SubscriberEntity::STATUS_SUBSCRIBED."' WHERE id='".$subscriber['id']."'";
-                //             $wpdb->query( $sql );
-                //         }
-                        
-                //         $count++;
-                //     } 
-                //     catch(\MailPoet\API\MP\v1\APIException $exception) {
-                //         $errors[$exception->getMessage()] = $exception->getMessage();
-                        
-                //     }
-                //     catch( Exception $exception ) {
-                //         $errors[$exception->getMessage()] = $exception->getMessage();
-                //     }
-                // }
-            }
-            catch( Exception $exception ) {
-                //print_r($exception);
-                $errors[$exception->getMessage()] = $exception->getMessage();
             }
         }
+        
         
         $message = '';
         $errormsg = '';
@@ -221,6 +135,8 @@ class Tickera_Customization_Settings {
             $message .= __('All subscribers are updated.', LDNFT_TEXT_DOMAIN);
         } else if( $count > 0 ) {
             $message .= sprintf( __('%d subscriber(s) updated.', LDNFT_TEXT_DOMAIN),$count );
+        } else if( $count == 0 && $exists > 0 ) {
+            $message .= __('All subscribers are updated.', LDNFT_TEXT_DOMAIN);
         } else{
             $errormsg .= __('Errors:', LDNFT_TEXT_DOMAIN).'<br>'.implode('<br>', $errors );
         }
