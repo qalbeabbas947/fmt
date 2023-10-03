@@ -36,7 +36,7 @@ class LDNFT_Checkout_Shortcode {
      */
     private function hooks() {
         
-        add_shortcode( 'LDNFT_Checkout', [ $this, 'sales_shortcode_cb' ] );
+        add_shortcode( 'LDNFT_Checkout', [ $this, 'checkout_shortcode_cb' ] );
         add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_front_scripts' ] );
         add_action( 'wp_ajax_ldnft_load_sales', [ $this, 'load_sales' ], 100 );
         
@@ -177,8 +177,110 @@ class LDNFT_Checkout_Shortcode {
      * 
      * @param $atts
      */
-    public function sales_shortcode_cb( $atts ) {
+    public function checkout_shortcode_cb( $atts ) {
         
+        $attributes = shortcode_atts( array(
+            'product_id' => 0,
+        ), $atts );
+        $plugin_id  = sanitize_text_field($attributes['product_id']);
+
+        if( empty( $plugin_id ) || intval($plugin_id) < 1 ) {
+            return '<div class="ldnft-error-message">'.__('Product ID is a required parameter.', LDNFT_TEXT_DOMAIN).'</div>';
+        }
+
+        $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
+        $result = $api->Api('plugins/'.$plugin_id.'/plans.json', 'GET', []);
+        if( !isset( $result->plans ) || !is_array( $result->plans ) || count( $result->plans ) == 0 ) {
+            return '<div class="ldnft-error-message">'.__('Please, configure a plan before visiting this page.', LDNFT_TEXT_DOMAIN).'</div>';
+        }
+        $plan = $result->plans[0];
+        $plan_id = $plan->id;
+       
+        $presult = $api->Api('plugins/'.$plugin_id.'/plans/'.$plan_id.'/pricing.json', 'GET', []);
+        if( !isset( $presult->pricing ) || !is_array( $presult->pricing ) || count( $presult->pricing ) == 0 ) {
+            return '<div class="ldnft-error-message">'.__('Please configure the product pricing before visiting this page.', LDNFT_TEXT_DOMAIN).'</div>';
+        }
+
+        $ldnft_settings = get_option( 'ldnft_settings' ); 
+        $public_key     = isset( $ldnft_settings['public_key'] ) ? sanitize_text_field( $ldnft_settings['public_key'] ): '';
+
+
+        echo '<pre>';
+        print_r($presult->pricing);
+        echo '</pre>';
+        ob_start();
+        ?>
+            <div class="ld-ninjas-buy-now-widget">
+                <div class="ld_price_options ld_single_mode">
+                    <ul style="list-style:none;font-size: 20px;padding-left:0;">
+                        <li>
+                            <label for="ld_price_option_0" class="selected">
+                                <span class="radio-button"></span>
+                                <input type="radio" checked="checked" name="ld_licenses_options" id="ld_price_option_1" class="ld_price_option_1" value="1">&nbsp;<span class="ld_price_option_name">Single Site</span><span class="ld_price_option_sep">&nbsp;–&nbsp;</span><span class="ld_price_option_price">$<?php echo $atts['f_price']; ?></span>
+                            </label>
+                        </li>
+                        <li>
+                            <label for="ld_price_option_1" class=""><span class="radio-button"></span><input type="radio" name="ld_licenses_options" id="ld_price_option_5" class="ld_price_option_5" value="5">&nbsp;<span class="ld_price_option_name">2 - 5 Sites</span><span class="ld_price_option_sep">&nbsp;–&nbsp;</span><span class="ld_price_option_price">$<?php echo $atts['s_price']; ?></span>
+                            </label>
+                        </li>
+                        <li>
+                            <label for="ld_price_option_2" class=""><span class="radio-button"></span><input type="radio" name="ld_licenses_options" id="ld_price_option_100" class="ld_price_option_100" value="100">&nbsp;<span class="ld_price_option_name">Upto 100 Sites</span><span class="ld_price_option_sep">&nbsp;–&nbsp;</span><span class="ld_price_option_price">$<?php echo $atts['t_price']; ?></span>
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+
+                <p class='ld-licence-description' style="margin-top:20px;">
+                    ⓘ <span>A license entitles you to 1 year of updates and support. Each installation of the add-on will require a license key in order for you to receive updates and support.</span>
+                    <br><br>
+                    <span><input type="checkbox" checked="checked" disabled="disabled"> Purchasing this add-on confirms you to be notified with the future updates..</span>
+                </p>	 
+
+                <div class="elementor-element elementor-element-6a0f461 elementor-align-justify elementor-widget elementor-widget-button" style="margin-bottom:0;" data-id="6a0f461" data-element_type="widget" data-widget_type="button.default">
+                    <div class="elementor-widget-container">
+                        <div class="elementor-button-wrapper">
+                            <a href="https://docs.ldninjas.com/plugin/custom-tabs-for-learndash/" target="_self" id="purchase" style="margin-top: 30px;margin-bottom: 10px;border-radius: 25px 25px 25px 25px;" class="elementor-button-link elementor-button elementor-size-md" role="button">
+                                <span class="elementor-button-content-wrapper">
+                                    <span class="elementor-button-icon elementor-align-icon-left">
+                                        <i aria-hidden="true" class="fas fa-cart-arrow-down fas button-icon-left"></i>
+                                    </span>
+                                    <span class="elementor-button-text">BUY NOW</span>
+                                </span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+                <script src="https://checkout.freemius.com/checkout.min.js"></script>
+                <script>
+                    var handler = FS.Checkout.configure({
+                        plugin_id: '<?php echo $plugin_id;  ?>',
+                        plan_id: '<?php echo $plan_id;   ?>',
+                        public_key: '<?php echo $public_key;  ?>',
+                        image: '<?php echo $atts['image']  ?>',
+                    });
+                    $('#purchase').on('click', function(e) {
+                        handler.open({
+                            name: 'Custom Tabs for LearnDash',
+                            licenses: $('input[name="ld_licenses_options"]:checked').val(),
+                            // You can consume the response for after purchase logic.
+                            purchaseCompleted: function(response) {
+                                // The logic here will be executed immediately after the purchase confirmation.                                // alert(response.user.email);
+                            },
+                            success: function(response) {
+                                // The logic here will be executed after the customer closes the checkout, after a successful purchase.                                // alert(response.user.email);
+                            }
+                        });
+                        e.preventDefault();
+                    });
+                </script>
+            </div>
+        <?php
+        $content = ob_get_contents();
+        ob_get_clean();
+
+        return $content;
         $user_id = isset( $atts['user_id'] ) ? $atts['user_id'] : get_current_user_id();
         $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
         

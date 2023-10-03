@@ -37,8 +37,25 @@ class LDNFT_Reviews_Shortcode {
     private function hooks() {
         add_action( 'wp_ajax_ldnft_load_reviews', [ $this, 'load_reviews' ], 100 );
         add_shortcode( 'LDNFT_Reviews', [ $this, 'reviews_shortcode_cb' ] );
+        add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_front_scripts' ] );
     }
 
+    /**
+     * Enqueue frontend scripte
+     */
+    public function enqueue_front_scripts() {
+
+        /**
+         * Enqueue frontend css
+         */
+        wp_enqueue_style( 'dashicons' );
+        wp_enqueue_style( 'ldnft-font-awesome-css', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css', [], LDNFT_VERSION, null );
+        wp_enqueue_style( 'ldnft-front-css', LDNFT_ASSETS_URL . 'css/frontend.css', [], LDNFT_VERSION, null );
+    }
+
+    /**
+     * Enqueue frontend scripte
+     */
     public function load_reviews() {
         
         $plugin_id  = sanitize_text_field($_POST['plugin_id']);

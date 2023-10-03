@@ -37,7 +37,7 @@ class LDNFT_Product_Rating {
     private function hooks() {
         
         add_shortcode( 'LDNFT_Product_Rating', [ $this, 'rating_shortcode_cb' ] );
-       // add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_front_scripts' ] );
+        add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_front_scripts' ] );
     }
 
     /**
@@ -49,18 +49,8 @@ class LDNFT_Product_Rating {
          * Enqueue frontend css
          */
         wp_enqueue_style( 'dashicons' );
-        wp_enqueue_style( 'ldnft-jqueryui-css', 'https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css', [], LDNFT_VERSION, null );
+        wp_enqueue_style( 'ldnft-font-awesome-css', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css', [], LDNFT_VERSION, null );
         wp_enqueue_style( 'ldnft-front-css', LDNFT_ASSETS_URL . 'css/frontend.css', [], LDNFT_VERSION, null );
-        
-        /**
-         * Enqueue frontend js
-         */
-        wp_enqueue_script('ldnft-jqueryui-js', 'https://code.jquery.com/ui/1.10.4/jquery-ui.js', ['jquery'], LDNFT_VERSION, true);
-        wp_enqueue_script( 'ldnft-frontend-js', LDNFT_ASSETS_URL . 'js/frontend.js', [ 'jquery' ], LDNFT_VERSION, true ); 
-        
-        wp_localize_script( 'ldnft-frontend-js', 'LDNFT', [ 
-            'ajaxURL' => admin_url( 'admin-ajax.php' ),
-        ] );
     }
 
     /**
@@ -101,8 +91,7 @@ class LDNFT_Product_Rating {
         }
         ob_start();
         ?>
-            <div class="review-container">
-            <div class="ldfmt_review_rate"><div class="ldnft-rating-div">
+            <div class="ldnft-rating-div">
                 <?php 
                     $rates = 0;
                     if( $total_reviews > 0 && $total_ratings > 0 ) {
@@ -117,9 +106,10 @@ class LDNFT_Product_Rating {
                         echo '<span class="fa fa-star '.$selected.'"></span>';
                     }
                 ?>
-            </div></div></div>
+                <span class="ldnft-rate-count">(<?php echo $total_reviews;?>)</span>
+            </div>
         <?php
-        echo $total_reviews.'--'.$total_ratings;
+        
         $content = ob_get_contents();
         ob_get_clean();
         return $content; 
