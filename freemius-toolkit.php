@@ -231,6 +231,18 @@ class LDNFT_Freemius {
         if( file_exists( LDNFT_INCLUDES_DIR.'shortcodes/class-sales.php' ) ) {
             require_once LDNFT_INCLUDES_DIR.'shortcodes/class-sales.php';
         }
+
+        if( file_exists( LDNFT_INCLUDES_DIR.'shortcodes/class-checkout.php' ) ) {
+            require_once LDNFT_INCLUDES_DIR.'shortcodes/class-checkout.php';
+        }
+
+        if( file_exists( LDNFT_INCLUDES_DIR.'shortcodes/class-product-ratings.php' ) ) {
+            require_once LDNFT_INCLUDES_DIR.'shortcodes/class-product-ratings.php';
+        }
+
+        if( file_exists( LDNFT_INCLUDES_DIR.'shortcodes/class-number-of-sales.php' ) ) {
+            require_once LDNFT_INCLUDES_DIR.'shortcodes/class-number-of-sales.php';
+        }
     }
 
     public static function get_country_name_by_code( $country_code ) {

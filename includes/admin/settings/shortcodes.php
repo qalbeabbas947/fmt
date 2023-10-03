@@ -31,5 +31,15 @@ $tc_roundtable_form_page	= get_option( 'tc_roundtable_form_page' );
         <tr>
             <td clss="ldfmt-shortcode-desc"><?php _e( 'This shortcode displays the plugin sales summary and listing on the frontend. Show parameter allows the user to control the display. Default value of the show parameter is both.', LDNFT_TEXT_DOMAIN ); ?></td>
         </tr>
+
+        <tr>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td><h3><?php _e( 'Shortcode:', LDNFT_TEXT_DOMAIN ); ?> [LDNFT_Number_of_Sales product_id="?"]</h3></td>
+        </tr>
+        <tr>
+            <td clss="ldfmt-shortcode-desc"><?php _e( 'This shortcode displays the total number of plugin/products sales based on the product_id/plugin_id.', LDNFT_TEXT_DOMAIN ); ?></td>
+        </tr>
     </table>
 </div>
