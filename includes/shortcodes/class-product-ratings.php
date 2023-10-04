@@ -1,6 +1,6 @@
 <?php
 /**
- * LDMFT_Sales shortcode class
+ * LDNFT_Product_Rating shortcode class
  */
 
 if( ! defined( 'ABSPATH' ) ) exit;
@@ -89,6 +89,7 @@ class LDNFT_Product_Rating {
                 }
             }
         }
+
         ob_start();
         ?>
             <div class="ldnft-rating-div">
@@ -112,8 +113,8 @@ class LDNFT_Product_Rating {
         
         $content = ob_get_contents();
         ob_get_clean();
-        return $content; 
-        
+
+        return $content;         
     }
 }
 

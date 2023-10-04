@@ -1,6 +1,6 @@
 <?php
 /**
- * LDMFT_Sales shortcode class
+ * LDNFT_Number_of_Sales_Shortcode shortcode class
  */
 
 if( ! defined( 'ABSPATH' ) ) exit;
@@ -56,9 +56,13 @@ class LDNFT_Number_of_Sales_Shortcode {
         $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
         $result = $api->Api('plugins/'.$plugin_id.'/subscriptions.json?count='.$tem_per_page.'&offset='.$tem_offset, 'GET', []);
         $total_sales = 0;
+
         if( count( $result->subscriptions ) > 0 ) {
+
             $has_more_records = true;
+
             while($has_more_records) {
+                
                 $total_sales += count($result->subscriptions);
 
                 $tem_offset += $tem_per_page;

@@ -42,6 +42,9 @@ class LDNFT_Sales_Shortcode {
         
     }
 
+    /**
+     * load the sales records via ajax call
+     */
     public function load_sales() {
         
         global $wpdb;
@@ -146,6 +149,7 @@ class LDNFT_Sales_Shortcode {
                 echo '<div class="ldfmt-no-results">'.__('No sale record(s) found.', LDNFT_TEXT_DOMAIN).'</div>';
             }
         }
+
         exit;
     }
 
@@ -173,7 +177,7 @@ class LDNFT_Sales_Shortcode {
     }
 
     /**
-     * Create shorcode to display reset progress option
+     * shorcode to display sales data
      * 
      * @param $atts
      */
@@ -185,8 +189,10 @@ class LDNFT_Sales_Shortcode {
         $plugins = $api->Api('plugins.json?fields=id,title', 'GET', ['fields'=>'id,title']);
         $content = '';
         if( isset( $plugins->plugins ) &&  count($plugins->plugins) > 0 ) {
+            
             $plugins = $plugins->plugins;
             $plugin = $plugins[0];
+
             ob_start();
             ?>
                 <div class="ldmft_wrapper">

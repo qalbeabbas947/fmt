@@ -56,10 +56,10 @@ $tc_roundtable_form_page	= get_option( 'tc_roundtable_form_page' );
             <td>&nbsp;</td>
         </tr>
         <tr>
-            <td><h3><?php _e( 'Shortcode:', LDNFT_TEXT_DOMAIN ); ?> [LDNFT_Checkout product_id="?"]</h3></td>
+            <td><h3><?php _e( 'Shortcode:', LDNFT_TEXT_DOMAIN ); ?> [LDNFT_Checkout product_id="?" plan_id="?" image="?"]</h3></td>
         </tr>
         <tr>
-            <td clss="ldfmt-shortcode-desc"><?php _e( 'This shortcode displays the checkout popup form of plugin/products based on the product_id/plugin_id.', LDNFT_TEXT_DOMAIN ); ?></td>
+            <td clss="ldfmt-shortcode-desc"><?php _e( 'This shortcode displays the checkout popup form of plugin/products based on the product_id/plugin_id. Prices will display based on the provided plan_id. By default, first premius plan will be used. You can also add the plugin/addon image in the shortocde that will be displayed on the checkout.', LDNFT_TEXT_DOMAIN ); ?></td>
         </tr>
     </table>
 </div>

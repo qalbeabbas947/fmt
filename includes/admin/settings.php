@@ -97,9 +97,8 @@ class Tickera_Customization_Settings {
         
                                     $sql = "insert into `".$wpdb->prefix."mailpoet_subscriber_segment`(subscriber_id, segment_id, status, created_at, updated_at) values('".$subscriber['id']."', '".$ldnft_mailpeot_list."', 'subscribed', now(), now() )";
                                     $wpdb->query( $sql );
+                                    $count++;
                                 }
-                                
-                                $count++;
                             } 
                             catch(\MailPoet\API\MP\v1\APIException $exception) {
                                 if($exception->getCode() == 6 || $exception->getCode() == '6' ) {
