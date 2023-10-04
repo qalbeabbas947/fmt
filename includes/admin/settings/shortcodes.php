@@ -41,5 +41,25 @@ $tc_roundtable_form_page	= get_option( 'tc_roundtable_form_page' );
         <tr>
             <td clss="ldfmt-shortcode-desc"><?php _e( 'This shortcode displays the total number of plugin/products sales based on the product_id/plugin_id.', LDNFT_TEXT_DOMAIN ); ?></td>
         </tr>
+
+        <tr>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td><h3><?php _e( 'Shortcode:', LDNFT_TEXT_DOMAIN ); ?> [LDNFT_Product_Rating product_id="?"]</h3></td>
+        </tr>
+        <tr>
+            <td clss="ldfmt-shortcode-desc"><?php _e( 'This shortcode displays the average rating of plugin/products based on the product_id/plugin_id.', LDNFT_TEXT_DOMAIN ); ?></td>
+        </tr>
+
+        <tr>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td><h3><?php _e( 'Shortcode:', LDNFT_TEXT_DOMAIN ); ?> [LDNFT_Checkout product_id="?"]</h3></td>
+        </tr>
+        <tr>
+            <td clss="ldfmt-shortcode-desc"><?php _e( 'This shortcode displays the checkout popup form of plugin/products based on the product_id/plugin_id.', LDNFT_TEXT_DOMAIN ); ?></td>
+        </tr>
     </table>
 </div>
