@@ -3,6 +3,7 @@
         
         var LDNFTbackEnd = {
             default_table_row: '',
+            default_sales_table_row: '',
             init: function() {
                 $('.ldnft-success-message').hide();
                 $('.ldnft-settings-mailpoet').on('submit', LDNFTbackEnd.post_mailpoet_form);
@@ -10,11 +11,110 @@
                 $('#ldnft_subscriptions_data').on('click', '.ldnft_subscribers_view_detail', LDNFTbackEnd.subscribers_view_detail);
                 $('.ldnft_sales_view_detail').on('click', LDNFTbackEnd.sales_view_detail);
                 $('.ldnft-admin-modal-close').on('click', LDNFTbackEnd.ldnft_subsciber_modal_close);
-                $('.ldfmt-sales-status-filter, .ldfmt-sales-interval-filter, .ldfmt-sales-plan_id-filter, .ldfmt-plugins-filter').on('change', LDNFTbackEnd.display_subscriptions_plus_summary);
-                $('#ldnft_subscriptions_data').on('click', '.tablenav-pages a', LDNFTbackEnd.display_new_page_subscriptions);
+                
 
+
+                $('.ldfmt-subscription-status-filter, .ldfmt-subscription-interval-filter, .ldfmt-subscription-plan_id-filter, .ldfmt-plugins-subscription-filter').on('change', LDNFTbackEnd.display_subscriptions_plus_summary);
+                $('#ldnft_subscriptions_data').on('click', '.tablenav-pages a', LDNFTbackEnd.display_new_page_subscriptions);
                 LDNFTbackEnd.display_subscriptions_plus_summary();
+
+                $('#ldnft_sales_data').on('click', '.tablenav-pages a', LDNFTbackEnd.display_new_page_sales);
+                $('.ldfmt-sales-interval-filter, .ldfmt-sales-filter, .ldfmt-plugins-sales-filter').on('change', LDNFTbackEnd.display_sales_plus_summary);
+                LDNFTbackEnd.display_sales_plus_summary();
             },
+            display_new_page_sales: function() {
+                var page = $('.ldnft-freemius-page').val($(this).data('offset'));
+                LDNFTbackEnd.display_sales();
+            },
+            display_sales_plus_summary: function() {
+                var page = $('.ldnft-freemius-page').val($(this).data('offset'));
+                LDNFTbackEnd.display_sales();
+                LDNFTbackEnd.load_sales_summary();
+            },
+            /** added method display
+             * for getting first sets of data
+             */
+            display_sales: function() {
+                console.log('display_saless');console.log(LDNFTbackEnd.default_table_row);
+                if( LDNFTbackEnd.default_sales_table_row == '' ) {
+                    LDNFTbackEnd.default_sales_table_row = $('#ldnft_sales_data table tbody').html();
+                } else {
+                    $('#ldnft_sales_data table tbody').html( LDNFTbackEnd.default_sales_table_row );
+                }
+               
+                var ldnftpage       = $('.ldnft-freemius-page').val();
+                var ldnftplugin     = $('.ldfmt-plugins-filter').val();
+                var ldnftinterval   = $('.ldfmt-sales-interval-filter').val();
+                var ldnftstatus     = $('.ldfmt-sales-status-filter').val();
+                
+                $.ajax({
+                    url: ajaxurl,
+                    dataType: 'json',
+                    data: {
+                        action: 'ldnft_sales_display',
+                        offset: ldnftpage,
+                        ldfmt_plugins_filter: ldnftplugin,
+                        interval: ldnftinterval,
+                        status: ldnftstatus
+                    },
+                    success: function (response) {
+                        console.log(response.display);
+                        $("#ldnft_sales_data").html(response.display);
+
+                        $("tbody").on("click", ".toggle-row", function(e) {
+                            
+                            $(this).closest("tr").toggleClass("is-expanded")
+                        });
+                    }
+                });
+            },
+            load_sales_summary: function() {
+                console.log('load_sales_summary');
+                $('.ldnft-subssummary-loader').css('display', 'inline');
+                $('.ldnft_sales_points').css('display', 'none');
+                $('.ldnft_sales_tax_fee').css('display', 'none');
+                $('.ldnft_sales_new_sales_count').css('display', 'none');
+                $('.ldnft_sales_new_sales_count').css('display', 'none');
+                $('.ldnft_sales_renewals_count').css('display', 'none');
+
+                var ldnftpage       = $('.ldnft-freemius-page').val();
+                var ldnftplugin     = $('.ldfmt-plugins-filter').val();
+                var ldnftinterval   = $('.ldfmt-sales-interval-filter').val();
+                var ldnftstatus     = $('.ldfmt-sales-status-filter').val();
+                var ldnftplan_id    = $('.ldfmt-sales-plan_id-filter').val();
+
+                $.ajax({
+                    url: ajaxurl,
+                    dataType: 'json',
+                    data: {
+                        action: 'ldnft_sales_summary',
+                        offset: ldnftpage,
+                        ldfmt_plugins_filter: ldnftplugin,
+                        interval: ldnftinterval,
+                        status: ldnftstatus,
+                        plan_id: ldnftplan_id,
+                    },
+                    success: function ( response ) {
+
+                        $('.ldnft_sales_points').html(response.gross_total).css('display', 'block');
+                        $('.ldnft_sales_tax_fee').html(response.tax_rate_total).css('display', 'block');
+                        $('.ldnft_sales_new_sales_count').html(response.total_number_of_sales).css('display', 'block');
+                        $('.ldnft_sales_new_sales_count').html(response.total_new_sales).css('display', 'block');
+                        $('.ldnft_sales_renewals_count').html(response.total_new_renewals).css('display', 'block');
+                        $('.ldnft-subssummary-loader').css('display', 'none');
+                        
+                    }
+                });
+            },
+
+
+
+
+
+
+
+
+
             display_new_page_subscriptions: function() {
                 var page = $('.ldnft-freemius-page').val($(this).data('offset'));
                 LDNFTbackEnd.display_subscriptions();
@@ -28,7 +128,7 @@
              * for getting first sets of data
              */
             display_subscriptions: function() {
-                
+                console.log('display_subscriptions');
                 if( LDNFTbackEnd.default_table_row == '' ) {
                     LDNFTbackEnd.default_table_row = $('#ldnft_subscriptions_data table tbody').html();
                 } else {
@@ -37,9 +137,9 @@
                
                 var ldnftpage       = $('.ldnft-freemius-page').val();
                 var ldnftplugin     = $('.ldfmt-plugins-filter').val();
-                var ldnftinterval   = $('.ldfmt-sales-interval-filter').val();
-                var ldnftstatus     = $('.ldfmt-sales-status-filter').val();
-                var ldnftplan_id    = $('.ldfmt-sales-plan_id-filter').val();
+                var ldnftinterval   = $('.ldfmt-subscription-interval-filter').val();
+                var ldnftstatus     = $('.ldfmt-subscription-status-filter').val();
+                var ldnftplan_id    = $('.ldfmt-subscription-plan_id-filter').val();
                 
                 $.ajax({
 
@@ -64,7 +164,7 @@
                 });
             },
             load_subscription_summary: function() {
-
+                console.log('load_subscription_summary');
                 $('.ldnft-subssummary-loader').css('display', 'inline');
                 $('.ldnft_subscription_points').css('display', 'none');
                 $('.ldnft_subscription_tax_fee').css('display', 'none');
@@ -74,9 +174,9 @@
 
                 var ldnftpage       = $('.ldnft-freemius-page').val();
                 var ldnftplugin     = $('.ldfmt-plugins-filter').val();
-                var ldnftinterval   = $('.ldfmt-sales-interval-filter').val();
-                var ldnftstatus     = $('.ldfmt-sales-status-filter').val();
-                var ldnftplan_id    = $('.ldfmt-sales-plan_id-filter').val();
+                var ldnftinterval   = $('.ldfmt-subscription-interval-filter').val();
+                var ldnftstatus     = $('.ldfmt-subscription-status-filter').val();
+                var ldnftplan_id    = $('.ldfmt-subscription-plan_id-filter').val();
 
                 $.ajax({
                     url: ajaxurl,

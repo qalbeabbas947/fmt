@@ -8,7 +8,7 @@
 }
 
 /**
- * LDNFT_Subscriptions class
+ * LDNFT_Subscriptions class 
  */
 class LDNFT_Subscriptions extends WP_List_Table {
 
@@ -72,7 +72,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
     public function column_view( $item ){
         
         if( !empty( intval( strip_tags( $item['id'] ) ) ) ) {
-            return '<a data-action="ldnft_subscribers_view_detail" data-user_id="'.$item['user_id'].'" data-plugin_id="'.$item['plugin_id'].'" data-id="'.$item['id'].'" class="ldnft_subscribers_view_detail" href="javascript:;">Get More</a>';
+            return '<a data-action="ldnft_subscribers_view_detail" data-user_id="'.$item['user_id'].'" data-plugin_id="'.$item['plugin_id'].'" data-id="'.$item['id'].'" class="ldnft_subscribers_view_detail" href="javascript:;">'._e('Get More', LDNFT_TEXT_DOMAIN).'</a>';
         } else {
             return LDNFT_Admin::get_bar_preloader();
         }    
@@ -210,12 +210,9 @@ class LDNFT_Subscriptions extends WP_List_Table {
          * used to build the value for our _column_headers property.
          */
         $columns = $this->get_columns();
-        
         $screen = WP_Screen::get( 'freemius-toolkit_page_freemius-subscriptions' );
-
         $hidden   = get_hidden_columns( $screen );
         $sortable = $this->get_sortable_columns();
-        
         
         /**
          * REQUIRED. Finally, we build an array to be used by the class for column 
@@ -393,7 +390,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
         $current_recs   = $this->_pagination_args['current_recs'];
         $offset_rec1    = ($offset) * $per_page;
         
-        $interval_str = '12';
+        $interval_str = '&billing_cycle=12';
         if( !empty($this->selected_interval) && !empty( $this->selected_interval ) ) {
             $interval_str = '&billing_cycle='.$this->selected_interval;
         }

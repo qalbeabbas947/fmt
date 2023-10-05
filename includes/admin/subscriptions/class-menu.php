@@ -407,7 +407,7 @@ class LDNFT_Subscriptions_Menu {
                 <div class="ldnft_filters_top">
                     <div class="alignleft actions bulkactions">
                         <span class="ldnft_filter_labels"><?php _e( 'Filters:', LDNFT_TEXT_DOMAIN ); ?></span>
-                        <select name="ldfmt-plugins-filter" class="ldfmt-plugins-filter">
+                        <select name="ldfmt-plugins-filter" class="ldfmt-plugins-filter ldfmt-plugins-subscription-filter">
                             <?php
                                 foreach( $products->plugins as $plugin ) {
                                     if( $selected_plugin_id == 0 ) {
@@ -425,7 +425,7 @@ class LDNFT_Subscriptions_Menu {
                             ?>
                         </select>
                         <?php $plans = $api->Api('plugins/'.$selected_plugin_id.'/plans.json?count=50', 'GET', []); ?>
-                        <select name="ldfmt-sales-plan_id-filter" class="ldfmt-sales-plan_id-filter">
+                        <select name="ldfmt-sales-plan_id-filter" class="ldfmt-subscription-plan_id-filter">
                             <option value=""><?php _e( 'Filter by Plan', LDNFT_TEXT_DOMAIN ); ?></option>
                             <?php
                             if( isset( $plans->plans ) && is_array( $plans->plans ) ) {
@@ -443,12 +443,12 @@ class LDNFT_Subscriptions_Menu {
                             ?>
                         </select>
                         
-                        <select name="ldfmt-sales-interval-filter" class="ldfmt-sales-interval-filter">
+                        <select name="ldfmt-sales-interval-filter" class="ldfmt-subscription-interval-filter">
                             <option value=""><?php echo __( 'All Time', LDNFT_TEXT_DOMAIN );?></option>
                             <option value="1" <?php echo $selected_interval=='1'?'selected':'';?>><?php echo __( 'Monthly', LDNFT_TEXT_DOMAIN );?></option>
                             <option value="12" <?php echo $selected_interval=='12'?'selected':'';?>><?php echo __( 'Annual', LDNFT_TEXT_DOMAIN );?></option>
                         </select>
-                        <select name="ldfmt-sales-interval-filter" class="ldfmt-sales-status-filter">
+                        <select name="ldfmt-sales-interval-filter" class="ldfmt-subscription-status-filter">
                             <option value="all"><?php echo __( 'All Status', LDNFT_TEXT_DOMAIN );?></option>
                             <option value="active" <?php echo $selected_status=='active'?'selected':'';?>><?php echo __( 'Active', LDNFT_TEXT_DOMAIN );?></option>
                             <option value="cancelled" <?php echo $selected_status=='cancelled'?'selected':'';?>><?php echo __( 'Cancelled', LDNFT_TEXT_DOMAIN );?></option>

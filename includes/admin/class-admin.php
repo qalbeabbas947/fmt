@@ -393,8 +393,6 @@ class LDNFT_Admin {
             LDNFT_ASSETS_URL.'images/freemius-icon-light-small.png',
             6 
         ); 
-        
-        
     }
     
     /**

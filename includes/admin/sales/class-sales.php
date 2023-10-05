@@ -41,11 +41,6 @@ class LDNFT_Sales extends WP_List_Table {
      */
     public $plugins;
     
-    /**
-     * Plugins
-     */
-    public $plugins_short_array;
-    
     /** ************************************************************************
      * REQUIRED. Set up a constructor that references the parent constructor. We 
      * use the parent reference to set some default configs.
@@ -53,35 +48,45 @@ class LDNFT_Sales extends WP_List_Table {
     public function __construct(){
         global $status, $page;
 
-        $this->selected_plugin_id = 0;  
-        $this->api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
+
+        $this->api = new Freemius_Api_WordPress( FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY );
+        $this->plugins = LDNFT_Freemius::$products;
+        $this->plugins = $this->plugins->plugins;
+
+        $this->selected_plugin_id = ( isset( $_GET['ldfmt_plugins_filter'] ) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) ? intval( $_GET['ldfmt_plugins_filter'] ) : $this->plugins[0]->id;
+        $this->selected_interval = ( isset( $_GET['interval'] ) ) ? $_GET['interval'] : 12; 
+        $this->selected_filter = ( isset( $_GET['filter'] )  ) ? $_GET['filter'] : 'all'; 
         
-        $this->plugins = $this->api->Api('plugins.json?fields=id,title', 'GET', ['fields'=>'id, title']);
 
-        if( isset( $this->plugins->plugins ) &&  count($this->plugins->plugins) > 0 ) {
-            $this->plugins = $this->plugins->plugins;
-            $plugin = $this->plugins[0];
-            if( $this->selected_plugin_id <= 0 ) {
-                $this->selected_plugin_id = $plugin->id;  
-            }
-
-            foreach( $this->plugins as $plugin ) {
-                $this->plugins_short_array[$plugin->id] = $plugin->title;
-            }
-        }
-
-        if( isset($_GET['ldfmt_plugins_filter']) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) {
-            $this->selected_plugin_id = intval( $_GET['ldfmt_plugins_filter'] ); 
-        }
-
-        if( isset($_GET['filter'])  ) {
-            $this->selected_filter = $_GET['filter']; 
-        }
+        // $this->selected_plugin_id = 0;  
+        // $this->api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
         
-        $this->selected_interval = 12; 
-        if( isset($_GET['interval'])  ) {
-            $this->selected_interval = $_GET['interval']; 
-        }
+        // $this->plugins = $this->api->Api('plugins.json?fields=id,title', 'GET', ['fields'=>'id, title']);
+
+        // if( isset( $this->plugins->plugins ) &&  count($this->plugins->plugins) > 0 ) {
+        //     $this->plugins = $this->plugins->plugins;
+        //     $plugin = $this->plugins[0];
+        //     if( $this->selected_plugin_id <= 0 ) {
+        //         $this->selected_plugin_id = $plugin->id;  
+        //     }
+
+        //     foreach( $this->plugins as $plugin ) {
+        //         //$this->plugins_short_array[$plugin->id] = $plugin->title;
+        //     }
+        // }
+
+        // if( isset($_GET['ldfmt_plugins_filter']) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) {
+        //     $this->selected_plugin_id = intval( $_GET['ldfmt_plugins_filter'] ); 
+        // }
+
+        // if( isset($_GET['filter'])  ) {
+        //     $this->selected_filter = $_GET['filter']; 
+        // }
+        
+        // $this->selected_interval = 12; 
+        // if( isset($_GET['interval'])  ) {
+        //     $this->selected_interval = $_GET['interval']; 
+        // }
         /**
          * Set parent defaults
          */
@@ -91,6 +96,18 @@ class LDNFT_Sales extends WP_List_Table {
             'ajax'      => true  
         ] );
         
+    }
+
+    /**
+     * Will display a link to show popup for the subscription detail.
+     */
+    public function column_view( $item ) {
+        
+        if( !empty( intval( strip_tags( $item['id'] ) ) ) ) {
+            return '<a data-action="ldnft_sales_view_detail" data-user_id="'.$item['user_id'].'" data-plugin_id="'.$item['plugin_id'].'" data-id="'.$item['id'].'" class="ldnft_sales_view_detail" href="javascript:;">'._e('Get More', LDNFT_TEXT_DOMAIN).'</a>';
+        } else {
+            return LDNFT_Admin::get_bar_preloader();
+        }    
     }
 
 
@@ -306,10 +323,54 @@ class LDNFT_Sales extends WP_List_Table {
             'sales_per_page',
             get_current_user_id()
         );
-        
-        if( empty($per_page) ) {
+
+        if( empty( $per_page ) ) {
             $per_page = 10;
         }
+
+        if( !wp_doing_ajax() ) {
+            
+            $this->items = [
+                [
+                    'id'                    => LDNFT_Admin::get_bar_preloader(), 
+                    'user_id'               => LDNFT_Admin::get_bar_preloader(), 
+                    'username'              => LDNFT_Admin::get_bar_preloader(), 
+                    'useremail'             => LDNFT_Admin::get_bar_preloader(), 
+                    'subscription_id'       => LDNFT_Admin::get_bar_preloader(), 
+                    'gateway_fee'           => LDNFT_Admin::get_bar_preloader(), 
+                    'gross'                 => LDNFT_Admin::get_bar_preloader(), 
+                    'license_id'            => LDNFT_Admin::get_bar_preloader(), 
+                    'gateway'               => LDNFT_Admin::get_bar_preloader(), 
+                    'country_code'          => LDNFT_Admin::get_bar_preloader(), 
+                    'is_renewal'            => LDNFT_Admin::get_bar_preloader(), 
+                    'type'                  => LDNFT_Admin::get_bar_preloader(), 
+                    'bound_payment_id'      => LDNFT_Admin::get_bar_preloader(), 
+                    'created'               => LDNFT_Admin::get_bar_preloader(), 
+                    'vat'                   => LDNFT_Admin::get_bar_preloader(),  
+                    'install_id'            => LDNFT_Admin::get_bar_preloader(), 
+                    'plan_id'               => LDNFT_Admin::get_bar_preloader(), 
+                    'pricing_id'            => LDNFT_Admin::get_bar_preloader(),
+                    'ip'                    => LDNFT_Admin::get_bar_preloader(),
+                    'zip_postal_code'       => LDNFT_Admin::get_bar_preloader(),
+                    'vat_id'                => LDNFT_Admin::get_bar_preloader(),
+                    'coupon_id'             => LDNFT_Admin::get_bar_preloader(),
+                    'user_card_id'          => LDNFT_Admin::get_bar_preloader(),
+                    'plugin_id'             => LDNFT_Admin::get_bar_preloader(),
+                    'external_id'           => LDNFT_Admin::get_bar_preloader(),
+                    'currency'              => LDNFT_Admin::get_bar_preloader(),
+                    'view'                  => LDNFT_Admin::get_bar_preloader()
+                ]
+            ];
+
+            $this->set_pagination_args( [
+                'per_page'      => $per_page,
+                'offset'        => 1,
+                'offset_rec'    => 1,
+                'current_recs'  => 1
+            ] );
+
+			return;
+		}
 
         $offset = isset($_REQUEST['offset']) && intval($_REQUEST['offset'])>0?intval($_REQUEST['offset']):1;
         $offset_rec = ($offset - 1) * $per_page;
@@ -322,7 +383,7 @@ class LDNFT_Sales extends WP_List_Table {
          * used to build the value for our _column_headers property.
          */
         $columns = $this->get_columns();
-        $screen = get_current_screen();
+        $screen = WP_Screen::get( 'freemius-toolkit_page_freemius-sales' );
         $hidden   = get_hidden_columns( $screen );
         $sortable = $this->get_sortable_columns();
         
@@ -355,13 +416,13 @@ class LDNFT_Sales extends WP_List_Table {
            $filter_str = '&filter='.$this->selected_filter;
         }
 
-        $interval_str = '12';
+        $interval_str = '';//'&billing_cycle=12';
         if( !empty($this->selected_interval) ) {
-           $interval_str = '&billing_cycle='.$this->selected_interval;
+         //  $interval_str = '&billing_cycle='.$this->selected_interval;
         }
-        
+        //echo 'plugins/'.$this->selected_plugin_id.'/payments.json?count='.$per_page.'&offset='.$offset_rec.$filter_str.$interval_str;
         $result = $this->api->Api('plugins/'.$this->selected_plugin_id.'/payments.json?count='.$per_page.'&offset='.$offset.$filter_str.$interval_str, 'GET', []);
-
+        //print_r($result);
         $data = [];
         $count = 0;
         $total_recs = 0;
@@ -443,7 +504,7 @@ class LDNFT_Sales extends WP_List_Table {
         $current_recs   = $this->_pagination_args['current_recs'];
         $offset_rec1    = ($offset) * $per_page;
         
-        $interval_str = '12';
+        $interval_str = '&billing_cycle=12';
         if( !empty($this->selected_interval) ) {
             $interval_str = '&billing_cycle='.$this->selected_interval;
         }
@@ -581,7 +642,7 @@ class LDNFT_Sales extends WP_List_Table {
 	 *
 	 * @param string $which
 	 */
-    public function extra_tablenav( $which ) {
+    public function extra_tablenav1( $which ) {
         
         if ( $which == "top" ){ 
             
@@ -590,7 +651,7 @@ class LDNFT_Sales extends WP_List_Table {
                 $filter_str = '&filter='.$this->selected_filter;
             }
             
-            $interval_str = '12';
+            $interval_str = '&billing_cycle=12';
             if( !empty($this->selected_interval) ) {
                 $interval_str = '&billing_cycle='.$this->selected_interval;
             }
