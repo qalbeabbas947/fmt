@@ -34,11 +34,6 @@ class LDNFT_Customers extends WP_List_Table {
      */
     public $plugins;
     
-    /**
-     * Plugins
-     */
-    public $plugins_short_array;
-
     /** ************************************************************************
      * REQUIRED. Set up a constructor that references the parent constructor. We 
      * use the parent reference to set some default configs.
@@ -47,32 +42,11 @@ class LDNFT_Customers extends WP_List_Table {
         
         global $status, $page;
 
-        $this->selected_plugin_id = 0;  
-        $this->selected_status = '';
-        $this->api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
-        
-        $this->plugins = $this->api->Api('plugins.json?fields=id,title', 'GET', ['fields'=>'id,title']);
-
-        if( isset( $this->plugins->plugins ) && count($this->plugins->plugins) > 0 ) {
-            $this->plugins = $this->plugins->plugins;
-            $plugin = $this->plugins[0];
-            if( $this->selected_plugin_id <= 0 ) {
-                $this->selected_plugin_id = $plugin->id;  
-            }
-
-            foreach( $this->plugins as $plugin ) {
-                $this->plugins_short_array[$plugin->id] = $plugin->title;
-            }
-            
-        }
-
-        if( isset($_GET['ldfmt_plugins_filter']) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) {
-            $this->selected_plugin_id = intval( $_GET['ldfmt_plugins_filter'] ); 
-        }
-
-        if( isset($_GET['status']) && !empty( $_GET['status'] ) ) {
-            $this->selected_status = $_GET['status']; 
-        }
+		$this->api = new Freemius_Api_WordPress( FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY );
+        $this->plugins = LDNFT_Freemius::$products;
+        $this->plugins = $this->plugins->plugins;
+        $this->selected_plugin_id = ( isset( $_GET['ldfmt_plugins_filter'] ) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) ? intval( $_GET['ldfmt_plugins_filter'] ) : $this->plugins[0]->id;
+        $this->selected_status = ( isset( $_GET['status'] )  ) ? $_GET['status'] : 'active'; 
         
         /**
          * Set parent defaults
@@ -80,7 +54,7 @@ class LDNFT_Customers extends WP_List_Table {
         parent::__construct( [
             'singular'      => 'freemius_customer',
             'plural'        => 'freemius_customers',
-            'ajax'          => false
+            'ajax'          => true
         ] );
         
     }
@@ -118,76 +92,35 @@ class LDNFT_Customers extends WP_List_Table {
             case 'is_marketing_allowed':
             case 'created':
                 return $item[$column_name];
-            case 'plugin_ids':
-                $plugins = $item[$column_name];
-                if( is_array($plugins) && count( $plugins ) ) {
-                    $string_plugins = '<ul>';
-                    foreach( $plugins as $id ) {
-                        $string_plugins .= $this->plugins_short_array[$id];
-                    }
-                    return $string_plugins .= '</ul>';
-                }
+            
                 
             default:
                 return print_r($item,true);
         }
     }
     
-    /** ************************************************************************
-     * Recommended. This is a custom column method and is responsible for what
-     * is rendered in any column with a name/slug of 'title'. Every time the class
-     * needs to render a column, it first looks for a method named 
-     * column_{$column_title} - if it exists, that method is run. If it doesn't
-     * exist, column_default() is called instead.
-     * 
-     * This example also illustrates how to implement rollover actions. Actions
-     * should be an associative array formatted as 'slug'=>'link html' - and you
-     * will need to generate the URLs yourself. You could even ensure the links
-     * 
-     * 
-     * @see WP_List_Table::::single_row_columns()
-     * @param array $item A singular item (one full row's worth of data)
-     * @return string Text to be placed inside the column <td> (movie title only)
-     **************************************************************************/
-    public function column_title($item){
-        
-        /**
-         * Build row actions 
-         */
-        $actions = [
-            'edit'      => sprintf('<a href="?page=%s&action=%s&movie=%s">Edit</a>',$_REQUEST['page'],'edit',$item['ID']),
-            'delete'    => sprintf('<a href="?page=%s&action=%s&movie=%s">Delete</a>',$_REQUEST['page'],'delete',$item['ID']),
-        ];
-        
-        /**
-         * Return the title contents
-         */
-        return sprintf('%1$s <span style="color:silver">(id:%2$s)</span>%3$s',
-            /*$1%s*/ $item['title'],
-            /*$2%s*/ $item['ID'],
-            /*$3%s*/ $this->row_actions($actions)
-        );
-    }
+	/**
+	* format the is_verified column
+	*/
+	public function column_is_verified($item){
+		if( intval( $item['is_verified'] ) == 1 ) {
+			return __( 'Yes', LDNFT_TEXT_DOMAIN );
+		} else {
+			return __( 'No', LDNFT_TEXT_DOMAIN );
+		}
+	}
 
 
-    /** ************************************************************************
-     * REQUIRED if displaying checkboxes or using bulk actions! The 'cb' column
-     * is given special treatment when columns are processed. It ALWAYS needs to
-     * have it's own method.
-     * 
-     * @see WP_List_Table::::single_row_columns()
-     * @param array $item A singular item (one full row's worth of data)
-     * @return string Text to be placed inside the column <td> (movie title only)
-     **************************************************************************/
-    public function column_cb($item){
-        
-        return sprintf(
-            '<input type="checkbox" name="%1$s[]" value="%2$s" />',
-            /*$1%s*/ $this->_args['singular'],  
-            /*$2%s*/ $item['ID']               
-        );
-
-    }
+   /**
+	* format the is_marketing_allowed column
+	*/
+	public function column_is_marketing_allowed($item){
+		if( intval( $item['is_marketing_allowed'] ) == 1 ) {
+			return __( 'Yes', LDNFT_TEXT_DOMAIN );
+		} else {
+			return __( 'No', LDNFT_TEXT_DOMAIN );
+		}
+	}
 
 
     /** ************************************************************************
@@ -212,7 +145,6 @@ class LDNFT_Customers extends WP_List_Table {
             'last'                      => __( 'Last Name', LDNFT_TEXT_DOMAIN ),
             'is_verified'               => __( 'Verified?', LDNFT_TEXT_DOMAIN ),
             'created'                   => __( 'Joined', LDNFT_TEXT_DOMAIN ),
-            'plugin_ids'                => __( 'Products', LDNFT_TEXT_DOMAIN ),
             'is_marketing_allowed'      => __( 'Is Marketing Allowed?', LDNFT_TEXT_DOMAIN )
         ];
 
@@ -303,12 +235,36 @@ class LDNFT_Customers extends WP_List_Table {
             get_current_user_id()
         );
         
-        if( empty($per_page) ) {
+        if( empty( $per_page ) ) {
             $per_page = 10;
         }
 
-        $offset = isset($_REQUEST['offset']) && intval($_REQUEST['offset'])>0?intval($_REQUEST['offset']):1;
-        $offset_rec = ($offset - 1) * $per_page;
+		if( !wp_doing_ajax() ) {
+            
+			$this->items = [
+                [
+                    'id'               		=> LDNFT_Admin::get_bar_preloader(), 
+                    'email'            		=> LDNFT_Admin::get_bar_preloader(), 
+                    'first'            		=> LDNFT_Admin::get_bar_preloader(), 
+                    'last'             		=> LDNFT_Admin::get_bar_preloader(), 
+                    'is_verified'      		=> LDNFT_Admin::get_bar_preloader(), 
+                    'created'              	=> LDNFT_Admin::get_bar_preloader(), 
+                    'is_marketing_allowed'  => LDNFT_Admin::get_bar_preloader()    
+                ]
+            ];
+
+            $this->set_pagination_args( [
+                'per_page'      => $per_page,
+                'offset'        => 1,
+                'offset_rec'    => 1,
+                'current_recs'  => 1
+            ] );
+
+			return;
+		}
+
+        $offset = isset( $_REQUEST['offset'] ) && intval( $_REQUEST['offset'] ) > 0 ? intval( $_REQUEST['offset'] ) : 1;
+        $offset_rec = ( $offset - 1 ) * $per_page;
         
         /**
          * REQUIRED. Now we need to define our column headers. This includes a complete
@@ -318,10 +274,9 @@ class LDNFT_Customers extends WP_List_Table {
          * used to build the value for our _column_headers property.
          */
         $columns = $this->get_columns();
-        $screen = get_current_screen();
+        $screen = WP_Screen::get( 'freemius-toolkit_page_freemius-customers' );
         $hidden   = get_hidden_columns( $screen );
         $sortable = $this->get_sortable_columns();
-        
         
         /**
          * REQUIRED. Finally, we build an array to be used by the class for column 
@@ -330,14 +285,6 @@ class LDNFT_Customers extends WP_List_Table {
          * for sortable columns.
          */
         $this->_column_headers = [ $columns, $hidden, $sortable ];
-        
-        
-        /**
-         * Optional. You can handle your bulk actions however you see fit. In this
-         * case, we'll handle them within our package just to keep things clean.
-         */
-        $this->process_bulk_action();
-        
         
         /**
          * Instead of querying a database, we're going to fetch the example data
@@ -355,6 +302,7 @@ class LDNFT_Customers extends WP_List_Table {
         }
         
         $result = $this->api->Api('plugins/'.$this->selected_plugin_id.'/users.json?count='.$per_page.'&offset='.$offset.$status, 'GET', []);
+		
         $data = [];
         $count = 0;
         $total_recs = 0;
@@ -368,37 +316,7 @@ class LDNFT_Customers extends WP_List_Table {
                 $count++;   
             }
         }
-        /**
-         * This checks for sorting input and sorts the data in our array accordingly.
-         * 
-         * In a real-world situation involving a database, you would probably want 
-         * to handle sorting by passing the 'orderby' and 'order' values directly 
-         * to a custom query. The returned data will be pre-sorted, and this array
-         * sorting technique would be unnecessary.
-         */
-        function usort_reorder($a,$b){
-
-            /**
-             * If no sort, default to title
-             */
-            $orderby = (!empty($_REQUEST['orderby'])) ? $_REQUEST['orderby'] : 'id';
-
-            /**
-             * If no order, default to asc
-             */
-            $order = (!empty($_REQUEST['order'])) ? $_REQUEST['order'] : 'asc';
-
-            /**
-             * Determine sort order
-             */
-            $result = strcmp($a[$orderby], $b[$orderby]); 
-
-            /**
-             * Send final sort direction to usort
-             */
-            return ($order==='asc') ? $result : -$result;
-        }
-        usort($data, 'usort_reorder');
+        
         
         /**
          * REQUIRED. Now we can add our *sorted* data to the items property, where 
@@ -413,7 +331,62 @@ class LDNFT_Customers extends WP_List_Table {
             'current_recs'  => $total_recs
         ] );
     }
+	
+	/**
+	 * @Override of display method
+	 */
 
+	public function display() {
+
+		parent::display();
+	}
+
+	/**
+	 * @Override ajax_response method
+	 */
+	public function ajax_response() {
+
+		$this->prepare_items();
+
+		extract( $this->_args );
+		extract( $this->_pagination_args, EXTR_SKIP );
+
+		ob_start();
+		if ( ! empty( $_REQUEST['no_placeholder'] ) ) {
+            $this->display_rows();
+        } else {
+            $this->display_rows_or_placeholder();
+        }
+		$rows = ob_get_clean();
+
+		ob_start();
+		$this->print_column_headers();
+		$headers = ob_get_clean();
+
+		ob_start();
+		$this->pagination('top');
+		$pagination_top = ob_get_clean();
+
+		ob_start();
+		$this->pagination('bottom');
+		$pagination_bottom = ob_get_clean();
+
+		$response = [ 'rows' => $rows ];
+		$response['pagination']['top'] = $pagination_top;
+		$response['pagination']['bottom'] = $pagination_bottom;
+		$response['column_headers'] = $headers;
+
+		if ( isset( $total_items ) )
+			$response['total_items_i18n'] = sprintf( _n( '1 item', '%s items', $total_items ), number_format_i18n( $total_items ) );
+
+		if ( isset( $total_pages ) ) {
+			$response['total_pages'] = $total_pages;
+			$response['total_pages_i18n'] = number_format_i18n( $total_pages );
+		}
+
+		die( json_encode( $response ) );
+	}
+	
     /**
 	 * Displays the pagination.
 	 *
@@ -441,6 +414,7 @@ class LDNFT_Customers extends WP_List_Table {
             </div>
         <?php
     }
+	
     /**
 	 * Displays the pagination.
 	 *
@@ -458,6 +432,7 @@ class LDNFT_Customers extends WP_List_Table {
 		$offset         = $this->_pagination_args['offset'];
         $offset_rec     = $this->_pagination_args['offset_rec'];
         $current_recs   = $this->_pagination_args['current_recs'];
+		
         $offset_rec1    = ($offset) * $per_page;
         
         
@@ -506,11 +481,10 @@ class LDNFT_Customers extends WP_List_Table {
 			$page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&laquo;</span>';
 		} else {
 			$page_links[] = sprintf(
-				"<a class='first-page button' href='%s'>" .
+				"<a class='first-page button' data-offset='1' href='javascript:;'>" .
 					"<span class='screen-reader-text'>%s</span>" .
 					"<span aria-hidden='true'>%s</span>" .
 				'</a>',
-				esc_url( remove_query_arg( 'offset', $current_url ) ),
 				/* translators: Hidden accessibility text. */
 				__( 'First page', LDNFT_TEXT_DOMAIN ),
 				'&laquo;'
@@ -522,17 +496,17 @@ class LDNFT_Customers extends WP_List_Table {
 		} else {
 
 			$page_links[] = sprintf(
-				"<a class='prev-page button' href='%s'>" .
+				"<a class='prev-page button' data-offset='%d' href='javascript:;'>" .
 					"<span class='screen-reader-text'>%s</span>" .
 					"<span aria-hidden='true'>%s</span>" .
 				'</a>', 
-				esc_url( add_query_arg( 'offset', intval($offset)>1?intval($offset)-1:1, $current_url ) ),
-				/* translators: Hidden accessibility text. */
+				intval($offset)>1?intval($offset)-1:1,
 				__( 'Previous page', LDNFT_TEXT_DOMAIN ),
 				'&lsaquo;'
 			);
 		}
-        
+		
+		
         if( $offset == 1 && $current_recs == 0 ) {
             $page_links[] = $total_pages_before . sprintf(
                 /* translators: 1: Current page, 2: Total pages. */
@@ -553,7 +527,7 @@ class LDNFT_Customers extends WP_List_Table {
 			$page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&rsaquo;</span>';
 		} else {
 			$page_links[] = sprintf(
-				"<a data-action='ldnft_customers_check_next' data-plugin_id='%d' data-status='%s' data-per_page='%d' data-offset='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='%s'>" .
+				"<a data-action='ldnft_customers_check_next' data-plugin_id='%d' data-status='%s' data-per_page='%d' data-offset='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
 					"<span class='screen-reader-text'>%s</span>" .
 					"<span aria-hidden='true'>%s</span>" .
 				'</a>',
@@ -562,7 +536,7 @@ class LDNFT_Customers extends WP_List_Table {
                 $per_page,
                 $offset+1,
                 $current_recs,
-				esc_url( add_query_arg( 'offset', intval($offset)+1, $current_url ) ),
+				
 				__( 'Next page', LDNFT_TEXT_DOMAIN ),
 				'&rsaquo;'
 			);
@@ -590,32 +564,7 @@ class LDNFT_Customers extends WP_List_Table {
     public function extra_tablenav( $which ) {
         
         if ( $which == "top" ){
-            ?>
-            <div class="alignleft actions bulkactions">
-                <select onchange="document.location='admin.php?page=freemius-customers&status=<?php echo $this->selected_status;?>&ldfmt_plugins_filter='+this.value" name="ldfmt-plugins-filter" class="ldfmt-plugins-filter">
-                    <?php
-                        foreach( $this->plugins as $plugin ) {
-                            
-                            $selected = '';
-                            if( $this->selected_plugin_id == $plugin->id ) {
-                                $selected = ' selected = "selected"';   
-                            }
-                            ?>
-                                <option value="<?php echo $plugin->id; ?>" <?php echo $selected; ?>><?php echo $plugin->title; ?></option>
-                            <?php   
-                        }
-                    ?>
-                </select>&nbsp;&nbsp;
-                <select onchange="document.location='admin.php?page=freemius-customers&ldfmt_plugins_filter=<?php echo $this->selected_plugin_id;?>&status='+this.value" name="ldfmt-plugins-status" class="ldfmt-plugins-status">
-                    <option value=""><?php _e('Filter by status', LDNFT_TEXT_DOMAIN);?></option>
-                    <option value="active" <?php echo $this->selected_status=='active'?'selected':''; ?>><?php _e('Active', LDNFT_TEXT_DOMAIN);?></option>
-                    <option value="never_paid" <?php echo $this->selected_status=='never_paid'?'selected':''; ?>><?php _e('Never Paid', LDNFT_TEXT_DOMAIN);?></option>
-                    <option value="paid" <?php echo $this->selected_status=='paid'?'selected':''; ?>><?php _e('Paid', LDNFT_TEXT_DOMAIN);?></option>
-                    <option value="paying" <?php echo $this->selected_status=='paying'?'selected':''; ?>><?php _e('Paying', LDNFT_TEXT_DOMAIN);?></option>
-                </select>
-                
-                </div>
-            <?php
+            
         }
         
     }

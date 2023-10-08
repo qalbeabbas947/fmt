@@ -21,9 +21,8 @@ class LDNFT_Reviews_Menu {
 	function __construct() {
 
         $this->default_hidden_columns = [ 
-            'user_id' ,
             'username',
-            'useremail',
+            'name',
             'job_title',
             'company_url',
             'picture',
@@ -31,11 +30,53 @@ class LDNFT_Reviews_Menu {
             'is_verified',
             'is_featured',
             'sharable_img', 
+            'company', 
+            'created', 						
         ];
 
-        add_action( 'admin_menu', [ $this, 'admin_menu_page' ] );
+        add_action( 'admin_menu', 								[ $this, 'admin_menu_page' ] );
+		add_action('wp_ajax_ldnft_reviews_display', 			[ $this, 'ldnft_reviews_display' ], 100 );
+        add_action( 'wp_ajax_ldnft_reviews_check_next',      	[ $this, 'reviews_check_next' ], 100 );
 	}
     
+	/**
+     * Action wp_ajax for fetching the first time table structure
+     */
+    public function ldnft_reviews_display() {
+        
+        $wp_list_table = new LDNFT_Reviews();
+        $wp_list_table->prepare_items();
+
+        ob_start();
+        $wp_list_table->display();
+        $display = ob_get_clean();
+
+        die(
+            json_encode([
+                "display" => $display
+            ])
+        );
+    }
+	
+	/**
+     * checks if there are subscribers records
+     */
+    public function reviews_check_next() {
+        
+        $per_page       = isset($_REQUEST['per_page']) && intval($_REQUEST['per_page'])>0?intval($_REQUEST['per_page']):10;
+        $offset         = isset($_REQUEST['offset']) && intval($_REQUEST['offset'])>0?intval($_REQUEST['offset']):1;
+        $current_recs   = isset($_REQUEST['current_recs']) && intval($_REQUEST['current_recs'])>0?intval($_REQUEST['current_recs']):0;
+        $plugin_id      = isset($_REQUEST['plugin_id']) && intval($_REQUEST['plugin_id'])>0?intval($_REQUEST['plugin_id']):0;
+        $offset_rec     = ($offset-1) * $per_page;
+
+        $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
+        $result = $api->Api('plugins/'.$plugin_id.'/reviews.json?count='.$per_page.'&offset='.$offset_rec, 'GET', []);
+        if( ! is_array( $result->reviews ) || count( $result->reviews ) == 0) {
+            echo __('No more record(s) found.', LDNFT_TEXT_DOMAIN);
+        }
+        exit;
+    }
+	
     /**
      * Add Reset Course Progress submenu page under learndash menus
      */
@@ -90,6 +131,24 @@ class LDNFT_Reviews_Menu {
      */
     public static function reviews_page( ) {
         
+		if( !FS__HAS_PLUGINS ) {
+            ?>
+                <div class="wrap">
+                    <h2><?php _e( 'Subscriptions', LDNFT_TEXT_DOMAIN ); ?></h2>
+                    <p><?php _e( 'No product(s) exists in your freemius account. Please, add a product on freemius and reload the page.', LDNFT_TEXT_DOMAIN ); ?></p>
+                </div>
+            <?php
+
+            return;
+        }
+		
+		$products = LDNFT_Freemius::$products;
+		
+		$selected_plugin_id = 0;
+        if( isset($_GET['ldfmt_plugins_filter']) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) {
+            $selected_plugin_id = intval( $_GET['ldfmt_plugins_filter'] ); 
+        }
+		
         /**
          * Create an instance of our package class... 
          */
@@ -103,18 +162,103 @@ class LDNFT_Reviews_Menu {
         ?>
             <div class="wrap">
                 
-                <div id="icon-users" class="icon32"><br/></div>
                 <h2><?php _e( 'Reviews', LDNFT_TEXT_DOMAIN ); ?></h2>
 
                 
                 <!-- Forms are NOT created automatically, so you need to wrap the table in one to use features like bulk actions -->
-                <form id="movies-filter" method="get">
-                    <!-- For plugins, we also need to ensure that the form posts back to our current page -->
-                    <input type="hidden" name="page" value="<?php echo $_REQUEST['page'] ?>" />
-                    <!-- Now we can render the completed list table -->
-                    <?php $testListTable->display() ?>
+                <form id="ldnft-reviews-filter" method="get">
+					<div class="ldnft_filters_top">
+						<div class="alignleft actions bulkactions">
+							<span class="ldnft_filter_labels"><?php _e( 'Filters:', LDNFT_TEXT_DOMAIN ); ?></span>
+							<select name="ldfmt-plugins-filter" class="ldfmt-plugins-filter ldfmt-plugins-reviews-filter">
+								<?php
+									foreach( $products->plugins as $plugin ) {
+										
+										$selected = '';
+										if( $selected_plugin_id == $plugin->id ) {
+											$selected = ' selected = "selected"';   
+										}
+										?>
+											<option value="<?php echo $plugin->id; ?>" <?php echo $selected; ?>><?php echo $plugin->title; ?></option>
+										<?php   
+									}
+								?>
+							</select>
+						</div>
+                		<div id="ldnft_reviews_data">	
+							<!-- Now we can render the completed list table -->
+							<?php $testListTable->display() ?>
+						</div>
+					</div>	
+					<!-- For plugins, we also need to ensure that the form posts back to our current page -->
+					<input type="hidden" class="ldnft-freemius-page" name="page" value="1" />
+					<input type="hidden" class="ldnft-script-freemius-type" name="ldnft-script-freemius-type" value="reviews" />
                 </form>
-                
+                <div id="ldnft-admin-modal" class="ldnft-admin-modal">
+					<!-- Modal content -->
+					<div class="ldnft-admin-modal-content">
+						<div class="ldnft-admin-modal-header">
+						<span class="ldnft-admin-modal-close">&times;</span>
+							<h2><?php echo __( 'Review Detail', LDNFT_TEXT_DOMAIN );?></h2>
+						</div>
+						<div class="ldnft-admin-modal-body">
+							<table id="ldnft-reviews-popup" width="100%" cellpadding="5" cellspacing="1">
+								<tbody>
+									<tr>
+										<th><?php _e('Transaction', LDNFT_TEXT_DOMAIN)?></th>
+										<td id = "ldnft-review-coloumn-transaction-id"></td>
+										<th><?php _e('User ID', LDNFT_TEXT_DOMAIN)?></th>
+										<td id = "ldnft-review-coloumn-user_id"></td>
+									</tr>
+									<tr>
+										<th><?php _e('Name', LDNFT_TEXT_DOMAIN)?></th>
+										<td id = "ldnft-review-coloumn-name"></td>
+										<th><?php _e('Transaction', LDNFT_TEXT_DOMAIN)?></th>
+										<td id = "ldnft-review-coloumn-useremail"></td>
+									</tr>
+									<tr>
+										<th><?php _e('Company', LDNFT_TEXT_DOMAIN)?></th>
+										<td id = "ldnft-review-coloumn-company"></td>
+										<th><?php _e('Company URL', LDNFT_TEXT_DOMAIN)?></th>
+										<td id = "ldnft-review-coloumn-company_url"></td>
+									</tr>
+									<tr>
+										<th><?php _e('Job Title', LDNFT_TEXT_DOMAIN)?></th>
+										<td id = "ldnft-review-coloumn-job_title"></td>
+										<th><?php _e('Posted At', LDNFT_TEXT_DOMAIN)?></th>
+										<td id = "ldnft-review-coloumn-created"></td>
+									</tr>
+									<tr>
+										<th><?php _e('Picture', LDNFT_TEXT_DOMAIN)?></th>
+										<td id = "ldnft-review-coloumn-picture"></td>
+										<th><?php _e('Profile URL', LDNFT_TEXT_DOMAIN)?></th>
+										<td id = "ldnft-review-coloumn-profile_url"></td>
+									</tr>
+									<tr>
+										<th><?php _e('Rate', LDNFT_TEXT_DOMAIN)?></th>
+										<td id = "ldnft-review-coloumn-rate"></td>
+										<th><?php _e('Sharable Image', LDNFT_TEXT_DOMAIN)?></th>
+										<td id = "ldnft-review-coloumn-sharable_img"></td>
+									</tr>
+									<tr>
+										<th><?php _e('Is Verified', LDNFT_TEXT_DOMAIN)?></th>
+										<td id = "ldnft-review-coloumn-is_verified"></td>
+										<th><?php _e('Is Featured', LDNFT_TEXT_DOMAIN)?></th>
+										<td id = "ldnft-review-coloumn-is_featured"></td>
+									</tr>
+									<tr>
+										<th><?php _e('Title', LDNFT_TEXT_DOMAIN)?></th>
+										<td colspan="3" id = "ldnft-review-coloumn-title"></td>
+									</tr>
+									<tr>
+										<td colspan="4" id = "ldnft-review-coloumn-text"></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div class="ldnft-popup-loader"><img class="" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" /></div>
+					</div>
+				</div>
             </div>
         <?php
     }

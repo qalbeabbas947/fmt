@@ -10,21 +10,20 @@
                 e.preventDefault();
                 $('.ldfmt-load-more-btn').css('display', 'block');
                 
-                $('.ldfmt-loader-div-btm').css('display', 'block');
-                var plugin = $('.ldfmt-sales-plugins-filter').val();
-                var interval = $('.ldfmt-sales-interval-filter').val();
+                $('.ldfmt-loader-div-btm-reviews').css('display', 'block');
+                var plugin = $('#ldfmt-sales-plugins-filter').val();
                 var show_type = $('#ldfmt-sales-show-type').val();
                 var link = $(this);
                 link.css('disabled', true);
                 $.ajax({
                     method: "POST",
                     url: LDNFT.ajaxURL,
-                    data: { action: 'ldnft_load_sales', plugin_id: plugin, interval: interval, show: show_type, per_page:record_sale_per_page, offset:record_sale_offset },
+                    data: { action: 'ldnft_load_sales', plugin_id: plugin, show: show_type, per_page:record_sale_per_page, offset:record_sale_offset },
                     cache: false,
                 })
                 .done(function( html ) {
                     $('.ldfmt-sales-list').append( html );
-                    $('.ldfmt-loader-div-btm').css('display', 'none');
+                    $('.ldfmt-loader-div-btm-reviews').css('display', 'none');
                     link.css('disabled', false);
                     
                     if( html.length==0 ) {
@@ -37,7 +36,7 @@
             load_more_review_records: function(e) {
                 e.preventDefault();
                 var plugin = $('.ldfmt-plugins-filter').val();
-                $('.ldfmt-loader-div-btm').css('display', 'block');
+                $('.ldfmt-loader-div-btm-sales').css('display', 'block');
                 var link = $(this);
                 link.css('disabled', true);
                 $.ajax({
@@ -48,7 +47,7 @@
                 })
                 .done(function( html ) {
                     $('.ldmft-filter-reviews').append( html );
-                    $('.ldfmt-loader-div-btm').css('display', 'none');
+                    $('.ldfmt-loader-div-btm-sales').css('display', 'none');
                     
                     link.css('disabled', false);
                     if( html.length==0 ) {
@@ -102,28 +101,27 @@
             },
             init: function() {
                 $('.ldfmt-plugins-filter').on('change', LDFMTFrontend.load_reviews).trigger('change');
-                $('.ldfmt-sales-plugins-filter, .ldfmt-sales-interval-filter').on('change', LDFMTFrontend.load_sales).trigger('change');
+                
                 $('.ldfmt-load-more-sales-btn').on('click', LDFMTFrontend.load_more_sales_records);
                 $('.ldfmt-load-more-btn').on('click', LDFMTFrontend.load_more_review_records);
                 $(document).on('click', '.ldfmt_review_image-link', LDFMTFrontend.load_view_image);
-                
+                LDFMTFrontend.load_sales();
                 //Click anywhere on the page to get rid of lightbox window 
                 $('body').on('click', '#lightbox', LDFMTFrontend.close_image_lightbox);
 
             },
             load_sales: function(e) {
-                e.preventDefault();
+                
                 record_sale_offset = 0;
                 $('.ldfmt-load-more-btn').css('display', 'block');
                 $('.ldmft-filter-sales').html('');
                 $('.ldfmt-loader-div').css('display', 'block');
-                var plugin = $('.ldfmt-sales-plugins-filter').val();
-                var interval = $('.ldfmt-sales-interval-filter').val();
+                var plugin = $('#ldfmt-sales-plugins-filter').val();
                 var show_type = $('#ldfmt-sales-show-type').val();
                 $.ajax({
                     method: "POST",
                     url: LDNFT.ajaxURL,
-                    data: { action: 'ldnft_load_sales', plugin_id: plugin, interval: interval, show: show_type, per_page:record_sale_per_page, offset:record_sale_offset },
+                    data: { action: 'ldnft_load_sales', plugin_id: plugin, show: show_type, per_page:record_sale_per_page, offset:record_sale_offset },
                     cache: false,
                   })
                 .done(function( html ) {

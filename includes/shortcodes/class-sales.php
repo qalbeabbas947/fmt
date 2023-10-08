@@ -48,17 +48,14 @@ class LDNFT_Sales_Shortcode {
     public function load_sales() {
         
         global $wpdb;
-
+		ini_set('display_errors', 'On');
+		error_reporting(E_ALL);
         $plugin_id  = sanitize_text_field($_POST['plugin_id']);
-        $interval   = sanitize_text_field($_POST['interval']);
         $show       = sanitize_text_field($_POST['show']);
         $per_page   = sanitize_text_field($_POST['per_page']);
         $offset     = sanitize_text_field($_POST['offset']);
 
-        $interval_str = '';
-        if( !empty($interval) ) {
-           $interval_str = '&billing_cycle='.$interval;
-        }
+        
         $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
         
 
@@ -70,7 +67,7 @@ class LDNFT_Sales_Shortcode {
             
             $tem_per_page = 50;
             $tem_offset = 0;
-            $result = $api->Api('plugins/'.$plugin_id.'/subscriptions.json?count='.$tem_per_page.'&offset='.$tem_offset.$interval_str, 'GET', []);
+            $result = $api->Api('plugins/'.$plugin_id.'/subscriptions.json?count='.$tem_per_page.'&offset='.$tem_offset, 'GET', []);
             $gross_total = 0;
             $tax_rate_total = 0;
             if( count( $result->subscriptions ) > 0 ) {
@@ -82,7 +79,7 @@ class LDNFT_Sales_Shortcode {
                     } 
 
                     $tem_offset += $tem_per_page;
-                    $result = $api->Api('plugins/'.$plugin_id.'/subscriptions.json?count='.$tem_per_page.'&offset='.$tem_offset.$interval_str, 'GET', []);
+                    $result = $api->Api('plugins/'.$plugin_id.'/subscriptions.json?count='.$tem_per_page.'&offset='.$tem_offset, 'GET', []);
                     if( count( $result->subscriptions ) > 0 ) {
                         $has_more_records = true;
                     } else {
@@ -110,7 +107,7 @@ class LDNFT_Sales_Shortcode {
         }
         
         if( $show == 'both' || $show=='listing' ) {
-            $results = $api->Api('plugins/'.$plugin_id.'/subscriptions.json?count='.$per_page.'&offset='.$offset.$interval_str, 'GET', []);
+            $results = $api->Api('plugins/'.$plugin_id.'/subscriptions.json?count='.$per_page.'&offset='.$offset, 'GET', []);
             if( is_array($results->subscriptions) && count( $results->subscriptions ) > 0 ) {
                 if(  $offset == 0 ) {
                     ?>
@@ -181,61 +178,48 @@ class LDNFT_Sales_Shortcode {
      * 
      * @param $atts
      */
-    public function sales_shortcode_cb( $atts ) {
+    public function sales_shortcode_cb( $attributes ) {
         
-        $user_id = isset( $atts['user_id'] ) ? $atts['user_id'] : get_current_user_id();
-        $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
-        
-        $plugins = $api->Api('plugins.json?fields=id,title', 'GET', ['fields'=>'id,title']);
+		$atts = shortcode_atts( array(
+            'product_id' => 0,
+            'user_id'   => 0,
+            'show' => ''
+        ), $attributes );
+
+
+        $user_id = isset( $atts['user_id'] ) && intval( $atts['user_id'] ) > 0 ? $atts['user_id'] : get_current_user_id();
+		$product_id = isset( $atts['product_id'] ) ? $atts['product_id'] : 0;
         $content = '';
-        if( isset( $plugins->plugins ) &&  count($plugins->plugins) > 0 ) {
-            
-            $plugins = $plugins->plugins;
-            $plugin = $plugins[0];
-
-            ob_start();
-            ?>
-                <div class="ldmft_wrapper">
-                    <div class="ldmft_filters">
-                        <input type="hidden" id="ldfmt-sales-show-type" value="<?php echo $atts['show'];?>" />
-                        <div class="ldmft_filter">
-                            <label><?php echo __( 'Select a Plugin:', LDNFT_TEXT_DOMAIN );?></label>
-                            <select name="ldfmt-sales-plugins-filter" class="ldfmt-sales-plugins-filter">
-                                <?php
-                                    foreach( $plugins as $plugin ) {
-                                            
-                                        $selected = '';
-                                        // if( $selected_plugin_id == $plugin->id ) {
-                                        //     $selected = ' selected = "selected"';   
-                                        // }
-                                        ?>
-                                            <option value="<?php echo $plugin->id; ?>" <?php echo $selected; ?>><?php echo $plugin->title; ?></option>
-                                        <?php   
-                                    }
-                                ?>
-                                
-                            </select>
-                        </div>
-                        <div class="ldmft_filter">
-                            <label><?php echo __( 'Select Interval:', LDNFT_TEXT_DOMAIN );?></label>
-                            <select name="ldfmt-sales-interval-filter" class="ldfmt-sales-interval-filter">
-                                <option value=""><?php echo __( 'All Time', LDNFT_TEXT_DOMAIN );?></option>
-                                <option value="1"><?php echo __( 'Monthly', LDNFT_TEXT_DOMAIN );?></option>
-                                <option value="12"><?php echo __( 'Annual', LDNFT_TEXT_DOMAIN );?></option>
-                            </select>
-                        </div>
-                    </div>
-                    <div style="display:none" class="ldfmt-loader-div"><img width="30px" class="ldfmt-data-loader" src="<?php echo LDNFT_ASSETS_URL.'images/spinner-2x.gif';?>" /></div>
-                    <div class="ldmft-filter-sales"></div>
-                    <div class="ldfmt-load-more-sales-btn"><a href="javascript:;">
-                        <?php echo __( 'Load More', LDNFT_TEXT_DOMAIN );?></a>
-                        <div style="display:none" class="ldfmt-loader-div-btm"><img width="30px" class="ldfmt-data-loader" src="<?php echo LDNFT_ASSETS_URL.'images/spinner-2x.gif';?>" /></div>
-                    </div>
-                </div>
-            <?php
-
-            $content = ob_get_contents();
-            ob_get_clean();
+        if( FS__HAS_PLUGINS ) {
+				ob_start();
+				if( intval( $product_id ) > 0 ) {
+				?>
+					<div class="ldmft_wrapper">
+						<div style="display:none" class="ldfmt-loader-div"><img width="30px" class="ldfmt-data-loader" src="<?php echo LDNFT_ASSETS_URL.'images/spinner-2x.gif';?>" /></div>
+						<div class="ldmft-filter-sales"></div>
+						<div class="ldfmt-load-more-sales-btn"><a href="javascript:;">
+							<?php echo __( 'Load More', LDNFT_TEXT_DOMAIN );?></a>
+							<div style="display:none" class="ldfmt-loader-div-btm ldfmt-loader-div-btm-sales"><img width="30px" class="ldfmt-data-loader" src="<?php echo LDNFT_ASSETS_URL.'images/spinner-2x.gif';?>" /></div>
+						</div>
+						<input type="hidden" id="ldfmt-sales-show-type" value="<?php echo $atts['show'];?>" />
+						<input type="hidden" id="ldfmt-sales-plugins-filter" value="<?php echo $product_id;?>" />
+					</div>
+				<?php
+				} else {
+					?>
+						<input type="hidden" id="ldfmt-sales-show-type" value="<?php echo $atts['show'];?>" />
+						<input type="hidden" id="ldfmt-sales-plugins-filter" value="0" />
+						<div class="ldmft_wrapper">
+							<div class="ldmft-filter-reviews">    
+								<?php echo __( 'To display product sales, you need to attach product id with the shortcode', LDNFT_TEXT_DOMAIN );?>
+							</div>
+						</div>
+					<?php
+				}
+				
+				$content = ob_get_contents();
+				ob_get_clean();
+				
         }
 
         return $content;

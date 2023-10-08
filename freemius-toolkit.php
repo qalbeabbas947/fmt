@@ -133,8 +133,8 @@ class LDNFT_Freemius {
         $fs_has_plugins = false;
         try {
             $products = $api->Api('plugins.json?fields=id,title', 'GET', []);
-            if( ! isset( $products->error )  ) {
-
+			if( ! isset( $products->error )  ) {
+	
                 self::$products = $products;
                 $fs_connection = true;
                 if( is_array( $products->plugins ) && count( $products->plugins ) > 0 ) {
@@ -142,7 +142,7 @@ class LDNFT_Freemius {
                 }
             }
         } catch( Exception $e ) {
-            
+    		       
         }
 
         define( 'FS__API_CONNECTION', $fs_connection );

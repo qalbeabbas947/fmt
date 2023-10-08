@@ -134,7 +134,7 @@ class LDNFT_Reviews_Shortcode {
                     </div>
                     <div class="ldfmt-load-more-btn">
                         <a href="javascript:;"><?php echo __( 'Load More', LDNFT_TEXT_DOMAIN );?></a>
-                        <div style="display:none" class="ldfmt-loader-div-btm"><img width="30px" class="ldfmt-data-loader" src="<?php echo LDNFT_ASSETS_URL.'images/spinner-2x.gif';?>" /></div>
+                        <div style="display:none" class="ldfmt-loader-div-btm ldfmt-loader-div-btm-reviews"><img width="30px" class="ldfmt-data-loader" src="<?php echo LDNFT_ASSETS_URL.'images/spinner-2x.gif';?>" /></div>
                     </div>
                 </div>
                 

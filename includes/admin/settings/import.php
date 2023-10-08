@@ -35,20 +35,26 @@ $plugins = LDNFT_Freemius::$products;
 					</td>
                     <td width="80%">
                         <?php
-                            $table_name = $wpdb->prefix.'mailpoet_segments';
-                            $list = $wpdb->get_results('select id, name from '.$table_name.'');
-                            $is_list_available = true;
-                            if( is_array($list) && count( $list ) > 0 ) {
-                                echo '<select id="ldnft_mailpeot_list" name="ldnft_mailpeot_list">';
-                                foreach( $list as $item ) {
-                                    echo '<option value="'.$item->id.'">'.$item->name.'</option>';
-                                }
-                                echo '</select>';
-                            } else {
-                                echo '<span class="mailpoet_unable_to_import">'.__( 'No mailpoet list for import.', LDNFT_TEXT_DOMAIN ).'</span>';
-                                $allow_import = false;
-                                $is_list_available = false;
-                            }
+							if (in_array('snippets', $wpdb->tables)) {
+								$table_name = $wpdb->prefix.'mailpoet_segments';
+								$list = $wpdb->get_results('select id, name from '.$table_name.'');
+								$is_list_available = true;
+								if( is_array($list) && count( $list ) > 0 ) {
+									echo '<select id="ldnft_mailpeot_list" name="ldnft_mailpeot_list">';
+									foreach( $list as $item ) {
+										echo '<option value="'.$item->id.'">'.$item->name.'</option>';
+									}
+									echo '</select>';
+								} else {
+									echo '<span class="mailpoet_unable_to_import">'.__( 'No mailpoet list for import.', LDNFT_TEXT_DOMAIN ).'</span>';
+									$allow_import = false;
+									$is_list_available = false;
+								}
+							} else {
+								echo '<span class="mailpoet_unable_to_import">'.__( 'No mailpoet list for import.', LDNFT_TEXT_DOMAIN ).'</span>';
+								$allow_import = false;
+								$is_list_available = false;
+							}
                         ?>
                         <?php if($is_list_available) { ?>
                             <p>

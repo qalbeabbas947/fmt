@@ -29,11 +29,7 @@ class LDNFT_Reviews extends WP_List_Table {
      */
     public $plugins;
     
-    /**
-     * Plugins
-     */
-    public $plugins_short_array;
-    
+     
     /** ************************************************************************
      * REQUIRED. Set up a constructor that references the parent constructor. We 
      * use the parent reference to set some default configs.
@@ -42,34 +38,18 @@ class LDNFT_Reviews extends WP_List_Table {
         
         global $status, $page;
 
-        $this->selected_plugin_id = 0;  
-        $this->api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
+		$this->api = new Freemius_Api_WordPress( FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY );
+        $this->plugins = LDNFT_Freemius::$products;
+        $this->plugins = $this->plugins->plugins;
+        $this->selected_plugin_id = ( isset( $_GET['ldfmt_plugins_filter'] ) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) ? intval( $_GET['ldfmt_plugins_filter'] ) : $this->plugins[0]->id;
         
-        $this->plugins = $this->api->Api('plugins.json?fields=id,title', 'GET', ['fields'=>'id,title']);
-
-        if( isset( $this->plugins->plugins ) &&  count($this->plugins->plugins) > 0 ) {
-            $this->plugins = $this->plugins->plugins;
-            $plugin = $this->plugins[0];
-            if( $this->selected_plugin_id <= 0 ) {
-                $this->selected_plugin_id = $plugin->id;  
-            }
-
-            foreach( $this->plugins as $plugin ) {
-                $this->plugins_short_array[$plugin->id] = $plugin->title;
-            }
-        }
-
-        if( isset($_GET['ldfmt_plugins_filter']) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) {
-            $this->selected_plugin_id = intval( $_GET['ldfmt_plugins_filter'] ); 
-        }
-
         /**
          * Set parent defaults
          */
         parent::__construct( [
-            'singular'  => 'freemius_customer',
-            'plural'    => 'freemius_customers',
-            'ajax'      => false
+            'singular'  => 'freemius_review',
+            'plural'    => 'freemius_reviews',
+            'ajax'      => true
         ] );
         
     }
@@ -98,86 +78,60 @@ class LDNFT_Reviews extends WP_List_Table {
      **************************************************************************/
     public function column_default($item, $column_name){
         
-        switch($column_name){
-            case 'title':
-            case 'text':
-            case 'user_id':
-            case 'useremail':
-            case 'job_title':
-            case 'company_url':
-            case 'picture':
-            case 'profile_url':
-            case 'is_verified':
-            case 'is_featured':
-            case 'sharable_img':
-            case 'created':
-            case 'id':
-                return $item[$column_name];
-            case 'rate':
-                if( !empty($item['sharable_img']) )
-                    return '<a target="_blank" href="'.$item['sharable_img'].'">'.$item[$column_name].'</a>';
-                else
-                    return $item[$column_name];
-            case 'name':
-                $pic = '';
-                if( !empty($item['picture']) )
-                    $pic = '<img src="'.$item['picture'].'" width="100px" /><br>';
-                if( !empty($item['profile_url']) )
-                    return $pic.'<a target="_blank" href="'.$item['profile_url'].'">'.$item[$column_name].'</a>';
-                else
-                    return $pic.$item[$column_name];
-            case 'company':
-                if( !empty($item['company_url']) )
-                    return '<a target="_blank" href="'.$item['company_url'].'">'.$item[$column_name].'</a>';
-                else
-                    return $item[$column_name];
-            default:
-                return print_r($item,true);
-        }
+         return $item[$column_name];
+    }
+	
+	public function column_company( $item ) {
+        
+		if( LDNFT_Admin::get_bar_preloader() == $item['company'] ) {
+			return LDNFT_Admin::get_bar_preloader();
+		}
+		
+        if( !empty($item['company_url']) ) {
+			return '<a target="_blank" href="'.$item['company_url'].'">'.$item[$column_name].'</a>';
+		} else {
+			return $item[$column_name];
+		}
+			
+    }
+	
+	public function column_name( $item ) {
+        
+		if( LDNFT_Admin::get_bar_preloader() == $item['name'] ) {
+			return LDNFT_Admin::get_bar_preloader();
+		}
+		
+        $pic = '';
+		if( !empty($item['picture']) && trim($item['picture']) != '-' ) {
+			$pic = $item['picture'].'<br>';
+		}
+			
+		return $pic.$item['name'];
+    }
+	
+	public function column_rate( $item ) {
+	
+		if( LDNFT_Admin::get_bar_preloader() == $item['rate'] ) {
+			return LDNFT_Admin::get_bar_preloader();
+		}
+		
+		ob_start();
+		
+		$rates = $item['rate'];
+		for($i=1; $i<=5; $i++) {
+			$selected = '';
+			if( $i*20 <= $rates ) {
+				$selected = 'ldnft-checked';
+			}
+			echo '<span class="fa fa-star '.$selected.'"></span>';
+		}
+        
+		$rating = ob_get_clean();
+		
+		return $rating;
     }
     
-    /** ************************************************************************
-     * Recommended. This is a custom column method and is responsible for what
-     * is rendered in any column with a name/slug of 'title'. Every time the class
-     * needs to render a column, it first looks for a method named 
-     * column_{$column_title} - if it exists, that method is run. If it doesn't
-     * exist, column_default() is called instead.
-     * 
-     * This example also illustrates how to implement rollover actions. Actions
-     * should be an associative array formatted as 'slug'=>'link html' - and you
-     * will need to generate the URLs yourself. You could even ensure the links
-     * 
-     * 
-     * @see WP_List_Table::::single_row_columns()
-     * @param array $item A singular item (one full row's worth of data)
-     * @return string Text to be placed inside the column <td> (movie title only)
-     **************************************************************************/
-    public function column_title( $item ) {
-        
-        return $item['title'];
-    }
-
-
-    /** ************************************************************************
-     * REQUIRED if displaying checkboxes or using bulk actions! The 'cb' column
-     * is given special treatment when columns are processed. It ALWAYS needs to
-     * have it's own method.
-     * 
-     * @see WP_List_Table::::single_row_columns()
-     * @param array $item A singular item (one full row's worth of data)
-     * @return string Text to be placed inside the column <td> (movie title only)
-     **************************************************************************/
-    public function column_cb($item){
-        
-        return sprintf(
-            '<input type="checkbox" name="%1$s[]" value="%2$s" />',
-            /*$1%s*/ $this->_args['singular'], 
-            /*$2%s*/ $item['ID']               
-        );
-    }
-
-
-    /** ************************************************************************
+   	/** ************************************************************************
      * REQUIRED! This method dictates the table's columns and titles. This should
      * return an array where the key is the column slug (and class) and the value 
      * is the column's title text. If you need a checkbox for bulk actions, refer
@@ -209,10 +163,33 @@ class LDNFT_Reviews extends WP_List_Table {
             'rate'              => __( 'Rating', LDNFT_TEXT_DOMAIN ),
             'company'           => __( 'Company', LDNFT_TEXT_DOMAIN ),
             'created'           => __( 'Joined', LDNFT_TEXT_DOMAIN ),
+			'view'              => __( 'Action', LDNFT_TEXT_DOMAIN ),
         ];
         
         return $columns;
     }
+	
+	/**
+	* format the is_verified column
+	*/
+	public function column_is_verified($item){
+		if( intval( $item['is_verified'] ) == 1 ) {
+			return __( 'Yes', LDNFT_TEXT_DOMAIN );
+		} else {
+			return __( 'No', LDNFT_TEXT_DOMAIN );
+		}
+	}
+	
+	/**
+	* format the is_verified column
+	*/
+	public function column_is_featured($item){
+		if( intval( $item['is_featured'] ) == 1 ) {
+			return __( 'Yes', LDNFT_TEXT_DOMAIN );
+		} else {
+			return __( 'No', LDNFT_TEXT_DOMAIN );
+		}
+	}
 
 
     /** ************************************************************************
@@ -234,46 +211,21 @@ class LDNFT_Reviews extends WP_List_Table {
         return [];
     }
 
-
-    /** ************************************************************************
-     * Optional. If you need to include bulk actions in your list table, this is
-     * the place to define them. Bulk actions are an associative array in the format
-     * 'slug'=>'Visible Title'
-     * 
-     * If this method returns an empty value, no bulk action will be rendered. If
-     * you specify any bulk actions, the bulk actions box will be rendered with
-     * the table automatically on display().
-     * 
-     * Also note that list tables are not automatically wrapped in <form> elements,
-     * so you will need to create those manually in order for bulk actions to function.
-     * 
-     * @return array An associative array containing all the bulk actions: 'slugs'=>'Visible Titles'
-     **************************************************************************/
-    public function get_bulk_actions() {
+	/**
+     * Will display a link to show popup for the subscription detail.
+     */
+    public function column_view( $item ){
         
-        $actions = [];
-        return $actions;
+        if( !empty( intval( strip_tags( $item['id'] ) ) ) ) {
+            return '<a class="ldnft_review_view_detail" data-action="ldnft_review_view_detail" data-useremail="'.$item['useremail'].'" data-title="'.$item['title'].'" data-text="'.$item['text'].'" data-job_title="'.$item['job_title'].'"  data-company_url="'.$item['company_url'].'" data-picture="'.$item['picture'].'" data-profile_url="'.$item['profile_url'].'" data-is_verified="'.$item['is_verified'].'" data-is_featured="'.$item['is_featured'].'" data-sharable_img="'.$item['sharable_img'].'" data-name="'.$item['name'].'" data-created="'.$item['created'].'" data-company="'.$item['company'].'" data-user_id="'.$item['user_id'].'" data-plugin_id="'.$item['plugin_id'].'" data-id="'.$item['id'].'" class="ldnft_review_view_detail" href="javascript:;">'.__('Get More', LDNFT_TEXT_DOMAIN).'</a>';
+        } else {
+            return LDNFT_Admin::get_bar_preloader();
+        }    
     }
 
 
-    /** ************************************************************************
-     * Optional. You can handle your bulk actions anywhere or anyhow you prefer.
-     * For this example package, we will handle it in the class to keep things
-     * clean and organized.
-     * 
-     * @see $this->prepare_items()
-     **************************************************************************/
-    public function process_bulk_action() {
-        
-        /**
-         * Detect when a bulk action is being triggered...
-         */
-        if( 'delete'===$this->current_action() ) {
-            wp_die('Items deleted (or they would be if we had items to delete)!');
-        }
-        
-    }
-
+ 
+                   
 
     /** ************************************************************************
      * REQUIRED! This is where you prepare your data for display. This method will
@@ -299,11 +251,47 @@ class LDNFT_Reviews extends WP_List_Table {
             get_current_user_id()
         );
         
-        if( empty($per_page) ) {
+        if( empty( $per_page ) ) {
             $per_page = 10;
         }
-        $offset = isset($_REQUEST['offset']) && intval($_REQUEST['offset'])>0?intval($_REQUEST['offset']):1;
-        $offset_rec = ($offset - 1) * $per_page;
+
+		if( !wp_doing_ajax() ) {
+            
+			$this->items = [
+                [
+                    'id'               		=> LDNFT_Admin::get_bar_preloader(), 
+                    'user_id'            	=> LDNFT_Admin::get_bar_preloader(), 
+                    'useremail'            	=> LDNFT_Admin::get_bar_preloader(), 
+                    'title'             	=> LDNFT_Admin::get_bar_preloader(), 
+                    'text'      			=> LDNFT_Admin::get_bar_preloader(), 
+                    'job_title'             => LDNFT_Admin::get_bar_preloader(),
+					'company_url'           => LDNFT_Admin::get_bar_preloader(),
+					'picture'              	=> LDNFT_Admin::get_bar_preloader(),
+					'profile_url'           => LDNFT_Admin::get_bar_preloader(),
+					'is_verified'           => LDNFT_Admin::get_bar_preloader(),
+					'is_featured'           => LDNFT_Admin::get_bar_preloader(),
+					'sharable_img'          => LDNFT_Admin::get_bar_preloader(),
+					'name'              	=> LDNFT_Admin::get_bar_preloader(),
+					'company'              	=> LDNFT_Admin::get_bar_preloader(),
+					'created'              	=> LDNFT_Admin::get_bar_preloader(),
+					'rate'              	=> LDNFT_Admin::get_bar_preloader(),
+					'view'              	=> LDNFT_Admin::get_bar_preloader(),
+                ]
+            ];
+			
+            $this->set_pagination_args( [
+                'per_page'      => $per_page,
+                'offset'        => 1,
+                'offset_rec'    => 1,
+                'current_recs'  => 1
+            ] );
+
+			return;
+		}
+
+        $offset = isset( $_REQUEST['offset'] ) && intval( $_REQUEST['offset'] ) > 0 ? intval( $_REQUEST['offset'] ) : 1;
+        $offset_rec = ( $offset - 1 ) * $per_page;
+        
         
         /**
          * REQUIRED. Now we need to define our column headers. This includes a complete
@@ -313,7 +301,7 @@ class LDNFT_Reviews extends WP_List_Table {
          * used to build the value for our _column_headers property.
          */
         $columns = $this->get_columns();
-        $screen = get_current_screen();
+        $screen = WP_Screen::get( 'freemius-toolkit_page_freemius-reviews' );
         $hidden   = get_hidden_columns( $screen );
         $sortable = $this->get_sortable_columns();
         
@@ -325,13 +313,6 @@ class LDNFT_Reviews extends WP_List_Table {
          */
         $this->_column_headers = [ $columns, $hidden, $sortable ];
         
-        
-        /**
-         * Optional. You can handle your bulk actions however you see fit. In this
-         * case, we'll handle them within our package just to keep things clean.
-         */
-        $this->process_bulk_action();
-        
         /**
          * Instead of querying a database, we're going to fetch the example data
          * property we created for use in this plugin. This makes this example 
@@ -342,7 +323,7 @@ class LDNFT_Reviews extends WP_List_Table {
          * be able to use your precisely-queried data immediately.
          */
         $results = $this->api->Api('plugins/'.$this->selected_plugin_id.'/reviews.json?is_featured=true&count='.$per_page.'&offset='.$offset_rec, 'GET', ['is_featured'=>'false','is_verified'=>'false', 'enriched'=>'true' ]);
-        
+       
         $data = [];
         $count = 0;
         foreach( $results->reviews as $review ) {
@@ -370,73 +351,6 @@ class LDNFT_Reviews extends WP_List_Table {
             $count++;   
         }
         
-        /**
-         * This checks for sorting input and sorts the data in our array accordingly.
-         * 
-         * In a real-world situation involving a database, you would probably want 
-         * to handle sorting by passing the 'orderby' and 'order' values directly 
-         * to a custom query. The returned data will be pre-sorted, and this array
-         * sorting technique would be unnecessary.
-         */
-        function usort_reorder($a,$b){
-
-            /**
-             * If no sort, default to title
-             */
-            $orderby = (!empty($_REQUEST['orderby'])) ? $_REQUEST['orderby'] : 'id';
-
-            /**
-             * If no order, default to asc
-             */
-            $order = (!empty($_REQUEST['order'])) ? $_REQUEST['order'] : 'asc';
-
-            /**
-             * Determine sort order
-             */
-            $result = strcmp($a[$orderby], $b[$orderby]);
-
-            /**
-             * Send final sort direction to usort
-             */
-            return ($order==='asc') ? $result : -$result;
-        }
-        usort($data, 'usort_reorder');
-        
-        /***********************************************************************
-         * ---------------------------------------------------------------------
-         * vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-         * 
-         * In a real-world situation, this is where you would place your query.
-         *
-         * For information on making queries in WordPress, see this Codex entry:
-         * http://codex.wordpress.org/Class_Reference/wpdb
-         * 
-         * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-         * ---------------------------------------------------------------------
-         **********************************************************************/
-        
-                
-        /**
-         * REQUIRED for pagination. Let's figure out what page the user is currently 
-         * looking at. We'll need this later, so you should always include it in 
-         * your own package classes.
-         */
-        $current_page = $this->get_pagenum();
-        
-        /**
-         * REQUIRED for pagination. Let's check how many items are in our data array. 
-         * In real-world use, this would be the total number of items in your database, 
-         * without filtering. We'll need this later, so you should always include it 
-         * in your own package classes.
-         */
-        $total_items = count($data);
-        
-        /**
-         * The WP_List_Table class does not handle pagination for us, so we need
-         * to ensure that the data is trimmed to only the current page. We can use
-         * array_slice() to 
-         */
-        $data = array_slice($data,(($current_page-1)*$per_page),$per_page);
         
         /**
          * REQUIRED. Now we can add our *sorted* data to the items property, where 
@@ -451,9 +365,64 @@ class LDNFT_Reviews extends WP_List_Table {
             'per_page'      => $per_page,
             'offset'        => $offset,
             'offset_rec'    => $offset_rec,
-            'current_recs'  => count($results->reviews)
+            'current_recs'  => count($this->items)
         ] );
     }
+	
+	/**
+	 * @Override of display method
+	 */
+
+	public function display() {
+
+		parent::display();
+	}
+
+	/**
+	 * @Override ajax_response method
+	 */
+	public function ajax_response() {
+
+		$this->prepare_items();
+
+		extract( $this->_args );
+		extract( $this->_pagination_args, EXTR_SKIP );
+
+		ob_start();
+		if ( ! empty( $_REQUEST['no_placeholder'] ) ) {
+            $this->display_rows();
+        } else {
+            $this->display_rows_or_placeholder();
+        }
+		$rows = ob_get_clean();
+
+		ob_start();
+		$this->print_column_headers();
+		$headers = ob_get_clean();
+
+		ob_start();
+		$this->pagination('top');
+		$pagination_top = ob_get_clean();
+
+		ob_start();
+		$this->pagination('bottom');
+		$pagination_bottom = ob_get_clean();
+
+		$response = [ 'rows' => $rows ];
+		$response['pagination']['top'] = $pagination_top;
+		$response['pagination']['bottom'] = $pagination_bottom;
+		$response['column_headers'] = $headers;
+
+		if ( isset( $total_items ) )
+			$response['total_items_i18n'] = sprintf( _n( '1 item', '%s items', $total_items ), number_format_i18n( $total_items ) );
+
+		if ( isset( $total_pages ) ) {
+			$response['total_pages'] = $total_pages;
+			$response['total_pages_i18n'] = number_format_i18n( $total_pages );
+		}
+
+		die( json_encode( $response ) );
+	}
 
     /**
 	 * Displays the pagination.
@@ -537,18 +506,17 @@ class LDNFT_Reviews extends WP_List_Table {
 
 
 		if ( is_array($result->reviews) && count($result->reviews) == 0 ) {
-			//$disable_next = true;
+			$disable_next = true;
 		}
 
 		if ( $disable_first ) {
 			$page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&laquo;</span>';
 		} else {
 			$page_links[] = sprintf(
-				"<a class='first-page button' href='%s'>" .
+				"<a class='first-page button' href='javascript:;'>" .
 					"<span class='screen-reader-text'>%s</span>" .
 					"<span aria-hidden='true'>%s</span>" .
 				'</a>',
-				esc_url( remove_query_arg( 'offset', $current_url ) ),
 				/* translators: Hidden accessibility text. */
 				__( 'First page', LDNFT_TEXT_DOMAIN ),
 				'&laquo;'
@@ -560,11 +528,10 @@ class LDNFT_Reviews extends WP_List_Table {
 		} else {
 
 			$page_links[] = sprintf(
-				"<a class='prev-page button' href='%s'>" .
+				"<a class='prev-page button' href='javascript:;'>" .
 					"<span class='screen-reader-text'>%s</span>" .
 					"<span aria-hidden='true'>%s</span>" .
 				'</a>', 
-				esc_url( add_query_arg( 'offset', intval($offset)>1?intval($offset)-1:1, $current_url ) ),
 				/* translators: Hidden accessibility text. */
 				__( 'Previous page', LDNFT_TEXT_DOMAIN ),
 				'&lsaquo;'
@@ -591,7 +558,7 @@ class LDNFT_Reviews extends WP_List_Table {
 			$page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&rsaquo;</span>';
 		} else {
 			$page_links[] = sprintf(
-				"<a data-action='ldnft_reviews_check_next' data-plugin_id='%d' data-per_page='%d' data-offset='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='%s'>" .
+				"<a data-action='ldnft_reviews_check_next' data-plugin_id='%d' data-per_page='%d' data-offset='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
 					"<span class='screen-reader-text'>%s</span>" .
 					"<span aria-hidden='true'>%s</span>" .
 				'</a>',
@@ -599,7 +566,6 @@ class LDNFT_Reviews extends WP_List_Table {
                 $per_page,
                 $offset+1,
                 $current_recs,
-				esc_url( add_query_arg( 'offset', intval($offset)+1, $current_url ) ),
 				__( 'Next page', LDNFT_TEXT_DOMAIN ),
 				'&rsaquo;'
 			);
@@ -621,25 +587,7 @@ class LDNFT_Reviews extends WP_List_Table {
     public function extra_tablenav( $which ) {
         
         if ( $which == "top" ){
-            ?>
-            <div class="alignleft actions bulkactions">
-                <select onchange="document.location='admin.php?page=freemius-reviews&ldfmt_plugins_filter='+this.value" name="ldfmt-plugins-filter" class="ldfmt-plugins-filter">
-                    <?php
-                        foreach( $this->plugins as $plugin ) {
-                            
-                            $selected = '';
-                            if( $this->selected_plugin_id == $plugin->id ) {
-                                $selected = ' selected = "selected"';   
-                            }
-                            ?>
-                                <option value="<?php echo $plugin->id; ?>" <?php echo $selected; ?>><?php echo $plugin->title; ?></option>
-                            <?php   
-                        }
-                    ?>
-                </select>
-                
-            </div>
-            <?php
+            
         }
 
     }

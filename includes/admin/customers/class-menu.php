@@ -26,8 +26,55 @@ class LDNFT_Customers_Menu {
         ];
 
         add_action( 'admin_menu', [ $this, 'admin_menu_page' ] );
+		
+		add_action('wp_ajax_ldnft_customers_display', 		[ $this, 'ldnft_customers_display' ], 100 );
+        add_action( 'wp_ajax_ldnft_customers_check_next',      [ $this, 'customers_check_next' ], 100 );
 	}
-    
+	
+	/**
+     * Action wp_ajax for fetching the first time table structure
+     */
+    public function ldnft_customers_display() {
+        
+        $wp_list_table = new LDNFT_Customers();
+        $wp_list_table->prepare_items();
+
+        ob_start();
+        $wp_list_table->display();
+        $display = ob_get_clean();
+
+        die(
+            json_encode([
+                "display" => $display
+            ])
+        );
+    }
+	
+	/**
+     * checks if there are subscribers records
+     */
+    public function customers_check_next() {
+        
+        $per_page       = isset($_REQUEST['per_page']) && intval($_REQUEST['per_page'])>0?intval($_REQUEST['per_page']):10;
+        $offset         = isset($_REQUEST['offset']) && intval($_REQUEST['offset'])>0?intval($_REQUEST['offset']):1;
+        $current_recs   = isset($_REQUEST['current_recs']) && intval($_REQUEST['current_recs'])>0?intval($_REQUEST['current_recs']):0;
+
+        $plugin_id      = isset($_REQUEST['plugin_id']) && intval($_REQUEST['plugin_id'])>0?intval($_REQUEST['plugin_id']):0;
+        $interval       = isset($_REQUEST['status']) && intval($_REQUEST['status'])>0?intval($_REQUEST['status']):'';
+        $offset_rec     = ($offset-1) * $per_page;
+
+        $status = "";
+        if( !empty( $this->selected_status ) ) {
+            $status = "&filter=".$this->selected_status;
+        }
+        $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
+        $result = $api->Api('plugins/'.$plugin_id.'/users.json?count='.$per_page.'&offset='.$offset_rec.$status, 'GET', []);
+        if( ! is_array( $result->users ) || count( $result->users ) == 0) {
+            echo __('No more record(s) found.', LDNFT_TEXT_DOMAIN);
+        }
+        exit;
+    }
+
     /**
      * Add Reset Course Progress submenu page under learndash menus
      */
@@ -83,6 +130,29 @@ class LDNFT_Customers_Menu {
      */
     public static function customers_page( ) {
 
+		if( !FS__HAS_PLUGINS ) {
+            ?>
+                <div class="wrap">
+                    <h2><?php _e( 'Customers', LDNFT_TEXT_DOMAIN ); ?></h2>
+                    <p><?php _e( 'No product(s) exists in your freemius account. Please, add a product on freemius and reload the page.', LDNFT_TEXT_DOMAIN ); ?></p>
+                </div>
+            <?php
+
+            return;
+        }
+		
+		$selected_plugin_id = 0;
+        if( isset($_GET['ldfmt_plugins_filter']) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) {
+            $selected_plugin_id = intval( $_GET['ldfmt_plugins_filter'] ); 
+        }
+		
+		$selected_status = 'active';
+        if( isset( $_GET['status'] )  ) {
+            $selected_status = $_GET['status']; 
+        }
+		
+		$products = LDNFT_Freemius::$products;
+		
         /**
          * Create an instance of our package class... 
          */
@@ -92,19 +162,46 @@ class LDNFT_Customers_Menu {
          * Fetch, prepare, sort, and filter our data... 
          */
         $testListTable->prepare_items();
+		
         ?>
             <div class="wrap">
-                <div id="icon-users" class="icon32"><br/></div>
                 <h2><?php _e( 'Customers', LDNFT_TEXT_DOMAIN ); ?></h2>
                 
                 <!-- Forms are NOT created automatically, so you need to wrap the table in one to use features like bulk actions -->
                 <form id="ldnft-customer-filter" method="get">
-                    <!-- For plugins, we also need to ensure that the form posts back to our current page -->
-                    <input type="hidden" name="page" value="<?php echo $_REQUEST['page'] ?>" />
-                    <!-- Now we can render the completed list table -->
-                    <?php $testListTable->display() ?>
+                    <div class="ldnft_filters_top">
+						<div class="alignleft actions bulkactions">
+							<span class="ldnft_filter_labels"><?php _e( 'Filters:', LDNFT_TEXT_DOMAIN ); ?></span>
+							<select name="ldfmt-plugins-filter" class="ldfmt-plugins-filter ldfmt-plugins-customers-filter" >
+								<?php
+									foreach( $products->plugins as $plugin ) {
+										
+										$selected = '';
+										if( $selected_plugin_id == $plugin->id ) {
+											$selected = ' selected = "selected"';   
+										}
+										?>
+											<option value="<?php echo $plugin->id; ?>" <?php echo $selected; ?>><?php echo $plugin->title; ?></option>
+										<?php   
+									}
+								?>
+							</select>&nbsp;&nbsp;
+							<select name="ldfmt-plugins-status" class="ldfmt-plugins-customers-status">
+								<option value=""><?php _e('Filter by status', LDNFT_TEXT_DOMAIN);?></option>
+								<option value="active" <?php echo $selected_status=='active'?'selected':''; ?>><?php _e('Active', LDNFT_TEXT_DOMAIN);?></option>
+								<option value="never_paid" <?php echo $selected_status=='never_paid'?'selected':''; ?>><?php _e('Free Users', LDNFT_TEXT_DOMAIN);?></option>
+								<option value="paid" <?php echo $selected_status=='paid'?'selected':''; ?>><?php _e('Customers', LDNFT_TEXT_DOMAIN);?></option>
+								<option value="paying" <?php echo $selected_status=='paying'?'selected':''; ?>><?php _e('Currently Customers', LDNFT_TEXT_DOMAIN);?></option>
+							</select>
+						</div>
+                		<div id="ldnft_customers_data">
+							<!-- Now we can render the completed list table -->
+							<?php $testListTable->display() ?>
+						</div>
+					</div>
+					<input type="hidden" class="ldnft-freemius-page" name="page" value="1" />
+					<input type="hidden" class="ldnft-script-freemius-type" name="ldnft-script-freemius-type" value="customers" />
                 </form>
-                
             </div>
         <?php
     }

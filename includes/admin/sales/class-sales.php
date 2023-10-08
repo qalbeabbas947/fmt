@@ -57,36 +57,6 @@ class LDNFT_Sales extends WP_List_Table {
         $this->selected_interval = ( isset( $_GET['interval'] ) ) ? $_GET['interval'] : 12; 
         $this->selected_filter = ( isset( $_GET['filter'] )  ) ? $_GET['filter'] : 'all'; 
         
-
-        // $this->selected_plugin_id = 0;  
-        // $this->api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
-        
-        // $this->plugins = $this->api->Api('plugins.json?fields=id,title', 'GET', ['fields'=>'id, title']);
-
-        // if( isset( $this->plugins->plugins ) &&  count($this->plugins->plugins) > 0 ) {
-        //     $this->plugins = $this->plugins->plugins;
-        //     $plugin = $this->plugins[0];
-        //     if( $this->selected_plugin_id <= 0 ) {
-        //         $this->selected_plugin_id = $plugin->id;  
-        //     }
-
-        //     foreach( $this->plugins as $plugin ) {
-        //         //$this->plugins_short_array[$plugin->id] = $plugin->title;
-        //     }
-        // }
-
-        // if( isset($_GET['ldfmt_plugins_filter']) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) {
-        //     $this->selected_plugin_id = intval( $_GET['ldfmt_plugins_filter'] ); 
-        // }
-
-        // if( isset($_GET['filter'])  ) {
-        //     $this->selected_filter = $_GET['filter']; 
-        // }
-        
-        // $this->selected_interval = 12; 
-        // if( isset($_GET['interval'])  ) {
-        //     $this->selected_interval = $_GET['interval']; 
-        // }
         /**
          * Set parent defaults
          */
@@ -104,7 +74,10 @@ class LDNFT_Sales extends WP_List_Table {
     public function column_view( $item ) {
         
         if( !empty( intval( strip_tags( $item['id'] ) ) ) ) {
-            return '<a data-action="ldnft_sales_view_detail" data-user_id="'.$item['user_id'].'" data-plugin_id="'.$item['plugin_id'].'" data-id="'.$item['id'].'" class="ldnft_sales_view_detail" href="javascript:;">'._e('Get More', LDNFT_TEXT_DOMAIN).'</a>';
+            return '<a class="ldnft_sales_view_detail" data-action="ldnft_sales_view_detail" data-username="'.$item['username'].'" data-useremail="'.$item['useremail'].'" data-subscription_id="'.$item['subscription_id'].'" data-gateway_fee="'.$item['gateway_fee'].'" data-gross="'.$item['gross'].'" data-license_id="'.$item['license_id'].'" data-gateway="'.$item['gateway'].'" data-country_code="'.$item['country_code'].'" data-is_renewal="'.$item['is_renewal'].'" data-type="'.$item['type'].'" data-bound_payment_id="'.$item['bound_payment_id'].'" data-created="'.$item['created'].'" data-vat="'.$item['vat'].'" data-install_id="'.$item['install_id'].'" data-plan_id="'.$item['plan_id'].'" data-pricing_id="'.$item['pricing_id'].'" data-ip="'.$item['ip'].'" data-zip_postal_code="'.$item['zip_postal_code'].'" data-vat_id="'.$item['vat_id'].'" data-coupon_id="'.$item['coupon_id'].'" data-user_card_id="'.$item['user_card_id'].'" data-external_id="'.$item['external_id'].'" data-currency="'.$item['currency'].'" data-user_id="'.$item['user_id'].'" data-plugin_id="'.$item['plugin_id'].'" data-id="'.$item['id'].'" class="ldnft_sales_view_detail" href="javascript:;">'.__('Get More', LDNFT_TEXT_DOMAIN).'</a>';
+
+ 			
+			
         } else {
             return LDNFT_Admin::get_bar_preloader();
         }    
@@ -234,6 +207,7 @@ class LDNFT_Sales extends WP_List_Table {
             'currency'              => __( 'Currency',LDNFT_TEXT_DOMAIN ), 
             'username'              => __( 'User Name',LDNFT_TEXT_DOMAIN ), 
             'useremail'             => __( 'Email',LDNFT_TEXT_DOMAIN ), 
+			'view'					=> __( 'Action',LDNFT_TEXT_DOMAIN ) 
         ];
         
         return $columns;
@@ -432,6 +406,11 @@ class LDNFT_Sales extends WP_List_Table {
                 $user_id = 0;
     
                 foreach( $payment as $key => $value ) {
+	
+					if( empty( $value ) ) {
+                        $value = '-';
+                    }
+					
                     $data[$count][$key] = $value;
                     if( 'user_id' == $key ) {
                         $user_id = $value;
@@ -440,8 +419,14 @@ class LDNFT_Sales extends WP_List_Table {
                 $data[$count]['country_code']   = LDNFT_Freemius::get_country_name_by_code( strtoupper($payment->country_code) );
                 $user = $this->api->Api('plugins/'.$this->selected_plugin_id.'/users/'.$user_id.'.json', 'GET', []);
                 $data[$count]['username']   = $user->first.' '.$user->last;
+				if(empty(trim($data[$count]['username']))) {
+					$data[$count]['username'] = '-';
+				}
                 $data[$count]['useremail']  = $user->email;
-    
+    			if(empty(trim($data[$count]['useremail']))) {
+					$data[$count]['useremail'] = '-';
+				}
+	
                 $count++;   
             }
         }

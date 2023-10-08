@@ -72,7 +72,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
     public function column_view( $item ){
         
         if( !empty( intval( strip_tags( $item['id'] ) ) ) ) {
-            return '<a data-action="ldnft_subscribers_view_detail" data-user_id="'.$item['user_id'].'" data-plugin_id="'.$item['plugin_id'].'" data-id="'.$item['id'].'" class="ldnft_subscribers_view_detail" href="javascript:;">'._e('Get More', LDNFT_TEXT_DOMAIN).'</a>';
+            return '<a data-action="ldnft_subscribers_view_detail" data-user_id="'.$item['user_id'].'" data-plugin_id="'.$item['plugin_id'].'" data-id="'.$item['id'].'" class="ldnft_subscribers_view_detail" href="javascript:;">'.__('Get More', LDNFT_TEXT_DOMAIN).'</a>';
         } else {
             return LDNFT_Admin::get_bar_preloader();
         }    
@@ -108,7 +108,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
             'next_payment'          => __( 'Next Renewal Date',LDNFT_TEXT_DOMAIN ), 
             'currency'              => __( 'Currency',LDNFT_TEXT_DOMAIN ),
             'country_code'          => __( 'Country',LDNFT_TEXT_DOMAIN ), 
-            'view'                  => __( 'View', LDNFT_TEXT_DOMAIN ),
+            'view'                  => __( 'Action', LDNFT_TEXT_DOMAIN ),
         ];
         
         return $columns;

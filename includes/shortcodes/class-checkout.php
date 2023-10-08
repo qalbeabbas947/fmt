@@ -38,7 +38,7 @@ class LDNFT_Checkout_Shortcode {
         
         add_shortcode( 'LDNFT_Checkout', [ $this, 'checkout_shortcode_cb' ] );
         add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_front_scripts' ] );
-        add_action( 'wp_ajax_ldnft_load_sales', [ $this, 'load_sales' ], 100 );
+       // add_action( 'wp_ajax_ldnft_load_sales', [ $this, 'load_sales' ], 100 );
         
     }
 

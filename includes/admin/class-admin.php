@@ -65,8 +65,10 @@ class LDNFT_Admin {
         ?>
             <img width="30px" class="<?php echo $class; ?>" src="<?php echo LDNFT_ASSETS_URL  . 'images/bar-preloader.gif'; ?>" />
         <?php
+		
         $return  = ob_get_contents();
         ob_end_clean();
+		
         return $return;
     }
 
@@ -410,7 +412,10 @@ class LDNFT_Admin {
                 || $screen->id == 'freemius-toolkit_page_freemius-sales' 
                 || $screen->id == 'freemius-toolkit_page_freemius-customers' 
                 || $screen->id == 'freemius-toolkit_page_freemius-reviews' ) {
-
+				
+				wp_enqueue_style( 'dashicons' );
+        		wp_enqueue_style( 'ldnft-font-awesome-css', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css', [], LDNFT_VERSION, null );
+        
                 /**
                  * enqueue admin css
                  */

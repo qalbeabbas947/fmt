@@ -298,8 +298,96 @@ class LDNFT_Sales_Menu {
                                 <span class="ldnft-admin-modal-close">&times;</span>
                                     <h2><?php echo __( 'Sales Detail', LDNFT_TEXT_DOMAIN );?></h2>
                                 </div>
-                                <div class="ldnft-admin-modal-body"></div>
-                                <div class="ldnft-popup-loader"><img class="" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" /></div>
+                                <div class="ldnft-admin-modal-body">
+									<table id="ldnft-reviews-popup" width="100%" cellpadding="5" cellspacing="1">
+										<tbody>
+ 											<tr>
+												<th><?php _e('Transaction', LDNFT_TEXT_DOMAIN)?></th>
+												<td id = "ldnft-review-coloumn-transaction-id"></td>
+												<th><?php _e('User ID', LDNFT_TEXT_DOMAIN)?></th>
+												<td id = "ldnft-review-coloumn-user_id"></td>
+											</tr>
+											<tr>
+												<th><?php _e('Name', LDNFT_TEXT_DOMAIN)?></th>
+												<td id = "ldnft-review-coloumn-username"></td>
+												<th><?php _e('Transaction', LDNFT_TEXT_DOMAIN)?></th>
+												<td id = "ldnft-review-coloumn-useremail"></td>
+											</tr>
+											<tr>
+												<th><?php _e('Subscription ID', LDNFT_TEXT_DOMAIN)?></th>
+												<td id = "ldnft-review-coloumn-subscription_id"></td>
+												<th><?php _e('Gateway Fee', LDNFT_TEXT_DOMAIN)?></th>
+												<td id = "ldnft-review-coloumn-gateway_fee"></td>
+											</tr>
+											<tr>
+												<th><?php _e('Total Amount', LDNFT_TEXT_DOMAIN)?></th>
+												<td id = "ldnft-review-coloumn-gross"></td>
+												<th><?php _e('License', LDNFT_TEXT_DOMAIN)?></th>
+												<td id = "ldnft-review-coloumn-license_id"></td>
+											</tr>
+											<tr>
+												<th><?php _e('Gateway', LDNFT_TEXT_DOMAIN)?></th>
+												<td id = "ldnft-review-coloumn-gateway"></td>
+												<th><?php _e('Type', LDNFT_TEXT_DOMAIN)?></th>
+												<td id = "ldnft-review-coloumn-type"></td>
+											</tr>
+											<tr>
+												<th><?php _e('Renewal?', LDNFT_TEXT_DOMAIN)?></th>
+												<td id = "ldnft-review-coloumn-is_renewal"></td>
+												<th><?php _e('Country', LDNFT_TEXT_DOMAIN)?></th>
+												<td id = "ldnft-review-coloumn-country_code"></td>
+											</tr>
+											<tr>
+												<th><?php _e('Bound Payment ID', LDNFT_TEXT_DOMAIN)?></th>
+												<td id = "ldnft-review-coloumn-bound_payment_id"></td>
+												<th><?php _e('Payment Date', LDNFT_TEXT_DOMAIN)?></th>
+												<td id = "ldnft-review-coloumn-created"></td>
+											</tr>
+											<tr>
+												<th><?php _e('VAT', LDNFT_TEXT_DOMAIN)?></th>
+												<td id = "ldnft-review-coloumn-vat"></td>
+												<th><?php _e('Install ID', LDNFT_TEXT_DOMAIN)?></th>
+												<td id = "ldnft-review-coloumn-install_id"></td>
+											</tr>
+											<tr>
+												<th><?php _e('Plan ID', LDNFT_TEXT_DOMAIN)?></th>
+												<td id = "ldnft-review-coloumn-plan_id"></td>
+												<th><?php _e('Pricing ID', LDNFT_TEXT_DOMAIN)?></th>
+												<td id = "ldnft-review-coloumn-pricing_id"></td>
+											</tr>
+											<tr>
+												<th><?php _e('IP', LDNFT_TEXT_DOMAIN)?></th>
+												<td id = "ldnft-review-coloumn-ip"></td>
+												<th><?php _e('Zip/Postal Code', LDNFT_TEXT_DOMAIN)?></th>
+												<td id = "ldnft-review-coloumn-zip_postal_code"></td>
+											</tr>
+											<tr>
+												<th><?php _e('VAT ID', LDNFT_TEXT_DOMAIN)?></th>
+												<td id = "ldnft-review-coloumn-vat_id"></td>
+												<th><?php _e('Coupon ID', LDNFT_TEXT_DOMAIN)?></th>
+												<td id = "ldnft-review-coloumn-coupon_id"></td>
+											</tr>
+											<tr>
+												<th><?php _e('Card ID', LDNFT_TEXT_DOMAIN)?></th>
+												<td id = "ldnft-review-coloumn-user_card_id"></td>
+												<th><?php _e('Product ID', LDNFT_TEXT_DOMAIN)?></th>
+												<td id = "ldnft-review-coloumn-plugin_id"></td>
+											</tr>
+											<tr>
+												<th><?php _e('External ID', LDNFT_TEXT_DOMAIN)?></th>
+												<td id = "ldnft-review-coloumn-external_id"></td>
+												<th><?php _e('Currency', LDNFT_TEXT_DOMAIN)?></th>
+												<td id = "ldnft-review-coloumn-currency"></td>
+											</tr>
+											<tr>
+												<th><?php _e('User Name', LDNFT_TEXT_DOMAIN)?></th>
+												<td id = "ldnft-review-coloumn-username"></td>
+												<th><?php _e('Email', LDNFT_TEXT_DOMAIN)?></th>
+												<td id = "ldnft-review-coloumn-useremail"></td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
                             </div>
                         </div>
                     </div>
@@ -311,6 +399,7 @@ class LDNFT_Sales_Menu {
                         <?php $testListTable->display() ?>
                     </div>
                     <input type="hidden" class="ldnft-freemius-page" name="page" value="1" />
+					<input type="hidden" class="ldnft-script-freemius-type" name="ldnft-script-freemius-type" value="sales" />
                 </form>
                 
             </div>

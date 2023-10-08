@@ -509,6 +509,7 @@ class LDNFT_Subscriptions_Menu {
                     <?php $ListTable->display(); ?>
                 </div>
                 <input type="hidden" class="ldnft-freemius-page" name="page" value="1" />
+				<input type="hidden" class="ldnft-script-freemius-type" name="ldnft-script-freemius-type" value="subscribers" />
             </form>
             
         </div>
