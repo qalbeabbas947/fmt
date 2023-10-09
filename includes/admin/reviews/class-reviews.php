@@ -183,7 +183,8 @@ class LDNFT_Reviews extends WP_List_Table {
 	/**
 	* format the is_verified column
 	*/
-	public function column_is_featured($item){
+	public function column_is_featured( $item ){
+        
 		if( intval( $item['is_featured'] ) == 1 ) {
 			return __( 'Yes', LDNFT_TEXT_DOMAIN );
 		} else {

@@ -67,7 +67,7 @@ class LDNFT_Sales_Shortcode {
             $result = $api->Api('plugins/'.$plugin_id.'/subscriptions.json?count='.$tem_per_page.'&offset='.$tem_offset, 'GET', []);
             $gross_total = 0;
             $tax_rate_total = 0;
-            if( count( $result->subscriptions ) > 0 ) {
+            if( isset( $result->subscriptions ) && is_array( $result->subscriptions ) && count( $result->subscriptions ) > 0 ) {
                 $has_more_records = true;
                 while($has_more_records) {
                     foreach( $result->subscriptions as $payment ) {

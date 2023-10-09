@@ -56,7 +56,7 @@ class LDNFT_Sales_Menu {
     
 
         $interval_str = '';
-        if( isset($_GET['interval']) && !empty( $_GET['interval'] ) ) {
+        if( isset( $_GET['interval'] ) && !empty( $_GET['interval'] ) ) {
             $interval_str = '&billing_cycle='.$_GET['interval'];
         }
 

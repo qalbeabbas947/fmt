@@ -120,10 +120,14 @@
                 $('.ldfmt-load-more-sales-btn').on('click', LDFMTFrontend.load_more_sales_records);
                 $('.ldfmt-load-more-btn').on('click', LDFMTFrontend.load_more_review_records);
                 $(document).on('click', '.ldfmt_review_image-link', LDFMTFrontend.load_view_image);
-                LDFMTFrontend.load_sales();
+
+                var plugin = $('#ldfmt-sales-plugins-filter').val();
+                if( parseInt(plugin) > 0 ) {
+                    LDFMTFrontend.load_sales();
+                }
+                
                 //Click anywhere on the page to get rid of lightbox window 
                 $('body').on('click', '#lightbox', LDFMTFrontend.close_image_lightbox);
-
             },
             /**
              * displays record more buttons is clicked on sales
