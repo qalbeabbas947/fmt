@@ -54,6 +54,8 @@ class LDNFT_Checkout_Shortcode {
         /**
          * Enqueue frontend js
          */
+        wp_enqueue_script( 'ldnft-jquery.freemius.com-js', 'https://code.jquery.com/jquery-1.12.4.min.js', [], LDNFT_VERSION, false ); 
+        wp_enqueue_script( 'ldnft-checkout.freemius.com-js', 'https://checkout.freemius.com/checkout.min.js', [ 'jquery' ], LDNFT_VERSION, false ); 
         wp_enqueue_script( 'ldnft-frontend-js', LDNFT_ASSETS_URL . 'js/frontend.js', [ 'jquery' ], LDNFT_VERSION, true ); 
         
         wp_localize_script( 'ldnft-frontend-js', 'LDNFT', [ 
@@ -145,7 +147,7 @@ class LDNFT_Checkout_Shortcode {
                 <div class="elementor-element elementor-element-6a0f461 elementor-align-justify elementor-widget elementor-widget-button" style="margin-bottom:0;" data-id="6a0f461" data-element_type="widget" data-widget_type="button.default">
                     <div class="elementor-widget-container">
                         <div class="elementor-button-wrapper">
-                            <a href="https://docs.ldninjas.com/plugin/custom-tabs-for-learndash/" target="_self" id="purchase" style="margin-top: 30px;margin-bottom: 10px;border-radius: 25px 25px 25px 25px;" class="elementor-button-link elementor-button elementor-size-md" role="button">
+                            <a href="https://docs.ldninjas.com/plugin/custom-tabs-for-learndash/" target="_self" id="ldnft-purchase" style="margin-top: 30px;margin-bottom: 10px;border-radius: 25px 25px 25px 25px;" class="elementor-button-link elementor-button elementor-size-md" role="button">
                                 <span class="elementor-button-content-wrapper">
                                     <span class="elementor-button-icon elementor-align-icon-left">
                                         <i aria-hidden="true" class="fas fa-cart-arrow-down fas button-icon-left"></i>
@@ -157,8 +159,6 @@ class LDNFT_Checkout_Shortcode {
                     </div>
                 </div>
 
-                <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-                <script src="https://checkout.freemius.com/checkout.min.js"></script>
                 <script>
                     var handler = FS.Checkout.configure({
                         plugin_id: '<?php echo $plugin_id;  ?>',
@@ -166,7 +166,7 @@ class LDNFT_Checkout_Shortcode {
                         public_key: '<?php echo $public_key;  ?>',
                         image: '<?php echo $attributes['image']  ?>',
                     });
-                    $('#purchase').on('click', function(e) {
+                    $('#ldnft-purchase').on('click', function(e) {
                         handler.open({
                             name: 'Custom Tabs for LearnDash',
                             licenses: $('input[name="ld_licenses_options"]:checked').val(),
