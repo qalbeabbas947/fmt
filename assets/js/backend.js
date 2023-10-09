@@ -8,17 +8,18 @@
 			default_reviews_table_row: '',
             init: function() {
 				
-				var script_type = $('.ldnft-script-freemius-type').val();
-				
                 $('.ldnft-success-message').hide();
                 $('.ldnft-settings-mailpoet').on('submit', LDNFTbackEnd.post_mailpoet_form);
                 $('.ldnft_check_load_next').on('click', LDNFTbackEnd.check_load_next);
                 $('#ldnft_subscriptions_data').on('click', '.ldnft_subscribers_view_detail', LDNFTbackEnd.subscribers_view_detail);
                 $('#ldnft_sales_data').on('click', '.ldnft_sales_view_detail', LDNFTbackEnd.sales_view_detail);
                 $('.ldnft-admin-modal-close').on('click', LDNFTbackEnd.ldnft_subsciber_modal_close);
-
 				$('#ldnft_reviews_data').on('click', '.ldnft_review_view_detail', LDNFTbackEnd.review_view_detail);
-				
+
+                /**
+                 * Execute based on the conditions
+                 */
+				var script_type = $('.ldnft-script-freemius-type').val();
 				if( script_type == 'subscribers' ) {
 					$('.ldfmt-subscription-status-filter, .ldfmt-subscription-interval-filter, .ldfmt-subscription-plan_id-filter, .ldfmt-plugins-subscription-filter').on('change', LDNFTbackEnd.display_subscriptions_plus_summary);
 					$('#ldnft_subscriptions_data').on('click', '.tablenav-pages a', LDNFTbackEnd.display_new_page_subscriptions);
@@ -41,18 +42,21 @@
                 
             },
 			/**
-				Reviews Functions
-			*/
+             * pagination click
+			 */
 			display_new_page_reviews: function() {
                 var page = $('.ldnft-freemius-page').val($(this).data('offset'));
                 LDNFTbackEnd.display_reviews();
             },
+            /**
+             * Show reviews based on filters
+             */
 			display_reviews_onchange: function() {
                 var page = $('.ldnft-freemius-page').val($(this).data('offset'));
                 LDNFTbackEnd.display_reviews();
             },
-            /** added method display
-             * for getting first sets of data
+            /**
+             * Display the reviews data based on ajax calls
              */
             display_reviews: function() {
 				
@@ -86,18 +90,21 @@
                 });
             },
 			/**
-				Customer Functions
-			*/
+             * displays customers on pagination clicks
+            */
 			display_new_page_customers: function() {
                 var page = $('.ldnft-freemius-page').val($(this).data('offset'));
                 LDNFTbackEnd.display_customers();
             },
+            /**
+             * Show customers based on filters
+             */
 			display_customers_onchange: function() {
                 var page = $('.ldnft-freemius-page').val($(this).data('offset'));
                 LDNFTbackEnd.display_customers();
             },
-            /** added method display
-             * for getting first sets of data
+            /**
+             * Display the customers data based on ajax calls
              */
             display_customers: function() {
 				
@@ -131,19 +138,22 @@
                 });
             },
 			/**
-				Sales functions
-			*/
+             * displays sals on pagination
+             */
             display_new_page_sales: function() {
                 var page = $('.ldnft-freemius-page').val($(this).data('offset'));
                 LDNFTbackEnd.display_sales();
             },
+            /**
+             * Show sales based on filters
+             */
             display_sales_plus_summary: function() {
                 var page = $('.ldnft-freemius-page').val($(this).data('offset'));
                 LDNFTbackEnd.display_sales();
                 LDNFTbackEnd.load_sales_summary();
             },
-            /** added method display
-             * for getting first sets of data
+            /**
+             * Display the sales data based on ajax calls
              */
             display_sales: function() {
                 
@@ -179,6 +189,9 @@
                     }
                 });
             },
+            /**
+             * Show sales summary based on filters
+             */
             load_sales_summary: function() {
                 
                 $('.ldnft-subssummary-loader').css('display', 'inline');
@@ -217,26 +230,23 @@
                     }
                 });
             },
-
-
-
-
-
-
-
-
-
+            /**
+             * Show subscription based on pagination
+             */
             display_new_page_subscriptions: function() {
                 var page = $('.ldnft-freemius-page').val($(this).data('offset'));
                 LDNFTbackEnd.display_subscriptions();
             },
+            /**
+             * Show subscription summary
+             */
             display_subscriptions_plus_summary: function() {
                 var page = $('.ldnft-freemius-page').val($(this).data('offset'));
                 LDNFTbackEnd.display_subscriptions();
                 LDNFTbackEnd.load_subscription_summary();
             },
-            /** added method display
-             * for getting first sets of data
+            /**
+             * Display the subscriptions data based on ajax calls
              */
             display_subscriptions: function() {
                 
@@ -274,6 +284,9 @@
                     }
                 });
             },
+            /**
+             * Show subscription summary based on filters
+             */
             load_subscription_summary: function() {
                 
                 $('.ldnft-subssummary-loader').css('display', 'inline');
@@ -320,6 +333,9 @@
             ldnft_subsciber_modal_close: function(e) { 
                 $('#ldnft-admin-modal').css('display', 'none');
             },
+            /**
+             * Show review popup on get more click
+             */
 			review_view_detail: function( e ) { 
                 e.preventDefault();
                 

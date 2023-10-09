@@ -100,8 +100,8 @@ class LDNFT_Customers extends WP_List_Table {
     }
     
 	/**
-	* format the is_verified column
-	*/
+	 * format the is_verified column
+	 */
 	public function column_is_verified($item){
 		if( intval( $item['is_verified'] ) == 1 ) {
 			return __( 'Yes', LDNFT_TEXT_DOMAIN );

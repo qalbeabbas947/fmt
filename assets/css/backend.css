@@ -65,7 +65,9 @@
     text-align: center;
     padding:5px; 
 }
-
+#ldnft-sales-filter h3{
+    padding: 6px;
+}
 .ldnft-general-settings{
     width: 50%;
     float:left;

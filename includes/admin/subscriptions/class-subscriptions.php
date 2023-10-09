@@ -125,6 +125,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
 	 */
 
 	public function column_default( $item, $column_name ) {
+
 		return $item[$column_name]; 
 	}
 	
@@ -196,8 +197,6 @@ class LDNFT_Subscriptions extends WP_List_Table {
 
 			return;
 		}
-
-		
 
         $offset = isset( $_REQUEST['offset'] ) && intval( $_REQUEST['offset'] ) > 0 ? intval( $_REQUEST['offset'] ) : 1;
         $offset_rec = ( $offset - 1 ) * $per_page;

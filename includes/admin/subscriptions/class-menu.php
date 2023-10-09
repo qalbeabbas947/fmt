@@ -8,6 +8,9 @@
  */
 class LDNFT_Subscriptions_Menu {
 
+    /**
+     * Default hidden columns
+     */
     private $default_hidden_columns;
 
     /**
@@ -33,7 +36,6 @@ class LDNFT_Subscriptions_Menu {
         add_action( 'wp_ajax_ldnft_subscriptions_summary', [ $this, 'ldnft_subscriptions_summary_callback' ], 100 );
         add_action( 'wp_ajax_ldnft_subscriber_check_next',      [ $this, 'subscriber_check_next' ], 100 );
         add_action( 'wp_ajax_ldnft_subscribers_view_detail',    [ $this, 'subscribers_view_detail' ], 100 );
-
     }
 
     /**

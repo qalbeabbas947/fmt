@@ -12,6 +12,9 @@
  */
 class LDNFT_Customers_Menu {
 
+    /**
+     * Default hidden columns
+     */
     private $default_hidden_columns;
 
     /** ************************************************************************

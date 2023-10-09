@@ -6,6 +6,9 @@
         var record_sale_offset = 0;
         var record_sale_per_page =10;
         var LDFMTFrontend = {
+            /**
+             * displays record more buttons is clicked on sales
+             */
             load_more_sales_records: function(e) {
                 e.preventDefault();
                 $('.ldfmt-load-more-btn').css('display', 'block');
@@ -33,6 +36,9 @@
                     }
                 });
             },
+            /**
+             * displays record more buttons is clicked on reviews
+             */
             load_more_review_records: function(e) {
                 e.preventDefault();
                 var plugin = $('.ldfmt-plugins-filter').val();
@@ -57,6 +63,9 @@
                     }
                 });
             },
+            /**
+             * displays image in popup
+             */
             load_view_image: function(e) {
                 //prevent default action (hyperlink) 
                 e.preventDefault();
@@ -96,9 +105,15 @@
                     $('body').append(lightbox);
                 }
             },
+            /**
+             * close the image lightbox
+             */
             close_image_lightbox: function(e) {
                 $('#lightbox').hide();
             },
+            /**
+             * Initial function to load things
+             */
             init: function() {
                 $('.ldfmt-plugins-filter').on('change', LDFMTFrontend.load_reviews).trigger('change');
                 
@@ -110,6 +125,9 @@
                 $('body').on('click', '#lightbox', LDFMTFrontend.close_image_lightbox);
 
             },
+            /**
+             * displays record more buttons is clicked on sales
+             */
             load_sales: function(e) {
                 
                 record_sale_offset = 0;
@@ -131,6 +149,9 @@
                 });
                
             },
+            /**
+             * displays record more buttons is clicked on reviews
+             */
             load_reviews: function(e) {
                 e.preventDefault();
                 record_offset = 0;

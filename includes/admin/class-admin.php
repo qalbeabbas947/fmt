@@ -102,7 +102,6 @@ class LDNFT_Admin {
         add_action( 'wp_ajax_ldnft_sales_view_detail',          [ $this, 'sales_view_detail' ], 100 );
         add_action( 'wp_ajax_ldnft_customers_check_next',       [ $this, 'customers_check_next' ], 100 );
         add_action( 'wp_ajax_ldnft_sales_check_next',           [ $this, 'sales_check_next' ], 100 );
-        
     }
 
     /**

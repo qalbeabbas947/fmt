@@ -8,6 +8,9 @@
  */
 class LDNFT_Sales_Menu { 
 
+    /**
+     * Default hidden columns
+     */
     private $default_hidden_columns;
 
     /** ************************************************************************
