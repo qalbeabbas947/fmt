@@ -24,7 +24,6 @@ class LDNFT_Number_of_Sales_Shortcode {
         if ( is_null( self::$instance ) && ! ( self::$instance instanceof LDNFT_Number_of_Sales_Shortcode ) ) {
 
             self::$instance = new self;
-
             self::$instance->hooks();
         }
         
@@ -60,7 +59,6 @@ class LDNFT_Number_of_Sales_Shortcode {
         if( count( $result->subscriptions ) > 0 ) {
 
             $has_more_records = true;
-
             while($has_more_records) {
                 
                 $total_sales += count($result->subscriptions);

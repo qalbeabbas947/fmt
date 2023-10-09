@@ -64,22 +64,22 @@ class LDNFT_Product_Rating {
             'product_id' => 0,
         ), $atts );
 
-        $plugin_id  = sanitize_text_field($attributes['product_id']);
+        $plugin_id  = sanitize_text_field( $attributes['product_id'] );
         $tem_per_page = 50;
         $tem_offset = 0;
-        $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
-        $result = $api->Api('plugins/'.$plugin_id.'/reviews.json?is_featured=true&count='.$tem_per_page.'&offset='.$tem_offset, 'GET', [ ]);
+        $api = new Freemius_Api_WordPress( FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY );
+        $result = $api->Api( 'plugins/'.$plugin_id.'/reviews.json?is_featured=true&count='.$tem_per_page.'&offset='.$tem_offset, 'GET', [ ] );
         $total_reviews = 0;
         $total_ratings = 0;
         if( count( $result->reviews ) > 0 ) {
             $has_more_records = true;
-            while($has_more_records) {
+            while( $has_more_records ) {
                 
                 foreach( $result->reviews as $review ) {
                     $total_ratings += $review->rate;
                 } 
 
-                $total_reviews += count($result->reviews);
+                $total_reviews += count( $result->reviews );
                 $tem_offset += $tem_per_page;
                 $result = $api->Api('plugins/'.$plugin_id.'/reviews.json?count='.$tem_per_page.'&offset='.$tem_offset, 'GET', []);
                 if( count( $result->reviews ) > 0 ) {

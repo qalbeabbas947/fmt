@@ -96,7 +96,7 @@ class LDNFT_Reviews_Shortcode {
                 </div>
             <?php
             }
-        } else if( $offset == 0 ){
+        } else if( $offset == 0 ) {
             echo '<div class="ldfmt-no-results">'.__('No review(s) found.', LDNFT_TEXT_DOMAIN).'</div>';
         }
         
@@ -114,41 +114,35 @@ class LDNFT_Reviews_Shortcode {
         $product_id = isset( $atts['product_id'] ) ? $atts['product_id'] : 0;
         $content = '';
         ob_start();
-        if( intval( $product_id ) > 0 ) {
-            ?>
-                <link rel="stylesheet" href="<?php echo LDNFT_ASSETS_URL;?>lightbox/css/lightbox.min.css">
-                <script src="<?php echo LDNFT_ASSETS_URL;?>lightbox/js/lightbox-plus-jquery.min.js"></script>
-                <!-- Add icon library -->
-                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-                <div class="ldmft_wrapper">
-                    <div class="filter">
-                        <input type="hidden" value="<?php echo $product_id;?>" name="ldfmt-plugins-filter" class="ldfmt-plugins-filter">
-                    </div>
-                    <div style="display:none" class="ldfmt-loader-div"><img width="30px" class="ldfmt-data-loader" src="<?php echo LDNFT_ASSETS_URL.'images/spinner-2x.gif';?>" /></div>
-                    <div class="ldmft-filter-reviews">    
-                        <!-- <div class="review-container">
-                            <img src="/w3images/bandmember.jpg" alt="Avatar" style="width:90px">
-                            <p><span>Chris Fox.</span> CEO at Mighty Schools.</p>
-                            <p>John Doe saved us from a web disaster.</p>
-                        </div> -->
-                    </div>
-                    <div class="ldfmt-load-more-btn">
-                        <a href="javascript:;"><?php echo __( 'Load More', LDNFT_TEXT_DOMAIN );?></a>
-                        <div style="display:none" class="ldfmt-loader-div-btm ldfmt-loader-div-btm-reviews"><img width="30px" class="ldfmt-data-loader" src="<?php echo LDNFT_ASSETS_URL.'images/spinner-2x.gif';?>" /></div>
-                    </div>
+        if( intval( $product_id ) > 0 ) { ?>
+            <link rel="stylesheet" href="<?php echo LDNFT_ASSETS_URL;?>lightbox/css/lightbox.min.css">
+            <script src="<?php echo LDNFT_ASSETS_URL;?>lightbox/js/lightbox-plus-jquery.min.js"></script>
+            <!-- Add icon library -->
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+            <div class="ldmft_wrapper">
+                <div class="filter">
+                    <input type="hidden" value="<?php echo $product_id;?>" name="ldfmt-plugins-filter" class="ldfmt-plugins-filter">
                 </div>
-                
-            <?php
-            
-            
-        } else {
-            ?>
-                <div class="ldmft_wrapper">
-                    <div class="ldmft-filter-reviews">    
-                        <?php echo __( 'To display product reviews, you need to attach product id with the shortcode', LDNFT_TEXT_DOMAIN );?>
-                    </div>
+                <div style="display:none" class="ldfmt-loader-div"><img width="30px" class="ldfmt-data-loader" src="<?php echo LDNFT_ASSETS_URL.'images/spinner-2x.gif';?>" /></div>
+                <div class="ldmft-filter-reviews">    
+                    <!-- <div class="review-container">
+                        <img src="/w3images/bandmember.jpg" alt="Avatar" style="width:90px">
+                        <p><span>Chris Fox.</span> CEO at Mighty Schools.</p>
+                        <p>John Doe saved us from a web disaster.</p>
+                    </div> -->
                 </div>
-            <?php
+                <div class="ldfmt-load-more-btn">
+                    <a href="javascript:;"><?php echo __( 'Load More', LDNFT_TEXT_DOMAIN );?></a>
+                    <div style="display:none" class="ldfmt-loader-div-btm ldfmt-loader-div-btm-reviews"><img width="30px" class="ldfmt-data-loader" src="<?php echo LDNFT_ASSETS_URL.'images/spinner-2x.gif';?>" /></div>
+                </div>
+            </div>
+        <?php } else { ?>
+            <div class="ldmft_wrapper">
+                <div class="ldmft-filter-reviews">    
+                    <?php echo __( 'To display product reviews, you need to attach product id with the shortcode', LDNFT_TEXT_DOMAIN );?>
+                </div>
+            </div>
+        <?php
         }
 
         $content = ob_get_contents();
