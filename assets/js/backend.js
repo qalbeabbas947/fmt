@@ -146,7 +146,7 @@
              * for getting first sets of data
              */
             display_sales: function() {
-                console.log('display_saless');console.log(LDNFTbackEnd.default_table_row);
+                
                 if( LDNFTbackEnd.default_sales_table_row == '' ) {
                     LDNFTbackEnd.default_sales_table_row = $('#ldnft_sales_data table tbody').html();
                 } else {
@@ -169,7 +169,7 @@
                         status: ldnftstatus
                     },
                     success: function (response) {
-                        console.log(response.display);
+                        
                         $("#ldnft_sales_data").html(response.display);
 
                         $("tbody").on("click", ".toggle-row", function(e) {
@@ -180,7 +180,7 @@
                 });
             },
             load_sales_summary: function() {
-                console.log('load_sales_summary');
+                
                 $('.ldnft-subssummary-loader').css('display', 'inline');
                 $('.ldnft_sales_points').css('display', 'none');
                 $('.ldnft_sales_tax_fee').css('display', 'none');
@@ -239,7 +239,7 @@
              * for getting first sets of data
              */
             display_subscriptions: function() {
-                console.log('display_subscriptions');
+                
                 if( LDNFTbackEnd.default_table_row == '' ) {
                     LDNFTbackEnd.default_table_row = $('#ldnft_subscriptions_data table tbody').html();
                 } else {
@@ -275,7 +275,7 @@
                 });
             },
             load_subscription_summary: function() {
-                console.log('load_subscription_summary');
+                
                 $('.ldnft-subssummary-loader').css('display', 'inline');
                 $('.ldnft_subscription_points').css('display', 'none');
                 $('.ldnft_subscription_tax_fee').css('display', 'none');
@@ -350,7 +350,7 @@
 				}
 				
 				$('#ldnft-review-coloumn-title').html( lnk.data('title') );
-				console.log( lnk.parent().parent().parent())
+				
 				$('#ldnft-review-coloumn-rate').html( lnk.parent().parent().find('.column-rate').html() );
 				$('#ldnft-review-coloumn-text').html( lnk.data('text') );
 				$('#ldnft-review-coloumn-created').html( lnk.data('created') );

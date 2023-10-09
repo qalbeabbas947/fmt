@@ -629,7 +629,7 @@ class LDNFT_Sales extends WP_List_Table {
 	 */
     public function extra_tablenav1( $which ) {
         
-        if ( $which == "top" ){ 
+        if ( $which == "top123213" ){ 
             
             $filter_str = '';
             if( !empty($this->selected_filter) ) {
