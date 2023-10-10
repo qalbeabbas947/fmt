@@ -186,10 +186,10 @@
     overflow: auto; /* Enable scroll if needed */
     background-color: rgb(0,0,0); /* Fallback color */
     background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-  }
+}
   
-  /* Modal Content */
-  .ldnft-admin-modal-content {
+/* Modal Content */
+.ldnft-admin-modal-content {
     position: relative;
     background-color: #fefefe;
     margin: auto;
@@ -201,54 +201,76 @@
     -webkit-animation-duration: 0.4s;
     animation-name: animatetop;
     animation-duration: 0.4s
-  }
+}
   
-  /* Add Animation */
-  @-webkit-keyframes animatetop {
+/* Add Animation */
+@-webkit-keyframes animatetop {
     from {top:-300px; opacity:0} 
     to {top:0; opacity:1}
-  }
+}
   
-  @keyframes animatetop {
+@keyframes animatetop {
     from {top:-300px; opacity:0}
     to {top:0; opacity:1}
-  }
+}
   
-  /* The Close Button */
-  .ldnft-admin-modal-close {
-    color: white;
+/* The Close Button */
+.ldnft-admin-modal-close {
+    color: #222222;
     float: right;
     font-size: 28px;
     font-weight: bold;
-  }
+    margin-top: 15px;
+}
   
-  .ldnft-admin-modal-close:hover,
-  .ldnft-admin-modal-close:focus {
-    color: #000;
+.ldnft-admin-modal-close:hover,
+.ldnft-admin-modal-close:focus {
+    color: #d4d4d4;
     text-decoration: none;
     cursor: pointer;
-  }
-  #ldnft-subscriptions{
-    background-color: #888;
-  }
-  #ldnft-subscriptions td, #ldnft-subscriptions th {
-    background-color: white;
-  }
-  .ldnft-admin-modal-header {
+}
+#ldnft-subscriptions,
+#ldnft-reviews-popup{
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+#ldnft-subscriptions th,
+#ldnft-reviews-popup th {
+    background-color: #f2f2f2;
+    text-align: left;
+    padding: 10px;
+    border: 1px solid #ddd;
+}
+#ldnft-subscriptions td,
+#ldnft-reviews-popup td {
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+#ldnft-subscriptions tr,
+#ldnft-reviews-popup tr {
+    background-color: #f9f9f9;
+}
+.ldnft-admin-modal-header {
     padding: 2px 16px;
-    background-color: #9999AF;
     color: white;
-  }
-  .ldnft_renewals_count, .ldnft_points, .ldnft_tax_fee, .ldnft_new_sales_count, .ldnft_new_subscriptions_count {
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+}
+.ldnft_renewals_count, .ldnft_points, .ldnft_tax_fee, .ldnft_new_sales_count, .ldnft_new_subscriptions_count {
     text-align: center;
-  }
-  .ldnft-admin-modal-body {padding: 2px 16px;}
+}
+.ldnft-admin-modal-body {
+    padding: 2px 16px;
+    max-height: 400px;
+    overflow: auto;
+}
 
-  .ldnft-popup-loader {
+.ldnft-popup-loader {
     display: none;
     text-align: center;
 }
-
+.ldnft-popup-loader img {
+    height: 30px;
+}
 .ldnft_filter_labels{
     float: left;
     font-weight: bold;
