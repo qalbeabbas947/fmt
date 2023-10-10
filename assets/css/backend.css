@@ -285,6 +285,7 @@
 .ldnft-admin-modal-body {
     padding: 2px 16px;
     max-height: 400px;
+    height: 400px;
     overflow: auto;
 }
 
@@ -293,7 +294,10 @@
     text-align: center;
 }
 .ldnft-popup-loader img {
-    height: 30px;
+    height: 40px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
 }
 .ldnft_filter_labels{
     float: left;
