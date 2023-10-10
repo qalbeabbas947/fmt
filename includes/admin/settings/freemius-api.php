@@ -12,10 +12,12 @@ $dev_id         = isset( $ldnft_settings['dev_id'] ) ? sanitize_text_field( $ldn
 $public_key     = isset( $ldnft_settings['public_key'] ) ? sanitize_text_field( $ldnft_settings['public_key'] ): '';
 $secret_key     = isset( $ldnft_settings['secret_key'] ) ? sanitize_text_field( $ldnft_settings['secret_key'] ): '';
 ?>
-<div id="general_settings" class="cs_ld_tabs"> 
+<div id="general_settings" class="cs_ld_tabs">
+    <div class="ldfmt-tab-data-heading"><span class="fa fa-cog ldfmt-icon"></span><?php _e( ' Settings', LDNFT_TEXT_DOMAIN ); ?>
+    </div> 
     <form method="post" action="<?php echo admin_url('admin-post.php'); ?>">
         <table class="setting-table-wrapper">
-            <tbody>
+            <tbody class="ldnft-table-content">
                 <tr> 
                     <td width="20%" align="left" valign="top">
 						<strong><label align="left" for="ldnft_dev_id"><?php _e( 'Developer ID', LDNFT_TEXT_DOMAIN ); ?></label></strong>

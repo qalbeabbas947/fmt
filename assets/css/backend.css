@@ -72,10 +72,34 @@
     width: 50%;
     float:left;
 }
+/* Setting Page */
+.ldfmt-tab-data-heading {
+    padding: 14px;
+    background: #fafafa;
+    font-size: 15px;
+    height: 20px;
+    border: 1px solid #cfd2d5c4;
+    color: black;
+}
+.ldfmt-div-info {
+    padding: 10px 0px;
+}
+.ldfmt-tab-shortcode-data {
+    margin-bottom: 10px;
+    margin-top: 10px;
+    padding: 20px;
+    background: #fff;
+}
+.ldnft-settings-mailpoet .ldnft-mailpoet-save-setting_import {
+    margin-left: 10px;
+}
 .ldnft-settings-mailpoet{
     width: 100%;
-    
+    background-color: #fff;
+    padding-bottom: 10px;
 }
+/* Setting Page end */
+
 #ldnft-settings-import-mailpoet-message{
     width: 80%;
     padding: 5px;
@@ -279,9 +303,12 @@
 
 .setting-table-wrapper{
 	width: 100%;
-	padding: 20px;
+	padding: 10px;
+    background-color: #fff;
 }
-
+.setting-table-wrapper .ldnft-table-content {
+    line-height: 3;
+}
 @media only screen and (max-width: 1000px) {
     .ldfmt-sales-box {
         width: 12%;
