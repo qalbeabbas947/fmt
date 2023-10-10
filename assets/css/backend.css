@@ -219,7 +219,9 @@
     margin: auto;
     padding: 0;
     border: 1px solid #888;
+    border-radius: 15px;
     width: 80%;
+    padding-bottom: 12px;
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
     -webkit-animation-name: animatetop;
     -webkit-animation-duration: 0.4s;
@@ -278,6 +280,7 @@
     padding: 2px 16px;
     color: white;
     box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    width: 97%;
 }
 .ldnft_renewals_count, .ldnft_points, .ldnft_tax_fee, .ldnft_new_sales_count, .ldnft_new_subscriptions_count {
     text-align: center;
