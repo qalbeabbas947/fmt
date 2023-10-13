@@ -32,8 +32,8 @@ function ldfmt_add_info_title( $info_text ) {
 <div id="general_settings" class="cs_ld_tabs"> 
     <div class="ldfmt-tab-data-heading"><span class="dashicons dashicons-shortcode ldfmt-icon"></span><?php _e( 'Shortcodes', LDNFT_TEXT_DOMAIN ); ?></div>
     <div class="ldfmt-tab-shortcode-data">
-        <code> [LDNFT_Reviews product_id="?"] </code>
-        <?php echo ldfmt_add_info_title( "Displays attached product's reviews on the frontend. User can filter the reviews based on the plugin." ); ?>
+        <code> [LDNFT_Reviews product_id="?" listing_type="[ pagination | onetime  slider ]" limit="?" ] </code>
+        <?php echo ldfmt_add_info_title( "Displays attached product's reviews on the frontend. List type parameters allows you to switch the display from  listing to slider. Limit parameter allows you to restrict the display of records at a time in screen." ); ?>
     </div>
     <div class="ldfmt-tab-shortcode-data">
         <code> [LDNFT_Sales product_id = "?" show="[ summary  |  listing  |  both ]"] </code>
@@ -44,7 +44,7 @@ function ldfmt_add_info_title( $info_text ) {
         <?php echo ldfmt_add_info_title( 'This shortcode displays the total number of plugin/products sales based on the product_id/plugin_id.' ); ?>
     </div>
     <div class="ldfmt-tab-shortcode-data">
-        <code> [LDNFT_Number_of_Sales product_id="?"] </code>
+        <code> [LDNFT_Product_Rating product_id="?"] </code>
         <?php echo ldfmt_add_info_title( 'This shortcode displays the average rating of plugin/products based on the product_id/plugin_id.' ); ?>
     </div>
     <div class="ldfmt-tab-shortcode-data">

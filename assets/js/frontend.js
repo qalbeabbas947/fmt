@@ -1,10 +1,10 @@
 (function( $ ) { 'use strict';
     $( document ).ready( function() {
         var record_offset = 0;
-        var record_per_page = 10;
-
+        
         var record_sale_offset = 0;
         var record_sale_per_page =10;
+
         var LDFMTFrontend = {
             /**
              * displays record more buttons is clicked on sales
@@ -36,33 +36,7 @@
                     }
                 });
             },
-            /**
-             * displays record more buttons is clicked on reviews
-             */
-            load_more_review_records: function(e) {
-                e.preventDefault();
-                var plugin = $('.ldfmt-plugins-filter').val();
-                $('.ldfmt-loader-div-btm-sales').css('display', 'block');
-                var link = $(this);
-                link.css('disabled', true);
-                $.ajax({
-                    method: "POST",
-                    url: LDNFT.ajaxURL,
-                    data: { action: 'ldnft_load_reviews', plugin_id: plugin, per_page:record_per_page, offset:record_offset  },
-                    cache: false,
-                })
-                .done(function( html ) {
-                    $('.ldmft-filter-reviews').append( html );
-                    $('.ldfmt-loader-div-btm-sales').css('display', 'none');
-                    
-                    link.css('disabled', false);
-                    if( html.length==0 ) {
-                        $('.ldfmt-load-more-btn').css('display', 'none');
-                    } else {
-                        record_offset += record_per_page;
-                    }
-                });
-            },
+            
             /**
              * displays image in popup
              */
@@ -151,7 +125,6 @@
                     $('.ldfmt-loader-div').css('display', 'none');
                     record_sale_offset = record_sale_per_page;
                 });
-               
             },
             /**
              * displays record more buttons is clicked on reviews
@@ -159,25 +132,80 @@
             load_reviews: function(e) {
                 e.preventDefault();
                 record_offset = 0;
-                $('.ldmft-filter-reviews').html('');
-                var plugin = $('.ldfmt-plugins-filter').val();
-                $('.ldfmt-load-more-btn').css('display', 'block');
-                $('.ldfmt-loader-div').css('display', 'block');
+
+                var review_div = $(this).parents('.ldmft_wrapper');
+                review_div.find( '.ldmft-filter-reviews' ).html('');
+                
+                var plugin = review_div.find('.ldfmt-plugins-filter').val();
+                var listing_type = review_div.find('.ldfmt-listing_type').val();
+                var limit = review_div.find('.ldfmt-page-limit').val();
+
+                review_div.find('.ldfmt-load-more-btn').css('display', 'block');
+                review_div.find('.ldfmt-loader-div').css('display', 'block');
                 $.ajax({
                     method: "POST",
                     url: LDNFT.ajaxURL,
-                    data: { action: 'ldnft_load_reviews', plugin_id: plugin, per_page:record_per_page, offset:record_offset  },
+                    data: { action: 'ldnft_load_reviews', plugin_id: plugin, per_page: limit, type:listing_type, offset:record_offset  },
                     cache: false,
                   })
                 .done(function( html ) {
-                    $('.ldmft-filter-reviews').html( html );
-                    $('.ldfmt-loader-div').css('display', 'none');
-                    record_offset = record_per_page;
+                    review_div.find( '.ldmft-filter-reviews' ).html( html );
+                    var loadmore = review_div.find( '#ldnft-is-loadmore-link' ).val();
+                    if( loadmore == 'yes' ) {
+                        review_div.find('.ldfmt-load-more-btn a').css('display', 'block');
+                    } else {
+                        review_div.find('.ldfmt-load-more-btn a').css('display', 'none');
+                    }
+                    
+                    review_div.find('.ldfmt-loader-div').css('display', 'none');
+                    record_offset = limit; 
+
+                    $(".ldmft-filter-reviews-slider").bxSlider();
+                    
                 });
-               
-            }
+            },
+            /**
+             * displays record more buttons is clicked on reviews
+             */
+            load_more_review_records: function(e) {
+                e.preventDefault();
+                var plugin          = $('.ldfmt-plugins-filter').val();
+                var listing_type    = $('.ldfmt-listing_type').val();
+                var limit           = $('.ldfmt-page-limit').val();
+                var link            = $(this);
+
+                var review_div = $(this).parents('.ldmft_wrapper');
+                review_div.find('.ldfmt-loader-div-btm-reviews').css('display', 'block');
+                
+                link.css('disabled', true);
+                $.ajax({
+                    method: "POST",
+                    url: LDNFT.ajaxURL,
+                    data: { action: 'ldnft_load_reviews', plugin_id: plugin, per_page: limit, type:listing_type, offset:record_offset  },
+                    cache: false,
+                })
+                .done(function( html ) {
+                    review_div.find( '#ldnft-is-loadmore-link' ).remove();
+
+                    review_div.find('.ldmft-filter-reviews').append( html );
+                    review_div.find('.ldfmt-loader-div-btm-reviews').css('display', 'none');
+                    
+                    link.css('disabled', false);
+                    if( html.length==0 || listing_type!='pagination' ) {
+                        review_div.find('.ldfmt-load-more-btn').css('display', 'none');
+                    } else {
+                        var loadmore = review_div.find( '#ldnft-is-loadmore-link' ).val();
+                        if( loadmore == 'yes' ) {
+                            review_div.find('.ldfmt-load-more-btn a').css('display', 'block');
+                        } else {
+                            review_div.find('.ldfmt-load-more-btn a').css('display', 'none');
+                        }
+                        record_offset += limit;
+                    }
+                });
+            },
         };
 
         LDFMTFrontend.init();
-    });
+    });   
 })( jQuery );
