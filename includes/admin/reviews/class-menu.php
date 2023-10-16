@@ -114,7 +114,7 @@ class LDNFT_Reviews_Menu {
                     
                     $option = 'per_page';
                     $args = [
-                            'label' => 'Subsriptions Per Page',
+                            'label' => 'Reviews Per Page',
                             'default' => 10,
                             'option' => 'reviews_per_page'
                         ];
