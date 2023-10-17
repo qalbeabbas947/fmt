@@ -1,11 +1,31 @@
 .review-container {
-    border: 2px solid #ccc;
     background-color: white;
     border-radius: 5px;
     padding: 16px;
-    margin: 16px 0
+    margin: 16px 0;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  }
+  .ldmft-filter-reviews {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .review-container {
+    flex: 0 0 calc(33.33% - 20px);
+    padding: 20px;
+    box-sizing: border-box;
+  }
+
+  .ldfmt_review_description {
+    font-size: 16px;
+    font-weight: 400;
+  }
+  .ldfmt_review_time {
+    padding-bottom: 10px;
   }
   .ldnft-checked {
+    margin-top: 10px;
     color: orange;
   }
   .review-container::after {
@@ -136,7 +156,7 @@
   display: block;
   margin: 10px auto;
   text-align: center;
-  background: white;
+  font-size: 20px;
   border-radius: 8px;
   width: 70%;
 }
@@ -158,7 +178,19 @@
 .ldmft_filter select::-ms-expand {
     display: none;
   }
-
+  @media (max-width: 850px) {
+    .ldmft-filter-reviews {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .review-container {
+      flex: 0 0 calc( 50% - 20px );
+      padding: 20px;
+      box-sizing: border-box;
+    }
+  } 
   @media (max-width: 500px) {
     .review-container {
         text-align: center;
@@ -167,5 +199,10 @@
         margin: auto;
         float: none;
         display: block;
+    }
+    .review-container {
+      flex: 0 0 100%; 
+      padding: 20px;
+      box-sizing: border-box;
     }
   } 
