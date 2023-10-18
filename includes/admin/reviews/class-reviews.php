@@ -147,6 +147,7 @@ class LDNFT_Reviews extends WP_List_Table {
     public function get_columns(){
 
         $columns = [
+            'is_featured'       => __( 'Is Featured', LDNFT_TEXT_DOMAIN ),
             'id'                => __( 'ID', LDNFT_TEXT_DOMAIN ),
             'user_id'           => __( 'User ID', LDNFT_TEXT_DOMAIN ),
             'useremail'         => __( 'Email',LDNFT_TEXT_DOMAIN ),
@@ -155,7 +156,6 @@ class LDNFT_Reviews extends WP_List_Table {
             'picture'           => __( 'Picture', LDNFT_TEXT_DOMAIN ),
             'profile_url'       => __( 'Profile URL', LDNFT_TEXT_DOMAIN ),
             'is_verified'       => __( 'Is Verified', LDNFT_TEXT_DOMAIN ),
-            'is_featured'       => __( 'Is Featured', LDNFT_TEXT_DOMAIN ),
             'sharable_img'      => __( 'Sharable Image', LDNFT_TEXT_DOMAIN ),
             'title'             => __( 'Review Title', LDNFT_TEXT_DOMAIN ),
             'text'              => __( 'Comment', LDNFT_TEXT_DOMAIN ),
@@ -170,22 +170,28 @@ class LDNFT_Reviews extends WP_List_Table {
     }
 	
 	/**
-	* format the is_verified column
+	* format the is_featured column
 	*/
-	public function column_is_verified($item){
-		if( intval( $item['is_verified'] ) == 1 ) {
-			return __( 'Yes', LDNFT_TEXT_DOMAIN );
-		} else {
-			return __( 'No', LDNFT_TEXT_DOMAIN );
-		}
+	public function column_is_featured($item){
+       //return LDNFT_Admin::get_bar_preloader().' != '. $item['is_featured'];
+        if( LDNFT_Admin::get_bar_preloader() !=  $item['is_featured'] ) 
+        {
+            
+            return '<input class="ldnft_is_featured_enabled_click" type="checkbox" '.(intval( $item['is_featured'] ) == 1?'checked':'').' id="is_featured_'.$item['id'].'" data-id="'.$item['id'].'" name="is_featured[]" value="'.$item['is_featured'].'" />';
+        } elseif( $item['is_featured'] == 1 ) {
+            return '<input class="ldnft_is_featured_enabled_click" type="checkbox" '.(intval( $item['is_featured'] ) == 1?'checked':'').' id="is_featured_'.$item['id'].'" data-id="'.$item['id'].'" name="is_featured[]" value="'.$item['is_featured'].'" />';
+        } else {
+            return $item['is_featured'];
+        }
+
 	}
 	
 	/**
 	* format the is_verified column
 	*/
-	public function column_is_featured( $item ){
+	public function column_is_verified( $item ){
         
-		if( intval( $item['is_featured'] ) == 1 ) {
+		if( intval( $item['column_is_verified'] ) == 1 ) {
 			return __( 'Yes', LDNFT_TEXT_DOMAIN );
 		} else {
 			return __( 'No', LDNFT_TEXT_DOMAIN );
@@ -269,7 +275,7 @@ class LDNFT_Reviews extends WP_List_Table {
 					'company_url'           => LDNFT_Admin::get_bar_preloader(),
 					'picture'              	=> LDNFT_Admin::get_bar_preloader(),
 					'profile_url'           => LDNFT_Admin::get_bar_preloader(),
-					'is_verified'           => LDNFT_Admin::get_bar_preloader(),
+					'is_verified'            => LDNFT_Admin::get_bar_preloader(),
 					'is_featured'           => LDNFT_Admin::get_bar_preloader(),
 					'sharable_img'          => LDNFT_Admin::get_bar_preloader(),
 					'name'              	=> LDNFT_Admin::get_bar_preloader(),
@@ -323,7 +329,7 @@ class LDNFT_Reviews extends WP_List_Table {
          * use sort and pagination data to build a custom query instead, as you'll
          * be able to use your precisely-queried data immediately.
          */
-        $results = $this->api->Api('plugins/'.$this->selected_plugin_id.'/reviews.json?is_featured=true&count='.$per_page.'&offset='.$offset_rec, 'GET', ['is_featured'=>'false','is_verified'=>'false', 'enriched'=>'true' ]);
+        $results = $this->api->Api('plugins/'.$this->selected_plugin_id.'/reviews.json?count='.$per_page.'&offset='.$offset_rec, 'GET', []);
        
         $data = [];
         $count = 0;
@@ -348,6 +354,8 @@ class LDNFT_Reviews extends WP_List_Table {
                     $data[$count]['useremail'] = '-';
                 }
             }
+
+            $data[$count]['is_featured'] = $review->is_featured;
 
             $count++;   
         }
@@ -473,7 +481,7 @@ class LDNFT_Reviews extends WP_List_Table {
         $offset_rec1    = ($offset) * $per_page;
         
         
-        $result = $this->api->Api('plugins/'.$this->selected_plugin_id.'/reviews.json?is_featured=true&count='.$per_page.'&offset='.$offset_rec1, 'GET', []);
+        $result = $this->api->Api('plugins/'.$this->selected_plugin_id.'/reviews.json?count='.$per_page.'&offset='.$offset_rec1, 'GET', []);
         
 		$total_items     = $this->_pagination_args['total_items'];
 		$total_pages     = $this->_pagination_args['total_pages'];

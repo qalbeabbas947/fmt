@@ -36,7 +36,7 @@ $plugins = LDNFT_Freemius::$products;
 					</td>
                     <td width="80%">
                         <?php
-							if (in_array('snippets', $wpdb->tables)) {
+                            if (defined('MAILPOET_VERSION')) {
 								$table_name = $wpdb->prefix.'mailpoet_segments';
 								$list = $wpdb->get_results('select id, name from '.$table_name.'');
 								$is_list_available = true;
@@ -52,7 +52,7 @@ $plugins = LDNFT_Freemius::$products;
 									$is_list_available = false;
 								}
 							} else {
-								echo '<span class="mailpoet_unable_to_import">'.__( 'No mailpoet list for import.', LDNFT_TEXT_DOMAIN ).'</span>';
+								echo '<span class="mailpoet_unable_to_import">'.__( 'Activate the mailpoet plugin.', LDNFT_TEXT_DOMAIN ).'</span>';
 								$allow_import = false;
 								$is_list_available = false;
 							}

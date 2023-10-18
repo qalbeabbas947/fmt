@@ -1,6 +1,5 @@
 (function( $ ) { 'use strict';
     $( document ).ready( function() {
-        
         var LDNFTbackEnd = {
             default_table_row: '',
             default_sales_table_row: '',
@@ -15,7 +14,7 @@
                 $('#ldnft_sales_data').on('click', '.ldnft_sales_view_detail', LDNFTbackEnd.sales_view_detail);
                 $('.ldnft-admin-modal-close').on('click', LDNFTbackEnd.ldnft_subsciber_modal_close);
 				$('#ldnft_reviews_data').on('click', '.ldnft_review_view_detail', LDNFTbackEnd.review_view_detail);
-
+                $('#ldnft-reviews-filter').on('click', '.ldnft_is_featured_enabled_click', LDNFTbackEnd.ldnft_is_featured_enabled);
                 /**
                  * Execute based on the conditions
                  */
@@ -40,6 +39,23 @@
 					LDNFTbackEnd.display_reviews();
 				}
                 
+            },
+            ldnft_is_featured_enabled: function(e){
+                $('#ldnft-reviews-filter').find('.ldnft_is_featured_enabled_click').attr('disabled', true);
+                var cid = $(this).data('id');
+                var status = $(this).prop('checked');
+                $.ajax({
+                    url: ajaxurl,
+                    dataType: 'json',
+                    data: {
+                        action: 'ldnft_reviews_enable_disable',
+                        id: cid,
+                        status: status
+                    },
+                    success: function (response) {
+                        $('#ldnft-reviews-filter').find('.ldnft_is_featured_enabled_click').attr('disabled', false);
+                    }
+                });
             },
 			/**
              * pagination click

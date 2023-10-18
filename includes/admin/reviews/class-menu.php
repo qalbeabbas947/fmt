@@ -31,7 +31,7 @@ class LDNFT_Reviews_Menu {
             'picture',
             'profile_url',
             'is_verified',
-            'is_featured',
+            'ID',
             'sharable_img', 
             'company', 
             'created', 						
@@ -40,8 +40,30 @@ class LDNFT_Reviews_Menu {
         add_action( 'admin_menu', 								[ $this, 'admin_menu_page' ] );
 		add_action('wp_ajax_ldnft_reviews_display', 			[ $this, 'ldnft_reviews_display' ], 100 );
         add_action( 'wp_ajax_ldnft_reviews_check_next',      	[ $this, 'reviews_check_next' ], 100 );
+        add_action( 'wp_ajax_ldnft_reviews_enable_disable',      	[ $this, 'reviews_enable_disable' ], 100 );
 	}
     
+    /**
+     * Action wp_ajax for fetching the first time table structure
+     */
+    public function reviews_enable_disable() {
+        header('Content-Type: application/json; charset=utf-8');
+
+        $id         = isset( $_REQUEST['id'] ) ? sanitize_text_field( $_REQUEST['id'] ) : 0;
+        $status     = sanitize_text_field( $_REQUEST['status'] );
+        $status     = $status ? 1 : 0;
+        $id         = 0;
+        if( intval( $id ) == 0 ) {
+            echo json_encode([ 'status'=> 'error', 'message' => __('Invalid review id.', LDNFT_TEXT_DOMAIN) ]);
+            exit();
+        } 
+
+        $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
+        $result = $api->Api('plugins/'.$plugin_id.'/reviews/'.$id.'.json', 'PUT',      [ 'is_featured' => $status ] );
+        
+        echo json_encode([ 'status'=> 'success', 'data'=> $result, 'message' => __('Invalid review id.', LDNFT_TEXT_DOMAIN) ]);
+    }
+
 	/**
      * Action wp_ajax for fetching the first time table structure
      */

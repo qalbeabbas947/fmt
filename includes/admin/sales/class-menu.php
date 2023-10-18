@@ -251,7 +251,7 @@ class LDNFT_Sales_Menu {
                             </select>
                             <select name="ldfmt-sales-filter" class="ldfmt-sales-filter">
                                 <option value="all"><?php echo __( 'All Status', LDNFT_TEXT_DOMAIN );?></option>
-                                <option value="not_refunded" <?php echo $selected_filter=='not_refunded'?'selected':'';?>><?php echo __( 'Not Refunded', LDNFT_TEXT_DOMAIN );?></option>
+                                <option value="not_refunded" <?php echo $selected_filter=='not_refunded'?'selected':'';?>><?php echo __( 'Active', LDNFT_TEXT_DOMAIN );?></option>
                                 <option value="refunds" <?php echo $selected_filter=='refunds'?'selected':'';?>><?php echo __( 'Refunds', LDNFT_TEXT_DOMAIN );?></option>
                             </select>
                         </div>
