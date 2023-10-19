@@ -11,6 +11,7 @@ $api_scope      = isset( $ldnft_settings['api_scope'] ) ? sanitize_text_field( $
 $dev_id         = isset( $ldnft_settings['dev_id'] ) ? sanitize_text_field( $ldnft_settings['dev_id'] ) : '';
 $public_key     = isset( $ldnft_settings['public_key'] ) ? sanitize_text_field( $ldnft_settings['public_key'] ): '';
 $secret_key     = isset( $ldnft_settings['secret_key'] ) ? sanitize_text_field( $ldnft_settings['secret_key'] ): '';
+$cron_status    = get_option('ldnft_run_cron_based_on_plugins');
 ?>
 <div id="general_settings" class="cs_ld_tabs">
     <div class="ldfmt-tab-data-heading"><span class="fa fa-cog ldfmt-icon"></span><?php _e( ' Settings', LDNFT_TEXT_DOMAIN ); ?>
@@ -52,11 +53,27 @@ $secret_key     = isset( $ldnft_settings['secret_key'] ) ? sanitize_text_field( 
                         </p>
                     </td>    
                 </tr>
-				       
-                
+                <?php if( $cron_status != 'complete' && FS__API_CONNECTION ) { ?>
+                    <tr> 
+                        <td colspan="2" class="ldnft-process-freemius-data-info">
+                            <div class="ldnft-process-freemius-data-plugins" style="display:none">
+                                <img class="ldnft-success-loader" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" />
+                                <span class="ldnft-loading-wrap"><?php _e( 'Please wait, while we are syncing the freemius data.', LDNFT_TEXT_DOMAIN ); ?></span>
+                            </div>
+                            <div class="ldnft-process-freemius-data-plans" style="display:none">
+                                <img class="ldnft-success-loader" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" />
+                                <span class="ldnft-loading-wrap"><?php _e( 'Please wait, while we are syncing the freemius data.', LDNFT_TEXT_DOMAIN ); ?></span>
+                            </div>
+                            <div class="ldnft-process-freemius-data-customers" style="display:none">
+                                <img class="ldnft-success-loader" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" />
+                                <span class="ldnft-loading-wrap"><?php _e( 'Please wait, while we are syncing the freemius data.', LDNFT_TEXT_DOMAIN ); ?></span>
+                            </div>
+                        </td>    
+                    </tr>
+                <?php } ?>
             </tbody>
         </table>
-        
+       
         <div class="submit-button" style="padding-top:10px">
             <?php wp_nonce_field( 'ldnft_nounce', 'ldnft_nounce_field' ); ?>
             <input type="hidden" name="action" value="ldnft_submit_action" />

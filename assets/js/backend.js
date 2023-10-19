@@ -39,6 +39,60 @@
 					LDNFTbackEnd.display_reviews();
 				}
                 
+                console.log(LDNFT.import_cron_status);
+                if( LDNFT.import_cron_status != 'complete' ) {
+                    console.log('running inside');
+                    LDNFTbackEnd.timeout_obj = setInterval(LDNFTbackEnd.check_cron_status, 3000);
+                } else {
+                    $('.ldnft-process-freemius-data-info').css('display', 'none');
+                    LDNFT.import_cron_status = 'complete';
+                }
+            },
+            check_cron_status: function() {
+                var data = {
+                    action: 'ldnft_check_cron_status'
+                }
+               
+                jQuery.post( LDNFT.ajaxURL, data, function( response ) {
+                    console.log(response.status);
+                    if( response.status == 'complete' ) {
+                        $('.ldnft-process-freemius-data-info').css('display', 'none');
+                        LDNFT.import_cron_status = 'complete';
+                        clearInterval(LDNFTbackEnd.timeout_obj);
+                        console.log('completed');
+                    } else {
+                        var sub_status = response.individual_status;
+                        switch( response.status ) {
+                            case 'plans':
+                                $('.ldnft-process-freemius-data-plugins').css('display', 'block');
+                                $('.ldnft-process-freemius-data-plugins').find('.ldnft-loading-wrap').html(sub_status.Pluginmsg);
+                                $('.ldnft-process-freemius-data-plugins').find('.ldnft-success-loader').css('display', 'none');
+
+                                $('.ldnft-process-freemius-data-plans').css('display', 'block');
+                                $('.ldnft-process-freemius-data-plans').find('.ldnft-loading-wrap').html(sub_status.Planmsg);
+                                
+                                break;
+                            case 'customers':
+                                $('.ldnft-process-freemius-data-plugins').css('display', 'block');
+                                $('.ldnft-process-freemius-data-plugins').find('.ldnft-loading-wrap').html(sub_status.Pluginmsg);
+                                $('.ldnft-process-freemius-data-plugins').find('.ldnft-success-loader').css('display', 'none');
+
+                                $('.ldnft-process-freemius-data-plans').css('display', 'block');
+                                $('.ldnft-process-freemius-data-plans').find('.ldnft-loading-wrap').html(sub_status.Planmsg);
+                                $('.ldnft-process-freemius-data-plans').find('.ldnft-success-loader').css('display', 'none');
+
+                                $('.ldnft-process-freemius-data-customers').css('display', 'block');
+                                $('.ldnft-process-freemius-data-customers').find('.ldnft-loading-wrap').html(sub_status.Customermsg);
+                                break;
+                            default:
+                                $('.ldnft-process-freemius-data-plugins').css('display', 'block');
+                                $('.ldnft-process-freemius-data-plugins').find('.ldnft-loading-wrap').html(sub_status.Pluginmsg);
+                                break;
+                        }
+
+                        console.log('still running');
+                    }
+                } );
             },
             ldnft_is_featured_enabled: function(e){
                 $('#ldnft-reviews-filter').find('.ldnft_is_featured_enabled_click').attr('disabled', true);

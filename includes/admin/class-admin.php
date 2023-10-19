@@ -405,13 +405,14 @@ class LDNFT_Admin {
 
         $screen = get_current_screen();
         if( $screen ) { 
+            
             if( $screen->id == 'freemius-toolkit_page_freemius-settings' 
                 || $screen->id == 'freemius-toolkit_page_freemius-settings-page'
                 || $screen->id == 'freemius-toolkit_page_freemius-subscriptions'
                 || $screen->id == 'freemius-toolkit_page_freemius-sales' 
                 || $screen->id == 'freemius-toolkit_page_freemius-customers' 
                 || $screen->id == 'freemius-toolkit_page_freemius-reviews' ) {
-				
+
 				wp_enqueue_style( 'dashicons' );
         		wp_enqueue_style( 'ldnft-font-awesome-css', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css', [], LDNFT_VERSION, null );
         
@@ -423,10 +424,11 @@ class LDNFT_Admin {
                 /**
                  * enqueue admin js
                  */
-                wp_enqueue_script( 'fmt-backend-js', LDNFT_ASSETS_URL . 'js/backend.js', [ 'jquery' ], LDNFT_VERSION, true ); 
-                    
+                wp_enqueue_script( 'fmt-backend-js', LDNFT_ASSETS_URL . 'js/backend.js?'.time(), [ 'jquery' ], LDNFT_VERSION, true ); 
+                $cron_status    = get_option('ldnft_run_cron_based_on_plugins');
                 wp_localize_script( 'fmt-backend-js', 'LDNFT', [  
                     'ajaxURL' => admin_url( 'admin-ajax.php' ),
+                    'import_cron_status' => $cron_status
                 ] );
             }
         }  

@@ -18,7 +18,555 @@ class Tickera_Customization_Settings {
         add_action( 'admin_post_ldnft_submit_action',           [ $this, 'save_settings' ] );
         add_action( 'admin_notices',                            [ $this, 'ldnft_admin_notice' ] );
         add_action( 'wp_ajax_ldnft_mailpoet_submit_action',     [ $this, 'mailpoet_submit_action' ], 100 );
+        add_action( 'wp_ajax_ldnft_check_cron_status',          [ $this, 'check_cron_status' ], 100 );
+
+        //import data via cron work
+        if( FS__API_CONNECTION && !wp_doing_ajax() ) {
+            add_filter('cron_schedules', [ $this, 'ldnft_cron_schedules' ], 9999, 1);
+            
+            $cron_status = get_option('ldnft_run_cron_based_on_plugins');
+            if( $cron_status != 'complete' ) { 
+                switch( $cron_status ) {
+                    case "customers":
+                        echo 'hello customers';
+                        break;
+                    case "plans":
+                        $active_crons = get_option('ldnft_process_freemius_plans_stats' );
+                        $active_crons = [ 0, 0 ]; //first param is used for count and second to check if cron is complete.
+                        update_option( 'ldnft_process_freemius_plans_stats', $active_crons );
+                        $this->ldnft_process_freemius_plans( );
+                        break;
+                    case "sales":
+
+                        break;
+                    case "subscription":
+
+                        break;
+                    default:
+                        $active_crons = get_option('ldnft_process_freemius_plugins_stats' );
+                        $active_crons = [ 0, 0 ]; //first param is used for count and second to check if cron is complete.
+                        update_option( 'ldnft_process_freemius_plugins_stats', $active_crons );
+                        $this->ldnft_process_freemius_plugins( );
+                        break;
+                }
+
+                self::calculate_cron_process();
+            }
+
+            
+           
+
+            // if( $cron_status != 'complete' && $cron_status != 'running' ) {
+            //     add_action( 'init', [ $this, 'ldnft_run_cron_based_on_plugins' ] );
+            // }
+            
+            add_action( 'ldnft_process_freemius_customers_data', [ $this, 'ldnft_process_freemius_customers' ], 10, 3 );
+            add_action( 'ldnft_process_freemius_plugins_data', [ $this, 'ldnft_process_freemius_plugins' ], 10, 2 );
+
+            add_action( 'ldnft_process_freemius_sales_data', [ $this, 'process_freemius_sales' ], 10, 2 );
+            add_action( 'ldnft_process_freemius_subscription_data', [ $this, 'process_freemius_subscription' ], 10, 2 );
+            add_action( 'ldnft_process_freemius_reviews_data', [ $this, 'process_freemius_reviews' ], 10, 2 );
+        }
     }
+
+    /**
+	 * checks if crons is running or complete.
+	 */
+    public function process_freemius_sales() {
+        
+        global $wpdb;
+        error_log( 'ldnft_process_freemius_sales:'.$plugin_id.',  '.$start.', '.$limit );
+        $table_name = $wpdb->prefix.'ldnft_transactions';
+        if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
+            $wpdb->query( "CREATE TABLE $table_name (
+                `id` int(11) NOT NULL,
+                `plugin_id` int(11) NOT NULL,
+                `plugin_title` varchar(255) NOT NULL,
+                `user_id` int(11) NOT NULL,
+                `username` varchar(255) DEFAULT NULL,
+                `useremail` varchar(255) DEFAULT NULL,
+                `install_id` int(11) DEFAULT NULL,
+                `subscription_id` int(11) DEFAULT NULL,
+                `plan_id` int(11) DEFAULT NULL,
+                `gross` float DEFAULT NULL,
+                `gateway_fee` float DEFAULT NULL,
+                `external_id` varchar(50) DEFAULT NULL,
+                `gateway` int(11) DEFAULT NULL,
+                `coupon_id` int(11) DEFAULT NULL,
+                `country_code` varchar(3) DEFAULT NULL,
+                `bound_payment_id` int(11) DEFAULT NULL,
+                `created` datetime DEFAULT NULL,
+                `updated` datetime DEFAULT NULL,
+                `vat` float DEFAULT NULL,
+                `is_renewal` tinyint(1) NOT NULL,
+                `type` varchar(15) NOT NULL,
+                `license_id` int(11) DEFAULT NULL
+            )" );     
+        }
+        
+        $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
+        $inserted = 0;
+        $updatednum = 0;
+        $usrobj = $api->Api('plugins/'.$plugin_id.'/users.json?count='.$limit.'&offset='.$start, 'GET', []);
+        foreach( $usrobj->users as $user ) {
+            
+            $res = $wpdb->get_results( $wpdb->prepare("select * from ".$table_name." where id=%d", $user->id ));
+            if( count( $res ) == 0 ) {
+                $wpdb->insert(
+                    $table_name,
+                    array(
+                        'id'                    => $user->id,
+                        'email'                 => $user->email,
+                        'first'                 => $user->first,
+                        'last'                  => $user->last,
+                        'is_verified'           => $user->is_verified,
+                        'created'               => $user->created,
+                        'is_marketing_allowed'  => $user->is_marketing_allowed
+                    )
+                );
+                $inserted++;
+            } else {
+                $wpdb->update( $table_name, 
+                    array(
+                        'email'                 => $user->email,
+                        'first'                 => $user->first,
+                        'last'                  => $user->last,
+                        'is_verified'           => $user->is_verified,
+                        'created'               => $user->created,
+                        'is_marketing_allowed'  => $user->is_marketing_allowed
+                    ), array('id'=>$user->id));
+                $updatednum++;
+            }
+        }
+
+        if( intval( $plugin_id ) > 0 ) {
+            $active_crons = get_option('ldnft_process_freemius_customers_stats' );
+            $active_crons[$plugin_id][0] = intval( $active_crons[$plugin_id][0] ) + count( $usrobj->users );
+            if( count( $usrobj->users ) < $limit) {
+                $active_crons[$plugin_id][1] = 1;
+            }
+        }
+
+        update_option('ldnft_process_freemius_customers_stats', $active_crons );
+
+        if( count( $usrobj->users ) == $limit) {
+            
+            if ( ! wp_next_scheduled( 'ldnft_process_freemius_customers_data' ) ) {
+                $data = [
+                        'plugin_id' => $plugin_id,
+                        'start' => $start + $limit,
+                        'limit' => $limit
+                    ];
+                $time = strtotime('+1 Minutes', strtotime('now'));
+                error_log( 'ldnft_process_freemius_customers passing:'.$plugin_id.',  '.$start + $limit.', '.$limit.'  '.date( 'Y-m-d H:i:s', $time) );
+                wp_schedule_single_event( $time , 'ldnft_process_freemius_customers_data', $data );
+            }
+        }
+
+        error_log( print_r(['inserted' => $inserted, 'updated'=>$updatednum, 'message' => sprintf( __('Inserted: %d, Updated: %d', 'MWC'), $inserted, $updatednum)], true) );
+        //return ['inserted' => $inserted, 'updated'=>$updatednum, 'message' => sprintf( __('Inserted: %d, Updated: %d', 'MWC'), $inserted, $updatednum)]; 
+    }
+
+    /**
+	 * checks if crons is running or complete.
+	 */
+    public function process_freemius_subscription() {
+        
+    }
+
+    /**
+	 * checks if crons is running or complete.
+	 */
+    public function process_freemius_reviews() {
+        
+    }
+
+    /**
+	 * checks if crons is running or complete.
+	 */
+    public function check_cron_status() {
+
+        header('Content-Type: application/json; charset=utf-8');
+        
+        echo self::calculate_cron_process();
+        exit;
+    }
+    
+    /**
+	 * checks if crons is complete.
+	 */
+    public static function calculate_cron_process( ) {
+        
+        $active_crons = get_option('ldnft_process_freemius_plugins_stats' );
+        
+        $status = [ 'Plugins' => 0, 'Pluginrecs' => 0, 'Pluginmsg' => __('Please wait, while we are syncing the freemius plugins data.', LDNFT_TEXT_DOMAIN) ];
+        if( is_array( $active_crons ) && count( $active_crons ) > 0 ) {
+            if( array_key_exists( 1, $active_crons ) ) {
+                if( $active_crons[1] == 1 || $active_crons[1] == "1" ) {
+                    $status[ 'Plugins' ] = 1;
+                    $status[ 'Pluginrecs' ] = $active_crons[0];
+                    $status[ 'Pluginmsg' ] = __('Plugins are synced with freemius.', LDNFT_TEXT_DOMAIN);
+                }
+            }
+        }
+
+        $status[ 'Plans' ] = 0;
+        $status[ 'Planrecs' ] = 0;
+        $status[ 'Planmsg' ] = __('Please wait, while we are syncing the freemius plans data.', LDNFT_TEXT_DOMAIN);
+        $active_crons = get_option('ldnft_process_freemius_plans_stats' );
+        if( is_array( $active_crons ) && count( $active_crons ) > 0 ) {
+            if( array_key_exists( 1, $active_crons ) ) {
+                if( $active_crons[1] == 1 || $active_crons[1] == "1" ) {
+                    $status[ 'Plans' ] = 1;
+                    $status[ 'Planrecs' ] = $active_crons[0];
+                    $status[ 'Planmsg' ] = __('Plans are synced with freemius.', LDNFT_TEXT_DOMAIN);
+                }
+            }
+        }
+
+        $status[ 'Customers' ] = 1;
+        $status[ 'Customerrecs' ] = 0;
+        $status[ 'Customermsg' ] = __('Please wait, while we are syncing the freemius customers data.', LDNFT_TEXT_DOMAIN);
+        $active_crons = get_option('ldnft_process_freemius_plans_stats' );
+        $active_crons = get_option('ldnft_process_freemius_customers_stats' );
+        if( is_array( $active_crons ) && count( $active_crons ) > 0 ) {
+            foreach( $active_crons as $key => $value ) {
+                if( array_key_exists(1, $value) && intval( $value[1] ) < 1 && $status[ 'Customers' ] == 1 ) {
+                    $status[ 'Customers' ] = 1;
+                    $status[ 'Customerrecs' ] = 0;
+                    $status[ 'Customermsg' ] = __('Customers are synced with freemius.', LDNFT_TEXT_DOMAIN);
+                }   
+            }
+            
+        } 
+
+        error_log( print_r([ 'status' => get_option('ldnft_run_cron_based_on_plugins'), 'individual_status' => $status ], true));
+        return json_encode( [ 'status' => get_option('ldnft_run_cron_based_on_plugins'), 'individual_status' => $status ]);
+    }
+    
+    /**
+	 * initialize the crons based on the plugins.
+	 */
+    public function ldnft_run_cron_based_on_plugins() {
+        
+        $service = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
+        $plugins = $service->Api('plugins.json?fields=id,title', 'GET', []);
+        
+        $inserted = 0;
+        $updatednum = 0;
+        
+        if( isset( $plugins->plugins ) &&  count($plugins->plugins) > 0 ) {
+            update_option('ldnft_run_cron_based_on_plugins', 'running' );
+
+            
+
+            foreach( $plugins->plugins as $plugin ) {
+                if( intval( $plugin->id ) > 0 ) {
+                    $active_crons = get_option('ldnft_process_freemius_customers_stats' );
+                    $active_crons[$plugin->id] = [ 0, 0 ]; //first param is used for count and second to check if cron is complete.
+                    update_option('ldnft_process_freemius_customers_stats', $active_crons );
+    
+                    $this->ldnft_process_freemius_customers( $plugin->id );
+                }
+            }
+        } else {
+            update_option('ldnft_run_cron_based_on_plugins', 'complete' );
+        }
+    }
+
+
+    /**
+	 * process plans data.
+	 */
+	public function ldnft_process_freemius_plans( $start = 0, $limit = 10 ) {
+        global $wpdb;
+        error_log( 'ldnft_process_freemius_plans_data:'.$start.', '.$limit);
+        $table_name = $wpdb->prefix.'ldnft_plans';
+        if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
+            $wpdb->query( "CREATE TABLE $table_name (
+                `id` int(11) NOT NULL,
+                `title` varchar(255) DEFAULT NULL,
+                `name` varchar(255) DEFAULT NULL,
+                `description` varchar(255) DEFAULT NULL,
+                `plugin_id` int(11) DEFAULT NULL,
+                `is_free_localhost` tinyint(1) DEFAULT NULL,
+                `is_block_features` tinyint(1) DEFAULT NULL,
+                `is_block_features_monthly` tinyint(1) DEFAULT NULL,
+                `license_type` tinyint(1) DEFAULT NULL,
+                `is_https_support` varchar(255) DEFAULT NULL,
+                `trial_period` int(11) DEFAULT NULL,
+                `is_require_subscription` tinyint(1) DEFAULT NULL,
+                `support_kb` varchar(255) DEFAULT NULL,
+                `support_forum` varchar(255) DEFAULT NULL,
+                `support_email` varchar(255) DEFAULT NULL,
+                `support_phone` varchar(20) DEFAULT NULL,
+                `support_skype` varchar(255) DEFAULT NULL,
+                `is_success_manager` varchar(255) DEFAULT NULL,
+                `is_featured` tinyint(1) DEFAULT NULL,
+                `is_hidden` tinyint(1) DEFAULT NULL,
+                `created` datetime DEFAULT NULL
+             )" ); 
+         }
+
+        $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
+        
+        $plugins = $wpdb->get_results( 'select id from '.$wpdb->prefix.'ldnft_plugins' );
+        foreach( $plugins as $plugin ) {
+            $plans_obj = $api->Api('plugins/'.$plugin->id.'/plans.json', 'GET', []);
+            foreach( $plans_obj->plans as $plan ) {
+                
+                $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_name." where id=%d", $plugin->id ));
+                if( count( $res ) == 0 ) {
+                    $wpdb->insert(
+                        $table_name,
+                        array(
+                            'id'                        => $plan->id,
+                            'title'                     => $plan->title,
+                            'name'                      => $plan->name,
+                            'description'               => $plan->description,
+                            'plugin_id'                 => $plan->plugin_id,
+                            'is_free_localhost'         => $plan->is_free_localhost,
+                            'is_block_features'         => $plan->is_block_features,
+                            'is_block_features_monthly' => $plan->is_block_features_monthly,
+                            'license_type'              => $plan->license_type,
+                            'is_https_support'          => $plan->is_https_support,
+                            'trial_period'              => $plan->trial_period,
+                            'is_require_subscription'   => $plan->is_require_subscription,
+                            'support_kb'                => $plan->support_kb,
+                            'support_forum'             => $plan->support_forum,
+                            'support_email'             => $plan->support_email,
+                            'support_phone'             => $plan->support_phone,
+                            'support_skype'             => $plan->support_skype,
+                            'is_success_manager'        => $plan->is_success_manager,
+                            'is_featured'               => $plan->is_featured,
+                            'is_hidden'                 => $plan->is_hidden,
+                            'created'                   => $plan->created
+                        )
+                    );
+                    $inserted++;
+                } else {
+                    $wpdb->update($table_name, 
+                        array(
+                            'title'                     => $plan->title,
+                            'name'                      => $plan->name,
+                            'description'               => $plan->description,
+                            'plugin_id'                 => $plan->plugin_id,
+                            'is_free_localhost'         => $plan->is_free_localhost,
+                            'is_block_features'         => $plan->is_block_features,
+                            'is_block_features_monthly' => $plan->is_block_features_monthly,
+                            'license_type'              => $plan->license_type,
+                            'is_https_support'          => $plan->is_https_support,
+                            'trial_period'              => $plan->trial_period,
+                            'is_require_subscription'   => $plan->is_require_subscription,
+                            'support_kb'                => $plan->support_kb,
+                            'support_forum'             => $plan->support_forum,
+                            'support_email'             => $plan->support_email,
+                            'support_phone'             => $plan->support_phone,
+                            'support_skype'             => $plan->support_skype,
+                            'is_success_manager'        => $plan->is_success_manager,
+                            'is_featured'               => $plan->is_featured,
+                            'is_hidden'                 => $plan->is_hidden,
+                        ), array('id'=>$plan->id));
+                    $updatednum++;
+                }
+
+            }
+
+            $active_crons = get_option('ldnft_process_freemius_plans_stats' );
+            $active_crons = [ $updatednum + $inserted, 0 ]; //first param is used for count and second to check if cron is complete.
+            update_option( 'ldnft_process_freemius_plans_stats', $active_crons );
+        }
+
+        $active_crons = get_option('ldnft_process_freemius_plans_stats' );
+        $active_crons = [ $updatednum + $inserted, 1 ]; //first param is used for count and second to check if cron is complete.
+        update_option( 'ldnft_process_freemius_plans_stats', $active_crons );
+
+        update_option('ldnft_run_cron_based_on_plugins', 'customers');
+        
+    }
+
+    /**
+	 * process customers data.
+	 */
+	public function ldnft_process_freemius_plugins( $start = 0, $limit = 3 ) {
+		
+        global $wpdb;
+        error_log( 'ldnft_process_freemius_plugins_data:'.$start.', '.$limit);
+        $table_name = $wpdb->prefix.'ldnft_plugins';
+        if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
+            $wpdb->query( "CREATE TABLE $table_name (
+                `id` int(11) NOT NULL,
+                `title` varchar(255) DEFAULT NULL,
+                `slug` varchar(255) DEFAULT NULL,
+                `default_plan_id` int(11) DEFAULT NULL,
+                `plans` varchar(255) DEFAULT NULL,
+                `features` varchar(255) DEFAULT NULL,
+                `money_back_period` int(11) Default NULL,
+                `created` datetime DEFAULT NULL
+            )" ); 
+        }
+
+        $service = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
+        $plugins = $service->Api('plugins.json?count='.$limit.'&offset='.$start, 'GET', []);
+        
+        $inserted = 0;
+        $updatednum = 0;
+        if( isset( $plugins->plugins ) &&  count($plugins->plugins) > 0 ) {
+            foreach( $plugins->plugins as $plugin ) {
+               
+                $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_name." where id=%d", $plugin->id ));
+                if( count( $res ) == 0 ) {
+                    $wpdb->insert(
+                        $table_name,
+                        array(
+                            'id'                    => $plugin->id,
+                            'title'                 => $plugin->title,
+                            'slug'                  => $plugin->slug,
+                            'default_plan_id'       => $plugin->default_plan_id,
+                            'plans'                 => $plugin->plans,
+                            'features'              => $plugin->features,
+                            'money_back_period'     => $plugin->money_back_period,
+                            'created'               => $plugin->created
+                        )
+                    );
+                    $inserted++;
+                } else {
+                    $wpdb->update($table_name, 
+                        array(
+                            'title'                 => $plugin->title,
+                            'slug'                  => $plugin->slug,
+                            'default_plan_id'       => $plugin->default_plan_id,
+                            'plans'                 => $plugin->plans,
+                            'features'              => $plugin->features,
+                            'money_back_period'     => $plugin->money_back_period,
+                            'created'               => $plugin->created
+                        ), array('id'=>$plugin->id));
+                    $updatednum++;
+                }
+            }
+        }
+
+        $active_crons = get_option('ldnft_process_freemius_plugins_stats' );
+        $active_crons[0] = intval( $active_crons[0] ) + count( $plugins->plugins );
+        if( count( $plugins->plugins ) < $limit) {
+            $active_crons[1] = 1;
+            update_option('ldnft_run_cron_based_on_plugins', 'plans');
+        }
+
+        update_option('ldnft_process_freemius_plugins_stats', $active_crons );
+        if( count( $plugins->plugins ) == $limit) {
+            
+            if ( ! wp_next_scheduled( 'ldnft_process_freemius_plugins_data' ) ) {
+                $data = [
+                        'start' => $start + $limit,
+                        'limit' => $limit
+                    ];
+                $time = strtotime('+1 Minutes', strtotime('now'));
+                wp_schedule_single_event( $time , 'ldnft_process_freemius_plugins_data', $data );
+            }
+        }
+        
+        //echo json_encode(['inserted' => $inserted, 'updated'=>$updatednum, 'message' => sprintf( __('Inserted: %d, Updated: %d', 'MWC'), $inserted, $updatednum)]);
+        //exit;
+	}
+
+    /**
+	 * process customers data.
+	 */
+	public function ldnft_process_freemius_customers( $plugin_id, $start = 0, $limit = 25){
+		
+        global $wpdb;
+        error_log( 'ldnft_process_freemius_customers:'.$plugin_id.',  '.$start.', '.$limit );
+        $table_name = $wpdb->prefix.'ldnft_customers';
+        if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
+            $wpdb->query( "CREATE TABLE $table_name (
+                `id` int(11) NOT NULL,
+                `email` varchar(255) DEFAULT NULL,
+                `first` varchar(255) DEFAULT NULL,
+                `last` varchar(255) DEFAULT NULL,
+                `is_verified` tinyint(1) DEFAULT NULL,
+                `is_marketing_allowed` tinyint(1) DEFAULT NULL,
+                `created` datetime DEFAULT NULL,
+                `status` varchar(20) DEFAULT NULL 
+            )" );     
+        }
+        
+        $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
+        $inserted = 0;
+        $updatednum = 0;
+        $usrobj = $api->Api('plugins/'.$plugin_id.'/users.json?count='.$limit.'&offset='.$start, 'GET', []);
+        foreach( $usrobj->users as $user ) {
+            
+            $res = $wpdb->get_results( $wpdb->prepare("select * from ".$table_name." where id=%d", $user->id ));
+            if( count( $res ) == 0 ) {
+                $wpdb->insert(
+                    $table_name,
+                    array(
+                        'id'                    => $user->id,
+                        'email'                 => $user->email,
+                        'first'                 => $user->first,
+                        'last'                  => $user->last,
+                        'is_verified'           => $user->is_verified,
+                        'created'               => $user->created,
+                        'is_marketing_allowed'  => $user->is_marketing_allowed
+                    )
+                );
+                $inserted++;
+            } else {
+                $wpdb->update( $table_name, 
+                    array(
+                        'email'                 => $user->email,
+                        'first'                 => $user->first,
+                        'last'                  => $user->last,
+                        'is_verified'           => $user->is_verified,
+                        'created'               => $user->created,
+                        'is_marketing_allowed'  => $user->is_marketing_allowed
+                    ), array('id'=>$user->id));
+                $updatednum++;
+            }
+        }
+
+        if( intval( $plugin_id ) > 0 ) {
+            $active_crons = get_option('ldnft_process_freemius_customers_stats' );
+            $active_crons[$plugin_id][0] = intval( $active_crons[$plugin_id][0] ) + count( $usrobj->users );
+            if( count( $usrobj->users ) < $limit) {
+                $active_crons[$plugin_id][1] = 1;
+            }
+        }
+
+        update_option('ldnft_process_freemius_customers_stats', $active_crons );
+
+        if( count( $usrobj->users ) == $limit) {
+            
+            if ( ! wp_next_scheduled( 'ldnft_process_freemius_customers_data' ) ) {
+                $data = [
+                        'plugin_id' => $plugin_id,
+                        'start' => $start + $limit,
+                        'limit' => $limit
+                    ];
+                $time = strtotime('+1 Minutes', strtotime('now'));
+                error_log( 'ldnft_process_freemius_customers passing:'.$plugin_id.',  '.$start + $limit.', '.$limit.'  '.date( 'Y-m-d H:i:s', $time) );
+                wp_schedule_single_event( $time , 'ldnft_process_freemius_customers_data', $data );
+            }
+        }
+
+        error_log( print_r(['inserted' => $inserted, 'updated'=>$updatednum, 'message' => sprintf( __('Inserted: %d, Updated: %d', 'MWC'), $inserted, $updatednum)], true) );
+        //return ['inserted' => $inserted, 'updated'=>$updatednum, 'message' => sprintf( __('Inserted: %d, Updated: %d', 'MWC'), $inserted, $updatednum)];
+	}
+
+    /**
+	 * Cron test schedules of 5mins.
+	 */
+	public function ldnft_cron_schedules($schedules){
+		
+		if(!isset($schedules["1min"])) {
+			$schedules["1min"] = array(
+				'interval' => 1*60,
+				'display' => __('Once every 5 minutes'));
+		}
+		
+		return $schedules;
+	}
 
     /**
      * Process mailpoet
