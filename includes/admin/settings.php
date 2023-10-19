@@ -414,7 +414,7 @@ class Tickera_Customization_Settings {
         if( isset( $plugins->plugins ) &&  count($plugins->plugins) > 0 ) {
             foreach( $plugins->plugins as $plugin ) {
                
-                $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_name." where id=%d", $plugin->id ));
+                $res = $wpdb->get_results($wpdb->prepare("select title from ".$table_name." where id=%d", $plugin->id ));
                 if( count( $res ) == 0 ) {
                     $wpdb->insert(
                         $table_name,

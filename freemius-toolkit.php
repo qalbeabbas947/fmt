@@ -245,6 +245,9 @@ class LDNFT_Freemius {
         }
     }
 
+    /**
+     * Return country list with code.
+     */
     public static function get_country_name_by_code( $country_code ) {
         
         $countries = [
@@ -504,8 +507,4 @@ class LDNFT_Freemius {
  * Retrieve the plugin object
  * @return bool
  */
-function LDNFT() {
-
-    return LDNFT_Freemius::instance();
-}
-add_action( 'plugins_loaded', 'LDNFT' );
+return LDNFT_Freemius::instance();
