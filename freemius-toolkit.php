@@ -184,6 +184,11 @@ class LDNFT_Freemius {
      */
     private function includes() {       
 
+        
+        if( file_exists( LDNFT_INCLUDES_DIR .'admin/class-crons.php' ) ) {
+            require_once LDNFT_INCLUDES_DIR . 'admin/class-crons.php';
+        }        
+        
         if( file_exists( LDNFT_INCLUDES_DIR .'admin/settings.php' ) ) {
             require_once LDNFT_INCLUDES_DIR . 'admin/settings.php';
         }        
