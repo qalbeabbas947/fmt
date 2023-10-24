@@ -106,6 +106,8 @@ class LDNFT_Freemius {
      */
     private function connect_freemius () {
 
+        global $wpdb;
+
         if( file_exists( LDNFT_DIR.'freemius/includes/sdk/FreemiusBase.php' ) ) {
             require_once LDNFT_DIR.'freemius/includes/sdk/FreemiusBase.php';
         }        
@@ -128,21 +130,13 @@ class LDNFT_Freemius {
         define( 'FS__API_PUBLIC_KEY', $public_key );
         define( 'FS__API_SECRET_KEY', $secret_key );
 
-        $api = new Freemius_Api_WordPress( FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY );
-        $fs_connection = false;
-        $fs_has_plugins = false;
-        try {
-            $products = $api->Api('plugins.json?fields=id,title', 'GET', []);
-			if( ! isset( $products->error )  ) {
-	
-                self::$products = $products;
-                $fs_connection = true;
-                if( is_array( $products->plugins ) && count( $products->plugins ) > 0 ) {
-                    $fs_has_plugins = true;
-                }
+        $fs_connection  = get_option( 'ldnft__freemius_connected' ) == 'yes'? true : false;
+        $fs_has_plugins = get_option( 'ldnft__HAS_PLUGINS' ) == 'yes'? true : false;
+        if( $fs_connection ) {
+            $table_name = $wpdb->prefix.'ldnft_plugins';
+            if( !is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
+                self::$products = $wpdb->get_results( 'select * from '.$table_name); 
             }
-        } catch( Exception $e ) {
-    		       
         }
 
         define( 'FS__API_CONNECTION', $fs_connection );

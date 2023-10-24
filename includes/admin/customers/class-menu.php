@@ -133,11 +133,25 @@ class LDNFT_Customers_Menu {
      */
     public static function customers_page( ) {
 
+        global $wpdb;
+        
 		if( !FS__HAS_PLUGINS ) {
             ?>
                 <div class="wrap">
                     <h2><?php _e( 'Customers', LDNFT_TEXT_DOMAIN ); ?></h2>
                     <p><?php _e( 'No product(s) exists in your freemius account. Please, add a product on freemius and reload the page.', LDNFT_TEXT_DOMAIN ); ?></p>
+                </div>
+            <?php
+
+            return;
+        }
+		
+        $table_name = $wpdb->prefix.'ldnft_customers';
+        if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
+            ?> 
+                <div class="wrap">
+                    <h2><?php _e( 'Customers', LDNFT_TEXT_DOMAIN ); ?></h2>
+                    <p id="ldnft-dat-not-imported-message"><?php _e( 'Customers are not imported yet. Please, click <a href="admin.php?page=freemius-settings&tab=freemius-api">here</a> to open the setting page and start the import process automatically.', LDNFT_TEXT_DOMAIN ); ?></p>
                 </div>
             <?php
 
@@ -177,7 +191,7 @@ class LDNFT_Customers_Menu {
 							<span class="ldnft_filter_labels"><?php _e( 'Filters:', LDNFT_TEXT_DOMAIN ); ?></span>
 							<select name="ldfmt-plugins-filter" class="ldfmt-plugins-filter ldfmt-plugins-customers-filter" >
 								<?php
-									foreach( $products->plugins as $plugin ) {
+									foreach( $products as $plugin ) {
 										
 										$selected = '';
 										if( $selected_plugin_id == $plugin->id ) {
@@ -191,10 +205,8 @@ class LDNFT_Customers_Menu {
 							</select>&nbsp;&nbsp;
 							<select name="ldfmt-plugins-status" class="ldfmt-plugins-customers-status">
 								<option value=""><?php _e('Filter by status', LDNFT_TEXT_DOMAIN);?></option>
-								<option value="active" <?php echo $selected_status=='active'?'selected':''; ?>><?php _e('Active', LDNFT_TEXT_DOMAIN);?></option>
-								<option value="never_paid" <?php echo $selected_status=='never_paid'?'selected':''; ?>><?php _e('Free Users', LDNFT_TEXT_DOMAIN);?></option>
-								<option value="paid" <?php echo $selected_status=='paid'?'selected':''; ?>><?php _e('Customers', LDNFT_TEXT_DOMAIN);?></option>
-								<option value="paying" <?php echo $selected_status=='paying'?'selected':''; ?>><?php _e('Currently Customers', LDNFT_TEXT_DOMAIN);?></option>
+								<option value="1" <?php echo $selected_status=='active'?'selected':''; ?>><?php _e('Verified', LDNFT_TEXT_DOMAIN);?></option>
+								<option value="0" <?php echo $selected_status=='0'?'selected':''; ?>><?php _e('Unverified', LDNFT_TEXT_DOMAIN);?></option>
 							</select>
 						</div>
                 		<div id="ldnft_customers_data">
@@ -203,6 +215,8 @@ class LDNFT_Customers_Menu {
 						</div>
 					</div>
 					<input type="hidden" class="ldnft-freemius-page" name="page" value="1" />
+                    <input type="hidden" class="ldnft-freemius-order" name="order" value="id" />
+                    <input type="hidden" class="ldnft-freemius-orderby" name="orderby" value="asc" />
 					<input type="hidden" class="ldnft-script-freemius-type" name="ldnft-script-freemius-type" value="customers" />
                 </form>
             </div>

@@ -71,9 +71,9 @@ $plugins = LDNFT_Freemius::$products;
                     <td>
                         <?php
                             $is_plugins_available = true;
-                            if( is_array($plugins->plugins) && count( $plugins->plugins ) > 0 ) {
+                            if( is_array($plugins) && count( $plugins ) > 0 ) {
                                 echo '<select id="ldnft_mailpeot_plugin" name="ldnft_mailpeot_plugin">';
-                                foreach( $plugins->plugins as $plugin ) {
+                                foreach( $plugins as $plugin ) {
                                     ?>
                                         <option value="<?php echo $plugin->id; ?>"><?php echo $plugin->title; ?></option>
                                     <?php   

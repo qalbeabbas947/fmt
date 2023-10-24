@@ -51,8 +51,7 @@ class LDNFT_Sales extends WP_List_Table {
 
         $this->api = new Freemius_Api_WordPress( FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY );
         $this->plugins = LDNFT_Freemius::$products;
-        $this->plugins = $this->plugins->plugins;
-
+        
         $this->selected_plugin_id = ( isset( $_GET['ldfmt_plugins_filter'] ) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) ? intval( $_GET['ldfmt_plugins_filter'] ) : $this->plugins[0]->id;
         $this->selected_interval = ( isset( $_GET['interval'] ) ) ? $_GET['interval'] : 12; 
         $this->selected_filter = ( isset( $_GET['filter'] )  ) ? $_GET['filter'] : 'all'; 

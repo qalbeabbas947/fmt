@@ -338,8 +338,6 @@ class LDNFT_Admin {
         }
         exit;
     }
-
-    
     
     /**
      * Create activities meta table on plugin updation.
@@ -426,9 +424,18 @@ class LDNFT_Admin {
                  */
                 wp_enqueue_script( 'fmt-backend-js', LDNFT_ASSETS_URL . 'js/backend.js?'.time(), [ 'jquery' ], LDNFT_VERSION, true ); 
                 $cron_status    = get_option('ldnft_run_cron_based_on_plugins');
+
+                $page = isset( $_REQUEST[ 'page' ] ) && $_REQUEST[ 'page' ] == 'freemius-settings' ? 'freemius' : '';
+                $tab  = isset( $_REQUEST[ 'tab' ] ) && ! empty( $_REQUEST[ 'tab' ] )? $_REQUEST[ 'tab' ]: 'freemius-api';
+                $is_cron_page_check = 'no';
+                if( $page == 'freemius' && $tab == 'freemius-api' ) {
+                    $is_cron_page_check = 'yes';
+                }
+
                 wp_localize_script( 'fmt-backend-js', 'LDNFT', [  
                     'ajaxURL' => admin_url( 'admin-ajax.php' ),
-                    'import_cron_status' => $cron_status
+                    'import_cron_status' => $cron_status,
+                    'is_cron_page_check' => $is_cron_page_check,
                 ] );
             }
         }  

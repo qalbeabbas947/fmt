@@ -156,11 +156,25 @@ class LDNFT_Reviews_Menu {
      */
     public static function reviews_page( ) {
         
+        global $wpdb;
+
 		if( !FS__HAS_PLUGINS ) {
-            ?>
+            ?> 
                 <div class="wrap">
-                    <h2><?php _e( 'Subscriptions', LDNFT_TEXT_DOMAIN ); ?></h2>
+                    <h2><?php _e( 'Reviews', LDNFT_TEXT_DOMAIN ); ?></h2>
                     <p><?php _e( 'No product(s) exists in your freemius account. Please, add a product on freemius and reload the page.', LDNFT_TEXT_DOMAIN ); ?></p>
+                </div>
+            <?php
+
+            return;
+        }
+
+        $table_name = $wpdb->prefix.'ldnft_reviews';
+        if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
+            ?> 
+                <div class="wrap">
+                    <h2><?php _e( 'Reviews', LDNFT_TEXT_DOMAIN ); ?></h2>
+                    <p id="ldnft-dat-not-imported-message"><?php _e( 'Reviews are not imported yet. Please, click <a href="admin.php?page=freemius-settings&tab=freemius-api">here</a> to open the setting page and start the import process automatically.', LDNFT_TEXT_DOMAIN ); ?></p>
                 </div>
             <?php
 
@@ -187,9 +201,7 @@ class LDNFT_Reviews_Menu {
         ?>
             <div class="wrap">
                 
-                <h2><?php _e( 'Reviews', LDNFT_TEXT_DOMAIN ); ?></h2>
-
-                
+                <h2><?php _e( 'Reviews', LDNFT_TEXT_DOMAIN ); ?></h2>                
                 <!-- Forms are NOT created automatically, so you need to wrap the table in one to use features like bulk actions -->
                 <form id="ldnft-reviews-filter" method="get">
 					<div class="ldnft_filters_top">
@@ -197,7 +209,7 @@ class LDNFT_Reviews_Menu {
 							<span class="ldnft_filter_labels"><?php _e( 'Filters:', LDNFT_TEXT_DOMAIN ); ?></span>
 							<select name="ldfmt-plugins-filter" class="ldfmt-plugins-filter ldfmt-plugins-reviews-filter">
 								<?php
-									foreach( $products->plugins as $plugin ) {
+									foreach( $products as $plugin ) {
 										
 										$selected = '';
 										if( $selected_plugin_id == $plugin->id ) {

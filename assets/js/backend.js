@@ -5,6 +5,7 @@
             default_sales_table_row: '',
 			default_customers_table_row: '',
 			default_reviews_table_row: '',
+            ajax_url_new: ajaxurl,
             init: function() {
 				
                 $('.ldnft-success-message').hide();
@@ -15,38 +16,45 @@
                 $('.ldnft-admin-modal-close').on('click', LDNFTbackEnd.ldnft_subsciber_modal_close);
 				$('#ldnft_reviews_data').on('click', '.ldnft_review_view_detail', LDNFTbackEnd.review_view_detail);
                 $('#ldnft-reviews-filter').on('click', '.ldnft_is_featured_enabled_click', LDNFTbackEnd.ldnft_is_featured_enabled);
+                
+                LDNFTbackEnd.listing_pages();
+                LDNFTbackEnd.import_cron_status();
+            },
+            listing_pages: function(){
                 /**
                  * Execute based on the conditions
                  */
-				var script_type = $('.ldnft-script-freemius-type').val();
-				if( script_type == 'subscribers' ) {
-					$('.ldfmt-subscription-status-filter, .ldfmt-subscription-interval-filter, .ldfmt-subscription-plan_id-filter, .ldfmt-plugins-subscription-filter').on('change', LDNFTbackEnd.display_subscriptions_plus_summary);
-					$('#ldnft_subscriptions_data').on('click', '.tablenav-pages a', LDNFTbackEnd.display_new_page_subscriptions);
-					LDNFTbackEnd.display_subscriptions_plus_summary();					
-				} else if( script_type == 'sales' ) { 
-					$('#ldnft_sales_data').on('click', '.tablenav-pages a', LDNFTbackEnd.display_new_page_sales);
-					$('.ldfmt-sales-interval-filter, .ldfmt-sales-filter, .ldfmt-plugins-sales-filter').on('change', LDNFTbackEnd.display_sales_plus_summary);
-					LDNFTbackEnd.display_sales_plus_summary();
-				} else if( script_type == 'customers' ) { 
-					
-					$('#ldnft_customers_data').on('click', '.tablenav-pages a', LDNFTbackEnd.display_new_page_customers);
-					$('.ldfmt-plugins-customers-filter, .ldfmt-plugins-customers-status').on('change', LDNFTbackEnd.display_customers_onchange);
-					LDNFTbackEnd.display_customers();
-					
-				} else if( script_type == 'reviews' ) { 
-					$('#ldnft_reviews_data').on('click', '.tablenav-pages a', LDNFTbackEnd.display_new_page_reviews);
-					$('.ldfmt-plugins-reviews-filter').on('change', LDNFTbackEnd.display_reviews_onchange);
-					LDNFTbackEnd.display_reviews();
-				}
+                var script_type = $('.ldnft-script-freemius-type').val();
+                if( script_type == 'subscribers' ) {
+                    $('.ldfmt-subscription-status-filter, .ldfmt-subscription-interval-filter, .ldfmt-subscription-plan_id-filter, .ldfmt-plugins-subscription-filter').on('change', LDNFTbackEnd.display_subscriptions_plus_summary);
+                    $('#ldnft_subscriptions_data').on('click', '.tablenav-pages a', LDNFTbackEnd.display_new_page_subscriptions);
+                    LDNFTbackEnd.display_subscriptions_plus_summary();					
+                } else if( script_type == 'sales' ) { 
+                    $('#ldnft_sales_data').on('click', '.tablenav-pages a', LDNFTbackEnd.display_new_page_sales);
+                    $('.ldfmt-sales-interval-filter, .ldfmt-sales-filter, .ldfmt-plugins-sales-filter').on('change', LDNFTbackEnd.display_sales_plus_summary);
+                    LDNFTbackEnd.display_sales_plus_summary();
+                } else if( script_type == 'customers' ) { 
+                    $('#ldnft_customers_data').on('click', '.tablenav-pages a, th a', LDNFTbackEnd.display_new_page_customers);
+                    $('.ldfmt-plugins-customers-filter, .ldfmt-plugins-customers-status').on('change', LDNFTbackEnd.display_customers_onchange);
+                    LDNFTbackEnd.display_customers();
+                    
+                } else if( script_type == 'reviews' ) { 
+                    $('#ldnft_reviews_data').on('click', '.tablenav-pages a', LDNFTbackEnd.display_new_page_reviews);
+                    $('.ldfmt-plugins-reviews-filter').on('change', LDNFTbackEnd.display_reviews_onchange);
+                    LDNFTbackEnd.display_reviews();
+                }
+            },
+            import_cron_status: function() {
                 
-                console.log(LDNFT.import_cron_status);
-                if( LDNFT.import_cron_status != 'complete' ) {
-                    console.log('running inside');
-                    LDNFTbackEnd.timeout_obj = setInterval(LDNFTbackEnd.check_cron_status, 3000);
-                } else {
-                    $('.ldnft-process-freemius-data-info').css('display', 'none');
-                    LDNFT.import_cron_status = 'complete';
-                    clearInterval(LDNFTbackEnd.timeout_obj);
+                if( LDNFT.is_cron_page_check=='yes' ) {
+                    if( LDNFT.import_cron_status != 'complete' ) {
+                        console.log('running inside');
+                        LDNFTbackEnd.timeout_obj = setInterval(LDNFTbackEnd.check_cron_status, 3000);
+                    } else {
+                        $('.ldnft-process-freemius-data-info').css('display', 'none');
+                        LDNFT.import_cron_status = 'complete';
+                        clearInterval(LDNFTbackEnd.timeout_obj);
+                    }
                 }
             },
             check_cron_status: function() {
@@ -225,18 +233,33 @@
                     }
                 });
             },
+            getParameterByName: function( name, url) {
+                name = name.replace(/[\[\]]/g, '\\$&');
+                var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                    results = regex.exec(url);
+                if (!results) return null;
+                if (!results[2]) return '';
+                return decodeURIComponent(results[2].replace(/\+/g, ' '));
+            },
 			/**
              * displays customers on pagination clicks
             */
-			display_new_page_customers: function() {
-                var page = $('.ldnft-freemius-page').val($(this).data('offset'));
+			display_new_page_customers: function( e ) { 
+
+                $('.ldnft-freemius-order').val(LDNFTbackEnd.getParameterByName('order', $(this).attr('href')));
+                $('.ldnft-freemius-orderby').val(LDNFTbackEnd.getParameterByName('orderby', $(this).attr('href')));
+                console.log($(this).attr('href'))
+                console.log(LDNFTbackEnd.getParameterByName('orderby', $(this).attr('href')));
+                console.log(LDNFTbackEnd.getParameterByName('order', $(this).attr('href')));
+                e.preventDefault();
+                var page = $('.ldnft-freemius-page').val($(this).data('paged'));
                 LDNFTbackEnd.display_customers();
             },
             /**
              * Show customers based on filters
              */
 			display_customers_onchange: function() {
-                var page = $('.ldnft-freemius-page').val($(this).data('offset'));
+                var page = $('.ldnft-freemius-page').val(1);
                 LDNFTbackEnd.display_customers();
             },
             /**
@@ -253,15 +276,19 @@
                 var ldnftpage       = $('.ldnft-freemius-page').val();
                 var ldnftplugin     = $('.ldfmt-plugins-filter').val();
                 var ldnftstatus     = $('.ldfmt-plugins-customers-status').val();
-                
+                var order_str           = $('.ldnft-freemius-order').val();
+                var orderby_str         = $('.ldnft-freemius-orderby').val();
+
                 $.ajax({
                     url: ajaxurl,
                     dataType: 'json',
                     data: {
-                        action: 'ldnft_customers_display',
-                        offset: ldnftpage,
+                        action: 'ldnft_customers_display', 
+                        paged: ldnftpage,
                         ldfmt_plugins_filter: ldnftplugin,
-                        status: ldnftstatus
+                        status: ldnftstatus,
+                        order: order_str,
+                        orderby: orderby_str,
                     },
                     success: function (response) {
                         $("#ldnft_customers_data").html(response.display);

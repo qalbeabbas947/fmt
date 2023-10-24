@@ -14,24 +14,28 @@ class LDNFT_Crons_Settings {
         
         global $wpdb;
 
-        add_action( 'wp_ajax_ldnft_check_cron_status',          [ $this, 'check_cron_status' ], 100 );
-
         //import data via cron work
-        if( FS__API_CONNECTION && !wp_doing_ajax() ) {
-            add_filter('cron_schedules', [ $this, 'ldnft_cron_schedules' ], 9999, 1);
-            
+        
+        add_action( 'wp_ajax_ldnft_check_cron_status',          [ $this, 'check_cron_status' ], 100 );
+        add_action( 'ldnft_process_freemius_customers_data', [ $this, 'ldnft_process_freemius_customers' ], 10, 3 );
+        add_action( 'ldnft_process_freemius_plugins_data', [ $this, 'ldnft_process_freemius_plugins' ], 10, 2 );
+        add_action( 'ldnft_process_freemius_sales_data', [ $this, 'process_freemius_sales' ], 10, 3 );
+        add_action( 'ldnft_process_freemius_subscription_data', [ $this, 'process_freemius_subscription' ], 10, 3 );
+        add_action( 'ldnft_process_freemius_reviews_data', [ $this, 'process_freemius_reviews' ], 10, 3 );
+
+        if( FS__API_CONNECTION  ) {
+
             $cron_status    = get_option( 'ldnft_run_cron_based_on_plugins' );
             $cron_started   = get_option( 'ldnft_run_cron_based_on_plugins_started' );
             
             if( $cron_status != 'complete' ) { 
-                
+                error_log('stest:'.$cron_status);
                 switch( $cron_status ) {
                     case "customers":
                         if( $cron_started != 'yes' ) {
                             $plugins = $wpdb->get_results( 'select id from '.$wpdb->prefix.'ldnft_plugins' );
                             foreach( $plugins as $plugin ) {
                                 if( intval( $plugin->id ) > 0 ) {
-                                    $active_crons = get_option('ldnft_process_freemius_customers_stats' );
                                     $active_crons[$plugin->id] = [0,0]; //first param is used for count and second to check if cron is complete.
                                     update_option('ldnft_process_freemius_customers_stats', $active_crons );
                                     $this->ldnft_process_freemius_customers( $plugin->id );
@@ -41,7 +45,6 @@ class LDNFT_Crons_Settings {
                         break;
                     case "plans":
                         if( $cron_started != 'yes' ) {
-                            $active_crons = get_option('ldnft_process_freemius_plans_stats' );
                             $active_crons = [ 0, 0 ]; //first param is used for count and second to check if cron is complete.
                             update_option( 'ldnft_process_freemius_plans_stats', $active_crons );
                             $this->ldnft_process_freemius_plans( );
@@ -50,10 +53,8 @@ class LDNFT_Crons_Settings {
                     case "sales":
                         if( $cron_started != 'yes' ) {
                             $plugins = $wpdb->get_results( 'select id from '.$wpdb->prefix.'ldnft_plugins' );
-                            
                             foreach( $plugins as $plugin ) {
                                 if( intval( $plugin->id ) > 0 ) {
-                                    $plugins = $wpdb->get_results( 'select id from '.$wpdb->prefix.'ldnft_plugins' );
                                     $active_crons[$plugin->id] = [0,0]; //first param is used for count and second to check if cron is complete.
                                     update_option( 'ldnft_process_freemius_sales_stats', $active_crons );
                                     $this->process_freemius_sales( $plugin->id );
@@ -90,7 +91,6 @@ class LDNFT_Crons_Settings {
                         break;
                     default:
                         if( $cron_started != 'yes' ) {
-                            $active_crons = get_option('ldnft_process_freemius_plugins_stats' );
                             $active_crons = [ 0, 0 ]; //first param is used for count and second to check if cron is complete.
                             update_option( 'ldnft_process_freemius_plugins_stats', $active_crons );
                             $this->ldnft_process_freemius_plugins( );
@@ -102,11 +102,7 @@ class LDNFT_Crons_Settings {
                 self::calculate_cron_process();
             }
 
-            add_action( 'ldnft_process_freemius_customers_data', [ $this, 'ldnft_process_freemius_customers' ], 10, 3 );
-            add_action( 'ldnft_process_freemius_plugins_data', [ $this, 'ldnft_process_freemius_plugins' ], 10, 2 );
-            add_action( 'ldnft_process_freemius_sales_data', [ $this, 'process_freemius_sales' ], 10, 3 );
-            add_action( 'ldnft_process_freemius_subscription_data', [ $this, 'process_freemius_subscription' ], 10, 3 );
-            add_action( 'ldnft_process_freemius_reviews_data', [ $this, 'process_freemius_reviews' ], 10, 3 );
+            
         }
     }
 
@@ -262,6 +258,7 @@ class LDNFT_Crons_Settings {
     public function process_freemius_subscription( $plugin_id,  $start = 0, $limit = 50 ) {
         
         global $wpdb;
+
         error_log( 'ldnft_process_freemius_subscription:'.$plugin_id.',  '.$start.', '.$limit );
         $table_name = $wpdb->prefix.'ldnft_subscription';
         if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
@@ -634,11 +631,11 @@ class LDNFT_Crons_Settings {
             }
         } 
 
-        $status[ 'Reviews' ] = 0;
-        $status[ 'Reviewsrecs' ] = 0;
-        $status[ 'Reviewsmsg' ] = __( 'Please wait, while we are syncing the freemius reviews data.', LDNFT_TEXT_DOMAIN );
-        $active_crons = get_option( 'ldnft_process_freemius_reviews_stats' );
-        $done_reviews = 0;
+        $status[ 'Reviews' ]        = 0;
+        $status[ 'Reviewsrecs' ]    = 0;
+        $status[ 'Reviewsmsg' ]     = __( 'Please wait, while we are syncing the freemius reviews data.', LDNFT_TEXT_DOMAIN );
+        $active_crons               = get_option( 'ldnft_process_freemius_reviews_stats' );
+        $done_reviews               = 0;
        
         if( is_array( $active_crons ) && count( $active_crons ) > 0 ) {
             foreach( $active_crons as $key => $value ) {
@@ -654,10 +651,10 @@ class LDNFT_Crons_Settings {
             }
         } 
 
-        $status[ 'Subscription' ] = 0;
-        $status[ 'Subscriptionrecs' ] = 0;
-        $status[ 'Subscriptionmsg' ] = __( 'Please wait, while we are syncing the freemius subscription data.', LDNFT_TEXT_DOMAIN );
-        $active_crons = get_option( 'ldnft_process_freemius_subscription_stats' );
+        $status[ 'Subscription' ]       = 0;
+        $status[ 'Subscriptionrecs' ]   = 0;
+        $status[ 'Subscriptionmsg' ]    = __( 'Please wait, while we are syncing the freemius subscription data.', LDNFT_TEXT_DOMAIN );
+        $active_crons                   = get_option( 'ldnft_process_freemius_subscription_stats' );
         $done_subscription = 0;
        
         if( is_array( $active_crons ) && count( $active_crons ) > 0 ) {
@@ -674,7 +671,6 @@ class LDNFT_Crons_Settings {
             }
         } 
 
-        error_log( print_r([ 'status' => get_option('ldnft_run_cron_based_on_plugins'), 'individual_status' => $status ], true));
         return json_encode( [ 'status' => get_option('ldnft_run_cron_based_on_plugins'), 'individual_status' => $status ]);
     }
     
@@ -713,7 +709,9 @@ class LDNFT_Crons_Settings {
 	 * process plans data.
 	 */
 	public function ldnft_process_freemius_plans( $start = 0, $limit = 50 ) {
+        
         global $wpdb;
+
         error_log( 'ldnft_process_freemius_plans_data:'.$start.', '.$limit);
         $table_name = $wpdb->prefix.'ldnft_plans';
         if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
@@ -827,6 +825,7 @@ class LDNFT_Crons_Settings {
 	public function ldnft_process_freemius_plugins( $start = 0, $limit = 50 ) {
 		
         global $wpdb;
+
         error_log( 'ldnft_process_freemius_plugins_data:'.$start.', '.$limit);
         $table_name = $wpdb->prefix.'ldnft_plugins';
         if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
@@ -927,7 +926,8 @@ class LDNFT_Crons_Settings {
                 `is_verified` tinyint(1) DEFAULT NULL,
                 `is_marketing_allowed` tinyint(1) DEFAULT NULL,
                 `created` datetime DEFAULT NULL,
-                `status` varchar(20) DEFAULT NULL 
+                `status` varchar(20) DEFAULT NULL, 
+                `plugin_id` int(11) NOT NULL
             )" );     
         }
         
@@ -935,65 +935,79 @@ class LDNFT_Crons_Settings {
         $inserted = 0;
         $updatednum = 0;
         $usrobj = $api->Api('plugins/'.$plugin_id.'/users.json?count='.$limit.'&offset='.$start, 'GET', []);
-        foreach( $usrobj->users as $user ) {
-            
-            $res = $wpdb->get_results( $wpdb->prepare("select * from ".$table_name." where id=%d", $user->id ));
-            if( count( $res ) == 0 ) {
-                $wpdb->insert(
-                    $table_name,
-                    array(
-                        'id'                    => $user->id,
-                        'email'                 => $user->email,
-                        'first'                 => $user->first,
-                        'last'                  => $user->last,
-                        'is_verified'           => $user->is_verified,
-                        'created'               => $user->created,
-                        'is_marketing_allowed'  => $user->is_marketing_allowed
-                    )
-                );
-                $inserted++;
-            } else {
-                $wpdb->update( $table_name, 
-                    array(
-                        'email'                 => $user->email,
-                        'first'                 => $user->first,
-                        'last'                  => $user->last,
-                        'is_verified'           => $user->is_verified,
-                        'created'               => $user->created,
-                        'is_marketing_allowed'  => $user->is_marketing_allowed
-                    ), array('id'=>$user->id));
-                $updatednum++;
-            }
-        }
-
-        if( intval( $plugin_id ) > 0 ) {
-            $active_crons = get_option('ldnft_process_freemius_customers_stats' );
-            $active_crons[$plugin_id][0] = intval( $active_crons[$plugin_id][0] ) + count( $usrobj->users );
-            if( count( $usrobj->users ) < $limit) {
-                $active_crons[$plugin_id][1] = 1;
+        if( ! isset( $usrobj->error )  ) {
+            foreach( $usrobj->users as $user ) {
+                
+                $res = $wpdb->get_results( $wpdb->prepare("select * from ".$table_name." where id=%d", $user->id ));
+                if( count( $res ) == 0 ) {
+                    $wpdb->insert(
+                        $table_name,
+                        array(
+                            'id'                    => $user->id,
+                            'email'                 => $user->email,
+                            'first'                 => $user->first,
+                            'last'                  => $user->last,
+                            'is_verified'           => $user->is_verified,
+                            'created'               => $user->created,
+                            'is_marketing_allowed'  => $user->is_marketing_allowed,
+                            'plugin_id'            => $plugin_id
+                        )
+                    );
+                    $inserted++;
+                } else {
+                    $wpdb->update( $table_name, 
+                        array(
+                            'email'                 => $user->email,
+                            'first'                 => $user->first,
+                            'last'                  => $user->last,
+                            'is_verified'           => $user->is_verified,
+                            'created'               => $user->created,
+                            'is_marketing_allowed'  => $user->is_marketing_allowed,
+                            'plugin_id'            => $plugin_id
+                        ), array('id'=>$user->id));
+                    $updatednum++;
+                }
             }
 
-            update_option( 'ldnft_process_freemius_customers_stats', $active_crons );
-        }
+            if( intval( $plugin_id ) > 0 ) {
+                $active_crons = get_option('ldnft_process_freemius_customers_stats' );
+                $active_crons[$plugin_id][0] = intval( $active_crons[$plugin_id][0] ) + count( $usrobj->users );
+                if( count( $usrobj->users ) < $limit) {
+                    $active_crons[$plugin_id][1] = 1;
+                }
+                error_log( print_r($active_crons, true) );
+                update_option( 'ldnft_process_freemius_customers_stats', $active_crons );
+            }
 
         
 
-        if( count( $usrobj->users ) == $limit) {
-            
+            if( count( $usrobj->users ) == $limit) {
+                
+                if ( ! wp_next_scheduled( 'ldnft_process_freemius_customers_data' ) ) {
+                    $data = [
+                            'plugin_id' => $plugin_id,
+                            'start' => $start + $limit,
+                            'limit' => $limit
+                        ];
+                    
+                    error_log( 'ldnft_process_freemius_customers passing:'.$plugin_id.',  '.$start + $limit.', '.$limit.'  ' );
+                    wp_schedule_single_event( time() , 'ldnft_process_freemius_customers_data', $data );
+                }
+            }
+
+            $this->check_and_complete( 'ldnft_process_freemius_customers_stats',  'sales' );
+        } else{
             if ( ! wp_next_scheduled( 'ldnft_process_freemius_customers_data' ) ) {
                 $data = [
                         'plugin_id' => $plugin_id,
-                        'start' => $start + $limit,
+                        'start' => $start,
                         'limit' => $limit
                     ];
                 
-                error_log( 'ldnft_process_freemius_customers passing:'.$plugin_id.',  '.$start + $limit.', '.$limit.'  ' );
+                error_log( 'ldnft_process_freemius_customers reschedule passing:'.$plugin_id.',  '.$start + $limit.', '.$limit.'  ' );
                 wp_schedule_single_event( time() , 'ldnft_process_freemius_customers_data', $data );
             }
         }
-
-        $this->check_and_complete( 'ldnft_process_freemius_customers_stats',  'sales' );
-
         error_log( print_r(['inserted' => $inserted, 'updated'=>$updatednum, 'message' => sprintf( __('Inserted: %d, Updated: %d', 'MWC'), $inserted, $updatednum)], true) );
         //return ['inserted' => $inserted, 'updated'=>$updatednum, 'message' => sprintf( __('Inserted: %d, Updated: %d', 'MWC'), $inserted, $updatednum)];
 	}
@@ -1002,8 +1016,9 @@ class LDNFT_Crons_Settings {
 	 * check and mark as complete if all plugins data is imported
 	 */
     public function check_and_complete( $stats_key,  $next_step ) {
-
-        $active_crons = get_option( $stats_key );
+        error_log( 'check_and_complete' );error_log( $next_step );
+        error_log( $stats_key );
+        $active_crons = get_option( $stats_key );error_log( print_r($active_crons, true) );
         $done_customers = 0;
         
         if( is_array( $active_crons ) && count( $active_crons ) > 0 ) {
@@ -1021,20 +1036,6 @@ class LDNFT_Crons_Settings {
         }
 
     }
-
-    /**
-	 * Cron test schedules of 5mins.
-	 */
-	public function ldnft_cron_schedules($schedules){
-		
-		if(!isset($schedules["1min"])) {
-			$schedules["1min"] = array(
-				'interval' => 1*60,
-				'display' => __('Once every 5 minutes'));
-		}
-		
-		return $schedules;
-	}
 }
 
 new LDNFT_Crons_Settings();

@@ -186,11 +186,25 @@ class LDNFT_Sales_Menu {
      */
     public static function sales_page( ) {
         
+        global $wpdb;
+
         if( !FS__HAS_PLUGINS ) {
             ?>
                 <div class="wrap">
                     <h2><?php _e( 'Sales', LDNFT_TEXT_DOMAIN ); ?></h2>
                     <p><?php _e( 'No product(s) exists in your freemius account. Please, add a product on freemius and reload the page.', LDNFT_TEXT_DOMAIN ); ?></p>
+                </div>
+            <?php
+
+            return;
+        }
+
+        $table_name = $wpdb->prefix.'ldnft_transactions';
+        if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
+            ?> 
+                <div class="wrap">
+                    <h2><?php _e( 'Sales', LDNFT_TEXT_DOMAIN ); ?></h2>
+                    <p id="ldnft-dat-not-imported-message"><?php _e( 'Sales are not imported yet. Please, click <a href="admin.php?page=freemius-settings&tab=freemius-api">here</a> to open the setting page and start the import process automatically.', LDNFT_TEXT_DOMAIN ); ?></p>
                 </div>
             <?php
 
@@ -232,7 +246,7 @@ class LDNFT_Sales_Menu {
                             <h2><?php _e( 'Sales', LDNFT_TEXT_DOMAIN ); ?></h2>
                             <select name="ldfmt-plugins-filter" class="ldfmt-plugins-filter ldfmt-plugins-sales-filter">
                                 <?php
-                                    foreach( $products->plugins as $plugin )  {
+                                    foreach( $products as $plugin )  {
                                         
                                         $selected = '';
                                         if( $selected_plugin_id == $plugin->id ) {
