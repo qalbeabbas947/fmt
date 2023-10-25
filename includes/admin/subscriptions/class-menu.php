@@ -527,7 +527,111 @@ class LDNFT_Subscriptions_Menu {
                             <span class="ldnft-admin-modal-close">&times;</span>
                                 <h2><?php echo __( 'Subscription Detail', LDNFT_TEXT_DOMAIN );?></h2>
                             </div>
-                            <div class="ldnft-admin-modal-body"></div>
+                            <div class="ldnft-admin-modal-body">
+                                <table id="ldnft-subscriptions" width="100%" cellpadding="5" cellspacing="1">
+                                    <tbody>
+                                        <tr>
+                                            <th><?php _e('Transaction', LDNFT_TEXT_DOMAIN)?></th>
+                                            <td id = "ldnft-review-coloumn-transaction-id"></td>
+                                            <th><?php _e('User ID', LDNFT_TEXT_DOMAIN)?></th>
+                                            <td id = "ldnft-review-coloumn-user_id"></td>
+                                        </tr>
+                                        <tr>
+                                            <th><?php _e('Name', LDNFT_TEXT_DOMAIN)?></th>
+                                            <td id = "ldnft-review-coloumn-username"></td>
+                                            <th><?php _e('Email', LDNFT_TEXT_DOMAIN)?></th>
+                                            <td id = "ldnft-review-coloumn-useremail"></td>
+                                        </tr>
+                                        <tr>
+                                            <th><?php _e('Country', LDNFT_TEXT_DOMAIN)?></th>
+                                            <td id = "ldnft-review-coloumn-country_code"></td>
+                                            <th><?php _e('Discount', LDNFT_TEXT_DOMAIN)?></th>
+                                            <td id = "ldnft-review-coloumn-discount"></td>
+                                        </tr>
+                                        <tr>
+                                            <th><?php _e('Amount Per Cycle:', LDNFT_TEXT_DOMAIN)?></th>
+                                            <td id = "ldnft-review-coloumn-amount_per_cycle"></td>
+                                            <th><?php _e('First Payment:', LDNFT_TEXT_DOMAIN)?></th>
+                                            <td id = "ldnft-review-coloumn-initial_amount"></td>
+                                        </tr>
+                                        <tr>
+                                            <th><?php _e('Tax Rate:', LDNFT_TEXT_DOMAIN)?></th>
+                                            <td id = "ldnft-review-coloumn-tax_rate"></td>
+                                            <th><?php _e('Total Amount:', LDNFT_TEXT_DOMAIN)?></th>
+                                            <td id = "ldnft-review-coloumn-gross"></td>
+                                        </tr>
+                                        <tr>
+                                            <th><?php _e('Renewal Amount:', LDNFT_TEXT_DOMAIN)?></th>
+                                            <td id = "ldnft-review-coloumn-renewal_amount"></td>
+                                            <th><?php _e('Billing Cycle:', LDNFT_TEXT_DOMAIN)?></th>
+                                            <td id = "ldnft-review-coloumn-billing_cycle"></td>
+                                        </tr>
+                                        <tr>
+                                            <th><?php _e('Outstanding Balance:', LDNFT_TEXT_DOMAIN)?></th>
+                                            <td id = "ldnft-review-coloumn-outstanding_balance"></td>
+                                            <th><?php _e('Failed Payments:', LDNFT_TEXT_DOMAIN)?></th>
+                                            <td id = "ldnft-review-coloumn-failed_payments"></td>
+                                        </tr>
+                                        <tr>
+                                            <th><?php _e('Trial Ends:', LDNFT_TEXT_DOMAIN)?></th>
+                                            <td id = "ldnft-review-coloumn-trial_ends"></td>
+                                            <th><?php _e('Next Payments:', LDNFT_TEXT_DOMAIN)?></th>
+                                            <td id = "ldnft-review-coloumn-next_payment"></td>
+                                        </tr>
+                                        <tr>
+                                            <th><?php _e('Cancelled At:', LDNFT_TEXT_DOMAIN)?></th>
+                                            <td id = "ldnft-review-coloumn-canceled_at"></td>
+                                            <th><?php _e('Install ID:', LDNFT_TEXT_DOMAIN)?></th>
+                                            <td id = "ldnft-review-coloumn-install_id"></td>
+                                        </tr>
+                                        <tr>
+                                            <th><?php _e('Plan ID:', LDNFT_TEXT_DOMAIN)?></th>
+                                            <td id = "ldnft-review-coloumn-plan_id"></td>
+                                            <th><?php _e('Plan:', LDNFT_TEXT_DOMAIN)?></th>
+                                            <td id = "ldnft-review-coloumn-title"></td>
+                                        </tr>
+                                        <tr>
+                                            <th><?php _e('License ID:', LDNFT_TEXT_DOMAIN)?></th>
+                                            <td id = "ldnft-review-coloumn-license_id"></td>
+                                            <th><?php _e('Plugin ID:', LDNFT_TEXT_DOMAIN)?></th>
+                                            <td id = "ldnft-review-coloumn-plugin_id"></td>
+                                        </tr>
+                                        <tr>
+                                            <th><?php _e('Zip/Postal Code:', LDNFT_TEXT_DOMAIN)?></th>
+                                            <td id = "ldnft-review-coloumn-zip_postal_code"></td>
+                                            <th><?php _e('VAT ID:', LDNFT_TEXT_DOMAIN)?></th>
+                                            <td id = "ldnft-review-coloumn-vat_id"></td>
+                                        </tr>
+                                        
+                                        <tr>
+                                            <th><?php _e('Coupon ID:', LDNFT_TEXT_DOMAIN)?></th>
+                                            <td id = "ldnft-review-coloumn-coupon_id"></td>
+                                            
+                                            <th><?php _e('Currency:', LDNFT_TEXT_DOMAIN)?></th>
+                                            <td id = "ldnft-review-coloumn-currency"></td>
+                                        </tr>
+                                        <tr>
+                                            <th><?php _e('External ID:', LDNFT_TEXT_DOMAIN)?></th>
+                                            <td id = "ldnft-review-coloumn-external_id"></td>
+                                            <th><?php _e('Gateway', LDNFT_TEXT_DOMAIN)?></th>
+                                            <td id = "ldnft-review-coloumn-gateway"></td>
+                                        </tr>
+                                        <tr>
+                                            <th><?php _e('Pricing ID', LDNFT_TEXT_DOMAIN)?></th>
+                                            <td id = "ldnft-review-coloumn-pricing_id"></td>
+                                            <th><?php _e('Renewal Discount:', LDNFT_TEXT_DOMAIN)?></th>
+                                            <td id = "ldnft-review-coloumn-renewals_discount"></td>
+                                        </tr>
+                                        <tr>
+                                            <th><?php _e('Payment Date:', LDNFT_TEXT_DOMAIN)?></th>
+                                            <td id = "ldnft-review-coloumn-created"></td>
+                                            <th><?php _e('Updated At:', LDNFT_TEXT_DOMAIN)?></th>
+                                            <td id = "ldnft-review-coloumn-updated_at"></td>
+                                        </tr>
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
                             <div class="ldnft-popup-loader"><img class="" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" /></div>
                         </div>
                     </div>

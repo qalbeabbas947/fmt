@@ -72,7 +72,8 @@ class LDNFT_Subscriptions extends WP_List_Table {
     public function column_view( $item ){
         
         if( !empty( intval( strip_tags( $item['id'] ) ) ) ) {
-            return '<a data-action="ldnft_subscribers_view_detail" data-user_id="'.$item['user_id'].'" data-plugin_id="'.$item['plugin_id'].'" data-id="'.$item['id'].'" class="ldnft_subscribers_view_detail" href="javascript:;">'.__('Get More', LDNFT_TEXT_DOMAIN).'</a>';
+ 
+            return '<a data-action="ldnft_subscribers_view_detail" data-user_id="'.$item['user_id'].'" data-install_id="'.$item['install_id'].'"  data-coupon_id="'.$item['coupon_id'].'"  data-updated_at="'.$item['updated_at'].'" data-external_id="'.$item['external_id'].'"  data-plan_id="'.$item['plan_id'].'"  data-pricing_id="'.$item['pricing_id'].'" data-renewals_discount="'.$item['renewals_discount'].'"  data-license_id="'.$item['license_id'].'" data-plugin_id="'.$item['plugin_id'].'" data-id="'.$item['id'].'" data-username="'.$item['username'].'" data-useremail="'.$item['useremail'].'" data-amount_per_cycle="'.$item['amount_per_cycle'].'" data-discount="'.$item['discount'].'" data-billing_cycle="'.$item['billing_cycle'].'" data-gross="'.$item['gross'].'" data-gateway="'.$item['gateway'].'" data-renewal_amount="'.$item['renewal_amount'].'" data-outstanding_balance="'.$item['outstanding_balance'].'" data-failed_payments="'.$item['failed_payments'].'" data-trial_ends="'.$item['trial_ends'].'" data-created="'.$item['created'].'" data-initial_amount="'.$item['initial_amount'].'" data-next_payment="'.$item['next_payment'].'" data-currency="'.$item['currency'].'" data-country_code="'.$item['country_code'].'" class="ldnft_subscribers_view_detail" href="javascript:;">'.__('Get More', LDNFT_TEXT_DOMAIN).'</a>';
         } else {
             return LDNFT_Admin::get_bar_preloader();
         }    

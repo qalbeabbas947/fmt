@@ -606,18 +606,41 @@
             * @param e
             */
             subscribers_view_detail: function( e ) { 
-               e.preventDefault();
                
-               var lnk = $( this );
+                e.preventDefault();
                
-               $('#ldnft-admin-modal').css('display', 'block');
-               $('.ldnft-popup-loader').css('display', 'block');
-               $('.ldnft-admin-modal-body').html('');
-               jQuery.post( LDNFT.ajaxURL, lnk.data(), function( response ) {
-                    $('#ldnft-admin-modal').css('display', 'block');
-                    $('.ldnft-admin-modal-body').html(response);
-                    $('.ldnft-popup-loader').css('display', 'none');
-               } );
+                var lnk = $( this );
+                  
+                $('#ldnft-admin-modal').css('display', 'block');
+                $('.ldnft-popup-loader').css('display', 'block');
+                $('#ldnft-review-coloumn-transaction-id').html( lnk.data('id') );
+                $('#ldnft-review-coloumn-user_id').html( lnk.data('user_id') );
+                $('#ldnft-review-coloumn-plugin_id').html( lnk.data('plugin_id') );
+                $('#ldnft-review-coloumn-username').html( lnk.data('username') );
+                $('#ldnft-review-coloumn-useremail').html( lnk.data('useremail') );
+                $('#ldnft-review-coloumn-amount_per_cycle').html( lnk.data('amount_per_cycle') );
+                $('#ldnft-review-coloumn-discount').html( lnk.data('discount') );
+                $('#ldnft-review-coloumn-billing_cycle').html( lnk.data('billing_cycle') );
+                $('#ldnft-review-coloumn-gross').html( lnk.data('gross') );
+                $('#ldnft-review-coloumn-gateway').html( lnk.data('gateway') );
+                $('#ldnft-review-coloumn-renewal_amount').html( lnk.data('renewal_amount') );
+                $('#ldnft-review-coloumn-outstanding_balance').html( lnk.data('outstanding_balance') );
+                $('#ldnft-review-coloumn-failed_payments').html( lnk.data('failed_payments') );
+                $('#ldnft-review-coloumn-trial_ends').html( lnk.data('trial_ends') );
+                $('#ldnft-review-coloumn-created').html( lnk.data('created') );
+                $('#ldnft-review-coloumn-initial_amount').html( lnk.data('initial_amount') );
+                $('#ldnft-review-coloumn-next_payment').html( lnk.data('next_payment') );
+                $('#ldnft-review-coloumn-currency').html( lnk.data('currency') );
+                $('#ldnft-review-coloumn-country_code').html( lnk.data('country_code') );
+                $('#ldnft-review-coloumn-install_id').html( lnk.data('install_id') );
+                $('#ldnft-review-coloumn-coupon_id').html( lnk.data('coupon_id') );
+                $('#ldnft-review-coloumn-updated_at').html( lnk.data('updated_at') );
+                $('#ldnft-review-coloumn-external_id').html( lnk.data('external_id') );
+                $('#ldnft-review-coloumn-plan_id').html( lnk.data('plan_id') );
+                $('#ldnft-review-coloumn-pricing_id').html( lnk.data('pricing_id') );
+                $('#ldnft-review-coloumn-renewals_discount').html( lnk.data('renewals_discount') );
+                $('#ldnft-review-coloumn-license_id').html( lnk.data('license_id') );
+                $('.ldnft-popup-loader').css('display', 'none');
             },
             /**
              * imports the data from mailpoet.
