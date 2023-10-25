@@ -26,21 +26,26 @@
                  */
                 var script_type = $('.ldnft-script-freemius-type').val();
                 if( script_type == 'subscribers' ) {
-                    $('.ldfmt-subscription-country-filter, .ldfmt-subscription-interval-filter, .ldfmt-subscription-plan_id-filter, .ldfmt-plugins-subscription-filter').on('change', LDNFTbackEnd.display_subscriptions_plus_summary);
+                    //$('.ldfmt-subscription-country-filter, .ldfmt-subscription-interval-filter, .ldfmt-subscription-plan_id-filter, .ldfmt-plugins-subscription-filter').on('change', LDNFTbackEnd.display_subscriptions_plus_summary);
+                    $('.ldnft-subscription-search-button').on('click', LDNFTbackEnd.display_subscriptions_plus_summary);
                     $('#ldnft_subscriptions_data').on('click', '.tablenav-pages a, th a', LDNFTbackEnd.display_new_page_subscriptions);
                     LDNFTbackEnd.display_subscriptions_plus_summary();					
                 } else if( script_type == 'sales' ) { 
                     $('#ldnft_sales_data').on('click', '.tablenav-pages a, th a', LDNFTbackEnd.display_new_page_sales);
-                    $('.ldfmt-sales-interval-filter, .ldfmt-sales-filter, .ldfmt-plugins-sales-filter').on('change', LDNFTbackEnd.display_sales_plus_summary);
+                    //$('.ldfmt-sales-interval-filter, .ldfmt-sales-filter, .ldfmt-plugins-sales-filter').on('change', LDNFTbackEnd.display_sales_plus_summary);
+                    $('.ldnft-sales-search-button').on('click', LDNFTbackEnd.display_sales_plus_summary);
+
                     LDNFTbackEnd.display_sales_plus_summary();
                 } else if( script_type == 'customers' ) { 
                     $('#ldnft_customers_data').on('click', '.tablenav-pages a, th a', LDNFTbackEnd.display_new_page_customers);
-                    $('.ldfmt-plugins-customers-filter, .ldfmt-plugins-customers-status').on('change', LDNFTbackEnd.display_customers_onchange);
+                    $('.ldnft-customer-search-button').on('click', LDNFTbackEnd.display_customers_onchange);
+                    //$('.ldfmt-plugins-customers-filter, .ldfmt-plugins-customers-status').on('change', LDNFTbackEnd.display_customers_onchange);
                     LDNFTbackEnd.display_customers();
                     
                 } else if( script_type == 'reviews' ) { 
                     $('#ldnft_reviews_data').on('click', '.tablenav-pages a, th a', LDNFTbackEnd.display_new_page_reviews);
-                    $('.ldfmt-plugins-reviews-filter').on('change', LDNFTbackEnd.display_reviews_onchange);
+                    //$('.ldfmt-plugins-reviews-filter').on('change', LDNFTbackEnd.display_reviews_onchange);
+                    $('.ldnft-reviews-search-button').on('click', LDNFTbackEnd.display_reviews_onchange);
                     LDNFTbackEnd.display_reviews();
                 }
             },

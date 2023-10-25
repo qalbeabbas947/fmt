@@ -304,6 +304,7 @@ class LDNFT_Sales_Menu {
                                 <option value="chargeback" <?php echo $selected_filter=='chargeback'?'selected':'';?>><?php echo __( 'Chargeback', LDNFT_TEXT_DOMAIN );?></option>
                                 <option value="lost_dispute" <?php echo $selected_filter=='lost_dispute'?'selected':'';?>><?php echo __( 'Lost Dispute', LDNFT_TEXT_DOMAIN );?></option>
                             </select>
+                            <input type="button" name="ldnft-sales-search-button" value="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>" class="btn button ldnft-sales-search-button" />
                         </div>
                         <div style="clear:both">&nbsp;</div> 
                         <div class="ldfmt-sales-upper-info">

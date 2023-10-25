@@ -189,7 +189,7 @@ class LDNFT_Reviews extends WP_List_Table {
 	*/
 	public function column_is_verified( $item ){
         
-		if( intval( $item['column_is_verified'] ) == 1 ) {
+		if( isset( $item['column_is_verified'] ) && intval( $item['column_is_verified'] ) == 1 ) {
 			return __( 'Yes', LDNFT_TEXT_DOMAIN );
 		} else {
 			return __( 'No', LDNFT_TEXT_DOMAIN );

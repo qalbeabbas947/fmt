@@ -208,6 +208,7 @@ class LDNFT_Customers_Menu {
 								<option value="1" <?php echo $selected_status=='active'?'selected':''; ?>><?php _e('Verified', LDNFT_TEXT_DOMAIN);?></option>
 								<option value="0" <?php echo $selected_status=='0'?'selected':''; ?>><?php _e('Unverified', LDNFT_TEXT_DOMAIN);?></option>
 							</select>
+                            <input type="button" name="ldnft-customer-search-button" value="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>" class="btn button ldnft-customer-search-button" />
 						</div>
                 		<div id="ldnft_customers_data">
 							<!-- Now we can render the completed list table -->

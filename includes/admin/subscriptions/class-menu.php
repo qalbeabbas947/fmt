@@ -480,6 +480,7 @@ class LDNFT_Subscriptions_Menu {
                                 <option value="<?php echo $key;?>" <?php echo $selected_country==$key?'selected':'';?>><?php echo $value;?></option>
                             <?php } ?>
                         </select>
+                        <input type="button" name="ldnft-subscription-search-button" value="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>" class="btn button ldnft-subscription-search-button" />
                     </div>
                     <div style="clear:both">&nbsp;</div> 
                     <div class="ldfmt-sales-upper-info">

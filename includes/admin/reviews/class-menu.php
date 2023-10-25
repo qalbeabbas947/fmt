@@ -221,6 +221,7 @@ class LDNFT_Reviews_Menu {
 									}
 								?>
 							</select>
+                            <input type="button" name="ldnft-reviews-search-button" value="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>" class="btn button ldnft-reviews-search-button" />
 						</div>
                 		<div id="ldnft_reviews_data">	
 							<!-- Now we can render the completed list table -->
