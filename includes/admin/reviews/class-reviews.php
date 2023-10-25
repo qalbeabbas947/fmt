@@ -347,8 +347,27 @@ class LDNFT_Reviews extends WP_List_Table {
          * REQUIRED. Now we can add our *sorted* data to the items property, where 
          * it can be used by the rest of the class.
          */
-        $this->items = $wpdb->get_results($wpdb->prepare("SELECT r.*, c.email as useremail FROM $table_name $where ORDER BY r.$orderby $order LIMIT %d OFFSET %d", $per_page, $offset), ARRAY_A);
+        $result = $wpdb->get_results($wpdb->prepare("SELECT r.*, c.email as useremail FROM $table_name $where ORDER BY r.$orderby $order LIMIT %d OFFSET %d", $per_page, $offset), ARRAY_A);
         
+        $data = [];
+        $count = 0;
+        if( isset($result) && is_array($result) && count($result) > 0 ) {
+            foreach( $result as $review ) {
+                $user_id = 0;
+                foreach( $review as $key => $value ) {
+                    
+                    if( empty( $value ) ) {
+                        $value = '-';
+                    }    
+                    $data[$count][$key] = $value;
+                } 
+                 
+                $count++;   
+            }
+        }
+        
+        $this->items = $data;
+
        /**
          * REQUIRED. We also have to register our pagination options & calculations.
          */

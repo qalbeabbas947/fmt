@@ -318,8 +318,28 @@ class LDNFT_Customers extends WP_List_Table {
         $offset      = isset($paged) ? intval(($paged-1) * $per_page) : 0;
         $orderby    = (isset($_REQUEST['orderby']) && in_array($_REQUEST['orderby'], array_keys($this->get_sortable_columns()))) ? $_REQUEST['orderby'] : 'id';
         $order      = (isset($_REQUEST['order']) && in_array($_REQUEST['order'], array('asc', 'desc'))) ? $_REQUEST['order'] : 'asc';
-        $this->items = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table_name $where ORDER BY $orderby $order LIMIT %d OFFSET %d", $per_page, $offset), ARRAY_A);
+        $result     = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table_name $where ORDER BY $orderby $order LIMIT %d OFFSET %d", $per_page, $offset), ARRAY_A);
         
+        $data = [];
+        $count = 0;
+        if( isset($result) && is_array($result) && count($result) > 0 ) {
+            foreach( $result as $customer ) {
+                $user_id = 0;
+                foreach( $customer as $key => $value ) {
+                    
+                    if( empty( $value ) ) {
+                        $value = '-';
+                    }    
+                    $data[$count][$key] = $value;
+                } 
+                 
+                $count++;   
+            }
+        }
+        
+        
+        $this->items = $data;
+
         $this->set_pagination_args( [
             'total_items'   => $total_items,
             'per_page'      => $per_page,
