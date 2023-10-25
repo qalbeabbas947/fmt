@@ -440,8 +440,12 @@ class LDNFT_Sales extends WP_List_Table {
         $offset = isset($paged) ? (intval($paged) -1) * $per_page : 0;
         $orderby = (isset($_REQUEST['orderby']) && in_array($_REQUEST['orderby'], array_keys($this->get_sortable_columns()))) ? $_REQUEST['orderby'] : 'id';
         $order = (isset($_REQUEST['order']) && in_array($_REQUEST['order'], array('asc', 'desc'))) ? $_REQUEST['order'] : 'asc';
- 
-        $result = $wpdb->get_results($wpdb->prepare("SELECT t.*, concat(c.first, ' ', c.first) as username, c.email as useremail FROM $table_name $where $where_interval ORDER BY t.$orderby $order LIMIT %d OFFSET %d", $per_page, $offset));
+
+        $orderby_prefix = "t.";
+        if( in_array( $orderby, [ 'username', 'useremail' ] ) ) {
+            $orderby_prefix = "";
+        }
+        $result = $wpdb->get_results($wpdb->prepare("SELECT t.*, concat(c.first, ' ', c.first) as username, c.email as useremail FROM $table_name $where $where_interval ORDER BY $orderby_prefix$orderby $order LIMIT %d OFFSET %d", $per_page, $offset));
          
         $data = [];
         $count = 0;

@@ -33,9 +33,9 @@ class LDNFT_Subscriptions extends WP_List_Table {
     public $selected_interval;
 
     /**
-     * Current selected status
+     * Current selected country
      */
-    public $selected_status;
+    public $selected_country;
 
     /**
      * Plugins list
@@ -54,7 +54,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
         
         $this->selected_plugin_id = ( isset( $_GET['ldfmt_plugins_filter'] ) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) ? intval( $_GET['ldfmt_plugins_filter'] ) : $this->plugins[0]->id;
         $this->selected_interval = ( isset( $_GET['interval'] ) ) ? $_GET['interval'] : 12; 
-        $this->selected_status = ( isset( $_GET['status'] )  ) ? $_GET['status'] : 'active'; 
+        $this->selected_country = ( isset( $_GET['country'] )  ) ? $_GET['country'] : ''; 
         $this->selected_plan_id = ( isset( $_GET['plan_id'] ) && intval( $_GET['plan_id'] ) > 0 ) ? $_GET['plan_id'] : '';
 
 		parent::__construct(
@@ -137,10 +137,29 @@ class LDNFT_Subscriptions extends WP_List_Table {
 	 * values are array of slug and a boolean that indicates if is sorted yet
 	 *
 	 */
-
 	public function get_sortable_columns() {
 
-        return [];
+        $sortable_columns = array(
+            'id'     => array('id',false),     //true means it's already sorted
+            'plugin_title'    => array('plugin_title',false),
+            'user_id'  => array('user_id',false),
+            'username'  => array('username',false),
+            'useremail'  => array('useremail',false),
+            'amount_per_cycle'    => array('amount_per_cycle',false),
+            'billing_cycle'  => array('billing_cycle',false),
+            'gross'  => array('gross',false),
+            'outstanding_balance'  => array('outstanding_balance',false),
+            'failed_payments'    => array('failed_payments',false),
+            'gateway'  => array('gateway',false),
+            'next_payment'  => array('next_payment',false),
+            'currency'  => array('currency',false),
+            'country_code'  => array('country_code',false),
+            'initial_amount'  => array('initial_amount',false),
+            'renewal_amount'  => array('renewal_amount',false),
+            'created'  => array('created',false)
+        );
+
+        return $sortable_columns;
 	}
 
 	/**
@@ -150,6 +169,8 @@ class LDNFT_Subscriptions extends WP_List_Table {
 
 	public function prepare_items() {
         
+        global $wpdb; //This is used only if making any database queries
+
         /**
          * First, lets decide how many records per page to show
          */
@@ -189,17 +210,17 @@ class LDNFT_Subscriptions extends WP_List_Table {
             ];
 
             $this->set_pagination_args( [
-                'per_page'      => $per_page,
-                'offset'        => 1,
-                'offset_rec'    => 1,
-                'current_recs'  => 1
+                'total_items'   => 1,
+                'per_page'      => 1,
+                'paged'         => 1,
+                'current_recs'  => 1,
+                'total_pages'   => 1
             ] );
 
 			return;
 		}
 
-        $offset = isset( $_REQUEST['offset'] ) && intval( $_REQUEST['offset'] ) > 0 ? intval( $_REQUEST['offset'] ) : 1;
-        $offset_rec = ( $offset - 1 ) * $per_page;
+        $paged = isset( $_REQUEST['paged'] ) && intval( $_REQUEST['paged'] ) > 0 ? intval( $_REQUEST['paged'] ) : 1;
         
         /**
          * REQUIRED. Now we need to define our column headers. This includes a complete
@@ -221,24 +242,55 @@ class LDNFT_Subscriptions extends WP_List_Table {
          */
         $this->_column_headers = [ $columns, $hidden, $sortable ];
         
-        
-        $interval_str = '&billing_cycle='.$this->selected_interval;
+        $table_name = $wpdb->prefix.'ldnft_subscription t inner join '.$wpdb->prefix.'ldnft_customers c on (t.user_id=c.id)';  
+        $where = " where t.plugin_id='".$this->selected_plugin_id."'";
 
-        $status_str = '&filter='.$this->selected_status;
+        if( !empty( $this->selected_interval )) {
+            switch( $this->selected_interval ) {
+                case "current_week":
+                    $where .= " and YEARWEEK(t.created) = YEARWEEK(NOW())";
+                    break;
+                case "last_week":
+                    $where .= ' and Date(t.created) between date_sub(now(),INTERVAL 1 WEEK) and now()';
+                    break;
+                case "current_month":
+                    $where .= ' and MONTH(t.created) = MONTH(now()) and YEAR(t.created) = YEAR(now())';
+                    break;
+                case "last_month":
+                    $where .= ' and Date(t.created) between Date((now() - interval 1 month)) and Date(now())';
+                    break;
+                default:
+                    $where .= " and Date(t.created) = '".date('Y-m-d')."'";
+                    break;
+            }
+        }
 
-        $plan_str = '';
+        if( !empty($this->selected_country) ) {  
+            $where .= " and t.country_code='".$this->selected_country."'";
+        }
+
         if( !empty($this->selected_plan_id) && intval($this->selected_plan_id) > 0 ) {  
-           $plan_str = '&plan_id='.$this->selected_plan_id;
+            $where .= ' and plan_id='.$this->selected_plan_id;
         }
         
-        $result = $this->api->Api('plugins/'.$this->selected_plugin_id.'/subscriptions.json?count='.$per_page.'&offset='.$offset_rec.$interval_str.$status_str.$plan_str, 'GET', []);
+        $total_items = $wpdb->get_var("SELECT COUNT(t.id) FROM $table_name".$where.$where_interval);
+
+        // prepare query params, as usual current page, order by and order direction
+        $offset = isset($paged) ? (intval($paged) -1) * $per_page : 0;
+        $orderby = (isset($_REQUEST['orderby']) && in_array($_REQUEST['orderby'], array_keys($this->get_sortable_columns()))) ? $_REQUEST['orderby'] : 'id';
+        $order = (isset($_REQUEST['order']) && in_array($_REQUEST['order'], array('asc', 'desc'))) ? $_REQUEST['order'] : 'asc';
+       
+        $orderby_prefix = "t.";
+        if( in_array( $orderby, [ 'username', 'useremail' ] ) ) {
+            $orderby_prefix = "";
+        }
+        
+        $result = $wpdb->get_results($wpdb->prepare("SELECT t.*, concat(c.first, ' ', c.first) as username, c.email as useremail FROM $table_name $where $where_interval ORDER BY $orderby_prefix$orderby $order LIMIT %d OFFSET %d", $per_page, $offset));
+        
         $data = [];
         $count = 0;
-        
-        $subscriptions_total = 0;
-        if( isset( $result ) && isset( $result->subscriptions ) ) {
-            $subscriptions_total = count( $result->subscriptions );
-            foreach( $result->subscriptions as $subscription ) {
+        if( isset($result) && is_array($result) && count($result) > 0 ) {
+            foreach( $result as $subscription ) {
                 $user_id = 0;
                 foreach( $subscription as $key => $value ) {
                     
@@ -251,16 +303,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
                     }
                 } 
                 
-                $user = $this->api->Api('plugins/'.$this->selected_plugin_id.'/users/'.$user_id.'.json', 'GET', []);
-                if( $user ) {
-                    $data[$count]['username']   = $user->first.' '.$user->last;
-                    if(empty(trim($data[$count]['username']))) {
-                        $data[$count]['username'] = '-';
-                    }
-                }
-    
                 $data[$count]['country_code']   = LDNFT_Freemius::get_country_name_by_code( strtoupper( $subscription->country_code ) );
-                $data[$count]['useremail']      = $user->email;
                 $data[$count]['discount']       = '-';
     
                 if( !empty( $subscription->renewals_discount ) && floatval( $subscription->renewals_discount ) > 0 ) {
@@ -279,10 +322,11 @@ class LDNFT_Subscriptions extends WP_List_Table {
         $this->items = $data;
  
         $this->set_pagination_args( [
+            'total_items'   => $total_items,
             'per_page'      => $per_page,
-            'offset'        => $offset,
-            'offset_rec'    => $offset_rec,
-            'current_recs'  => $subscriptions_total
+            'paged'         => $paged,
+            'current_recs'  => count($this->items),
+            'total_pages'   => ceil($total_items / $per_page)
         ] );
 	}
 
@@ -379,142 +423,174 @@ class LDNFT_Subscriptions extends WP_List_Table {
 	 */
 	protected function pagination_new( $which ) {
         
-		if ( empty( $this->_pagination_args ) ) {
-			return;
-		}
-        
+        if ( empty( $this->_pagination_args ) ) {
+            return;
+        }
+
+        $total_items     = $this->_pagination_args['total_items'];
+        $total_pages     = $this->_pagination_args['total_pages'];
         $per_page       = $this->_pagination_args['per_page'];
-		$offset         = $this->_pagination_args['offset'];
-        $offset_rec     = $this->_pagination_args['offset_rec'];
+		$paged          = $this->_pagination_args['paged'];
         $current_recs   = $this->_pagination_args['current_recs'];
-        $offset_rec1    = ($offset) * $per_page;
-        
-        $interval_str = '&billing_cycle=12';
-        if( !empty($this->selected_interval) && !empty( $this->selected_interval ) ) {
-            $interval_str = '&billing_cycle='.$this->selected_interval;
+
+        $infinite_scroll = false;
+        if ( isset( $this->_pagination_args['infinite_scroll'] ) ) {
+            $infinite_scroll = $this->_pagination_args['infinite_scroll'];
         }
-
-        $status_str = 'active';
-        if( !empty($this->selected_status) ) {
-            $status_str = '&filter='.$this->selected_status;
+    
+        if ( 'top' === $which && $total_pages > 1 ) {
+            $this->screen->render_screen_reader_content( 'heading_pagination' );
         }
-        
-        $plan_str = '';
-        if( !empty($this->selected_plan_id) && intval($this->selected_plan_id) > 0 ) {
-           $plan_str = '&plan_id='.$this->selected_plan_id;
+    
+        $output = '<span class="displaying-num">' . sprintf(
+            /* translators: %s: Number of items. */
+            _n( '%s item', '%s items', $total_items ),
+            number_format_i18n( $total_items )
+        ) . '</span>';
+    
+        $current              = $this->get_pagenum();
+        $removable_query_args = wp_removable_query_args();
+    
+        $current_url = set_url_scheme( 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
+    
+        $current_url = remove_query_arg( $removable_query_args, $current_url );
+    
+        $page_links = array();
+    
+        $total_pages_before = '<span class="paging-input">';
+        $total_pages_after  = '</span></span>';
+    
+        $disable_first = false;
+        $disable_last  = false;
+        $disable_prev  = false;
+        $disable_next  = false;
+    
+        if ( 1 == $current ) {
+            $disable_first = true;
+            $disable_prev  = true;
         }
-
-        $result = $this->api->Api('plugins/'.$this->selected_plugin_id.'/subscriptions.json?count='.$per_page.'&offset='.$offset_rec1.$interval_str.$status_str.$plan_str, 'GET', []);
-        
-		$total_items     = $this->_pagination_args['total_items'];
-		$total_pages     = $this->_pagination_args['total_pages'];
-		$infinite_scroll = false;
-		if ( isset( $this->_pagination_args['infinite_scroll'] ) ) {
-			$infinite_scroll = $this->_pagination_args['infinite_scroll'];
-		}
-
-		$output = '';
-        
-		$current              = $this->get_pagenum();
-		$removable_query_args = wp_removable_query_args();
-
-		$current_url = set_url_scheme( 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
-
-		$current_url = remove_query_arg( $removable_query_args, $current_url );
-
-		$page_links = [];
-
-		$total_pages_before = '<span class="paging-input">';
-		$total_pages_after  = '</span></span>';
-
-		$disable_first = false;
-		$disable_prev  = false;
-		$disable_next  = false;
-
-		if ( 1 == $offset  ) {
-			$disable_first = true;
-			$disable_prev  = true;
-		}
-
-        if( isset($result) && isset($result->subscriptions) ) {
-            if ( count($result->subscriptions) == 0 ) {
-                $disable_next = true;
-            }
+        if ( $total_pages == $current ) {
+            $disable_last = true;
+            $disable_next = true;
         }
-		if ( $disable_first ) {
-			$page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&laquo;</span>';
-		} else {
-			$page_links[] = sprintf(
-				"<a class='first-page button' data-offset='1' href='javascript:;'>" .
-					"<span class='screen-reader-text'>%s</span>" .
-					"<span aria-hidden='true'>%s</span>" .
-				'</a>',
-				__( 'First page', LDNFT_TEXT_DOMAIN ),
-				'&laquo;'
-			);
-		}
-
-		if ( $disable_prev ) {
-			$page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&lsaquo;</span>';
-		} else {
-
-			$page_links[] = sprintf(
-				"<a class='prev-page button' data-offset='%d' href='javascript:;'>" .
-					"<span class='screen-reader-text'>%s</span>" .
-					"<span aria-hidden='true'>%s</span>" .
-				'</a>', 
-				intval($offset)>1?intval($offset)-1:1,
-				__( 'Previous page', LDNFT_TEXT_DOMAIN ),
-				'&lsaquo;'
-			);
-		}
-        
-        if( $offset == 1 && $current_recs == 0 ) {
-            $page_links[] = $total_pages_before . sprintf(
-                _x( '%1$s to %2$s', 'paging' ),
-                0,
-                0
-            ) . $total_pages_after;
+    
+        if ( $disable_first ) {
+            $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&laquo;</span>';
         } else {
-            $page_links[] = $total_pages_before . sprintf(
-                _x( 'From %1$s to %2$s', 'paging' ),
-                $offset_rec>0?$offset_rec+1:1,
-                (intval($offset_rec)+intval($current_recs))
-                ) . $total_pages_after;
-        }
-
-		if ( $disable_next ) {
-			$page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&rsaquo;</span>';
-		} else {
-			$page_links[] = sprintf(
-				"<a data-action='ldnft_subscriber_check_next' data-plugin_id='%d' data-status='%s' data-plan_id='%s' data-interval='%d' data-per_page='%d' data-offset='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
-					"<span class='screen-reader-text'>%s</span>" .
-					"<span aria-hidden='true'>%s</span>" .
-				'</a>',
+            
+            $page_links[] = sprintf( 
+                "<a  data-action='ldnft_subscriber_check_next' data-plugin_id='%d' data-country='%s' data-plan_id='%s' data-interval='%d' data-per_page='%d'  data-paged='1' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
+                    "<span class='screen-reader-text'>%s</span>" .
+                    "<span aria-hidden='true'>%s</span>" .
+                '</a>',
                 $this->selected_plugin_id,
-                $this->selected_status,
+                $this->selected_country,
                 $this->selected_plan_id,
                 $this->selected_interval,
                 $per_page,
-                $offset+1,
                 $current_recs,
-				__( 'Next page', LDNFT_TEXT_DOMAIN ),
-				'&rsaquo;'
-			);
-		}
-        
-		$pagination_links_class = 'pagination-links';
-		if ( ! empty( $infinite_scroll ) ) {
-			$pagination_links_class .= ' hide-if-js';
-		}
-		
+                /* translators: Hidden accessibility text. */
+                __( 'First page' ),
+                '&laquo;'
+            );
+        }
+    
+        if ( $disable_prev ) {
+            $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&lsaquo;</span>';
+        } else {
+            $page_links[] = sprintf(
+                "<a  data-action='ldnft_subscriber_check_next' data-plugin_id='%d' data-country='%s' data-plan_id='%s' data-interval='%d' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
+                    "<span class='screen-reader-text'>%s</span>" .
+                    "<span aria-hidden='true'>%s</span>" .
+                '</a>',
+                $this->selected_plugin_id,
+                $this->selected_country,
+                $this->selected_plan_id,
+                $this->selected_interval,
+                $per_page,
+                intval($paged)>1?intval($paged)-1:1,
+                $current_recs,
+                /* translators: Hidden accessibility text. */
+                __( 'Previous page' ),
+                '&lsaquo;'
+            );
+
+        }
+    
+        $html_current_page  = $current;
+        $total_pages_before = sprintf(
+            '<span class="screen-reader-text">%s</span>' .
+            '<span id="table-paging" class="paging-input">' .
+            '<span class="tablenav-paging-text">',
+            /* translators: Hidden accessibility text. */
+            __( 'Current Page' )
+        );
+    
+        $html_total_pages = sprintf( "<span class='total-pages'>%s</span>", number_format_i18n( $total_pages ) );
+    
+        $page_links[] = $total_pages_before . sprintf(
+            /* translators: 1: Current page, 2: Total pages. */
+            _x( '%1$s of %2$s', 'paging' ),
+            $html_current_page,
+            $html_total_pages
+        ) . $total_pages_after;
+    
+        if ( $disable_next ) {
+            $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&rsaquo;</span>';
+        } else {
+            $page_links[] = sprintf(
+                "<a  data-action='ldnft_subscriber_check_next' data-plugin_id='%d' data-country='%s' data-plan_id='%s' data-interval='%d' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
+                    "<span class='screen-reader-text'>%s</span>" .
+                    "<span aria-hidden='true'>%s</span>" .
+                '</a>',
+                $this->selected_plugin_id,
+                $this->selected_country,
+                $this->selected_plan_id,
+                $this->selected_interval,
+                $per_page,
+                $paged+1,
+                $current_recs,
+                /* translators: Hidden accessibility text. */
+                __( 'Next page' ),
+                '&rsaquo;'
+            );
+        }
+    
+        if ( $disable_last ) {
+            $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&raquo;</span>';
+        } else {
+            $page_links[] = sprintf(
+                "<a data-action='ldnft_subscriber_check_next' data-plugin_id='%d' data-country='%s' data-plan_id='%s' data-interval='%d' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
+                    "<span class='screen-reader-text'>%s</span>" .
+                    "<span aria-hidden='true'>%s</span>" .
+                '</a>',
+                $this->selected_plugin_id,
+                $this->selected_country,
+                $this->selected_plan_id,
+                $this->selected_interval,
+                $per_page,
+                $total_pages,
+                $current_recs,
+                /* translators: Hidden accessibility text. */
+                __( 'Last page' ),
+                '&raquo;'
+            );
+        }
+    
+        $pagination_links_class = 'pagination-links';
+        if ( ! empty( $infinite_scroll ) ) {
+            $pagination_links_class .= ' hide-if-js';
+        }
         $output .= "\n<span class='$pagination_links_class'>" . implode( "\n", $page_links ) . '</span>';
-
-		
-		$this->_pagination = "<div class='tablenav-pages'>$output</div>";
-
-		echo $this->_pagination;
-
+    
+        if ( $total_pages ) {
+            $page_class = $total_pages < 2 ? ' one-page' : '';
+        } else {
+            $page_class = ' no-pages';
+        }
+        $this->_pagination = "<div class='tablenav-pages{$page_class}'>$output</div>";
+    
+        echo $this->_pagination;
 	}
 
     /**

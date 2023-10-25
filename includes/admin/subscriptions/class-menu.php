@@ -219,61 +219,63 @@ class LDNFT_Subscriptions_Menu {
      */
      public function ldnft_subscriptions_summary_callback() {
         
+        ini_set('display_errors', 'On');
+        error_reporting(E_ALL);
+        global $wpdb;
+
         $selected_plugin_id = 0;
         if( isset($_GET['ldfmt_plugins_filter']) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) {
             $selected_plugin_id = intval( $_GET['ldfmt_plugins_filter'] ); 
         }
-    
 
-        $interval_str = '';
-        if( isset($_GET['interval']) && !empty( $_GET['interval'] ) ) {
-            $interval_str = '&billing_cycle='.$_GET['interval'];
+        $table_name = $wpdb->prefix.'ldnft_transactions';  
+        $where = " where plugin_id='".$selected_plugin_id."'";
+        
+       if( !empty( $_GET['interval'] )) {
+            switch( $_GET['interval'] ) {
+                case "current_week":
+                    $where .= " and YEARWEEK(t.created) = YEARWEEK(NOW())";
+                    break;
+                case "last_week":
+                    $where .= ' and Date(t.created) between date_sub(now(),INTERVAL 1 WEEK) and now()';
+                    break;
+                case "current_month":
+                    $where .= ' and MONTH(t.created) = MONTH(now()) and YEAR(t.created) = YEAR(now())';
+                    break;
+                case "last_month":
+                    $where .= ' and Date(t.created) between Date((now() - interval 1 month)) and Date(now())';
+                    break;
+                default:
+                    $where .= " and Date(t.created) = '".date('Y-m-d')."'";
+                    break;
+            }
         }
 
-        $status_str = '';
-        if( isset( $_GET['status'] )  ) {
-            $status_str = '&filter='.$_GET['status'];
+        if( isset( $_GET['country'] ) && !empty( $_GET['country'] )  ) {
+            $where .=  " and country_code='".$_GET['country']."'";
         }
         
-        $plan_str = '';
         if( isset( $_GET['plan_id'] ) && intval($_GET['plan_id']) > 0 ) {
-            $plan_str = '&plan_id='.$_GET['plan_id']; 
-        }
+            $where .= ' and plan_id='.$_GET['plan_id'] ;
+        } 
 
-        $tem_per_page = 50;
-        $tem_offset = 0;
-        $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
-        $result = $api->Api('plugins/'.$selected_plugin_id.'/subscriptions.json?count='.$tem_per_page.'&offset='.$tem_offset.$interval_str.$status_str.$plan_str, 'GET', []);
-        $gross_total = 0;
+        $result = $wpdb->get_results( "SELECT * FROM $table_name $where");
+        $gross_total = 0; 
         $tax_rate_total = 0;
         $total_number_of_sales = 0;
         $total_new_subscriptions = 0;
         $total_new_renewals = 0;
         
-        if( isset($result) && isset($result->subscriptions) ) {
-            $has_more_records = true;
-            while($has_more_records) {
-                foreach( $result->subscriptions as $payment ) {
+        if( isset($result) && isset($result) ) {
+            foreach( $result as $obj ) {
                     
-                    $pmts = $api->Api('plugins/'.$selected_plugin_id.'/subscriptions/'.$payment->id.'/payments.json?count='.$tem_per_page.'&offset='.$tem_offset.$interval_str, 'GET', []);
-                    foreach($pmts->payments as $pmt) {
-                        $gross_total += $pmt->gross;
-                        $tax_rate_total += $pmt->vat;
-                        $total_number_of_sales++;
-                        if( $pmt->is_renewal == '1' || $pmt->is_renewal == 1 ) {
-                            $total_new_renewals++;
-                        } else {
-                            $total_new_subscriptions++;
-                        }
-                    }
-                } 
-
-                $tem_offset += $tem_per_page;
-                $result = $api->Api('plugins/'.$selected_plugin_id.'/subscriptions.json?count='.$tem_per_page.'&offset='.$tem_offset.$interval_str, 'GET', []);
-                if( count( $result->subscriptions ) > 0 ) {
-                    $has_more_records = true;
+                $gross_total += $obj->gross;
+                $tax_rate_total += $obj->vat;
+                $total_number_of_sales++;
+                if( $obj->is_renewal == '1' || $obj->is_renewal == 1 ) {
+                    $total_new_renewals++;
                 } else {
-                    $has_more_records = false;
+                    $total_new_subscriptions++;
                 }
             }
         }
@@ -399,9 +401,9 @@ class LDNFT_Subscriptions_Menu {
             $selected_interval = $_GET['interval']; 
         }
         
-        $selected_status = 'active';
-        if( isset( $_GET['status'] )  ) {
-            $selected_status = $_GET['status']; 
+        $selected_country = '';
+        if( isset( $_GET['country'] )  ) {
+            $selected_country = $_GET['country']; 
         }
         
         $selected_plan_id = '';
@@ -440,12 +442,15 @@ class LDNFT_Subscriptions_Menu {
                                 }
                             ?>
                         </select>
-                        <?php $plans = $api->Api('plugins/'.$selected_plugin_id.'/plans.json?count=50', 'GET', []); ?>
+                        <?php 
+                            $table_name = $wpdb->prefix.'ldnft_plans'; 
+                            $plans = $wpdb->get_results($wpdb->prepare("SELECT id, title FROM $table_name where plugin_id = %d", $selected_plugin_id ) );
+                        ?>
                         <select name="ldfmt-sales-plan_id-filter" class="ldfmt-subscription-plan_id-filter">
                             <option value=""><?php _e( 'Filter by Plan', LDNFT_TEXT_DOMAIN ); ?></option>
                             <?php
-                            if( isset( $plans->plans ) && is_array( $plans->plans ) ) {
-                                foreach( $plans->plans as $plan ) {
+                            if( isset( $plans ) && is_array( $plans ) ) {
+                                foreach( $plans as $plan ) {
                                     
                                     $selected = '';
                                     if( $selected_plan_id == $plan->id ) {
@@ -461,13 +466,19 @@ class LDNFT_Subscriptions_Menu {
                         
                         <select name="ldfmt-sales-interval-filter" class="ldfmt-subscription-interval-filter">
                             <option value=""><?php echo __( 'All Time', LDNFT_TEXT_DOMAIN );?></option>
-                            <option value="1" <?php echo $selected_interval=='1'?'selected':'';?>><?php echo __( 'Monthly', LDNFT_TEXT_DOMAIN );?></option>
-                            <option value="12" <?php echo $selected_interval=='12'?'selected':'';?>><?php echo __( 'Annual', LDNFT_TEXT_DOMAIN );?></option>
+                            <option value="today" <?php echo $selected_interval=='today'?'selected':'';?>><?php echo __( 'Today', LDNFT_TEXT_DOMAIN );?></option>
+                            <option value="current_week" <?php echo $selected_interval=='current_week'?'selected':'';?>><?php echo __( 'Current Week', LDNFT_TEXT_DOMAIN );?></option>
+                            <option value="last_week" <?php echo $selected_interval=='last_week'?'selected':'';?>><?php echo __( 'Last Week', LDNFT_TEXT_DOMAIN );?></option>
+                            <option value="current_month" <?php echo $selected_interval=='current_month'?'selected':'';?>><?php echo __( 'Current Month', LDNFT_TEXT_DOMAIN );?></option>
+                            <option value="last_month" <?php echo $selected_interval=='last_month'?'selected':'';?>><?php echo __( 'Last Month', LDNFT_TEXT_DOMAIN );?></option>
                         </select>
-                        <select name="ldfmt-sales-interval-filter" class="ldfmt-subscription-status-filter">
-                            <option value="all"><?php echo __( 'All Status', LDNFT_TEXT_DOMAIN );?></option>
-                            <option value="active" <?php echo $selected_status=='active'?'selected':'';?>><?php echo __( 'Active', LDNFT_TEXT_DOMAIN );?></option>
-                            <option value="cancelled" <?php echo $selected_status=='cancelled'?'selected':'';?>><?php echo __( 'Cancelled', LDNFT_TEXT_DOMAIN );?></option>
+                        <select name="ldfmt-sales-interval-filter" class="ldfmt-subscription-country-filter">
+                            <option value=""><?php echo __( 'All Countries', LDNFT_TEXT_DOMAIN );?></option>
+                            <?php $countries = LDNFT_Freemius::get_country_name_by_code( 'list' ); 
+                                foreach( $countries as $key=>$value ) {
+                            ?>
+                                <option value="<?php echo $key;?>" <?php echo $selected_country==$key?'selected':'';?>><?php echo $value;?></option>
+                            <?php } ?>
                         </select>
                     </div>
                     <div style="clear:both">&nbsp;</div> 

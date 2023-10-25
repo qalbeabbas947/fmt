@@ -247,7 +247,7 @@ class LDNFT_Freemius {
     /**
      * Return country list with code.
      */
-    public static function get_country_name_by_code( $country_code ) {
+    public static function get_country_name_by_code( $country_code  = 'list') {
         
         $countries = [
             'AX' => __( 'Åland Islands', LDNFT_TEXT_DOMAIN ),
@@ -496,9 +496,14 @@ class LDNFT_Freemius {
             'ZW' => __( 'Zimbabwe', LDNFT_TEXT_DOMAIN ),
         ];
 
-        $countries = apply_filters( 'ldnft_countries', $countries,  $country_code );
+        if( $country_code == 'list' ) {
+            return $countries;
+        } else {
+            $countries = apply_filters( 'ldnft_countries', $countries,  $country_code );
 
-        return ( isset( $countries[ $country_code ] ) ? $countries[ $country_code ] : false );
+            return ( isset( $countries[ $country_code ] ) ? $countries[ $country_code ] : false );
+        }
+        
     }
 }
 

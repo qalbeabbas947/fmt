@@ -26,7 +26,7 @@
                  */
                 var script_type = $('.ldnft-script-freemius-type').val();
                 if( script_type == 'subscribers' ) {
-                    $('.ldfmt-subscription-status-filter, .ldfmt-subscription-interval-filter, .ldfmt-subscription-plan_id-filter, .ldfmt-plugins-subscription-filter').on('change', LDNFTbackEnd.display_subscriptions_plus_summary);
+                    $('.ldfmt-subscription-country-filter, .ldfmt-subscription-interval-filter, .ldfmt-subscription-plan_id-filter, .ldfmt-plugins-subscription-filter').on('change', LDNFTbackEnd.display_subscriptions_plus_summary);
                     $('#ldnft_subscriptions_data').on('click', '.tablenav-pages a, th a', LDNFTbackEnd.display_new_page_subscriptions);
                     LDNFTbackEnd.display_subscriptions_plus_summary();					
                 } else if( script_type == 'sales' ) { 
@@ -411,7 +411,7 @@
             /**
              * Show subscription based on pagination
              */
-            display_new_page_subscriptions: function() {
+            display_new_page_subscriptions: function(e) {
 
                 e.preventDefault();
                 $('.ldnft-freemius-order').val(LDNFTbackEnd.getParameterByName('order', $(this).attr('href')));
@@ -442,7 +442,7 @@
                 var ldnftpage       = $('.ldnft-freemius-page').val();
                 var ldnftplugin     = $('.ldfmt-plugins-filter').val();
                 var ldnftinterval   = $('.ldfmt-subscription-interval-filter').val();
-                var ldnftstatus     = $('.ldfmt-subscription-status-filter').val();
+                var ldnftcountry     = $('.ldfmt-subscription-country-filter').val();
                 var ldnftplan_id    = $('.ldfmt-subscription-plan_id-filter').val();
                 var order_str       = $('.ldnft-freemius-order').val();
                 var orderby_str     = $('.ldnft-freemius-orderby').val();
@@ -456,7 +456,7 @@
                         paged: ldnftpage,
                         ldfmt_plugins_filter: ldnftplugin,
                         interval: ldnftinterval,
-                        status: ldnftstatus,
+                        country: ldnftcountry,
                         order: order_str,
                         orderby: orderby_str,
                         plan_id: ldnftplan_id,
@@ -486,7 +486,7 @@
                 var ldnftpage       = $('.ldnft-freemius-page').val();
                 var ldnftplugin     = $('.ldfmt-plugins-filter').val();
                 var ldnftinterval   = $('.ldfmt-subscription-interval-filter').val();
-                var ldnftstatus     = $('.ldfmt-subscription-status-filter').val();
+                var ldnftcountry     = $('.ldfmt-subscription-country-filter').val();
                 var ldnftplan_id    = $('.ldfmt-subscription-plan_id-filter').val();
 
                 $.ajax({
@@ -497,7 +497,7 @@
                         paged: ldnftpage,
                         ldfmt_plugins_filter: ldnftplugin,
                         interval: ldnftinterval,
-                        status: ldnftstatus,
+                        country: ldnftcountry,
                         plan_id: ldnftplan_id,
                     },
                     success: function ( response ) {
