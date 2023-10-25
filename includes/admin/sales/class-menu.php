@@ -48,64 +48,96 @@ class LDNFT_Sales_Menu {
      * Action wp_ajax for fetching ajax_response
      */
     public function sales_summary() {
-        
+
+        global $wpdb;
+        ini_set('display_errors', 'On');
+        error_reporting(E_ALL);
         $selected_plugin_id = 0;
         if( isset($_GET['ldfmt_plugins_filter']) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) {
             $selected_plugin_id = intval( $_GET['ldfmt_plugins_filter'] ); 
         }
-    
 
-        $interval_str = '';
+        $selected_interval = '';
         if( isset( $_GET['interval'] ) && !empty( $_GET['interval'] ) ) {
-            $interval_str = '&billing_cycle='.$_GET['interval'];
+            $selected_interval = $_GET['interval'];
         }
 
-        $status_str = '';
+        $selected_status = '';
         if( isset( $_GET['status'] )  ) {
-            $status_str = '&filter='.$_GET['status'];
+            $selected_status = $_GET['status'];
         }
         
         $plan_str = '';
         if( isset( $_GET['plan_id'] ) && intval($_GET['plan_id']) > 0 ) {
-            $plan_str = '&plan_id='.$_GET['plan_id']; 
+            $plan_str = $_GET['plan_id']; 
         }
 
-        $tem_per_page = 50;
-        $tem_offset = 0;
-        $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
-        $result = $api->Api('plugins/'.$selected_plugin_id.'/subscriptions.json?count='.$tem_per_page.'&offset='.$tem_offset.$interval_str.$status_str.$plan_str, 'GET', []);
-        $gross_total = 0;
+        $table_name = $wpdb->prefix.'ldnft_transactions';  
+        $where = " where plugin_id='".$selected_plugin_id."'";
+        
+        if( $selected_status != 'all' ) {
+            switch( $selected_status ) {
+                case "not_refunded":
+                    $where .= " and type='payment'";
+                    break;
+                case "refunds":
+                    $where .= " and type='refund'";
+                    break;
+                case "chargeback":
+                    $where .= " and type='chargeback'";
+                    break;
+                case "lost_dispute":
+                    $where .= " and type='lost_dispute'";
+                    break;
+                        
+            }
+        }
+
+        $where_interval = '';
+        if( !empty( $selected_interval )) {
+            switch( $selected_interval ) {
+                case "current_week":
+                    $where_interval = " and YEARWEEK(created) = YEARWEEK(NOW())";
+                    break;
+                case "last_week":
+                    $where_interval = ' and Date(created) between date_sub(now(),INTERVAL 1 WEEK) and now()';
+                    break;
+                case "current_month":
+                    $where_interval = ' and MONTH(created) = MONTH(now()) and YEAR(created) = YEAR(now())';
+                    break;
+                case "last_month":
+                    $where_interval = ' and Date(created) between Date((now() - interval 1 month)) and Date(now())';
+                    break;
+                default:
+                    $where_interval = " and Date(created) = '".date('Y-m-d')."'";
+                    break;
+            }
+        }
+
+        // $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
+        // $result = $api->Api('plugins/'.$selected_plugin_id.'/subscriptions.json?count='.$tem_per_page.'&offset='.$tem_offset.$interval_str.$status_str.$plan_str, 'GET', []);
+        
+        $result = $wpdb->get_results( "SELECT * FROM $table_name $where $where_interval" );
+        
+        $gross_total = 0; 
         $tax_rate_total = 0;
         $total_number_of_sales = 0;
         $total_new_subscriptions = 0;
         $total_new_renewals = 0;
         
-        if( isset($result) && isset($result->subscriptions) ) {
+        if( isset($result) && isset($result) ) {
             $has_more_records = true;
-            while($has_more_records) {
-                foreach( $result->subscriptions as $payment ) {
+            foreach( $result as $pmt ) {
                     
-                    $pmts = $api->Api('plugins/'.$selected_plugin_id.'/subscriptions/'.$payment->id.'/payments.json?count='.$tem_per_page.'&offset='.$tem_offset.$interval_str, 'GET', []);
-                    foreach($pmts->payments as $pmt) {
-                        $gross_total += $pmt->gross;
-                        $tax_rate_total += $pmt->vat;
-                        $total_number_of_sales++;
-                        if( $pmt->is_renewal == '1' || $pmt->is_renewal == 1 ) {
-                            $total_new_renewals++;
-                        } else {
-                            $total_new_subscriptions++;
-                        }
-                    }
-                } 
-
-                $tem_offset += $tem_per_page;
-                $result = $api->Api('plugins/'.$selected_plugin_id.'/subscriptions.json?count='.$tem_per_page.'&offset='.$tem_offset.$interval_str, 'GET', []);
-                if( count( $result->subscriptions ) > 0 ) {
-                    $has_more_records = true;
+                $gross_total += $pmt->gross;
+                $tax_rate_total += $pmt->vat;
+                $total_number_of_sales++;
+                if( $pmt->is_renewal == '1' || $pmt->is_renewal == 1 ) {
+                    $total_new_renewals++;
                 } else {
-                    $has_more_records = false;
+                    $total_new_subscriptions++;
                 }
-            }
+            } 
         }
 
         $data = [
@@ -218,7 +250,7 @@ class LDNFT_Sales_Menu {
             $selected_plugin_id = intval( $_GET['ldfmt_plugins_filter'] ); 
         }
 
-        $selected_interval = '12';
+        $selected_interval = 'today';
         if( isset($_GET['interval'])  ) {
             $selected_interval = $_GET['interval']; 
         }
@@ -260,13 +292,18 @@ class LDNFT_Sales_Menu {
                             </select>
                             <select name="ldfmt-sales-interval-filter" class="ldfmt-sales-interval-filter">
                                 <option value=""><?php echo __( 'All Time', LDNFT_TEXT_DOMAIN );?></option>
-                                <option value="1" <?php echo $selected_interval=='1'?'selected':'';?>><?php echo __( 'Monthly', LDNFT_TEXT_DOMAIN );?></option>
-                                <option value="12" <?php echo $selected_interval=='12'?'selected':'';?>><?php echo __( 'Annual', LDNFT_TEXT_DOMAIN );?></option>
+                                <option value="today" <?php echo $selected_interval=='today'?'selected':'';?>><?php echo __( 'Today', LDNFT_TEXT_DOMAIN );?></option>
+                                <option value="current_week" <?php echo $selected_interval=='current_week'?'selected':'';?>><?php echo __( 'Current Week', LDNFT_TEXT_DOMAIN );?></option>
+                                <option value="last_week" <?php echo $selected_interval=='last_week'?'selected':'';?>><?php echo __( 'Last Week', LDNFT_TEXT_DOMAIN );?></option>
+                                <option value="current_month" <?php echo $selected_interval=='current_month'?'selected':'';?>><?php echo __( 'Current Month', LDNFT_TEXT_DOMAIN );?></option>
+                                <option value="last_month" <?php echo $selected_interval=='last_month'?'selected':'';?>><?php echo __( 'Last Month', LDNFT_TEXT_DOMAIN );?></option>
                             </select>
                             <select name="ldfmt-sales-filter" class="ldfmt-sales-filter">
                                 <option value="all"><?php echo __( 'All Status', LDNFT_TEXT_DOMAIN );?></option>
                                 <option value="not_refunded" <?php echo $selected_filter=='not_refunded'?'selected':'';?>><?php echo __( 'Active', LDNFT_TEXT_DOMAIN );?></option>
                                 <option value="refunds" <?php echo $selected_filter=='refunds'?'selected':'';?>><?php echo __( 'Refunds', LDNFT_TEXT_DOMAIN );?></option>
+                                <option value="chargeback" <?php echo $selected_filter=='chargeback'?'selected':'';?>><?php echo __( 'Chargeback', LDNFT_TEXT_DOMAIN );?></option>
+                                <option value="lost_dispute" <?php echo $selected_filter=='lost_dispute'?'selected':'';?>><?php echo __( 'Lost Dispute', LDNFT_TEXT_DOMAIN );?></option>
                             </select>
                         </div>
                         <div style="clear:both">&nbsp;</div> 
@@ -366,12 +403,7 @@ class LDNFT_Sales_Menu {
 												<th><?php _e('Install ID', LDNFT_TEXT_DOMAIN)?></th>
 												<td id = "ldnft-review-coloumn-install_id"></td>
 											</tr>
-											<tr>
-												<th><?php _e('Plan ID', LDNFT_TEXT_DOMAIN)?></th>
-												<td id = "ldnft-review-coloumn-plan_id"></td>
-												<th><?php _e('Pricing ID', LDNFT_TEXT_DOMAIN)?></th>
-												<td id = "ldnft-review-coloumn-pricing_id"></td>
-											</tr>
+											
 											<tr>
 												<th><?php _e('IP', LDNFT_TEXT_DOMAIN)?></th>
 												<td id = "ldnft-review-coloumn-ip"></td>
@@ -415,6 +447,8 @@ class LDNFT_Sales_Menu {
                         <!-- Now we can render the completed list table -->
                         <?php $testListTable->display() ?>
                     </div>
+                    <input type="hidden" class="ldnft-freemius-order" name="order" value="id" />
+                    <input type="hidden" class="ldnft-freemius-orderby" name="orderby" value="asc" />
                     <input type="hidden" class="ldnft-freemius-page" name="page" value="1" />
 					<input type="hidden" class="ldnft-script-freemius-type" name="ldnft-script-freemius-type" value="sales" />
                 </form>

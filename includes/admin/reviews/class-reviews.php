@@ -38,8 +38,7 @@ class LDNFT_Reviews extends WP_List_Table {
         
         global $status, $page;
 
-		$this->api = new Freemius_Api_WordPress( FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY );
-        $this->plugins = LDNFT_Freemius::$products;
+		$this->plugins = LDNFT_Freemius::$products;
         $this->selected_plugin_id = ( isset( $_GET['ldfmt_plugins_filter'] ) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) ? intval( $_GET['ldfmt_plugins_filter'] ) : $this->plugins[0]->id;
         
         /**
@@ -214,7 +213,17 @@ class LDNFT_Reviews extends WP_List_Table {
      **************************************************************************/
     public function get_sortable_columns() {
         
-        return [];
+        $sortable_columns = array(
+            'id'     => array('id',false),     //true means it's already sorted
+            'title'    => array('title',false),
+            'text'  => array('text',false),
+            'name'  => array('name',false),
+            'rate'  => array('rate',false),
+            'company'  => array('company',false),
+            'created'  => array('created',false)
+        );
+ 
+        return $sortable_columns;
     }
 
 	/**
@@ -228,10 +237,6 @@ class LDNFT_Reviews extends WP_List_Table {
             return LDNFT_Admin::get_bar_preloader();
         }    
     }
-
-
- 
-                   
 
     /** ************************************************************************
      * REQUIRED! This is where you prepare your data for display. This method will
@@ -248,7 +253,9 @@ class LDNFT_Reviews extends WP_List_Table {
      * @uses $this->set_pagination_args()
      **************************************************************************/
     public function prepare_items() {
-       
+
+        global $wpdb;
+        
         /**
          * First, lets decide how many records per page to show
          */
@@ -286,19 +293,18 @@ class LDNFT_Reviews extends WP_List_Table {
             ];
 			
             $this->set_pagination_args( [
-                'per_page'      => $per_page,
-                'offset'        => 1,
-                'offset_rec'    => 1,
-                'current_recs'  => 1
+                'total_items'   => 1,
+                'per_page'      => 1,
+                'paged'         => 1,
+                'current_recs'  => 1,
+                'total_pages'   => 1
             ] );
 
 			return;
 		}
 
-        $offset = isset( $_REQUEST['offset'] ) && intval( $_REQUEST['offset'] ) > 0 ? intval( $_REQUEST['offset'] ) : 1;
-        $offset_rec = ( $offset - 1 ) * $per_page;
-        
-        
+        $paged = isset( $_REQUEST['paged'] ) && intval( $_REQUEST['paged'] ) > 0 ? intval( $_REQUEST['paged'] ) : 1;
+
         /**
          * REQUIRED. Now we need to define our column headers. This includes a complete
          * array of columns to be displayed (slugs & titles), a list of columns
@@ -328,52 +334,30 @@ class LDNFT_Reviews extends WP_List_Table {
          * use sort and pagination data to build a custom query instead, as you'll
          * be able to use your precisely-queried data immediately.
          */
-        $results = $this->api->Api('plugins/'.$this->selected_plugin_id.'/reviews.json?count='.$per_page.'&offset='.$offset_rec, 'GET', []);
-       
-        $data = [];
-        $count = 0;
-        foreach( $results->reviews as $review ) {
-            
-            foreach( $review as $key=>$value ) {
-                
-                if( empty( $value ) ) 
-                    $value = '-';
-                
-                $data[$count][$key] = $value;
-                
-                if( 'user_id' == $key ) {
-                    $user_id = $value;
-                }
-            } 
+        $table_name = $wpdb->prefix.'ldnft_reviews r inner join '.$wpdb->prefix.'ldnft_customers c on (r.user_id=c.id)'; 
+        $where = " where r.plugin_id='".$this->selected_plugin_id."'";
+        $total_items = $wpdb->get_var("SELECT COUNT(r.id) FROM $table_name".$where);
 
-            $user = $this->api->Api('plugins/'.$this->selected_plugin_id.'/users/'.$user_id.'.json', 'GET', []);
-            if( $user ) {
-                $data[$count]['useremail']      = $user->email;
-                if(empty(trim($data[$count]['useremail']))) {
-                    $data[$count]['useremail'] = '-';
-                }
-            }
-
-            $data[$count]['is_featured'] = $review->is_featured;
-
-            $count++;   
-        }
-        
+        // prepare query params, as usual current page, order by and order direction
+        $offset      = isset($paged) ? intval(($paged-1) * $per_page) : 0;
+        $orderby    = (isset($_REQUEST['orderby']) && in_array($_REQUEST['orderby'], array_keys($this->get_sortable_columns()))) ? $_REQUEST['orderby'] : 'id';
+        $order      = (isset($_REQUEST['order']) && in_array($_REQUEST['order'], array('asc', 'desc'))) ? $_REQUEST['order'] : 'asc';
         
         /**
          * REQUIRED. Now we can add our *sorted* data to the items property, where 
          * it can be used by the rest of the class.
          */
-        $this->items = $data;
+        $this->items = $wpdb->get_results($wpdb->prepare("SELECT r.*, c.email as useremail FROM $table_name $where ORDER BY r.$orderby $order LIMIT %d OFFSET %d", $per_page, $offset), ARRAY_A);
         
-        /**
+       /**
          * REQUIRED. We also have to register our pagination options & calculations.
          */
         $this->set_pagination_args( [
+            'total_items'   => $total_items,
             'per_page'      => $per_page,
-            'offset'        => $offset,
-            'offset_rec'    => $offset_rec,
-            'current_recs'  => count($this->items)
+            'paged'         => $paged,
+            'current_recs'  => count($this->items),
+            'total_pages'   => ceil($total_items / $per_page)
         ] );
     }
 	
@@ -469,127 +453,159 @@ class LDNFT_Reviews extends WP_List_Table {
 	 */
 	protected function pagination_new( $which ) {
         
-		if ( empty( $this->_pagination_args ) ) {
-			return;
-		}
-        
-        $per_page       = $this->_pagination_args['per_page'];
-		$offset         = $this->_pagination_args['offset'];
-        $offset_rec     = $this->_pagination_args['offset_rec'];
-        $current_recs   = $this->_pagination_args['current_recs'];
-        $offset_rec1    = ($offset) * $per_page;
-        
-        
-        $result = $this->api->Api('plugins/'.$this->selected_plugin_id.'/reviews.json?count='.$per_page.'&offset='.$offset_rec1, 'GET', []);
-        
-		$total_items     = $this->_pagination_args['total_items'];
-		$total_pages     = $this->_pagination_args['total_pages'];
-		$infinite_scroll = false;
-		if ( isset( $this->_pagination_args['infinite_scroll'] ) ) {
-			$infinite_scroll = $this->_pagination_args['infinite_scroll'];
-		}
-
-		$output = '';
-        
-		$current              = $this->get_pagenum();
-		$removable_query_args = wp_removable_query_args();
-
-		$current_url = set_url_scheme( 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
-
-		$current_url = remove_query_arg( $removable_query_args, $current_url );
-
-		$page_links = [];
-
-		$total_pages_before = '<span class="paging-input">';
-		$total_pages_after  = '</span></span>';
-
-		$disable_first = false;
-		$disable_prev  = false;
-		$disable_next  = false;
-
-		if ( 1 == $offset  ) {
-			$disable_first = true;
-			$disable_prev  = true;
-		}
-
-
-		if ( is_array($result->reviews) && count($result->reviews) == 0 ) {
-			$disable_next = true;
-		}
-
-		if ( $disable_first ) {
-			$page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&laquo;</span>';
-		} else {
-			$page_links[] = sprintf(
-				"<a class='first-page button' href='javascript:;'>" .
-					"<span class='screen-reader-text'>%s</span>" .
-					"<span aria-hidden='true'>%s</span>" .
-				'</a>',
-				/* translators: Hidden accessibility text. */
-				__( 'First page', LDNFT_TEXT_DOMAIN ),
-				'&laquo;'
-			);
-		}
-
-		if ( $disable_prev ) {
-			$page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&lsaquo;</span>';
-		} else {
-
-			$page_links[] = sprintf(
-				"<a class='prev-page button' href='javascript:;'>" .
-					"<span class='screen-reader-text'>%s</span>" .
-					"<span aria-hidden='true'>%s</span>" .
-				'</a>', 
-				/* translators: Hidden accessibility text. */
-				__( 'Previous page', LDNFT_TEXT_DOMAIN ),
-				'&lsaquo;'
-			);
-		}
-        
-        if( $offset == 1 && $current_recs == 0 ) {
-            $page_links[] = $total_pages_before . sprintf(
-                /* translators: 1: Current page, 2: Total pages. */
-                _x( '%1$s to %2$s', 'paging' ),
-                0,
-                0
-            ) . $total_pages_after;
-        } else {
-            $page_links[] = $total_pages_before . sprintf(
-                /* translators: 1: Current page, 2: Total pages. */
-                _x( 'From %1$s to %2$s', 'paging' ),
-                $offset_rec>0?$offset_rec+1:1,
-                (intval($offset_rec)+intval($current_recs))
-                ) . $total_pages_after;
+        if ( empty( $this->_pagination_args ) ) {
+            return;
         }
 
-		if ( $disable_next ) {
-			$page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&rsaquo;</span>';
-		} else {
-			$page_links[] = sprintf(
-				"<a data-action='ldnft_reviews_check_next' data-plugin_id='%d' data-per_page='%d' data-offset='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
-					"<span class='screen-reader-text'>%s</span>" .
-					"<span aria-hidden='true'>%s</span>" .
-				'</a>',
+        $total_items     = $this->_pagination_args['total_items'];
+        $total_pages     = $this->_pagination_args['total_pages'];
+        $per_page       = $this->_pagination_args['per_page'];
+		$paged          = $this->_pagination_args['paged'];
+        $current_recs   = $this->_pagination_args['current_recs'];
+
+        $infinite_scroll = false;
+        if ( isset( $this->_pagination_args['infinite_scroll'] ) ) {
+            $infinite_scroll = $this->_pagination_args['infinite_scroll'];
+        }
+    
+        if ( 'top' === $which && $total_pages > 1 ) {
+            $this->screen->render_screen_reader_content( 'heading_pagination' );
+        }
+    
+        $output = '<span class="displaying-num">' . sprintf(
+            /* translators: %s: Number of items. */
+            _n( '%s item', '%s items', $total_items ),
+            number_format_i18n( $total_items )
+        ) . '</span>';
+    
+        $current              = $this->get_pagenum();
+        $removable_query_args = wp_removable_query_args();
+    
+        $current_url = set_url_scheme( 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
+    
+        $current_url = remove_query_arg( $removable_query_args, $current_url );
+    
+        $page_links = array();
+    
+        $total_pages_before = '<span class="paging-input">';
+        $total_pages_after  = '</span></span>';
+    
+        $disable_first = false;
+        $disable_last  = false;
+        $disable_prev  = false;
+        $disable_next  = false;
+    
+        if ( 1 == $current ) {
+            $disable_first = true;
+            $disable_prev  = true;
+        }
+        if ( $total_pages == $current ) {
+            $disable_last = true;
+            $disable_next = true;
+        }
+    
+        if ( $disable_first ) {
+            $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&laquo;</span>';
+        } else {
+            $page_links[] = sprintf( 
+                "<a data-action='ldnft_customers_check_next' data-ldfmt_plugins_filter='%d' data-per_page='%d' class='first-page button ldnft_check_load_next' data-paged='1' href='javascript:;'>" .
+                    "<span class='screen-reader-text'>%s</span>" .
+                    "<span aria-hidden='true'>%s</span>" .
+                '</a>',
                 $this->selected_plugin_id,
                 $per_page,
-                $offset+1,
+                /* translators: Hidden accessibility text. */
+                __( 'First page' ),
+                '&laquo;'
+            );
+        }
+    
+        if ( $disable_prev ) {
+            $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&lsaquo;</span>';
+        } else {
+            $page_links[] = sprintf(
+                "<a data-action='ldnft_customers_check_next' data-ldfmt_plugins_filter='%d' data-per_page='%d' class='prev-page button ldnft_check_load_next' data-paged='%d' href='javascript:;'>" .
+                    "<span class='screen-reader-text'>%s</span>" .
+                    "<span aria-hidden='true'>%s</span>" .
+                '</a>',
+                $this->selected_plugin_id,
+                $per_page,
+                intval($paged)>1?intval($paged)-1:1,
+                /* translators: Hidden accessibility text. */
+                __( 'Previous page' ),
+                '&lsaquo;'
+            );
+
+        }
+    
+        $html_current_page  = $current;
+        $total_pages_before = sprintf(
+            '<span class="screen-reader-text">%s</span>' .
+            '<span id="table-paging" class="paging-input">' .
+            '<span class="tablenav-paging-text">',
+            /* translators: Hidden accessibility text. */
+            __( 'Current Page' )
+        );
+    
+        $html_total_pages = sprintf( "<span class='total-pages'>%s</span>", number_format_i18n( $total_pages ) );
+    
+        $page_links[] = $total_pages_before . sprintf(
+            /* translators: 1: Current page, 2: Total pages. */
+            _x( '%1$s of %2$s', 'paging' ),
+            $html_current_page,
+            $html_total_pages
+        ) . $total_pages_after;
+    
+        if ( $disable_next ) {
+            $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&rsaquo;</span>';
+        } else {
+            $page_links[] = sprintf(
+                "<a data-action='ldnft_customers_check_next' data-ldfmt_plugins_filter='%d' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
+                    "<span class='screen-reader-text'>%s</span>" .
+                    "<span aria-hidden='true'>%s</span>" .
+                '</a>',
+                $this->selected_plugin_id,
+                $per_page,
+                $paged+1,
                 $current_recs,
-				__( 'Next page', LDNFT_TEXT_DOMAIN ),
-				'&rsaquo;'
-			);
-		}
-        
-		$pagination_links_class = 'pagination-links';
-		if ( ! empty( $infinite_scroll ) ) {
-			$pagination_links_class .= ' hide-if-js';
-		}
-		
+                /* translators: Hidden accessibility text. */
+                __( 'Next page' ),
+                '&rsaquo;'
+            );
+        }
+    
+        if ( $disable_last ) {
+            $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&raquo;</span>';
+        } else {
+            $page_links[] = sprintf(
+                "<a  data-action='ldnft_customers_check_next' data-ldfmt_plugins_filter='%d' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='last-page button ldnft_check_load_next' href='javascript:;'>" .
+                    "<span class='screen-reader-text'>%s</span>" .
+                    "<span aria-hidden='true'>%s</span>" .
+                '</a>',
+                $this->selected_plugin_id,
+                $per_page,
+                $total_pages,
+                $current_recs,
+                /* translators: Hidden accessibility text. */
+                __( 'Last page' ),
+                '&raquo;'
+            );
+        }
+    
+        $pagination_links_class = 'pagination-links';
+        if ( ! empty( $infinite_scroll ) ) {
+            $pagination_links_class .= ' hide-if-js';
+        }
         $output .= "\n<span class='$pagination_links_class'>" . implode( "\n", $page_links ) . '</span>';
-
-		
-		$this->_pagination = "<div class='tablenav-pages'>$output</div>";
-
-		echo $this->_pagination;
+    
+        if ( $total_pages ) {
+            $page_class = $total_pages < 2 ? ' one-page' : '';
+        } else {
+            $page_class = ' no-pages';
+        }
+        $this->_pagination = "<div class='tablenav-pages{$page_class}'>$output</div>";
+    
+        echo $this->_pagination;
 	}
 
     public function extra_tablenav( $which ) {

@@ -524,6 +524,8 @@ class LDNFT_Subscriptions_Menu {
                 <div id="ldnft_subscriptions_data">
                     <?php $ListTable->display(); ?>
                 </div>
+                <input type="hidden" class="ldnft-freemius-order" name="order" value="id" />
+                <input type="hidden" class="ldnft-freemius-orderby" name="orderby" value="asc" />
                 <input type="hidden" class="ldnft-freemius-page" name="page" value="1" />
 				<input type="hidden" class="ldnft-script-freemius-type" name="ldnft-script-freemius-type" value="subscribers" />
             </form>

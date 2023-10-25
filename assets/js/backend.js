@@ -27,10 +27,10 @@
                 var script_type = $('.ldnft-script-freemius-type').val();
                 if( script_type == 'subscribers' ) {
                     $('.ldfmt-subscription-status-filter, .ldfmt-subscription-interval-filter, .ldfmt-subscription-plan_id-filter, .ldfmt-plugins-subscription-filter').on('change', LDNFTbackEnd.display_subscriptions_plus_summary);
-                    $('#ldnft_subscriptions_data').on('click', '.tablenav-pages a', LDNFTbackEnd.display_new_page_subscriptions);
+                    $('#ldnft_subscriptions_data').on('click', '.tablenav-pages a, th a', LDNFTbackEnd.display_new_page_subscriptions);
                     LDNFTbackEnd.display_subscriptions_plus_summary();					
                 } else if( script_type == 'sales' ) { 
-                    $('#ldnft_sales_data').on('click', '.tablenav-pages a', LDNFTbackEnd.display_new_page_sales);
+                    $('#ldnft_sales_data').on('click', '.tablenav-pages a, th a', LDNFTbackEnd.display_new_page_sales);
                     $('.ldfmt-sales-interval-filter, .ldfmt-sales-filter, .ldfmt-plugins-sales-filter').on('change', LDNFTbackEnd.display_sales_plus_summary);
                     LDNFTbackEnd.display_sales_plus_summary();
                 } else if( script_type == 'customers' ) { 
@@ -39,7 +39,7 @@
                     LDNFTbackEnd.display_customers();
                     
                 } else if( script_type == 'reviews' ) { 
-                    $('#ldnft_reviews_data').on('click', '.tablenav-pages a', LDNFTbackEnd.display_new_page_reviews);
+                    $('#ldnft_reviews_data').on('click', '.tablenav-pages a, th a', LDNFTbackEnd.display_new_page_reviews);
                     $('.ldfmt-plugins-reviews-filter').on('change', LDNFTbackEnd.display_reviews_onchange);
                     LDNFTbackEnd.display_reviews();
                 }
@@ -154,7 +154,7 @@
                                 $('.ldnft-process-freemius-data-reviews').css('display', 'block');
                                 $('.ldnft-process-freemius-data-reviews').find('.ldnft-loading-wrap').html(sub_status.Reviewsmsg);
 
-                                break;
+                                break; 
                             case 'complete':
                                 $('.ldnft-process-freemius-data-info').css('display', 'none');
                                 break;
@@ -188,15 +188,18 @@
 			/**
              * pagination click
 			 */
-			display_new_page_reviews: function() {
-                var page = $('.ldnft-freemius-page').val($(this).data('offset'));
+			display_new_page_reviews: function(e) {
+                e.preventDefault();
+                $('.ldnft-freemius-order').val(LDNFTbackEnd.getParameterByName('order', $(this).attr('href')));
+                $('.ldnft-freemius-orderby').val(LDNFTbackEnd.getParameterByName('orderby', $(this).attr('href')));
+                var page = $('.ldnft-freemius-page').val($(this).data('paged'));
                 LDNFTbackEnd.display_reviews();
             },
             /**
              * Show reviews based on filters
              */
 			display_reviews_onchange: function() {
-                var page = $('.ldnft-freemius-page').val($(this).data('offset'));
+                var page = $('.ldnft-freemius-page').val(1);
                 LDNFTbackEnd.display_reviews();
             },
             /**
@@ -213,14 +216,18 @@
                 var ldnftpage       = $('.ldnft-freemius-page').val();
                 var ldnftplugin     = $('.ldfmt-plugins-filter').val();
                 var ldnftstatus     = $('.ldfmt-plugins-reviews-status').val();
-                
+                var order_str       = $('.ldnft-freemius-order').val();
+                var orderby_str     = $('.ldnft-freemius-orderby').val();
+
                 $.ajax({
                     url: ajaxurl,
                     dataType: 'json',
                     data: {
                         action: 'ldnft_reviews_display',
-                        offset: ldnftpage,
+                        paged: ldnftpage,
                         ldfmt_plugins_filter: ldnftplugin,
+                        order: order_str,
+                        orderby: orderby_str,
                         status: ldnftstatus
                     },
                     success: function (response) {
@@ -248,9 +255,7 @@
 
                 $('.ldnft-freemius-order').val(LDNFTbackEnd.getParameterByName('order', $(this).attr('href')));
                 $('.ldnft-freemius-orderby').val(LDNFTbackEnd.getParameterByName('orderby', $(this).attr('href')));
-                console.log($(this).attr('href'))
-                console.log(LDNFTbackEnd.getParameterByName('orderby', $(this).attr('href')));
-                console.log(LDNFTbackEnd.getParameterByName('order', $(this).attr('href')));
+                
                 e.preventDefault();
                 var page = $('.ldnft-freemius-page').val($(this).data('paged'));
                 LDNFTbackEnd.display_customers();
@@ -303,15 +308,19 @@
 			/**
              * displays sals on pagination
              */
-            display_new_page_sales: function() {
-                var page = $('.ldnft-freemius-page').val($(this).data('offset'));
+            display_new_page_sales: function(e) {
+
+                e.preventDefault();
+                $('.ldnft-freemius-order').val(LDNFTbackEnd.getParameterByName('order', $(this).attr('href')));
+                $('.ldnft-freemius-orderby').val(LDNFTbackEnd.getParameterByName('orderby', $(this).attr('href')));
+                var page = $('.ldnft-freemius-page').val($(this).data('paged'));
                 LDNFTbackEnd.display_sales();
             },
             /**
              * Show sales based on filters
              */
             display_sales_plus_summary: function() {
-                var page = $('.ldnft-freemius-page').val($(this).data('offset'));
+                var page = $('.ldnft-freemius-page').val(1);
                 LDNFTbackEnd.display_sales();
                 LDNFTbackEnd.load_sales_summary();
             },
@@ -329,16 +338,20 @@
                 var ldnftpage       = $('.ldnft-freemius-page').val();
                 var ldnftplugin     = $('.ldfmt-plugins-filter').val();
                 var ldnftinterval   = $('.ldfmt-sales-interval-filter').val();
-                var ldnftstatus     = $('.ldfmt-sales-status-filter').val();
+                var ldnftstatus     = $('.ldfmt-sales-filter').val();
+                var order_str       = $('.ldnft-freemius-order').val();
+                var orderby_str     = $('.ldnft-freemius-orderby').val();
                 
                 $.ajax({
                     url: ajaxurl,
                     dataType: 'json',
                     data: {
                         action: 'ldnft_sales_display',
-                        offset: ldnftpage,
+                        paged: ldnftpage,
                         ldfmt_plugins_filter: ldnftplugin,
                         interval: ldnftinterval,
+                        order: order_str,
+                        orderby: orderby_str,
                         status: ldnftstatus
                     },
                     success: function (response) {
@@ -354,7 +367,7 @@
             },
             /**
              * Show sales summary based on filters
-             */
+             */ 
             load_sales_summary: function() {
                 
                 $('.ldnft-subssummary-loader').css('display', 'inline');
@@ -367,19 +380,21 @@
                 var ldnftpage       = $('.ldnft-freemius-page').val();
                 var ldnftplugin     = $('.ldfmt-plugins-filter').val();
                 var ldnftinterval   = $('.ldfmt-sales-interval-filter').val();
-                var ldnftstatus     = $('.ldfmt-sales-status-filter').val();
-                var ldnftplan_id    = $('.ldfmt-sales-plan_id-filter').val();
+                var ldnftstatus     = $('.ldfmt-sales-filter').val();
+                var order_str       = $('.ldnft-freemius-order').val();
+                var orderby_str     = $('.ldnft-freemius-orderby').val();
 
                 $.ajax({
                     url: ajaxurl,
                     dataType: 'json',
                     data: {
                         action: 'ldnft_sales_summary',
-                        offset: ldnftpage,
+                        paged: ldnftpage,
                         ldfmt_plugins_filter: ldnftplugin,
                         interval: ldnftinterval,
-                        status: ldnftstatus,
-                        plan_id: ldnftplan_id,
+                        order: order_str,
+                        orderby: orderby_str,
+                        status: ldnftstatus
                     },
                     success: function ( response ) {
 
@@ -397,14 +412,19 @@
              * Show subscription based on pagination
              */
             display_new_page_subscriptions: function() {
-                var page = $('.ldnft-freemius-page').val($(this).data('offset'));
+
+                e.preventDefault();
+                $('.ldnft-freemius-order').val(LDNFTbackEnd.getParameterByName('order', $(this).attr('href')));
+                $('.ldnft-freemius-orderby').val(LDNFTbackEnd.getParameterByName('orderby', $(this).attr('href')));
+
+                var page = $('.ldnft-freemius-page').val($(this).data('paged'));
                 LDNFTbackEnd.display_subscriptions();
             },
             /**
              * Show subscription summary
              */
             display_subscriptions_plus_summary: function() {
-                var page = $('.ldnft-freemius-page').val($(this).data('offset'));
+                var page = $('.ldnft-freemius-page').val($(this).data('paged'));
                 LDNFTbackEnd.display_subscriptions();
                 LDNFTbackEnd.load_subscription_summary();
             },
@@ -424,6 +444,8 @@
                 var ldnftinterval   = $('.ldfmt-subscription-interval-filter').val();
                 var ldnftstatus     = $('.ldfmt-subscription-status-filter').val();
                 var ldnftplan_id    = $('.ldfmt-subscription-plan_id-filter').val();
+                var order_str       = $('.ldnft-freemius-order').val();
+                var orderby_str     = $('.ldnft-freemius-orderby').val();
                 
                 $.ajax({
 
@@ -431,10 +453,12 @@
                     dataType: 'json',
                     data: {
                         action: 'ldnft_subscriptions_display',
-                        offset: ldnftpage,
+                        paged: ldnftpage,
                         ldfmt_plugins_filter: ldnftplugin,
                         interval: ldnftinterval,
                         status: ldnftstatus,
+                        order: order_str,
+                        orderby: orderby_str,
                         plan_id: ldnftplan_id,
                     },
                     success: function (response) {
@@ -470,7 +494,7 @@
                     dataType: 'json',
                     data: {
                         action: 'ldnft_subscriptions_summary',
-                        offset: ldnftpage,
+                        paged: ldnftpage,
                         ldfmt_plugins_filter: ldnftplugin,
                         interval: ldnftinterval,
                         status: ldnftstatus,
@@ -566,12 +590,10 @@
 				$('#ldnft-review-coloumn-vat').html( lnk.data('vat') );
 				$('#ldnft-review-coloumn-install_id').html( lnk.data('install_id') );
 				$('#ldnft-review-coloumn-plan_id').html( lnk.data('plan_id') );
-				$('#ldnft-review-coloumn-pricing_id').html( lnk.data('pricing_id') );
-				$('#ldnft-review-coloumn-ip').html( lnk.data('ip') );
+				
 				$('#ldnft-review-coloumn-zip_postal_code').html( lnk.data('zip_postal_code') );
-				$('#ldnft-review-coloumn-vat_id').html( lnk.data('vat_id') );
+				
 				$('#ldnft-review-coloumn-coupon_id').html( lnk.data('coupon_id') );
-				$('#ldnft-review-coloumn-user_card_id').html( lnk.data('user_card_id') );
 				$('#ldnft-review-coloumn-plugin_id').html( lnk.data('plugin_id') );
 				$('#ldnft-review-coloumn-external_id').html( lnk.data('external_id') );
 				$('#ldnft-review-coloumn-currency').html( lnk.data('currency') );

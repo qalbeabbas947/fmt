@@ -228,6 +228,8 @@ class LDNFT_Reviews_Menu {
 						</div>
 					</div>	
 					<!-- For plugins, we also need to ensure that the form posts back to our current page -->
+                    <input type="hidden" class="ldnft-freemius-order" name="order" value="id" />
+                    <input type="hidden" class="ldnft-freemius-orderby" name="orderby" value="asc" />
 					<input type="hidden" class="ldnft-freemius-page" name="page" value="1" />
 					<input type="hidden" class="ldnft-script-freemius-type" name="ldnft-script-freemius-type" value="reviews" />
                 </form>

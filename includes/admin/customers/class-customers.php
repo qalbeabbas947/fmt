@@ -306,7 +306,7 @@ class LDNFT_Customers extends WP_List_Table {
          * our data. In a real-world implementation, you will probably want to 
          * use sort and pagination data to build a custom query instead, as you'll
          * be able to use your precisely-queried data immediately.
-         */
+         */ 
 
         $table_name = $wpdb->prefix.'ldnft_customers'; 
         $where = " where plugin_id='".$this->selected_plugin_id."'";
