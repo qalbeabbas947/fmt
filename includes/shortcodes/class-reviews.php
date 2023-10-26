@@ -60,74 +60,66 @@ class LDNFT_Reviews_Shortcode {
      */
     public function load_reviews() {
         
+        global $wpdb;
+
         $plugin_id      = sanitize_text_field($_POST['plugin_id']);
         $per_page       = sanitize_text_field($_POST['per_page']);
         $listing_type   = sanitize_text_field($_POST['type']); //pagination, onetime, slider
         $offset         = sanitize_text_field($_POST['offset']);
         
-        $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
-        $results = $api->Api('plugins/'.$plugin_id.'/reviews.json?is_featured=true&count='.$per_page.'&offset='.$offset, 'GET', [ ]);
+        $table_name = $wpdb->prefix.'ldnft_reviews r inner join '.$wpdb->prefix.'ldnft_customers c on (r.user_id=c.id)'; 
+        $results = $wpdb->get_results( $wpdb->prepare( "SELECT r.*, c.email as useremail FROM $table_name where is_featured = 1 and r.plugin_id = %d ORDER BY r.id LIMIT %d OFFSET %d", $plugin_id, $per_page, $offset ) );
         
-        if( is_array($results->reviews) && count( $results->reviews ) > 0 ) {
+        if( is_array($results) && count( $results ) > 0 ) {
             $slides         = '';
             $slide_ctrl     = '';
             $slide_index = 0;
-            foreach($results->reviews as $review) { 
+            foreach( $results as $review ) { 
                 if( $listing_type == 'pagination' || $listing_type == 'onetime' ) {
-                ?>
-                    <div class="review-container">
-                        <?php if(!empty($review->picture)) { ?>
-                            <a class="ldfmt_review_image-link" href="<?php echo $review->profile_url;?>"><img class="ldfmt_review_image" src="<?php echo $review->picture;?>" alt="Avatar" style="width:90px"></a>
-                        <?php } ?>
-                        <h3 class="ldfmt_review_title"><a class="ldfmt_review_title-link" href="<?php echo $review->sharable_img;?>" data-lightbox="ldfmt-set" data-title="<?php echo $review->title;?>"><?php echo $review->title;?></a></h3>
-                        <p class="ldfmt_review_user"><span><?php echo $review->name;?></span> of <?php echo !empty($review->company)?'<a href="'.$review->company_url.'">'.$review->company.'</a>':''; ?></p>
-                        <p class="ldfmt_review_description"><?php echo $review->text;?></p>
-                        <p class="ldfmt_review_time_wrapper">
-                            <div class="ldfmt_review_time"><?php echo $review->created;?></div>
-                            <div class="ldfmt_review_rate">
-                                <?php echo __('Rate:', LDNFT_TEXT_DOMAIN);?> 
-                                <div class="ldnft-rating-div">
-                                    <?php 
-                                        $rates = $review->rate;
-                                        for($i=1; $i<=5; $i++) {
-                                            $selected = '';
-                                            if( $i*20 <= $rates ) {
-                                                $selected = 'ldnft-checked';
+                    ?>
+                        <div class="review-container">
+                            <?php if( ! empty( $review->picture ) ) { ?>
+                                <a class="ldfmt_review_image-link" href="<?php echo $review->profile_url;?>"><img class="ldfmt_review_image" src="<?php echo $review->picture;?>" alt="Avatar"></a>
+                            <?php } ?>
+                            <h3 class="ldfmt_review_title"><a class="ldfmt_review_title-link" href="<?php echo $review->sharable_img;?>" data-lightbox="ldfmt-set" data-title="<?php echo $review->title;?>"><?php echo $review->title;?></a></h3>
+                            <p class="ldfmt_review_user"><span><?php echo $review->name;?></span> of <?php echo !empty($review->company)?'<a href="'.$review->company_url.'">'.$review->company.'</a>':''; ?></p>
+                            <p class="ldfmt_review_description"><?php echo $review->text;?></p>
+                            <p class="ldfmt_review_time_wrapper">
+                                <div class="ldfmt_review_time"><?php echo $review->created;?></div>
+                                <div class="ldfmt_review_rate">
+                                    <?php echo __( 'Rate:', LDNFT_TEXT_DOMAIN );?> 
+                                    <div class="ldnft-rating-div">
+                                        <?php 
+                                            $rates = $review->rate;
+                                            for($i=1; $i<=5; $i++) {
+
+                                                $selected = '';
+                                                if( $i*20 <= $rates ) {
+                                                    $selected = 'ldnft-checked';
+                                                }
+
+                                                echo '<span class="fa fa-star '.$selected.'"></span>';
                                             }
-                                            echo '<span class="fa fa-star '.$selected.'"></span>';
-                                        }
-                                    ?>
-                                </div>    
-                            </div>
-                        </p>
-                    </div>
-                <?php
+                                        ?>
+                                    </div>    
+                                </div>
+                            </p>
+                        </div>
+                    <?php
                 } elseif ( $listing_type == 'slider' ) {
                     $slides          .= '<div class="slider-item '.($slide_index == 0?'active':'').'"><img src="'.$review->sharable_img.'" width="100%" /></div>';
-                    //$slide_ctrl      .= '<i class="fas fa-circle indicator '.($slide_index == 0?'active':'').'" data-slide-to="'.($slide_index++).'"></i>';
-                    
                 }
             }
 
             if( $listing_type == 'slider' ) {
                 echo $slides;
-                ?>
-                    <!-- <div class="slider-panel">
-                        <div class="slider-panel__navigation">
-                            <?php echo $slide_ctrl;?>
-                        </div>
-                        <div class="slider-panel__controls">
-                            <i class="far fa-arrow-alt-circle-left" id="previous"></i>
-                            <i class="far fa-pause-circle" id="pause-play"></i>
-                            <i class="far fa-arrow-alt-circle-right" id="next"></i>
-                        </div>
-                    </div> -->
-                <?php
             }
 
             if( $listing_type == 'pagination' ) {
-                $result_check = $api->Api('plugins/'.$plugin_id.'/reviews.json?is_featured=true&count='.$per_page.'&offset='.($offset+$per_page), 'GET', [ ]);
-                if( is_array($result_check->reviews) && count( $result_check->reviews ) > 0 ) {
+                
+                $result_check = $wpdb->get_results( $wpdb->prepare( "SELECT r.*, c.email as useremail FROM $table_name where is_featured = 1 and r.plugin_id = %d ORDER BY r.id LIMIT %d OFFSET %d", $plugin_id, $per_page, ( $offset+$per_page ) ) );
+
+                if( is_array( $result_check ) && count( $result_check ) > 0 ) {
                     echo '<input type="hidden" id="ldnft-is-loadmore-link" value="yes" />';
                 } else {
                     echo '<input type="hidden" id="ldnft-is-loadmore-link" value="no" />';
@@ -170,6 +162,7 @@ class LDNFT_Reviews_Shortcode {
                     <input type="hidden" value="<?php echo $product_id;?>" name="ldfmt-plugins-filter" class="ldfmt-plugins-filter">
                     <input type="hidden" value="<?php echo $listing_type;?>" name="ldfmt-listing_type" class="ldfmt-listing_type">
                     <input type="hidden" value="<?php echo $limit;?>" name="ldfmt-page-limit" class="ldfmt-page-limit">
+                    <input type="hidden" value="0" name="ldfmt-page-offset" class="ldfmt-page-offset" />
                 </div>
                 <div style="display:none" class="ldfmt-loader-div"><img width="30px" class="ldfmt-data-loader" src="<?php echo LDNFT_ASSETS_URL.'images/spinner-2x.gif';?>" /></div>
                 <div class="ldmft-filter-reviews <?php if( $listing_type=='slider' ) { ?>ldmft-filter-reviews-slider<?php } ?>">    

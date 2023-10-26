@@ -139,13 +139,14 @@
                 var plugin = review_div.find('.ldfmt-plugins-filter').val();
                 var listing_type = review_div.find('.ldfmt-listing_type').val();
                 var limit = review_div.find('.ldfmt-page-limit').val();
-
+                var start_offset = review_div.find('.ldfmt-page-offset').val();
+                
                 review_div.find('.ldfmt-load-more-btn').css('display', 'block');
                 review_div.find('.ldfmt-loader-div').css('display', 'block');
                 $.ajax({
                     method: "POST",
                     url: LDNFT.ajaxURL,
-                    data: { action: 'ldnft_load_reviews', plugin_id: plugin, per_page: limit, type:listing_type, offset:record_offset  },
+                    data: { action: 'ldnft_load_reviews', plugin_id: plugin, per_page: limit, type:listing_type, offset:start_offset  },
                     cache: false,
                   })
                 .done(function( html ) {
@@ -158,7 +159,7 @@
                     }
                     
                     review_div.find('.ldfmt-loader-div').css('display', 'none');
-                    record_offset = limit; 
+                    review_div.find('.ldfmt-page-offset').val(( parseInt( limit ) + parseInt( start_offset ) ) );
 
                     $(".ldmft-filter-reviews-slider").bxSlider();
                     
@@ -169,24 +170,27 @@
              */
             load_more_review_records: function(e) {
                 e.preventDefault();
-                var plugin          = $('.ldfmt-plugins-filter').val();
-                var listing_type    = $('.ldfmt-listing_type').val();
-                var limit           = $('.ldfmt-page-limit').val();
+
                 var link            = $(this);
 
-                var review_div = $(this).parents('.ldmft_wrapper');
-                review_div.find('.ldfmt-loader-div-btm-reviews').css('display', 'block');
+                var review_div      = $(this).parents('.ldmft_wrapper');
+                var plugin          = review_div.find('.ldfmt-plugins-filter').val();
+                var listing_type    = review_div.find('.ldfmt-listing_type').val();
+                var start_offset    = review_div.find('.ldfmt-page-offset').val();
+                var limit           = review_div.find('.ldfmt-page-limit').val();
                 
+                review_div.find('.ldfmt-loader-div-btm-reviews').css('display', 'block');
+
                 link.css('disabled', true);
                 $.ajax({
                     method: "POST",
                     url: LDNFT.ajaxURL,
-                    data: { action: 'ldnft_load_reviews', plugin_id: plugin, per_page: limit, type:listing_type, offset:record_offset  },
+                    data: { action: 'ldnft_load_reviews', plugin_id: plugin, per_page: limit, type:listing_type, offset:start_offset  },
                     cache: false,
                 })
                 .done(function( html ) {
                     review_div.find( '#ldnft-is-loadmore-link' ).remove();
-
+                    
                     review_div.find('.ldmft-filter-reviews').append( html );
                     review_div.find('.ldfmt-loader-div-btm-reviews').css('display', 'none');
                     
@@ -195,12 +199,14 @@
                         review_div.find('.ldfmt-load-more-btn').css('display', 'none');
                     } else {
                         var loadmore = review_div.find( '#ldnft-is-loadmore-link' ).val();
+                        
                         if( loadmore == 'yes' ) {
                             review_div.find('.ldfmt-load-more-btn a').css('display', 'block');
                         } else {
                             review_div.find('.ldfmt-load-more-btn a').css('display', 'none');
                         }
-                        record_offset += limit;
+                        
+                        review_div.find('.ldfmt-page-offset').val( ( parseInt( limit ) + parseInt( start_offset ) ) );
                     }
                 });
             },
