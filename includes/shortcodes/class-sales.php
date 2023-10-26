@@ -54,59 +54,33 @@ class LDNFT_Sales_Shortcode {
         $per_page   = sanitize_text_field($_POST['per_page']);
         $offset     = sanitize_text_field($_POST['offset']);
 
-        $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
-        
         if( empty($show) ) {
             $show = 'both';
         }
         
         if( ($show == 'both' || $show=='summary' ) && $offset == 0) {
-            
-            $tem_per_page = 50;
-            $tem_offset = 0;
-            $result = $api->Api('plugins/'.$plugin_id.'/subscriptions.json?count='.$tem_per_page.'&offset='.$tem_offset, 'GET', []);
-            $gross_total = 0;
-            $tax_rate_total = 0;
-            if( isset( $result->subscriptions ) && is_array( $result->subscriptions ) && count( $result->subscriptions ) > 0 ) {
-                $has_more_records = true;
-                while($has_more_records) {
-                    foreach( $result->subscriptions as $payment ) {
-                        $gross_total += $payment->total_gross;
-                        $tax_rate_total += $payment->tax_rate;
-                    } 
-
-                    $tem_offset += $tem_per_page;
-                    $result = $api->Api('plugins/'.$plugin_id.'/subscriptions.json?count='.$tem_per_page.'&offset='.$tem_offset, 'GET', []);
-                    if( count( $result->subscriptions ) > 0 ) {
-                        $has_more_records = true;
-                    } else {
-                        $has_more_records = false;
-                    }
-                }
-            }
-
-            $gross = 0;
-
+            $table_name     = $wpdb->prefix.'ldnft_subscription';
+            $gross_total    = $wpdb->get_var($wpdb->prepare("SELECT sum(gross) as total FROM $table_name where plugin_id=%d", $plugin_id));
+            $gateway_total  = $wpdb->get_var($wpdb->prepare("SELECT sum(gateway) as total FROM $table_name where plugin_id=%d", $plugin_id));
             ?>
                 <div class="ldfmt-gross-sales-box ldfmt-sales-box">
                     <label><?php echo __('Gross Sales', LDNFT_TEXT_DOMAIN);?></label>
                     <div class="ldnft_points"><?php echo number_format( floatval($gross_total), 2);?></div>
                 </div>
-            <?php
-    
-            $gateway_fee = 0;
-            ?>
                 <div class="ldfmt-gross-gateway-box ldfmt-sales-box">
-                    <label><?php echo __('Tax Rate', LDNFT_TEXT_DOMAIN);?></label>
-                    <div class="ldnft_gateway_fee"><?php echo number_format( floatval($tax_rate_total), 2);?></div>
+                    <label><?php echo __('Gateway Fee', LDNFT_TEXT_DOMAIN);?></label>
+                    <div class="ldnft_gateway_fee"><?php echo number_format( floatval($gateway_total), 2);?></div>
                 </div>
             <?php
             echo '<div class="ldfmt-clear-div">&nbsp;</div>';
         }
         
         if( $show == 'both' || $show=='listing' ) {
-            $results = $api->Api('plugins/'.$plugin_id.'/subscriptions.json?count='.$per_page.'&offset='.$offset, 'GET', []);
-            if( is_array($results->subscriptions) && count( $results->subscriptions ) > 0 ) {
+            
+            $table_name = $wpdb->prefix.'ldnft_subscription t inner join '.$wpdb->prefix.'ldnft_customers c on (t.user_id=c.id)'; 
+            $results    = $wpdb->get_results( $wpdb->prepare( "SELECT t.*, concat(c.first, ' ', c.first) as username, c.email FROM $table_name where t.plugin_id=%d LIMIT %d OFFSET %d", $plugin_id, $per_page, $offset ) );
+        
+            if( is_array( $results ) && count( $results ) > 0 ) {
                 if(  $offset == 0 ) {
                     ?>
                         <table class="ldfmt-sales-list">
@@ -121,13 +95,10 @@ class LDNFT_Sales_Shortcode {
                     <?php
                 }
 
-                foreach( $results->subscriptions as $result ) {
-                    $user = $api->Api('plugins/'.$plugin_id.'/users/'.$result->user_id.'.json', 'GET', []);
-                    $username   = $user->first.' '.$user->last;
-                    $useremail  = $user->email;
+                foreach( $results as $result ) {
                     ?>
                         <tr>
-                            <td><?php echo $username;?><br>(<?php echo $useremail;?>)</td>
+                            <td><?php echo $result->username;?><br>(<?php echo $result->email;?>)</td>
                             <td><?php echo $result->total_gross;?></td>
                             <td><?php echo $result->tax_rate;?></td>
                             <td><?php echo $result->created;?></td>
