@@ -53,9 +53,9 @@ class LDNFT_Subscriptions extends WP_List_Table {
         $this->plugins = LDNFT_Freemius::$products;
         
         $this->selected_plugin_id = ( isset( $_GET['ldfmt_plugins_filter'] ) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) ? intval( $_GET['ldfmt_plugins_filter'] ) : $this->plugins[0]->id;
-        $this->selected_interval = ( isset( $_GET['interval'] ) ) ? $_GET['interval'] : 12; 
-        $this->selected_country = ( isset( $_GET['country'] )  ) ? $_GET['country'] : ''; 
-        $this->selected_plan_id = ( isset( $_GET['plan_id'] ) && intval( $_GET['plan_id'] ) > 0 ) ? $_GET['plan_id'] : '';
+        $this->selected_interval = ( isset( $_GET['interval'] ) ) ? sanitize_text_field( $_GET['interval'] ) : 12; 
+        $this->selected_country = ( isset( $_GET['country'] )  ) ? sanitize_text_field( $_GET['country'] ) : ''; 
+        $this->selected_plan_id = ( isset( $_GET['plan_id'] ) && intval( $_GET['plan_id'] ) > 0 ) ? sanitize_text_field( $_GET['plan_id'] ) : '';
 
 		parent::__construct(
 			[
@@ -278,8 +278,8 @@ class LDNFT_Subscriptions extends WP_List_Table {
 
         // prepare query params, as usual current page, order by and order direction
         $offset = isset($paged) ? (intval($paged) -1) * $per_page : 0;
-        $orderby = (isset($_REQUEST['orderby']) && in_array($_REQUEST['orderby'], array_keys($this->get_sortable_columns()))) ? $_REQUEST['orderby'] : 'id';
-        $order = (isset($_REQUEST['order']) && in_array($_REQUEST['order'], array('asc', 'desc'))) ? $_REQUEST['order'] : 'asc';
+        $orderby = (isset($_REQUEST['orderby']) && in_array($_REQUEST['orderby'], array_keys($this->get_sortable_columns()))) ? sanitize_text_field( $_REQUEST['orderby'] ) : 'id';
+        $order = (isset($_REQUEST['order']) && in_array($_REQUEST['order'], array('asc', 'desc'))) ? sanitize_text_field( $_REQUEST['order'] ) : 'asc';
        
         $orderby_prefix = "t.";
         if( in_array( $orderby, [ 'username', 'useremail' ] ) ) {

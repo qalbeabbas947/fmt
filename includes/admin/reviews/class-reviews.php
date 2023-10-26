@@ -340,8 +340,8 @@ class LDNFT_Reviews extends WP_List_Table {
 
         // prepare query params, as usual current page, order by and order direction
         $offset      = isset($paged) ? intval(($paged-1) * $per_page) : 0;
-        $orderby    = (isset($_REQUEST['orderby']) && in_array($_REQUEST['orderby'], array_keys($this->get_sortable_columns()))) ? $_REQUEST['orderby'] : 'id';
-        $order      = (isset($_REQUEST['order']) && in_array($_REQUEST['order'], array('asc', 'desc'))) ? $_REQUEST['order'] : 'asc';
+        $orderby    = (isset($_REQUEST['orderby']) && in_array($_REQUEST['orderby'], array_keys($this->get_sortable_columns()))) ? sanitize_text_field( $_REQUEST['orderby'] ) : 'id';
+        $order      = (isset($_REQUEST['order']) && in_array($_REQUEST['order'], array('asc', 'desc'))) ? sanitize_text_field( $_REQUEST['order'] ) : 'asc';
         
         /**
          * REQUIRED. Now we can add our *sorted* data to the items property, where 

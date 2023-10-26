@@ -232,7 +232,8 @@ class LDNFT_Subscriptions_Menu {
         $where = " where plugin_id='".$selected_plugin_id."'";
         
        if( !empty( $_GET['interval'] )) {
-            switch( $_GET['interval'] ) {
+            $interval = sanitize_text_field( $_GET['interval'] );
+            switch( $interval ) {
                 case "current_week":
                     $where .= " and YEARWEEK(t.created) = YEARWEEK(NOW())";
                     break;
@@ -252,11 +253,11 @@ class LDNFT_Subscriptions_Menu {
         }
 
         if( isset( $_GET['country'] ) && !empty( $_GET['country'] )  ) {
-            $where .=  " and country_code='".$_GET['country']."'";
+            $where .=  " and country_code='".sanitize_text_field( $_GET['country'] )."'";
         }
         
-        if( isset( $_GET['plan_id'] ) && intval($_GET['plan_id']) > 0 ) {
-            $where .= ' and plan_id='.$_GET['plan_id'] ;
+        if( isset( $_GET['plan_id'] ) && intval( $_GET['plan_id'] ) > 0 ) {
+            $where .= ' and plan_id='.sanitize_text_field( $_GET['plan_id'] );
         } 
 
         $result = $wpdb->get_results( "SELECT * FROM $table_name $where");
@@ -398,17 +399,17 @@ class LDNFT_Subscriptions_Menu {
 
         $selected_interval = '12';
         if( isset($_GET['interval'])  ) {
-            $selected_interval = $_GET['interval']; 
+            $selected_interval = sanitize_text_field( $_GET['interval'] ); 
         }
         
         $selected_country = '';
         if( isset( $_GET['country'] )  ) {
-            $selected_country = $_GET['country']; 
+            $selected_country = sanitize_text_field( $_GET['country'] ); 
         }
         
         $selected_plan_id = '';
         if( isset( $_GET['plan_id'] ) ) {
-            $selected_plan_id = $_GET['plan_id']; 
+            $selected_plan_id = sanitize_text_field( $_GET['plan_id'] ); 
         }
 
         /**

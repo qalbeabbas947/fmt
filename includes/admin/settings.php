@@ -15,7 +15,7 @@ class LDNFT_Settings {
         
         global $wpdb;
 
-        $this->page_tab = isset( $_GET['tab'] ) ? $_GET['tab'] : 'freemius-api';
+        $this->page_tab = isset( $_GET['tab'] ) ? sanitize_text_field( $_GET['tab'] ) : 'freemius-api';
         add_action( 'admin_menu',                               [ $this, 'setting_menu' ], 1001 );
         add_action( 'admin_post_ldnft_submit_action',           [ $this, 'save_settings' ] );
         add_action( 'admin_notices',                            [ $this, 'ldnft_admin_notice' ] );
@@ -29,14 +29,14 @@ class LDNFT_Settings {
        
         global $wpdb;
 
-        $ldnft_mailpeot_plugin  = sanitize_text_field($_POST['ldnft_mailpeot_plugin']);
+        $ldnft_mailpeot_plugin  = sanitize_text_field( $_POST['ldnft_mailpeot_plugin'] );
         if( ! isset( $_POST['ldnft_mailpeot_plugin'] ) || empty($ldnft_mailpeot_plugin) ) {
             $errormsg = __('Freemius product is required for import.', LDNFT_TEXT_DOMAIN);
             $response = ['added'=>0, 'exists'=>0, 'message'=>'', 'errors'=> [$errormsg], 'errormsg'=> $errormsg ];
             echo json_encode($response);exit;
         }
 
-        $ldnft_mailpeot_list    = sanitize_text_field($_POST['ldnft_mailpeot_list']);
+        $ldnft_mailpeot_list    = sanitize_text_field( $_POST['ldnft_mailpeot_list'] );
         if( ! isset( $_POST['ldnft_mailpeot_list'] ) || empty($ldnft_mailpeot_list) ) {
             $errormsg = __('Mailpoet list is required for import.', LDNFT_TEXT_DOMAIN);
             $response = ['added'=>0, 'exists'=>0, 'message'=>'', 'errors'=> [$errormsg], 'errormsg'=> $errormsg ];

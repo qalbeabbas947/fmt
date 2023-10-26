@@ -159,13 +159,13 @@ class LDNFT_Customers_Menu {
         }
 		
 		$selected_plugin_id = 0;
-        if( isset($_GET['ldfmt_plugins_filter']) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) {
+        if( isset( $_GET['ldfmt_plugins_filter'] ) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) {
             $selected_plugin_id = intval( $_GET['ldfmt_plugins_filter'] ); 
         }
 		
 		$selected_status = 'active';
         if( isset( $_GET['status'] )  ) {
-            $selected_status = $_GET['status']; 
+            $selected_status = sanitize_text_field( $_GET['status'] ); 
         }
 		
 		$products = LDNFT_Freemius::$products;

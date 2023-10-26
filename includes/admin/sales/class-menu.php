@@ -58,17 +58,17 @@ class LDNFT_Sales_Menu {
 
         $selected_interval = '';
         if( isset( $_GET['interval'] ) && !empty( $_GET['interval'] ) ) {
-            $selected_interval = $_GET['interval'];
+            $selected_interval = sanitize_text_field( $_GET['interval'] );
         }
 
         $selected_status = '';
         if( isset( $_GET['status'] )  ) {
-            $selected_status = $_GET['status'];
+            $selected_status = sanitize_text_field( $_GET['status'] );
         }
         
         $plan_str = '';
         if( isset( $_GET['plan_id'] ) && intval($_GET['plan_id']) > 0 ) {
-            $plan_str = $_GET['plan_id']; 
+            $plan_str = sanitize_text_field( $_GET['plan_id'] ); 
         }
 
         $table_name = $wpdb->prefix.'ldnft_transactions';  
@@ -251,12 +251,12 @@ class LDNFT_Sales_Menu {
 
         $selected_interval = 'today';
         if( isset($_GET['interval'])  ) {
-            $selected_interval = $_GET['interval']; 
+            $selected_interval = sanitize_text_field( $_GET['interval'] ); 
         }
         
         $selected_filter = 'all';
         if( isset( $_GET['filter'] )  ) {
-            $selected_filter = $_GET['filter']; 
+            $selected_filter = sanitize_text_field( $_GET['filter'] ); 
         }
 
         /**
