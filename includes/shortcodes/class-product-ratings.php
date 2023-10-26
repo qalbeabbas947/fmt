@@ -60,35 +60,16 @@ class LDNFT_Product_Rating {
      */
     public function rating_shortcode_cb( $atts ) {
         
+        global $wpdb;
+
         $attributes = shortcode_atts( array(
             'product_id' => 0,
         ), $atts );
 
-        $plugin_id  = sanitize_text_field( $attributes['product_id'] );
-        $tem_per_page = 50;
-        $tem_offset = 0;
-        $api = new Freemius_Api_WordPress( FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY );
-        $result = $api->Api( 'plugins/'.$plugin_id.'/reviews.json?is_featured=true&count='.$tem_per_page.'&offset='.$tem_offset, 'GET', [ ] );
-        $total_reviews = 0;
-        $total_ratings = 0;
-        if( count( $result->reviews ) > 0 ) {
-            $has_more_records = true;
-            while( $has_more_records ) {
-                
-                foreach( $result->reviews as $review ) {
-                    $total_ratings += $review->rate;
-                } 
-
-                $total_reviews += count( $result->reviews );
-                $tem_offset += $tem_per_page;
-                $result = $api->Api('plugins/'.$plugin_id.'/reviews.json?count='.$tem_per_page.'&offset='.$tem_offset, 'GET', []);
-                if( count( $result->reviews ) > 0 ) {
-                    $has_more_records = true;
-                } else {
-                    $has_more_records = false;
-                }
-            }
-        }
+        $plugin_id      = sanitize_text_field( $attributes['product_id'] );
+        $table_name     = $wpdb->prefix.'ldnft_reviews'; 
+        $total_ratings  = $wpdb->get_var( $wpdb->prepare( "SELECT sum(rate) as rate FROM $table_name where plugin_id = %d", $plugin_id ) );
+        $total_reviews  = $wpdb->get_var( $wpdb->prepare( "SELECT count(id) as rate FROM $table_name where plugin_id = %d", $plugin_id ) );
 
         ob_start();
         ?>
