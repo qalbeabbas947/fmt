@@ -45,33 +45,16 @@ class LDNFT_Number_of_Sales_Shortcode {
      */
     public function sales_shortcode_cb( $atts ) {
         
+        global  $wpdb;
+
         $attributes = shortcode_atts( array(
             'product_id' => 0,
         ), $atts );
 
         $plugin_id  = sanitize_text_field($attributes['product_id']);
-        $tem_per_page = 50;
-        $tem_offset = 0;
-        $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
-        $result = $api->Api('plugins/'.$plugin_id.'/subscriptions.json?count='.$tem_per_page.'&offset='.$tem_offset, 'GET', []);
-        $total_sales = 0;
+        $table_name = $wpdb->prefix.'ldnft_subscription';  
+        $total_sales = $wpdb->get_var($wpdb->prepare("SELECT count(id) as id FROM $table_name where plugin_id=%d", $plugin_id));
 
-        if( count( $result->subscriptions ) > 0 ) {
-
-            $has_more_records = true;
-            while($has_more_records) {
-                
-                $total_sales += count($result->subscriptions);
-
-                $tem_offset += $tem_per_page;
-                $result = $api->Api('plugins/'.$plugin_id.'/subscriptions.json?count='.$tem_per_page.'&offset='.$tem_offset, 'GET', []);
-                if( count( $result->subscriptions ) > 0 ) {
-                    $has_more_records = true;
-                } else {
-                    $has_more_records = false;
-                }
-            }
-        }
         
         return $total_sales;
     }
