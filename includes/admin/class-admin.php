@@ -197,6 +197,7 @@ class LDNFT_Admin {
                     'ajaxURL' => admin_url( 'admin-ajax.php' ),
                     'import_cron_status' => $cron_status,
                     'is_cron_page_check' => $is_cron_page_check,
+                    'preloader_gif_img' => $this->get_bar_preloader()
                 ] );
             }
         }  

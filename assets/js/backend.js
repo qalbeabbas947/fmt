@@ -1,10 +1,6 @@
 (function( $ ) { 'use strict';
     $( document ).ready( function() {
         var LDNFTbackEnd = {
-            default_table_row: '',
-            default_sales_table_row: '',
-			default_customers_table_row: '',
-			default_reviews_table_row: '',
             ajax_url_new: ajaxurl,
             init: function() {
 				
@@ -190,11 +186,13 @@
              */
             display_reviews: function() {
 				
-                if( LDNFTbackEnd.default_reviews_table_row == '' ) {
-                    LDNFTbackEnd.default_reviews_table_row = $('#ldnft_reviews_data table tbody').html();
-                } else {
-                    $('#ldnft_reviews_data table tbody').html( LDNFTbackEnd.default_reviews_table_row );
+                var columns_count = $('#ldnft_reviews_data table thead tr:eq(0)').find('th:not(.hidden)').length; 
+                var placeholder = '<tr>';
+                for( var i = 0; i < columns_count; i++ ) {
+                    placeholder += '<td align="center">' + LDNFT.preloader_gif_img + '</td>';
                 }
+                placeholder += '</tr>';
+                $('#ldnft_reviews_data table tbody').html( placeholder );
                
                 var ldnftpage       = $('.ldnft-freemius-page').val();
                 var ldnftplugin     = $('.ldfmt-plugins-filter').val();
@@ -255,11 +253,13 @@
              */
             display_customers: function() {
 				
-                if( LDNFTbackEnd.default_customers_table_row == '' ) {
-                    LDNFTbackEnd.default_customers_table_row = $('#ldnft_customers_data table tbody').html();
-                } else {
-                    $('#ldnft_customers_data table tbody').html( LDNFTbackEnd.default_customers_table_row );
+                var columns_count = $('#ldnft_customers_data table thead tr:eq(0)').find('th:not(.hidden)').length; 
+                var placeholder = '<tr>';
+                for( var i = 0; i < columns_count; i++ ) {
+                    placeholder += '<td align="center">' + LDNFT.preloader_gif_img + '</td>';
                 }
+                placeholder += '</tr>';
+                $('#ldnft_customers_data table tbody').html( placeholder );
                
                 var ldnftpage       = $('.ldnft-freemius-page').val();
                 var ldnftplugin     = $('.ldfmt-plugins-filter').val();
@@ -312,11 +312,13 @@
              */
             display_sales: function() {
                 
-                if( LDNFTbackEnd.default_sales_table_row == '' ) {
-                    LDNFTbackEnd.default_sales_table_row = $('#ldnft_sales_data table tbody').html();
-                } else {
-                    $('#ldnft_sales_data table tbody').html( LDNFTbackEnd.default_sales_table_row );
+                var columns_count = $('#ldnft_sales_data table thead tr:eq(0)').find('th:not(.hidden)').length; 
+                var placeholder = '<tr>';
+                for( var i = 0; i < columns_count; i++ ) {
+                    placeholder += '<td align="center">' + LDNFT.preloader_gif_img + '</td>';
                 }
+                placeholder += '</tr>';
+                $('#ldnft_sales_data table tbody').html( placeholder );
                
                 var ldnftpage       = $('.ldnft-freemius-page').val();
                 var ldnftplugin     = $('.ldfmt-plugins-filter').val();
@@ -416,11 +418,13 @@
              */
             display_subscriptions: function() {
                 
-                if( LDNFTbackEnd.default_table_row == '' ) {
-                    LDNFTbackEnd.default_table_row = $('#ldnft_subscriptions_data table tbody').html();
-                } else {
-                    $('#ldnft_subscriptions_data table tbody').html( LDNFTbackEnd.default_table_row );
+                var columns_count = $('#ldnft_subscriptions_data table thead tr:eq(0)').find('th:not(.hidden)').length; 
+                var placeholder = '<tr>';
+                for( var i = 0; i < columns_count; i++ ) {
+                    placeholder += '<td align="center">' + LDNFT.preloader_gif_img + '</td>';
                 }
+                placeholder += '</tr>';
+                $('#ldnft_subscriptions_data table tbody').html( placeholder );
                
                 var ldnftpage       = $('.ldnft-freemius-page').val();
                 var ldnftplugin     = $('.ldfmt-plugins-filter').val();
