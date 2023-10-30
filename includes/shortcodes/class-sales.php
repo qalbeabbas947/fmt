@@ -58,6 +58,8 @@ class LDNFT_Sales_Shortcode {
             $show = 'both';
         }
         
+        ob_start();
+        
         if( ($show == 'both' || $show=='summary' ) && $offset == 0) {
             $table_name     = $wpdb->prefix.'ldnft_subscription';
             $gross_total    = $wpdb->get_var($wpdb->prepare("SELECT sum(gross) as total FROM $table_name where plugin_id=%d", $plugin_id));
@@ -116,7 +118,10 @@ class LDNFT_Sales_Shortcode {
                 echo '<div class="ldfmt-no-results">'.__('No sale record(s) found.', LDNFT_TEXT_DOMAIN).'</div>';
             }
         }
-
+        
+        $content = ob_get_contents();
+        ob_get_clean();
+        
         exit;
     }
 

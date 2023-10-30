@@ -154,6 +154,8 @@ class LDNFT_Freemius {
         define( 'LDNFT_DIR', plugin_dir_path ( __FILE__ ) );
         define( 'LDNFT_DIR_FILE', LDNFT_DIR . basename ( __FILE__ ) );
         define( 'LDNFT_INCLUDES_DIR', trailingslashit ( LDNFT_DIR . 'includes' ) );
+        define( 'LDNFT_SHORTCODES_DIR', trailingslashit ( LDNFT_INCLUDES_DIR . 'shortcodes' ) );
+        define( 'LDNFT_SHORTCODES_TEMPLATES_DIR', trailingslashit ( LDNFT_SHORTCODES_DIR . 'templates' ) );
         define( 'LDNFT_BASE_DIR', plugin_basename(__FILE__));
 
         /**
@@ -165,8 +167,8 @@ class LDNFT_Freemius {
         /**
          * Plugin version
          */
-        //define( 'LDNFT_VERSION', self::VERSION );
         define( 'LDNFT_VERSION', time() );
+
         /**
          * Text Domain
          */

@@ -55,7 +55,6 @@ class LDNFT_Number_of_Sales_Shortcode {
         $table_name = $wpdb->prefix.'ldnft_subscription';  
         $total_sales = $wpdb->get_var($wpdb->prepare("SELECT count(id) as id FROM $table_name where plugin_id=%d", $plugin_id));
 
-        
         return $total_sales;
     }
 }
