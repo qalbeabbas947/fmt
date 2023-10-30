@@ -53,14 +53,14 @@ class LDNFT_Sales_Shortcode {
         $show       = sanitize_text_field($_POST['show']);
         $per_page   = sanitize_text_field($_POST['per_page']);
         $offset     = sanitize_text_field($_POST['offset']);
-
+        
         if( empty($show) ) {
             $show = 'both';
         }
         
         ob_start();
         
-        if( ($show == 'both' || $show=='summary' ) && $offset == 0) {
+        if( ( $show == 'both' || $show=='summary' ) && $offset == 0 ) {
             $table_name     = $wpdb->prefix.'ldnft_subscription';
             $gross_total    = $wpdb->get_var($wpdb->prepare("SELECT sum(gross) as total FROM $table_name where plugin_id=%d", $plugin_id));
             $gateway_total  = $wpdb->get_var($wpdb->prepare("SELECT sum(gateway) as total FROM $table_name where plugin_id=%d", $plugin_id));
@@ -121,7 +121,8 @@ class LDNFT_Sales_Shortcode {
         
         $content = ob_get_contents();
         ob_get_clean();
-        
+
+        echo $content;
         exit;
     }
 
@@ -166,28 +167,8 @@ class LDNFT_Sales_Shortcode {
         $content = '';
         if( FS__HAS_PLUGINS ) {
             ob_start();
-            if( intval( $product_id ) > 0 ) {
-            ?>
-                <div class="ldmft_wrapper">
-                    <div style="display:none" class="ldfmt-loader-div"><img width="30px" class="ldfmt-data-loader" src="<?php echo LDNFT_ASSETS_URL.'images/spinner-2x.gif';?>" /></div>
-                    <div class="ldmft-filter-sales"></div>
-                    <div class="ldfmt-load-more-sales-btn"><a href="javascript:;">
-                        <?php echo __( 'Load More', LDNFT_TEXT_DOMAIN );?></a>
-                        <div style="display:none" class="ldfmt-loader-div-btm ldfmt-loader-div-btm-sales"><img width="30px" class="ldfmt-data-loader" src="<?php echo LDNFT_ASSETS_URL.'images/spinner-2x.gif';?>" /></div>
-                    </div>
-                    <input type="hidden" id="ldfmt-sales-show-type" value="<?php echo $atts['show'];?>" />
-                    <input type="hidden" id="ldfmt-sales-plugins-filter" value="<?php echo $product_id;?>" />
-                </div>
-            <?php } else { ?>
-                    <input type="hidden" id="ldfmt-sales-show-type" value="<?php echo $atts['show'];?>" />
-                    <input type="hidden" id="ldfmt-sales-plugins-filter" value="0" />
-                    <div class="ldmft_wrapper">
-                        <div class="ldmft-filter-reviews">    
-                            <?php echo __( 'To display product sales, you need to attach product id with the shortcode', LDNFT_TEXT_DOMAIN );?>
-                        </div>
-                    </div>
-                <?php
-            }
+
+            require_once( LDNFT_SHORTCODES_TEMPLATES_DIR . 'sales.php' );
             
             $content = ob_get_contents();
             ob_get_clean();
