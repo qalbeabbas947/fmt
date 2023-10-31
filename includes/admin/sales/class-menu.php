@@ -249,7 +249,7 @@ class LDNFT_Sales_Menu {
             $selected_plugin_id = intval( $_GET['ldfmt_plugins_filter'] ); 
         }
 
-        $selected_interval = 'today';
+        $selected_interval = 'current_month';
         if( isset($_GET['interval'])  ) {
             $selected_interval = sanitize_text_field( $_GET['interval'] ); 
         }
@@ -301,8 +301,8 @@ class LDNFT_Sales_Menu {
                                 <option value="all"><?php echo __( 'All Status', LDNFT_TEXT_DOMAIN );?></option>
                                 <option value="not_refunded" <?php echo $selected_filter=='not_refunded'?'selected':'';?>><?php echo __( 'Active', LDNFT_TEXT_DOMAIN );?></option>
                                 <option value="refunds" <?php echo $selected_filter=='refunds'?'selected':'';?>><?php echo __( 'Refunds', LDNFT_TEXT_DOMAIN );?></option>
-                                <option value="chargeback" <?php echo $selected_filter=='chargeback'?'selected':'';?>><?php echo __( 'Chargeback', LDNFT_TEXT_DOMAIN );?></option>
-                                <option value="lost_dispute" <?php echo $selected_filter=='lost_dispute'?'selected':'';?>><?php echo __( 'Lost Dispute', LDNFT_TEXT_DOMAIN );?></option>
+                                <!-- <option value="chargeback" <?php echo $selected_filter=='chargeback'?'selected':'';?>><?php echo __( 'Chargeback', LDNFT_TEXT_DOMAIN );?></option>
+                                <option value="lost_dispute" <?php echo $selected_filter=='lost_dispute'?'selected':'';?>><?php echo __( 'Lost Dispute', LDNFT_TEXT_DOMAIN );?></option> -->
                             </select>
                             <input type="button" name="ldnft-sales-search-button" value="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>" class="btn button ldnft-sales-search-button" />
                         </div>

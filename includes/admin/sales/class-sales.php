@@ -343,7 +343,7 @@ class LDNFT_Sales extends WP_List_Table {
         if( $this->selected_status != 'all' ) {
             switch( $this->selected_status ) {
                 case "not_refunded":
-                    $where .= " and t.type='payment'";
+                    $where .= " and t.type='payment' and ( t.bound_payment_id  = '' or t.bound_payment_id is NULL)";
                     break;
                 case "refunds":
                     $where .= " and t.type='refund'";
@@ -356,6 +356,8 @@ class LDNFT_Sales extends WP_List_Table {
                     break;
                         
             }
+        } else {
+            $where .= " and t.type in ('payment', 'refund' ) ";
         }
 
         $where_interval = '';
@@ -380,7 +382,7 @@ class LDNFT_Sales extends WP_List_Table {
         }
 
         $total_items = $wpdb->get_var("SELECT COUNT(t.id) FROM $table_name".$where.$where_interval);
-
+ 
         // prepare query params, as usual current page, order by and order direction
         $offset = isset($paged) ? (intval($paged) -1) * $per_page : 0;
         $orderby = (isset($_REQUEST['orderby']) && in_array($_REQUEST['orderby'], array_keys($this->get_sortable_columns()))) ? sanitize_text_field( $_REQUEST['orderby'] ) : 'id';
