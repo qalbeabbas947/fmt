@@ -20,6 +20,21 @@ class LDNFT_Reviews extends WP_List_Table {
     public $selected_plugin_id;
 
     /**
+     * Featured and Not Featured records
+     */
+    public $selected_featured;
+
+    /**
+     * General Search
+     */
+    public $selected_search;
+
+    /**
+     * General Search
+     */
+    public $selected_verified;
+
+    /**
      * Freemius API object
      */
     public $api;
@@ -41,6 +56,10 @@ class LDNFT_Reviews extends WP_List_Table {
 		$this->plugins = LDNFT_Freemius::$products;
         $this->selected_plugin_id = ( isset( $_GET['ldfmt_plugins_filter'] ) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) ? intval( $_GET['ldfmt_plugins_filter'] ) : $this->plugins[0]->id;
         
+        $this->selected_featured   = isset( $_REQUEST['featured'] ) ? sanitize_text_field( $_REQUEST['featured'] ) : '';
+        $this->selected_search     = isset( $_REQUEST['search'] ) ? sanitize_text_field( $_REQUEST['search'] ) : '';
+        $this->selected_verified    = isset( $_REQUEST['verified'] ) ? sanitize_text_field( $_REQUEST['verified'] ) : '';
+
         /**
          * Set parent defaults
          */
@@ -336,6 +355,19 @@ class LDNFT_Reviews extends WP_List_Table {
          */
         $table_name = $wpdb->prefix.'ldnft_reviews r inner join '.$wpdb->prefix.'ldnft_customers c on (r.user_id=c.id)'; 
         $where = " where r.plugin_id='".$this->selected_plugin_id."'";
+        
+        if( $this->selected_verified != '' ) {
+            $where   .= ( ! empty( $where ) ? ' and ' : '' ). " r.is_verified='".$this->selected_verified."'";
+        }
+
+        if( $this->selected_featured != '') {
+            $where   .= ( ! empty( $where ) ? ' and ' : '' ). " r.is_featured='".$this->selected_featured."'";
+        }
+
+        if( ! empty( $this->selected_search ) ) {
+            $where   .= ( ! empty( $where ) ? ' and ' : '' ). " ( r.user_id like '%".$this->selected_search."%' or r.title like '%".$this->selected_search."%' or r.name like '%".$this->selected_search."%' or c.email like '%".$this->selected_search."%' )";
+        }
+
         $total_items = $wpdb->get_var("SELECT COUNT(r.id) FROM $table_name".$where);
 
         // prepare query params, as usual current page, order by and order direction
@@ -527,27 +559,33 @@ class LDNFT_Reviews extends WP_List_Table {
             $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&laquo;</span>';
         } else {
             $page_links[] = sprintf( 
-                "<a data-action='ldnft_customers_check_next' data-ldfmt_plugins_filter='%d' data-per_page='%d' class='first-page button ldnft_check_load_next' data-paged='1' href='javascript:;'>" .
+                "<a data-action='ldnft_customers_check_next' data-ldfmt_plugins_filter='%d' data-featured='%d' data-verified='%d' data-search='%s' data-per_page='%d' class='first-page button ldnft_check_load_next' data-paged='1' href='javascript:;'>" .
                     "<span class='screen-reader-text'>%s</span>" .
                     "<span aria-hidden='true'>%s</span>" .
                 '</a>',
                 $this->selected_plugin_id,
+                $this->selected_featured,
+                $this->selected_verified,
+                $this->selected_search,
                 $per_page,
                 /* translators: Hidden accessibility text. */
                 __( 'First page' ),
                 '&laquo;'
             );
         }
-    
+        
         if ( $disable_prev ) {
             $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&lsaquo;</span>';
         } else {
             $page_links[] = sprintf(
-                "<a data-action='ldnft_customers_check_next' data-ldfmt_plugins_filter='%d' data-per_page='%d' class='prev-page button ldnft_check_load_next' data-paged='%d' href='javascript:;'>" .
+                "<a data-action='ldnft_customers_check_next' data-ldfmt_plugins_filter='%d' data-featured='%d' data-verified='%d' data-search='%s' data-per_page='%d' class='prev-page button ldnft_check_load_next' data-paged='%d' href='javascript:;'>" .
                     "<span class='screen-reader-text'>%s</span>" .
                     "<span aria-hidden='true'>%s</span>" .
                 '</a>',
                 $this->selected_plugin_id,
+                $this->selected_featured,
+                $this->selected_verified,
+                $this->selected_search,
                 $per_page,
                 intval($paged)>1?intval($paged)-1:1,
                 /* translators: Hidden accessibility text. */
@@ -579,11 +617,14 @@ class LDNFT_Reviews extends WP_List_Table {
             $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&rsaquo;</span>';
         } else {
             $page_links[] = sprintf(
-                "<a data-action='ldnft_customers_check_next' data-ldfmt_plugins_filter='%d' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
+                "<a data-action='ldnft_customers_check_next' data-ldfmt_plugins_filter='%d' data-featured='%d' data-verified='%d' data-search='%s' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
                     "<span class='screen-reader-text'>%s</span>" .
                     "<span aria-hidden='true'>%s</span>" .
                 '</a>',
                 $this->selected_plugin_id,
+                $this->selected_featured,
+                $this->selected_verified,
+                $this->selected_search,
                 $per_page,
                 $paged+1,
                 $current_recs,
@@ -597,11 +638,14 @@ class LDNFT_Reviews extends WP_List_Table {
             $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&raquo;</span>';
         } else {
             $page_links[] = sprintf(
-                "<a  data-action='ldnft_customers_check_next' data-ldfmt_plugins_filter='%d' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='last-page button ldnft_check_load_next' href='javascript:;'>" .
+                "<a  data-action='ldnft_customers_check_next' data-ldfmt_plugins_filter='%d' data-featured='%d' data-verified='%d' data-search='%s' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='last-page button ldnft_check_load_next' href='javascript:;'>" .
                     "<span class='screen-reader-text'>%s</span>" .
                     "<span aria-hidden='true'>%s</span>" .
                 '</a>',
                 $this->selected_plugin_id,
+                $this->selected_featured,
+                $this->selected_verified,
+                $this->selected_search,
                 $per_page,
                 $total_pages,
                 $current_recs,

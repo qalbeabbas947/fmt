@@ -47,21 +47,23 @@ class LDNFT_Reviews_Menu {
      * Action wp_ajax for fetching the first time table structure
      */
     public function reviews_enable_disable() {
+        
         header('Content-Type: application/json; charset=utf-8');
 
         $id         = isset( $_REQUEST['id'] ) ? sanitize_text_field( $_REQUEST['id'] ) : 0;
         $status     = sanitize_text_field( $_REQUEST['status'] );
-        $status     = $status ? 1 : 0;
-        $id         = 0;
+        $status     = $status == true ? true : false;
+
         if( intval( $id ) == 0 ) {
             echo json_encode([ 'status'=> 'error', 'message' => __('Invalid review id.', LDNFT_TEXT_DOMAIN) ]);
             exit();
         } 
 
         $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
-        $result = $api->Api('plugins/'.$plugin_id.'/reviews/'.$id.'.json', 'PUT',      [ 'is_featured' => $status ] );
+        $result = $api->Api('plugins/'.$plugin_id.'/reviews/'.$id.'.json', 'PUT', [ 'is_featured' => $status ] );
         
-        echo json_encode([ 'status'=> 'success', 'data'=> $result, 'message' => __('Invalid review id.', LDNFT_TEXT_DOMAIN) ]);
+        echo json_encode([ 'status'=> 'success', 'data'=> $result, 'message' => __('Record is updated.', LDNFT_TEXT_DOMAIN) ]);
+        exit;
     }
 
 	/**
@@ -187,6 +189,21 @@ class LDNFT_Reviews_Menu {
         if( isset( $_GET['ldfmt_plugins_filter'] ) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) {
             $selected_plugin_id = intval( $_GET['ldfmt_plugins_filter'] ); 
         }
+
+        $selected_featured = '';
+        if( isset( $_GET['featured'] ) && intval( $_GET['featured'] ) > 0 ) {
+            $selected_featured = intval( $_GET['featured'] ); 
+        }
+
+        $selected_verified = '';
+        if( isset( $_GET['verified'] ) && intval( $_GET['verified'] ) > 0 ) {
+            $selected_verified = intval( $_GET['verified'] ); 
+        }
+
+        $search = '';
+        if( isset( $_GET['search'] ) ) {
+            $search = intval( $_GET['search'] ); 
+        }
 		
         /**
          * Create an instance of our package class... 
@@ -221,9 +238,20 @@ class LDNFT_Reviews_Menu {
 									}
 								?>
 							</select>
+                            <select name="ldfmt-plugins-status" class="ldfmt-plugins-reviews-verified">
+								<option value=""><?php _e('Filter by Verified', LDNFT_TEXT_DOMAIN);?></option>
+								<option value="1" <?php echo $selected_verified=='1'?'selected':''; ?>><?php _e('Verified', LDNFT_TEXT_DOMAIN);?></option>
+								<option value="0" <?php echo $selected_verified=='0'?'selected':''; ?>><?php _e('Unverified', LDNFT_TEXT_DOMAIN);?></option>
+							</select>
+                            <select name="ldfmt-plugins-featured" class="ldfmt-plugins-reviews-featured">
+                                <option value=""><?php _e('Filter by Featured', LDNFT_TEXT_DOMAIN);?></option>
+                                <option value="1" <?php echo $selected_featured=='1'?'selected':''; ?>><?php _e('Featured', LDNFT_TEXT_DOMAIN);?></option>
+                                <option value="0" <?php echo $selected_featured=='0'?'selected':''; ?>><?php _e('Not Featured', LDNFT_TEXT_DOMAIN);?></option>
+                            </select>
+                            <input class="form-control" type="text" value = "<?php echo $search;?>" name = "ldnft-reviews-general-search" id = "ldnft-reviews-general-search" placeholder="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>">
                             <input type="button" name="ldnft-reviews-search-button" value="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>" class="btn button ldnft-reviews-search-button" />
 						</div>
-                		<div id="ldnft_reviews_data">	
+		                <div id="ldnft_reviews_data">	
 							<!-- Now we can render the completed list table -->
 							<?php $testListTable->display() ?>
 						</div>

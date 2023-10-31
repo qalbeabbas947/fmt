@@ -196,9 +196,11 @@
                
                 var ldnftpage       = $('.ldnft-freemius-page').val();
                 var ldnftplugin     = $('.ldfmt-plugins-filter').val();
-                var ldnftstatus     = $('.ldfmt-plugins-reviews-status').val();
+                var ldnftverified   = $('.ldfmt-plugins-reviews-verified').val();
                 var order_str       = $('.ldnft-freemius-order').val();
                 var orderby_str     = $('.ldnft-freemius-orderby').val();
+                var featured_str    = $('.ldfmt-plugins-reviews-featured').val();
+                var search_str      = $('#ldnft-reviews-general-search').val();
 
                 $.ajax({
                     url: ajaxurl,
@@ -209,7 +211,9 @@
                         ldfmt_plugins_filter: ldnftplugin,
                         order: order_str,
                         orderby: orderby_str,
-                        status: ldnftstatus
+                        verified: ldnftverified,
+                        featured: featured_str,
+                        search: search_str,
                     },
                     success: function (response) {
                         $("#ldnft_reviews_data").html(response.display);
