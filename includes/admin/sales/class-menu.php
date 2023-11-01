@@ -50,7 +50,8 @@ class LDNFT_Sales_Menu {
     public function sales_summary() {
 
         global $wpdb;
-        
+        ini_set('display_errors', 'On');
+        error_reporting(E_ALL);
         $selected_plugin_id = 0;
         if( isset($_GET['ldfmt_plugins_filter']) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) {
             $selected_plugin_id = intval( $_GET['ldfmt_plugins_filter'] ); 
@@ -107,7 +108,6 @@ class LDNFT_Sales_Menu {
                 case "lost_dispute":
                     $where .= " and t.type='lost_dispute'";
                     break;
-                        
             }
         }
 
@@ -134,32 +134,40 @@ class LDNFT_Sales_Menu {
 
         $result = $wpdb->get_results( "SELECT * FROM $table_name $where $where_interval" );
         
+        $gross_total_count = 0;
         $gross_total = 0; 
         $tax_rate_total = 0;
         $total_number_of_sales = 0;
         $total_new_subscriptions = 0;
         $total_new_renewals = 0;
-        
+        $total_new_subscriptions_amount = 0;
+        $total_new_renewals_amount = 0;
+
         if( isset($result) && isset($result) ) {
             $has_more_records = true;
             foreach( $result as $pmt ) {
-                    
+                $gross_total_count++;
                 $gross_total += $pmt->gross;
                 $tax_rate_total += $pmt->vat;
                 $total_number_of_sales++;
                 if( $pmt->is_renewal == '1' || $pmt->is_renewal == 1 ) {
+                    $total_new_renewals_amount += $pmt->gross;
                     $total_new_renewals++;
                 } else {
                     $total_new_subscriptions++;
+                    $total_new_subscriptions_amount += $pmt->gross;
                 }
             } 
         }
 
         $data = [
+            'gross_total_count' => $gross_total_count,
             'gross_total' => number_format($gross_total, 2),
             'tax_rate_total' => number_format($tax_rate_total, 2),
             'total_number_of_sales' => $total_number_of_sales,
             'total_new_subscriptions' => $total_new_subscriptions,
+            'total_new_subscriptions_amount' => number_format($total_new_subscriptions_amount, 2),
+            'total_new_renewals_amount' => number_format($total_new_renewals_amount, 2),
             'total_new_renewals' => $total_new_renewals
         ];
         
@@ -350,7 +358,7 @@ class LDNFT_Sales_Menu {
                         <div style="clear:both">&nbsp;</div> 
                         <div class="ldfmt-sales-upper-info">
                             <div class="ldfmt-gross-sales-box ldfmt-sales-box">
-                                <label><?php echo __( 'Gross Sales', LDNFT_TEXT_DOMAIN );?></label>
+                                <label><?php echo __( 'Gross Sales', LDNFT_TEXT_DOMAIN );?><span class="ldnft_sales_points_count"></span></label>
                                 <div class="ldnft_points">
                                     <span class="ldnft_sales_points"></span>
                                     <?php echo LDNFT_Admin::get_bar_preloader("ldnft-subssummary-loader");?>
@@ -362,26 +370,18 @@ class LDNFT_Sales_Menu {
                                     <span class="ldnft_sales_tax_fee"></span>
                                     <?php echo LDNFT_Admin::get_bar_preloader("ldnft-subssummary-loader");?>
                                 </div>
-                                
                             </div>
                             <div class="ldfmt-new-sales-box ldfmt-sales-box">
-                                <label><?php echo __('Total Sales Count', LDNFT_TEXT_DOMAIN);?></label>
+                                <label><?php echo __('New Subscriptions', LDNFT_TEXT_DOMAIN);?><span class="ldnft_new_subscriptions_count"></span></label>
                                 <div class="ldnft_new_sales_count">
-                                    <span class="ldnft_sales_new_sales_count"></span>
-                                    <?php echo LDNFT_Admin::get_bar_preloader("ldnft-subssummary-loader");?>
-                                </div>
-                            </div>
-                            <div class="ldfmt-new-sales-box ldfmt-sales-box">
-                                <label><?php echo __('New subscriptions', LDNFT_TEXT_DOMAIN);?></label>
-                                <div class="ldnft_new_sales_count">
-                                    <span class="ldnft_sales_new_sales_count"></span>
+                                    <span class="ldnft_sales_new_subscriptions"></span>
                                     <?php echo LDNFT_Admin::get_bar_preloader("ldnft-subssummary-loader");?>
                                 </div>
                             </div>
                             <div class="ldfmt-renewals-count-box ldfmt-sales-box">
-                                <label><?php echo __('Total Renewals', LDNFT_TEXT_DOMAIN);?></label>
+                                <label><?php echo __('Total Renewals', LDNFT_TEXT_DOMAIN);?><span class="ldnft_new_renewals_count"></span></label>
                                 <div class="ldnft_renewals_count">
-                                    <span class="ldnft_sales_renewals_count"></span>
+                                    <span class="ldnft_sales_renewals_amount"></span>
                                     <?php echo LDNFT_Admin::get_bar_preloader("ldnft-subssummary-loader");?>
                                 </div>
                             </div>
