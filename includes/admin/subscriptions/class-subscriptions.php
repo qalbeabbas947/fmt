@@ -244,8 +244,11 @@ class LDNFT_Subscriptions extends WP_List_Table {
         $this->_column_headers = [ $columns, $hidden, $sortable ];
         
         $table_name = $wpdb->prefix.'ldnft_subscription t inner join '.$wpdb->prefix.'ldnft_customers c on (t.user_id=c.id)';  
-        $where = " where t.plugin_id='".$this->selected_plugin_id."'";
-
+        $where = " where 1 = 1";
+        if( ! empty( $this->selected_plugin_id )) {
+            $where .= " and t.plugin_id='".$this->selected_plugin_id."'";
+        }
+        
         if( !empty( $this->selected_interval )) {
             switch( $this->selected_interval ) {
                 case "current_week":

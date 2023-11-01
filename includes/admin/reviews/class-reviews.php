@@ -354,8 +354,11 @@ class LDNFT_Reviews extends WP_List_Table {
          * be able to use your precisely-queried data immediately.
          */
         $table_name = $wpdb->prefix.'ldnft_reviews r inner join '.$wpdb->prefix.'ldnft_customers c on (r.user_id=c.id)'; 
-        $where = " where r.plugin_id='".$this->selected_plugin_id."'";
-        
+        $where = " where 1 = 1";
+        if( ! empty( $this->selected_plugin_id )) {
+            $where .= " and r.plugin_id='".$this->selected_plugin_id."'";
+        }
+
         if( $this->selected_verified != '' ) {
             $where   .= ( ! empty( $where ) ? ' and ' : '' ). " r.is_verified='".$this->selected_verified."'";
         }

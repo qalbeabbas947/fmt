@@ -309,7 +309,11 @@ class LDNFT_Customers extends WP_List_Table {
          */
 
         $table_name = $wpdb->prefix.'ldnft_customers'; 
-        $where = " where plugin_id='".$this->selected_plugin_id."'";
+        $where = " where 1 = 1";
+        if( ! empty( $this->selected_plugin_id )) {
+            $where .= " and plugin_id='".$this->selected_plugin_id."'";
+        }
+
         $where .= $this->selected_status != ''? " and is_verified='".$this->selected_status."' " : '';
 
         $total_items = $wpdb->get_var("SELECT COUNT(id) FROM $table_name".$where);

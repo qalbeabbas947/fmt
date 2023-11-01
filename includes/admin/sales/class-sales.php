@@ -30,6 +30,11 @@ class LDNFT_Sales extends WP_List_Table {
      * Current selected Interval
      */
     public $selected_interval;
+    
+    /**
+     * General Search
+     */
+    public $selected_search;
 
     /**
      * Freemius API object
@@ -52,9 +57,10 @@ class LDNFT_Sales extends WP_List_Table {
         $this->api = new Freemius_Api_WordPress( FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY );
         $this->plugins = LDNFT_Freemius::$products;
 
-        $this->selected_plugin_id = ( isset( $_GET['ldfmt_plugins_filter'] ) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) ? intval( $_GET['ldfmt_plugins_filter'] ) : $this->plugins[0]->id;
-        $this->selected_interval = ( isset( $_GET['interval'] ) ) ? sanitize_text_field( $_GET['interval'] ) : 12; 
-        $this->selected_status = ( isset( $_GET['status'] )  ) ? sanitize_text_field( $_GET['status'] ) : 'all'; 
+        $this->selected_plugin_id   = ( isset( $_GET['ldfmt_plugins_filter'] ) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) ? intval( $_GET['ldfmt_plugins_filter'] ) : '';
+        $this->selected_interval    = ( isset( $_GET['interval'] ) ) ? sanitize_text_field( $_GET['interval'] ) : 12; 
+        $this->selected_status      = ( isset( $_GET['status'] )  ) ? sanitize_text_field( $_GET['status'] ) : 'all'; 
+        $this->selected_search      = isset( $_REQUEST['search'] ) ? sanitize_text_field( $_REQUEST['search'] ) : '';
         
         /**
          * Set parent defaults
@@ -247,8 +253,7 @@ class LDNFT_Sales extends WP_List_Table {
     public function prepare_items() {
         
         global $wpdb;
-        ini_set('display_errors', 'On');
-        error_reporting(E_ALL);
+        
         /**
          * First, lets decide how many records per page to show
          */
@@ -338,7 +343,10 @@ class LDNFT_Sales extends WP_List_Table {
          * be able to use your precisely-queried data immediately.
          */
         $table_name = $wpdb->prefix.'ldnft_transactions t inner join '.$wpdb->prefix.'ldnft_customers c on (t.user_id=c.id)';  
-        $where = " where t.plugin_id='".$this->selected_plugin_id."'";
+        $where = " where 1 = 1";
+        if( ! empty( $this->selected_plugin_id )) {
+            $where .= " and t.plugin_id='".$this->selected_plugin_id."'";
+        }
         
         if( $this->selected_status != 'all' ) {
             switch( $this->selected_status ) {
@@ -357,7 +365,7 @@ class LDNFT_Sales extends WP_List_Table {
                         
             }
         } else {
-            $where .= " and t.type in ('payment', 'refund' ) ";
+            //$where .= " and t.type in ('payment', 'refund' ) ";
         }
 
         $where_interval = '';
@@ -381,6 +389,10 @@ class LDNFT_Sales extends WP_List_Table {
             }
         }
 
+        if( ! empty( $this->selected_search ) ) {
+            $where   .= " and ( t.license_id like '%".$this->selected_search."%' or t.user_id like '%".$this->selected_search."%' or t.id like '%".$this->selected_search."%' or c.first like '%".$this->selected_search."%' or c.last like '%".$this->selected_search."%' or c.email like '%".$this->selected_search."%' )";
+        }
+
         $total_items = $wpdb->get_var("SELECT COUNT(t.id) FROM $table_name".$where.$where_interval);
  
         // prepare query params, as usual current page, order by and order direction
@@ -392,7 +404,8 @@ class LDNFT_Sales extends WP_List_Table {
         if( in_array( $orderby, [ 'username', 'useremail' ] ) ) {
             $orderby_prefix = "";
         }
-        $result = $wpdb->get_results($wpdb->prepare("SELECT t.*, concat(c.first, ' ', c.first) as username, c.email as useremail FROM $table_name $where $where_interval ORDER BY $orderby_prefix$orderby $order LIMIT %d OFFSET %d", $per_page, $offset));
+
+        $result = $wpdb->get_results( $wpdb->prepare("SELECT t.*, concat(c.first, ' ', c.last) as username, c.email as useremail FROM $table_name $where $where_interval ORDER BY $orderby_prefix$orderby $order LIMIT %d OFFSET %d", $per_page, $offset) );
          
         $data = [];
         $count = 0;
@@ -520,7 +533,7 @@ class LDNFT_Sales extends WP_List_Table {
         } else {
             
             $page_links[] = sprintf( 
-                "<a data-action='ldnft_sales_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-plan_id='%s' data-interval='%d' data-per_page='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' data-paged='1' href='javascript:;'>" .
+                "<a data-action='ldnft_sales_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-plan_id='%s' data-interval='%d' data-search='%s' data-per_page='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' data-paged='1' href='javascript:;'>" .
                     "<span class='screen-reader-text'>%s</span>" .
                     "<span aria-hidden='true'>%s</span>" .
                 '</a>',
@@ -528,6 +541,7 @@ class LDNFT_Sales extends WP_List_Table {
                 $this->selected_status,
                 $this->selected_plan_id,
                 $this->selected_interval,
+                $this->selected_search,
                 $per_page,
                 $current_recs,
                 /* translators: Hidden accessibility text. */
@@ -540,7 +554,7 @@ class LDNFT_Sales extends WP_List_Table {
             $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&lsaquo;</span>';
         } else {
             $page_links[] = sprintf(
-                "<a data-action='ldnft_sales_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-plan_id='%s' data-interval='%d' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
+                "<a data-action='ldnft_sales_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-plan_id='%s' data-interval='%d' data-search='%s' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
                     "<span class='screen-reader-text'>%s</span>" .
                     "<span aria-hidden='true'>%s</span>" .
                 '</a>',
@@ -548,6 +562,7 @@ class LDNFT_Sales extends WP_List_Table {
                 $this->selected_status,
                 $this->selected_plan_id,
                 $this->selected_interval,
+                $this->selected_search,
                 $per_page,
                 intval($paged)>1?intval($paged)-1:1,
                 $current_recs,
@@ -580,7 +595,7 @@ class LDNFT_Sales extends WP_List_Table {
             $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&rsaquo;</span>';
         } else {
             $page_links[] = sprintf(
-                "<a data-action='ldnft_sales_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-plan_id='%s' data-interval='%d' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
+                "<a data-action='ldnft_sales_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-plan_id='%s' data-interval='%d' data-search='%s' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
                     "<span class='screen-reader-text'>%s</span>" .
                     "<span aria-hidden='true'>%s</span>" .
                 '</a>',
@@ -588,6 +603,7 @@ class LDNFT_Sales extends WP_List_Table {
                 $this->selected_status,
                 $this->selected_plan_id,
                 $this->selected_interval,
+                $this->selected_search,
                 $per_page,
                 $paged+1,
                 $current_recs,
@@ -601,7 +617,7 @@ class LDNFT_Sales extends WP_List_Table {
             $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&raquo;</span>';
         } else {
             $page_links[] = sprintf(
-                "<a data-action='ldnft_sales_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-plan_id='%s' data-interval='%d' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
+                "<a data-action='ldnft_sales_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-plan_id='%s' data-interval='%d' data-search='%s' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
                     "<span class='screen-reader-text'>%s</span>" .
                     "<span aria-hidden='true'>%s</span>" .
                 '</a>',
@@ -609,6 +625,7 @@ class LDNFT_Sales extends WP_List_Table {
                 $this->selected_status,
                 $this->selected_plan_id,
                 $this->selected_interval,
+                $this->selected_search,
                 $per_page,
                 $total_pages,
                 $current_recs,

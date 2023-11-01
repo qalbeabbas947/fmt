@@ -328,6 +328,7 @@
                 var ldnftplugin     = $('.ldfmt-plugins-filter').val();
                 var ldnftinterval   = $('.ldfmt-sales-interval-filter').val();
                 var ldnftstatus     = $('.ldfmt-sales-filter').val();
+                var ldnftsearch     = $('.ldnft-sales-general-search').val();
                 var order_str       = $('.ldnft-freemius-order').val();
                 var orderby_str     = $('.ldnft-freemius-orderby').val();
                 
@@ -339,6 +340,7 @@
                         paged: ldnftpage,
                         ldfmt_plugins_filter: ldnftplugin,
                         interval: ldnftinterval,
+                        search: ldnftsearch,
                         order: order_str,
                         orderby: orderby_str,
                         status: ldnftstatus
@@ -370,6 +372,7 @@
                 var ldnftplugin     = $('.ldfmt-plugins-filter').val();
                 var ldnftinterval   = $('.ldfmt-sales-interval-filter').val();
                 var ldnftstatus     = $('.ldfmt-sales-filter').val();
+                var ldnftsearch     = $('.ldnft-sales-general-search').val();
                 var order_str       = $('.ldnft-freemius-order').val();
                 var orderby_str     = $('.ldnft-freemius-orderby').val();
 
@@ -381,6 +384,7 @@
                         paged: ldnftpage,
                         ldfmt_plugins_filter: ldnftplugin,
                         interval: ldnftinterval,
+                        search: ldnftsearch,
                         order: order_str,
                         orderby: orderby_str,
                         status: ldnftstatus

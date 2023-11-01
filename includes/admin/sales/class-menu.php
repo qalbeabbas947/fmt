@@ -40,7 +40,7 @@ class LDNFT_Sales_Menu {
         ];
 
         add_action( 'admin_menu', [ $this, 'admin_menu_page' ] );
-        add_action('wp_ajax_ldnft_sales_display',  [ $this, 'ldnft_sales_display' ], 100 );
+        add_action( 'wp_ajax_ldnft_sales_display',  [ $this, 'ldnft_sales_display' ], 100 );
         add_action( 'wp_ajax_ldnft_sales_summary', [ $this, 'sales_summary' ], 100 );
 	}
 
@@ -69,24 +69,33 @@ class LDNFT_Sales_Menu {
         $plan_str = '';
         if( isset( $_GET['plan_id'] ) && intval($_GET['plan_id']) > 0 ) {
             $plan_str = sanitize_text_field( $_GET['plan_id'] ); 
+        } 
+        
+        $selected_search      = isset( $_REQUEST['search'] ) ? sanitize_text_field( $_REQUEST['search'] ) : '';
+        
+        $table_name = $wpdb->prefix.'ldnft_transactions t inner join '.$wpdb->prefix.'ldnft_customers c on (t.user_id=c.id)';  
+        $where = " where 1 = 1";
+        if( ! empty( $selected_plugin_id )) {
+            $where .= " and t.plugin_id='".$selected_plugin_id."'";
+        }
+        
+        if( ! empty( $selected_search ) ) {
+            $where   .= " and ( t.license_id like '%".$selected_search."%' or t.user_id like '%".$selected_search."%' or t.id like '%".$selected_search."%' or c.first like '%".$this->selected_search."%' or c.last like '%".$this->selected_search."%' or c.email like '%".$selected_search."%' )";
         }
 
-        $table_name = $wpdb->prefix.'ldnft_transactions';  
-        $where = " where plugin_id='".$selected_plugin_id."'";
-        
         if( $selected_status != 'all' ) {
             switch( $selected_status ) {
                 case "not_refunded":
-                    $where .= " and type='payment'";
+                    $where .= " and t.type='payment'";
                     break;
                 case "refunds":
-                    $where .= " and type='refund'";
+                    $where .= " and t.type='refund'";
                     break;
                 case "chargeback":
-                    $where .= " and type='chargeback'";
+                    $where .= " and t.type='chargeback'";
                     break;
                 case "lost_dispute":
-                    $where .= " and type='lost_dispute'";
+                    $where .= " and t.type='lost_dispute'";
                     break;
                         
             }
@@ -96,26 +105,23 @@ class LDNFT_Sales_Menu {
         if( !empty( $selected_interval )) {
             switch( $selected_interval ) {
                 case "current_week":
-                    $where_interval = " and YEARWEEK(created) = YEARWEEK(NOW())";
+                    $where_interval = " and YEARWEEK(t.created) = YEARWEEK(NOW())";
                     break;
                 case "last_week":
-                    $where_interval = ' and Date(created) between date_sub(now(),INTERVAL 1 WEEK) and now()';
+                    $where_interval = ' and Date(t.created) between date_sub(now(),INTERVAL 1 WEEK) and now()';
                     break;
                 case "current_month":
-                    $where_interval = ' and MONTH(created) = MONTH(now()) and YEAR(created) = YEAR(now())';
+                    $where_interval = ' and MONTH(t.created) = MONTH(now()) and YEAR(t.created) = YEAR(now())';
                     break;
                 case "last_month":
-                    $where_interval = ' and Date(created) between Date((now() - interval 1 month)) and Date(now())';
+                    $where_interval = ' and Date(t.created) between Date((now() - interval 1 month)) and Date(now())';
                     break;
                 default:
-                    $where_interval = " and Date(created) = '".date('Y-m-d')."'";
+                    $where_interval = " and Date(t.created) = '".date('Y-m-d')."'";
                     break;
             }
         }
 
-        // $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
-        // $result = $api->Api('plugins/'.$selected_plugin_id.'/subscriptions.json?count='.$tem_per_page.'&offset='.$tem_offset.$interval_str.$status_str.$plan_str, 'GET', []);
-        
         $result = $wpdb->get_results( "SELECT * FROM $table_name $where $where_interval" );
         
         $gross_total = 0; 
@@ -259,6 +265,11 @@ class LDNFT_Sales_Menu {
             $selected_filter = sanitize_text_field( $_GET['filter'] ); 
         }
 
+        $search = '';
+        if( isset( $_GET['search'] ) ) {
+            $search = intval( $_GET['search'] ); 
+        }
+
         /**
          * Create an instance of our package class... 
          */
@@ -276,6 +287,7 @@ class LDNFT_Sales_Menu {
                         <div class="alignleft actions bulkactions">
                             <h2><?php _e( 'Sales', LDNFT_TEXT_DOMAIN ); ?></h2>
                             <select name="ldfmt-plugins-filter" class="ldfmt-plugins-filter ldfmt-plugins-sales-filter">
+                                <option value=""><?php echo __( 'All Plugin/Product', LDNFT_TEXT_DOMAIN );?></option>
                                 <?php
                                     foreach( $products as $plugin )  {
                                         
@@ -304,6 +316,7 @@ class LDNFT_Sales_Menu {
                                 <!-- <option value="chargeback" <?php echo $selected_filter=='chargeback'?'selected':'';?>><?php echo __( 'Chargeback', LDNFT_TEXT_DOMAIN );?></option>
                                 <option value="lost_dispute" <?php echo $selected_filter=='lost_dispute'?'selected':'';?>><?php echo __( 'Lost Dispute', LDNFT_TEXT_DOMAIN );?></option> -->
                             </select>
+                            <input type="text" value="<?php echo $search;?>" name="ldnft-sales-general-search" class="form-control ldnft-sales-general-search" placeholder="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>">
                             <input type="button" name="ldnft-sales-search-button" value="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>" class="btn button ldnft-sales-search-button" />
                         </div>
                         <div style="clear:both">&nbsp;</div> 
