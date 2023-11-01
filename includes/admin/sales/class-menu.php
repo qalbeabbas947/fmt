@@ -160,6 +160,16 @@ class LDNFT_Sales_Menu {
             } 
         }
 
+        $records = $wpdb->get_results( "select country_code, sum(gross) as gross from $table_name $where $where_interval group by country_code order by gross desc limit 3" );
+        $countries = [];
+        foreach( $records as $rec ) {
+            $countries[] = [
+                'country_code' => $rec->country_code,
+                'gross' => number_format($rec->gross, 2),
+                'country_name' => LDNFT_Freemius::get_country_name_by_code( strtoupper( $rec->country_code ) )
+            ];
+        }
+
         $data = [
             'gross_total_count' => $gross_total_count,
             'gross_total' => number_format($gross_total, 2),
@@ -168,7 +178,8 @@ class LDNFT_Sales_Menu {
             'total_new_subscriptions' => $total_new_subscriptions,
             'total_new_subscriptions_amount' => number_format($total_new_subscriptions_amount, 2),
             'total_new_renewals_amount' => number_format($total_new_renewals_amount, 2),
-            'total_new_renewals' => $total_new_renewals
+            'total_new_renewals' => $total_new_renewals,
+            'countries' => $countries
         ];
         
         die(
@@ -265,7 +276,7 @@ class LDNFT_Sales_Menu {
 
             return;
         }
-
+        
         $products = LDNFT_Freemius::$products;
         
         $selected_plugin_id = 0;
@@ -382,6 +393,13 @@ class LDNFT_Sales_Menu {
                                 <label><?php echo __('Total Renewals', LDNFT_TEXT_DOMAIN);?><span class="ldnft_new_renewals_count"></span></label>
                                 <div class="ldnft_renewals_count">
                                     <span class="ldnft_sales_renewals_amount"></span>
+                                    <?php echo LDNFT_Admin::get_bar_preloader("ldnft-subssummary-loader");?>
+                                </div>
+                            </div>
+                            <div class="ldfmt-top3-countries-count-box ldfmt-sales-box">
+                                <label><?php echo __('Top 3 Countries', LDNFT_TEXT_DOMAIN);?></label>
+                                <div class="ldnft_sales_top3_countries_main">
+                                    <div class="ldnft_sales_top3_countries"></div>
                                     <?php echo LDNFT_Admin::get_bar_preloader("ldnft-subssummary-loader");?>
                                 </div>
                             </div>

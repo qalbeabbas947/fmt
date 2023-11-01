@@ -56,7 +56,24 @@
     text-align: center;
     padding:5px; 
 }
+.ldfmt-top3-countries-count-box{
+    float: left;
+    border-radius: 5px; 
+    font-size: 1em;
+    margin-left: 50px;
+    text-align: center;
+    padding:5px; 
 
+}
+.ldfmt-top3-countries-count-box label {
+    margin: 0px;
+}
+.ldfmt-top3-countries-count-box ul{
+    font-size: 10px;
+    text-wrap: nowrap;
+    text-align: left;
+    line-height: 11px;
+}
 .ldfmt-renewals-count-box{
     float: left;
     border-radius: 5px; 

@@ -368,12 +368,11 @@
              */ 
             load_sales_summary: function() {
                 
-            
-
                 $('.ldnft-subssummary-loader').css('display', 'inline');
+
                 $('.ldnft_sales_points').css('display', 'none');
                 $('.ldnft_sales_points_count').html('');
-                
+                $('.ldnft_sales_top3_countries').css('display', 'none');;
                 $('.ldnft_sales_tax_fee').css('display', 'none');
                 $('.ldnft_sales_new_subscriptions_count').css('display', 'none');
                 $('.ldnft_sales_renewals_count').css('display', 'none');
@@ -411,8 +410,18 @@
                         $('.ldnft_sales_renewals_amount').html(response.total_new_renewals_amount).css('display', 'block');
                         $('.ldnft_new_renewals_count').html('(' + response.total_new_renewals + ')');
                         $('.ldnft-subssummary-loader').css('display', 'none');
-                        $('.total_new_subscriptions_amount').html(response.total_new_subscriptions).css('display', 'block');
+                        $('.ldnft_sales_new_subscriptions').html(response.total_new_subscriptions_amount).css('display', 'block');
                         $('.ldnft_new_subscriptions_count').html('(' + response.total_new_subscriptions+')');
+                        var list_items = '<ul>';
+                        for (const key in response.countries ) {
+                            if (Object.hasOwnProperty.call(response.countries, key)) {
+                                const element = response.countries[key];
+                                list_items += '<li>'+element.country_name+': '+element.gross+'</li>';
+                                console.log(element)
+                            }
+                        }
+                        list_items += '</ul>';
+                        $('.ldnft_sales_top3_countries').html(list_items).css('display', 'block');
 
                     }
                 });
