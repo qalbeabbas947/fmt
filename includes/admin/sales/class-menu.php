@@ -71,12 +71,17 @@ class LDNFT_Sales_Menu {
             $plan_str = sanitize_text_field( $_GET['plan_id'] ); 
         } 
         
-        $selected_search      = isset( $_REQUEST['search'] ) ? sanitize_text_field( $_REQUEST['search'] ) : '';
-        
+        $selected_search        = isset( $_REQUEST['search'] ) ? sanitize_text_field( $_REQUEST['search'] ) : '';
+        $selected_type          = isset( $_REQUEST['type'] ) ? sanitize_text_field( $_REQUEST['type'] ) : '';
+
         $table_name = $wpdb->prefix.'ldnft_transactions t inner join '.$wpdb->prefix.'ldnft_customers c on (t.user_id=c.id)';  
         $where = " where 1 = 1";
         if( ! empty( $selected_plugin_id )) {
             $where .= " and t.plugin_id='".$selected_plugin_id."'";
+        }
+        
+        if( $this->selected_type != '' ) {
+            $where .= " and t.is_renewal	='".$this->selected_type."'";
         }
         
         if( ! empty( $selected_search ) ) {
@@ -315,6 +320,11 @@ class LDNFT_Sales_Menu {
                                 <option value="refunds" <?php echo $selected_filter=='refunds'?'selected':'';?>><?php echo __( 'Refunds', LDNFT_TEXT_DOMAIN );?></option>
                                 <!-- <option value="chargeback" <?php echo $selected_filter=='chargeback'?'selected':'';?>><?php echo __( 'Chargeback', LDNFT_TEXT_DOMAIN );?></option>
                                 <option value="lost_dispute" <?php echo $selected_filter=='lost_dispute'?'selected':'';?>><?php echo __( 'Lost Dispute', LDNFT_TEXT_DOMAIN );?></option> -->
+                            </select>
+                            <select name="ldnft-sales-payment-types" class="ldnft-sales-payment-types">
+                                <option value=""><?php echo __( 'Paymet Types', LDNFT_TEXT_DOMAIN );?></option>
+                                <option value="0" <?php echo $selected_filter == 'new'?'selected':'';?>><?php echo __( 'New Sales', LDNFT_TEXT_DOMAIN );?></option>
+                                <option value="1" <?php echo $selected_filter == 'renewal'?'selected':'';?>><?php echo __( 'Renewal', LDNFT_TEXT_DOMAIN );?></option>
                             </select>
                             <input type="text" value="<?php echo $search;?>" name="ldnft-sales-general-search" class="form-control ldnft-sales-general-search" placeholder="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>">
                             <input type="button" name="ldnft-sales-search-button" value="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>" class="btn button ldnft-sales-search-button" />

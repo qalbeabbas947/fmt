@@ -329,6 +329,7 @@
                 var ldnftinterval   = $('.ldfmt-sales-interval-filter').val();
                 var ldnftstatus     = $('.ldfmt-sales-filter').val();
                 var ldnftsearch     = $('.ldnft-sales-general-search').val();
+                var ldnfttypes      = $('.ldnft-sales-payment-types').val();
                 var order_str       = $('.ldnft-freemius-order').val();
                 var orderby_str     = $('.ldnft-freemius-orderby').val();
                 
@@ -341,6 +342,7 @@
                         ldfmt_plugins_filter: ldnftplugin,
                         interval: ldnftinterval,
                         search: ldnftsearch,
+                        type: ldnfttypes,
                         order: order_str,
                         orderby: orderby_str,
                         status: ldnftstatus
@@ -373,6 +375,7 @@
                 var ldnftinterval   = $('.ldfmt-sales-interval-filter').val();
                 var ldnftstatus     = $('.ldfmt-sales-filter').val();
                 var ldnftsearch     = $('.ldnft-sales-general-search').val();
+                var ldnfttypes      = $('.ldnft-sales-payment-types').val();
                 var order_str       = $('.ldnft-freemius-order').val();
                 var orderby_str     = $('.ldnft-freemius-orderby').val();
 
@@ -385,6 +388,7 @@
                         ldfmt_plugins_filter: ldnftplugin,
                         interval: ldnftinterval,
                         search: ldnftsearch,
+                        type: ldnfttypes,
                         order: order_str,
                         orderby: orderby_str,
                         status: ldnftstatus
