@@ -473,7 +473,7 @@ class LDNFT_Subscriptions_Menu {
                             <option value="current_month" <?php echo $selected_interval=='current_month'?'selected':'';?>><?php echo __( 'Current Month', LDNFT_TEXT_DOMAIN );?></option>
                             <option value="last_month" <?php echo $selected_interval=='last_month'?'selected':'';?>><?php echo __( 'Last Month', LDNFT_TEXT_DOMAIN );?></option>
                         </select>
-                        <select name="ldfmt-sales-interval-filter" class="ldfmt-subscription-country-filter">
+                        <select name="ldfmt-subscription-country-filter" class="ldfmt-subscription-country-filter">
                             <option value=""><?php echo __( 'All Countries', LDNFT_TEXT_DOMAIN );?></option>
                             <?php $countries = LDNFT_Freemius::get_country_name_by_code( 'list' ); 
                                 foreach( $countries as $key=>$value ) {

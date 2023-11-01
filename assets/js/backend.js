@@ -44,6 +44,9 @@
                     $('.ldnft-reviews-search-button').on('click', LDNFTbackEnd.display_reviews_onchange);
                     LDNFTbackEnd.display_reviews();
                 }
+
+                $('.ldfmt-sales-country-filter').select2({minimumInputLength: 3, allowClear: true});
+                $('.ldfmt-subscription-country-filter').select2({minimumInputLength: 3, allowClear: true});
             },
             import_cron_status: function() {
                 
@@ -329,6 +332,7 @@
                 var ldnftinterval   = $('.ldfmt-sales-interval-filter').val();
                 var ldnftstatus     = $('.ldfmt-sales-filter').val();
                 var ldnftsearch     = $('.ldnft-sales-general-search').val();
+                var country_str     = $('.ldfmt-sales-country-filter').val();
                 var ldnfttypes      = $('.ldnft-sales-payment-types').val();
                 var order_str       = $('.ldnft-freemius-order').val();
                 var orderby_str     = $('.ldnft-freemius-orderby').val();
@@ -342,6 +346,7 @@
                         ldfmt_plugins_filter: ldnftplugin,
                         interval: ldnftinterval,
                         search: ldnftsearch,
+                        country: country_str,
                         type: ldnfttypes,
                         order: order_str,
                         orderby: orderby_str,
@@ -378,6 +383,7 @@
                 var ldnfttypes      = $('.ldnft-sales-payment-types').val();
                 var order_str       = $('.ldnft-freemius-order').val();
                 var orderby_str     = $('.ldnft-freemius-orderby').val();
+                var country_str     = $('.ldfmt-sales-country-filter').val();
 
                 $.ajax({
                     url: ajaxurl,
@@ -389,6 +395,7 @@
                         interval: ldnftinterval,
                         search: ldnftsearch,
                         type: ldnfttypes,
+                        country: country_str,
                         order: order_str,
                         orderby: orderby_str,
                         status: ldnftstatus

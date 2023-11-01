@@ -174,6 +174,7 @@ class LDNFT_Admin {
 
 				wp_enqueue_style( 'dashicons' );
         		wp_enqueue_style( 'ldnft-font-awesome-css', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css', [], LDNFT_VERSION, null );
+                wp_enqueue_style( 'ldnft-select2-css', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css', [], LDNFT_VERSION, null );
         
                 /**
                  * enqueue admin css
@@ -183,6 +184,7 @@ class LDNFT_Admin {
                 /**
                  * enqueue admin js
                  */
+                wp_enqueue_script( 'fmt-select2-js', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js?'.time(), [ 'jquery' ], LDNFT_VERSION, true ); 
                 wp_enqueue_script( 'fmt-backend-js', LDNFT_ASSETS_URL . 'js/backend.js?'.time(), [ 'jquery' ], LDNFT_VERSION, true ); 
                 $cron_status    = get_option('ldnft_run_cron_based_on_plugins');
 

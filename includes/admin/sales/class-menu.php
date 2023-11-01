@@ -73,6 +73,7 @@ class LDNFT_Sales_Menu {
         
         $selected_search        = isset( $_REQUEST['search'] ) ? sanitize_text_field( $_REQUEST['search'] ) : '';
         $selected_type          = isset( $_REQUEST['type'] ) ? sanitize_text_field( $_REQUEST['type'] ) : '';
+        $selected_country       = isset( $_REQUEST['country'] ) ? sanitize_text_field( $_REQUEST['country'] ) : '';
 
         $table_name = $wpdb->prefix.'ldnft_transactions t inner join '.$wpdb->prefix.'ldnft_customers c on (t.user_id=c.id)';  
         $where = " where 1 = 1";
@@ -80,10 +81,14 @@ class LDNFT_Sales_Menu {
             $where .= " and t.plugin_id='".$selected_plugin_id."'";
         }
         
-        if( $this->selected_type != '' ) {
-            $where .= " and t.is_renewal	='".$this->selected_type."'";
+        if( $selected_type != '' ) {
+            $where .= " and t.is_renewal	='".$selected_type."'";
         }
-        
+
+        if( ! empty( $selected_country ) ) {
+            $where .= " and t.country_code='".$selected_country."'";
+        }
+
         if( ! empty( $selected_search ) ) {
             $where   .= " and ( t.license_id like '%".$selected_search."%' or t.user_id like '%".$selected_search."%' or t.id like '%".$selected_search."%' or c.first like '%".$this->selected_search."%' or c.last like '%".$this->selected_search."%' or c.email like '%".$selected_search."%' )";
         }
@@ -275,6 +280,11 @@ class LDNFT_Sales_Menu {
             $search = intval( $_GET['search'] ); 
         }
 
+        $selected_country = '';
+        if( isset( $_GET['country'] )  ) {
+            $selected_country = sanitize_text_field( $_GET['country'] ); 
+        }
+
         /**
          * Create an instance of our package class... 
          */
@@ -325,6 +335,14 @@ class LDNFT_Sales_Menu {
                                 <option value=""><?php echo __( 'Paymet Types', LDNFT_TEXT_DOMAIN );?></option>
                                 <option value="0" <?php echo $selected_filter == 'new'?'selected':'';?>><?php echo __( 'New Sales', LDNFT_TEXT_DOMAIN );?></option>
                                 <option value="1" <?php echo $selected_filter == 'renewal'?'selected':'';?>><?php echo __( 'Renewal', LDNFT_TEXT_DOMAIN );?></option>
+                            </select>
+                            <select name="ldfmt-sales-country-filter" class="ldfmt-sales-country-filter">
+                                <option value=""><?php echo __( 'All Countries', LDNFT_TEXT_DOMAIN );?></option>
+                                <?php $countries = LDNFT_Freemius::get_country_name_by_code( 'list' ); 
+                                    foreach( $countries as $key=>$value ) {
+                                ?>
+                                    <option value="<?php echo $key;?>" <?php echo $selected_country==$key?'selected':'';?>><?php echo $value;?></option>
+                                <?php } ?>
                             </select>
                             <input type="text" value="<?php echo $search;?>" name="ldnft-sales-general-search" class="form-control ldnft-sales-general-search" placeholder="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>">
                             <input type="button" name="ldnft-sales-search-button" value="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>" class="btn button ldnft-sales-search-button" />
