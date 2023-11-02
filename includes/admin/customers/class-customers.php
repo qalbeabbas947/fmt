@@ -25,6 +25,16 @@ class LDNFT_Customers extends WP_List_Table {
     public $selected_status;
 
     /**
+     * Customer Seach
+     */
+    public $selected_search;
+
+    /**
+     * Customer marketing
+     */
+    public $selected_marketing;
+                        
+    /**
      * Freemius API object
      */
     public $api;
@@ -48,7 +58,10 @@ class LDNFT_Customers extends WP_List_Table {
 
         $this->selected_plugin_id = ( isset( $_GET['ldfmt_plugins_filter'] ) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) ? intval( $_GET['ldfmt_plugins_filter'] ) : $default_plugin_id ;
         $this->selected_status = ( isset( $_GET['status'] )  ) ? sanitize_text_field( $_GET['status'] ) : ''; 
-        
+        $this->selected_marketing = ( isset( $_GET['marketing'] )  ) ? sanitize_text_field( $_GET['marketing'] ) : ''; 
+        $this->selected_search = ( isset( $_GET['search'] )  ) ? sanitize_text_field( $_GET['search'] ) : ''; 
+
+
         /**
          * Set parent defaults
          */
@@ -315,7 +328,12 @@ class LDNFT_Customers extends WP_List_Table {
         }
 
         $where .= $this->selected_status != ''? " and is_verified='".$this->selected_status."' " : '';
+        $where .= $this->selected_marketing != ''? " and is_marketing_allowed='".$this->selected_marketing."' " : '';
 
+        if( ! empty( $this->selected_search )) {
+            $where   .= " and ( id like '%".$this->selected_search."%' or email like '%".$this->selected_search."%' or first like '%".$this->selected_search."%' or last like '%".$this->selected_search."%' )";
+        }
+        
         $total_items = $wpdb->get_var("SELECT COUNT(id) FROM $table_name".$where);
 
         // prepare query params, as usual current page, order by and order direction
@@ -500,29 +518,33 @@ class LDNFT_Customers extends WP_List_Table {
             $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&laquo;</span>';
         } else {
             $page_links[] = sprintf( 
-                "<a data-action='ldnft_customers_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-per_page='%d' class='first-page button ldnft_check_load_next' data-paged='1' href='javascript:;'>" .
+                "<a data-action='ldnft_customers_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-marketing='%d' data-search='%s' data-per_page='%d' class='first-page button ldnft_check_load_next' data-paged='1' href='javascript:;'>" .
                     "<span class='screen-reader-text'>%s</span>" .
                     "<span aria-hidden='true'>%s</span>" .
                 '</a>',
                 $this->selected_plugin_id,
                 $this->selected_status,
+                $this->selected_marketing,
+                $this->selected_search,
                 $per_page,
                 /* translators: Hidden accessibility text. */
                 __( 'First page' ),
                 '&laquo;'
             );
         }
-    
+        
         if ( $disable_prev ) {
             $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&lsaquo;</span>';
         } else {
             $page_links[] = sprintf(
-                "<a data-action='ldnft_customers_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-per_page='%d' class='prev-page button ldnft_check_load_next' data-paged='%d' href='javascript:;'>" .
+                "<a data-action='ldnft_customers_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-marketing='%d' data-search='%s' data-per_page='%d' class='prev-page button ldnft_check_load_next' data-paged='%d' href='javascript:;'>" .
                     "<span class='screen-reader-text'>%s</span>" .
                     "<span aria-hidden='true'>%s</span>" .
                 '</a>',
                 $this->selected_plugin_id,
                 $this->selected_status,
+                $this->selected_marketing,
+                $this->selected_search,
                 $per_page,
                 intval($paged)>1?intval($paged)-1:1,
                 /* translators: Hidden accessibility text. */
@@ -554,12 +576,14 @@ class LDNFT_Customers extends WP_List_Table {
             $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&rsaquo;</span>';
         } else {
             $page_links[] = sprintf(
-                "<a data-action='ldnft_customers_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
+                "<a data-action='ldnft_customers_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-marketing='%d' data-search='%s' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
                     "<span class='screen-reader-text'>%s</span>" .
                     "<span aria-hidden='true'>%s</span>" .
                 '</a>',
                 $this->selected_plugin_id,
                 $this->selected_status,
+                $this->selected_marketing,
+                $this->selected_search,
                 $per_page,
                 $paged+1,
                 $current_recs,
@@ -573,12 +597,14 @@ class LDNFT_Customers extends WP_List_Table {
             $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&raquo;</span>';
         } else {
             $page_links[] = sprintf(
-                "<a  data-action='ldnft_customers_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='last-page button ldnft_check_load_next' href='javascript:;'>" .
+                "<a  data-action='ldnft_customers_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-marketing='%d' data-search='%s' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='last-page button ldnft_check_load_next' href='javascript:;'>" .
                     "<span class='screen-reader-text'>%s</span>" .
                     "<span aria-hidden='true'>%s</span>" .
                 '</a>',
                 $this->selected_plugin_id,
                 $this->selected_status,
+                $this->selected_marketing,
+                $this->selected_search,
                 $per_page,
                 $total_pages,
                 $current_recs,

@@ -36,6 +36,33 @@ class LDNFT_Subscriptions_Menu {
         add_action( 'wp_ajax_ldnft_subscriptions_summary', [ $this, 'ldnft_subscriptions_summary_callback' ], 100 );
         add_action( 'wp_ajax_ldnft_subscriber_check_next',      [ $this, 'subscriber_check_next' ], 100 );
         add_action( 'wp_ajax_ldnft_subscribers_view_detail',    [ $this, 'subscribers_view_detail' ], 100 );
+        add_action( 'wp_ajax_ldnft_subscription_plans_dropdown',    [ $this, 'subscription_plans_dropdown' ], 100 );
+    }
+
+    /**
+     * Returns the subscription data.
+     */
+    public function subscription_plans_dropdown() {
+        
+        global $wpdb;
+
+        $_plugin_id = ( isset( $_REQUEST['plugin_id'] ) && intval( $_REQUEST['plugin_id'] ) > 0 ) ? intval( $_REQUEST['plugin_id'] ) : 0 ;
+        
+        $where = '';
+        if( $_plugin_id > 0 ) {
+            $where = " where plugin_id = '$_plugin_id'";
+        }
+
+        $table_name = $wpdb->prefix.'ldnft_plans'; 
+        $plans = $wpdb->get_results("SELECT id, title FROM $table_name".$where );
+        $options = '<option value="">'.__( 'Filter by Plan', LDNFT_TEXT_DOMAIN ).'</option>';
+        if( is_array( $plans ) && count( $plans ) > 0 ) {
+            foreach( $plans as $plan ) {
+                $options .= '<option value="'.$plan->id.'">'.$plan->title.'</option>';
+            }
+        }
+
+        wp_die( $options );
     }
 
     /**
@@ -108,7 +135,7 @@ class LDNFT_Subscriptions_Menu {
                             <tr>
                                 <th><?php _e('Renewal Amount:', LDNFT_TEXT_DOMAIN)?></th>
                                 <td><?php echo $result->renewal_amount;?></td>
-                                <th><?php _e('Billing Cycle:', LDNFT_TEXT_DOMAIN)?></th>
+                                <th><?php _e('Billing Cycle (months):', LDNFT_TEXT_DOMAIN)?></th>
                                 <td><?php echo $result->billing_cycle;?></td>
                             </tr>
                             <tr>
@@ -219,8 +246,6 @@ class LDNFT_Subscriptions_Menu {
      */
      public function ldnft_subscriptions_summary_callback() {
         
-        ini_set('display_errors', 'On');
-        error_reporting(E_ALL);
         global $wpdb;
 
         $selected_plugin_id = 0;
@@ -228,9 +253,12 @@ class LDNFT_Subscriptions_Menu {
             $selected_plugin_id = intval( $_GET['ldfmt_plugins_filter'] ); 
         }
 
-        $table_name = $wpdb->prefix.'ldnft_transactions';  
-        $where = " where plugin_id='".$selected_plugin_id."'";
-        
+        $table_name = $wpdb->prefix.'ldnft_subscription t inner join '.$wpdb->prefix.'ldnft_customers c on (t.user_id=c.id)';  
+        $where = " where 1 = 1";
+        if( ! empty( $this->selected_plugin_id )) {
+            $where .= " and t.plugin_id='".$this->selected_plugin_id."'";
+        }
+
        if( !empty( $_GET['interval'] )) {
             $interval = sanitize_text_field( $_GET['interval'] );
             switch( $interval ) {
@@ -253,14 +281,20 @@ class LDNFT_Subscriptions_Menu {
         }
 
         if( isset( $_GET['country'] ) && !empty( $_GET['country'] )  ) {
-            $where .=  " and country_code='".sanitize_text_field( $_GET['country'] )."'";
+            $where .=  " and t.country_code='".sanitize_text_field( $_GET['country'] )."'";
         }
         
         if( isset( $_GET['plan_id'] ) && intval( $_GET['plan_id'] ) > 0 ) {
-            $where .= ' and plan_id='.sanitize_text_field( $_GET['plan_id'] );
+            $where .= ' and t.plan_id='.sanitize_text_field( $_GET['plan_id'] );
         } 
 
-        $result = $wpdb->get_results( "SELECT * FROM $table_name $where");
+        $where .= $_GET['gateway'] != ''? " and t.gateway='".sanitize_text_field( $_GET['gateway'] )."' " : '';
+        $search = sanitize_text_field( $_GET['search'] );
+        if( ! empty( $search )) {
+            $where   .= " and ( t.id like '%".$search."%' or t.user_id like '%".$search."%' or c.email like '%".$search."%' or c.first like '%".$search."%' or c.last like '%".$search."%' )";
+        }
+
+        $result = $wpdb->get_results( "SELECT t.* FROM $table_name $where");
         $gross_total = 0; 
         $tax_rate_total = 0;
         $total_number_of_sales = 0;
@@ -392,12 +426,12 @@ class LDNFT_Subscriptions_Menu {
         $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
         $products = LDNFT_Freemius::$products;
         
-        $selected_plugin_id = 0;
+        $selected_plugin_id = '';
         if( isset($_GET['ldfmt_plugins_filter']) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) {
             $selected_plugin_id = intval( $_GET['ldfmt_plugins_filter'] ); 
         }
 
-        $selected_interval = '12';
+        $selected_interval = 'current_month';
         if( isset($_GET['interval'])  ) {
             $selected_interval = sanitize_text_field( $_GET['interval'] ); 
         }
@@ -411,6 +445,9 @@ class LDNFT_Subscriptions_Menu {
         if( isset( $_GET['plan_id'] ) ) {
             $selected_plan_id = sanitize_text_field( $_GET['plan_id'] ); 
         }
+        
+        $selected_gateway = ( isset( $_GET['gateway'] )  ) ? sanitize_text_field( $_GET['gateway'] ) : ''; 
+        $search = ( isset( $_GET['search'] )  ) ? sanitize_text_field( $_GET['search'] ) : ''; 
 
         /**
          * Fetch, prepare, sort, and filter our data... 
@@ -427,6 +464,7 @@ class LDNFT_Subscriptions_Menu {
                     <div class="alignleft actions bulkactions">
                         <span class="ldnft_filter_labels"><?php _e( 'Filters:', LDNFT_TEXT_DOMAIN ); ?></span>
                         <select name="ldfmt-plugins-filter" class="ldfmt-plugins-filter ldfmt-plugins-subscription-filter">
+                            <option value=""><?php echo __( 'All Plugin/Product', LDNFT_TEXT_DOMAIN );?></option>
                             <?php
                                 foreach( $products as $plugin ) {
                                     if( $selected_plugin_id == 0 ) {
@@ -481,6 +519,28 @@ class LDNFT_Subscriptions_Menu {
                                 <option value="<?php echo $key;?>" <?php echo $selected_country==$key?'selected':'';?>><?php echo $value;?></option>
                             <?php } ?>
                         </select>
+                        <?php 
+                            $table_name = $wpdb->prefix.'ldnft_subscription'; 
+                            $gateways      = $wpdb->get_results( "SELECT distinct( gateway ) as gateway FROM $table_name" );
+                        ?>
+                        <select name="ldfmt-subscription-gateway-filter" class="ldfmt-subscription-gateway-filter">
+                            <option value=""><?php _e( 'Filter by Gateway', LDNFT_TEXT_DOMAIN ); ?></option>
+                            <?php
+                            if( isset( $gateways ) && is_array( $gateways ) ) {
+                                foreach( $gateways as $gateway ) {
+                                    
+                                    $selected = '';
+                                    if( $selected_gateway == $gateway->gateway ) {
+                                        $selected = ' selected = "selected"';   
+                                    }
+                                    ?>
+                                        <option value="<?php echo $gateway->gateway; ?>" <?php echo $selected; ?>><?php echo $gateway->gateway; ?></option>
+                                    <?php   
+                                }
+                            }
+                            ?>
+                        </select>
+                        <input type="text" value="<?php echo $search;?>" name="ldnft-subscription-general-search" class="form-control ldnft-subscription-general-search" placeholder="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>">
                         <input type="button" name="ldnft-subscription-search-button" value="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>" class="btn button ldnft-subscription-search-button" />
                     </div>
                     <div style="clear:both">&nbsp;</div> 
@@ -565,7 +625,7 @@ class LDNFT_Subscriptions_Menu {
                                         <tr>
                                             <th><?php _e('Renewal Amount:', LDNFT_TEXT_DOMAIN)?></th>
                                             <td id = "ldnft-review-coloumn-renewal_amount"></td>
-                                            <th><?php _e('Billing Cycle:', LDNFT_TEXT_DOMAIN)?></th>
+                                            <th><?php _e('Billing Cycle (months):', LDNFT_TEXT_DOMAIN)?></th>
                                             <td id = "ldnft-review-coloumn-billing_cycle"></td>
                                         </tr>
                                         <tr>

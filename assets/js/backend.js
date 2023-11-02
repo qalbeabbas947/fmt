@@ -3,18 +3,45 @@
         var LDNFTbackEnd = {
             ajax_url_new: ajaxurl,
             init: function() {
-				
+                LDNFTbackEnd.hooks();
+                LDNFTbackEnd.listing_pages();
+                LDNFTbackEnd.import_cron_status();
+            },
+            hooks: function() {
                 $('.ldnft-success-message').hide();
                 $('.ldnft-settings-mailpoet').on('submit', LDNFTbackEnd.post_mailpoet_form);
                 $('.ldnft_check_load_next').on('click', LDNFTbackEnd.check_load_next);
+                $('.ldnft-sync-data-setting').on('click', LDNFTbackEnd.sync_data_from_freemius);
+                $('.ldfmt-plugins-subscription-filter').on('change', LDNFTbackEnd.subscription_plans_dropdown);
                 $('#ldnft_subscriptions_data').on('click', '.ldnft_subscribers_view_detail', LDNFTbackEnd.subscribers_view_detail);
                 $('#ldnft_sales_data').on('click', '.ldnft_sales_view_detail', LDNFTbackEnd.sales_view_detail);
                 $('.ldnft-admin-modal-close').on('click', LDNFTbackEnd.ldnft_subsciber_modal_close);
 				$('#ldnft_reviews_data').on('click', '.ldnft_review_view_detail', LDNFTbackEnd.review_view_detail);
                 $('#ldnft-reviews-filter').on('click', '.ldnft_is_featured_enabled_click', LDNFTbackEnd.ldnft_is_featured_enabled);
-                
-                LDNFTbackEnd.listing_pages();
-                LDNFTbackEnd.import_cron_status();
+            },
+            subscription_plans_dropdown: function(){
+
+                var sel_plugin_id = $(this).val();
+
+                var data = {
+                    action: 'ldnft_subscription_plans_dropdown',
+                    plugin_id: sel_plugin_id
+                }
+                $('.ldfmt-subscription-plan_id-filter').attr('disabled', true).html("");
+                jQuery.post( LDNFT.ajaxURL, data, function( response ) {
+                    console.log(response);
+
+                    $('.ldfmt-subscription-plan_id-filter').attr( 'disabled', false ).html( response );
+                } ); 
+            },
+            sync_data_from_freemius: function(){
+                var data = {
+                    action: 'ldnft_run_freemius_import'
+                }
+               
+                jQuery.post( LDNFT.ajaxURL, data, function( response ) {
+                    $('.ldnft-settings-sync-data-message').html(response).css( 'display', 'block' )
+                } ); 
             },
             listing_pages: function(){
                 /**
@@ -271,8 +298,10 @@
                 var ldnftpage       = $('.ldnft-freemius-page').val();
                 var ldnftplugin     = $('.ldfmt-plugins-filter').val();
                 var ldnftstatus     = $('.ldfmt-plugins-customers-status').val();
-                var order_str           = $('.ldnft-freemius-order').val();
-                var orderby_str         = $('.ldnft-freemius-orderby').val();
+                var order_str       = $('.ldnft-freemius-order').val();
+                var orderby_str     = $('.ldnft-freemius-orderby').val();
+                var ldnftsearch     = $('.ldnft-customers-general-search').val();
+                var marketing_str   = $('.ldfmt-plugins-customers-marketing').val();
 
                 $.ajax({
                     url: ajaxurl,
@@ -283,6 +312,8 @@
                         ldfmt_plugins_filter: ldnftplugin,
                         status: ldnftstatus,
                         order: order_str,
+                        search: ldnftsearch,
+                        marketing: marketing_str,
                         orderby: orderby_str,
                     },
                     success: function (response) {
@@ -466,7 +497,8 @@
                 var ldnftplan_id    = $('.ldfmt-subscription-plan_id-filter').val();
                 var order_str       = $('.ldnft-freemius-order').val();
                 var orderby_str     = $('.ldnft-freemius-orderby').val();
-                
+                var gateway_str     = $('.ldfmt-subscription-gateway-filter').val();
+                var search_str      = $('.ldnft-subscription-general-search').val();
                 $.ajax({
 
                     url: ajaxurl,
@@ -477,6 +509,8 @@
                         ldfmt_plugins_filter: ldnftplugin,
                         interval: ldnftinterval,
                         country: ldnftcountry,
+                        gateway: gateway_str,
+                        search: search_str,
                         order: order_str,
                         orderby: orderby_str,
                         plan_id: ldnftplan_id,
@@ -508,6 +542,8 @@
                 var ldnftinterval   = $('.ldfmt-subscription-interval-filter').val();
                 var ldnftcountry     = $('.ldfmt-subscription-country-filter').val();
                 var ldnftplan_id    = $('.ldfmt-subscription-plan_id-filter').val();
+                var gateway_str     = $('.ldfmt-subscription-gateway-filter').val();
+                var search_str      = $('.ldnft-subscription-general-search').val();
 
                 $.ajax({
                     url: ajaxurl,
@@ -519,6 +555,8 @@
                         interval: ldnftinterval,
                         country: ldnftcountry,
                         plan_id: ldnftplan_id,
+                        gateway: gateway_str,
+                        search: search_str
                     },
                     success: function ( response ) {
 

@@ -23,6 +23,16 @@ class LDNFT_Subscriptions extends WP_List_Table {
     public $selected_plan_id;
 
     /**
+     * Current gateway
+     */
+    public $selected_gateway;
+
+    /**
+     * Current search
+     */
+    public $selected_search;
+
+    /**
      * Freemius API object
      */
     public $api;
@@ -52,10 +62,13 @@ class LDNFT_Subscriptions extends WP_List_Table {
         $this->api = new Freemius_Api_WordPress( FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY );
         $this->plugins = LDNFT_Freemius::$products;
         
-        $this->selected_plugin_id = ( isset( $_GET['ldfmt_plugins_filter'] ) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) ? intval( $_GET['ldfmt_plugins_filter'] ) : $this->plugins[0]->id;
+        $this->selected_plugin_id = ( isset( $_GET['ldfmt_plugins_filter'] ) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) ? intval( $_GET['ldfmt_plugins_filter'] ) : '';
         $this->selected_interval = ( isset( $_GET['interval'] ) ) ? sanitize_text_field( $_GET['interval'] ) : 12; 
         $this->selected_country = ( isset( $_GET['country'] )  ) ? sanitize_text_field( $_GET['country'] ) : ''; 
         $this->selected_plan_id = ( isset( $_GET['plan_id'] ) && intval( $_GET['plan_id'] ) > 0 ) ? sanitize_text_field( $_GET['plan_id'] ) : '';
+
+        $this->selected_gateway = isset( $_GET['gateway'] ) ? sanitize_text_field( $_GET['gateway'] ) : ''; 
+        $this->selected_search = isset( $_GET['search'] ) ? sanitize_text_field( $_GET['search'] ) : '';
 
 		parent::__construct(
 			[
@@ -97,7 +110,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
             'useremail'             => __( 'Email',LDNFT_TEXT_DOMAIN ),
             'amount_per_cycle'      => __( 'Price',LDNFT_TEXT_DOMAIN ),
             'discount'              => __( 'Discount', LDNFT_TEXT_DOMAIN ),
-            'billing_cycle'         => __( 'Billing Cycle',LDNFT_TEXT_DOMAIN ),
+            'billing_cycle'         => __( 'Billing Cycle (months)',LDNFT_TEXT_DOMAIN ),
             'total_gross'           => __( 'Total Amount',LDNFT_TEXT_DOMAIN ),
             'gateway'               => __( 'Gateway',LDNFT_TEXT_DOMAIN ),
             'renewal_amount'        => __( 'Next Renewal Amount', LDNFT_TEXT_DOMAIN ),
@@ -275,6 +288,12 @@ class LDNFT_Subscriptions extends WP_List_Table {
 
         if( !empty($this->selected_plan_id) && intval($this->selected_plan_id) > 0 ) {  
             $where .= ' and plan_id='.$this->selected_plan_id;
+        }
+
+        $where .= $this->selected_gateway != ''? " and t.gateway='".sanitize_text_field( $_GET['gateway'] )."' " : '';
+        
+        if( ! empty( $this->selected_search )) {
+            $where   .= " and ( t.id like '%".$this->selected_search."%' or t.user_id like '%".$this->selected_search."%' or c.email like '%".$this->selected_search."%' or c.first like '%".$this->selected_search."%' or c.last like '%".$this->selected_search."%' )";
         }
         
         $total_items = $wpdb->get_var("SELECT COUNT(t.id) FROM $table_name".$where.$where_interval);
@@ -483,7 +502,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
         } else {
             
             $page_links[] = sprintf( 
-                "<a  data-action='ldnft_subscriber_check_next' data-plugin_id='%d' data-country='%s' data-plan_id='%s' data-interval='%d' data-per_page='%d'  data-paged='1' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
+                "<a  data-action='ldnft_subscriber_check_next' data-plugin_id='%d' data-country='%s' data-plan_id='%s' data-interval='%d' data-gateway='%s' data-search='%s' data-per_page='%d'  data-paged='1' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
                     "<span class='screen-reader-text'>%s</span>" .
                     "<span aria-hidden='true'>%s</span>" .
                 '</a>',
@@ -491,6 +510,8 @@ class LDNFT_Subscriptions extends WP_List_Table {
                 $this->selected_country,
                 $this->selected_plan_id,
                 $this->selected_interval,
+                $this->selected_gateway,
+                $this->selected_search,
                 $per_page,
                 $current_recs,
                 /* translators: Hidden accessibility text. */
@@ -503,7 +524,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
             $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&lsaquo;</span>';
         } else {
             $page_links[] = sprintf(
-                "<a  data-action='ldnft_subscriber_check_next' data-plugin_id='%d' data-country='%s' data-plan_id='%s' data-interval='%d' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
+                "<a  data-action='ldnft_subscriber_check_next' data-plugin_id='%d' data-country='%s' data-plan_id='%s' data-interval='%d' data-gateway='%s' data-search='%s' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
                     "<span class='screen-reader-text'>%s</span>" .
                     "<span aria-hidden='true'>%s</span>" .
                 '</a>',
@@ -511,6 +532,8 @@ class LDNFT_Subscriptions extends WP_List_Table {
                 $this->selected_country,
                 $this->selected_plan_id,
                 $this->selected_interval,
+                $this->selected_gateway,
+                $this->selected_search,
                 $per_page,
                 intval($paged)>1?intval($paged)-1:1,
                 $current_recs,
@@ -543,7 +566,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
             $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&rsaquo;</span>';
         } else {
             $page_links[] = sprintf(
-                "<a  data-action='ldnft_subscriber_check_next' data-plugin_id='%d' data-country='%s' data-plan_id='%s' data-interval='%d' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
+                "<a  data-action='ldnft_subscriber_check_next' data-plugin_id='%d' data-country='%s' data-plan_id='%s' data-interval='%d' data-gateway='%s' data-search='%s' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
                     "<span class='screen-reader-text'>%s</span>" .
                     "<span aria-hidden='true'>%s</span>" .
                 '</a>',
@@ -551,6 +574,8 @@ class LDNFT_Subscriptions extends WP_List_Table {
                 $this->selected_country,
                 $this->selected_plan_id,
                 $this->selected_interval,
+                $this->selected_gateway,
+                $this->selected_search,
                 $per_page,
                 $paged+1,
                 $current_recs,
@@ -564,7 +589,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
             $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&raquo;</span>';
         } else {
             $page_links[] = sprintf(
-                "<a data-action='ldnft_subscriber_check_next' data-plugin_id='%d' data-country='%s' data-plan_id='%s' data-interval='%d' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
+                "<a data-action='ldnft_subscriber_check_next' data-plugin_id='%d' data-country='%s' data-plan_id='%s' data-interval='%d' data-gateway='%s' data-search='%s' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
                     "<span class='screen-reader-text'>%s</span>" .
                     "<span aria-hidden='true'>%s</span>" .
                 '</a>',
@@ -572,6 +597,8 @@ class LDNFT_Subscriptions extends WP_List_Table {
                 $this->selected_country,
                 $this->selected_plan_id,
                 $this->selected_interval,
+                $this->selected_gateway,
+                $this->selected_search,
                 $per_page,
                 $total_pages,
                 $current_recs,
