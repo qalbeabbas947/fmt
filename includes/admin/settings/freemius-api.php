@@ -58,26 +58,32 @@ $cron_status    = get_option('ldnft_run_cron_based_on_plugins');
                         <td colspan="2" class="ldnft-process-freemius-data-info">
                             <div class="ldnft-process-freemius-data-plugins" style="display:none">
                                 <img class="ldnft-success-loader" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" />
+                                <span class="ldnft-checkmark" style="display:none">&#10003;</span>
                                 <span class="ldnft-loading-wrap"><?php _e( 'Please wait, while we are syncing the freemius plugins data.', LDNFT_TEXT_DOMAIN ); ?></span>
                             </div>
                             <div class="ldnft-process-freemius-data-plans" style="display:none">
                                 <img class="ldnft-success-loader" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" />
+                                <span class="ldnft-checkmark" style="display:none">&#10003;</span>
                                 <span class="ldnft-loading-wrap"><?php _e( 'Please wait, while we are syncing the freemius plans data.', LDNFT_TEXT_DOMAIN ); ?></span>
                             </div>
                             <div class="ldnft-process-freemius-data-customers" style="display:none">
                                 <img class="ldnft-success-loader" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" />
+                                <span class="ldnft-checkmark" style="display:none">&#10003;</span>
                                 <span class="ldnft-loading-wrap"><?php _e( 'Please wait, while we are syncing the freemius customers data.', LDNFT_TEXT_DOMAIN ); ?></span>
                             </div>
                             <div class="ldnft-process-freemius-data-sales" style="display:none">
                                 <img class="ldnft-success-loader" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" />
+                                <span class="ldnft-checkmark" style="display:none">&#10003;</span>
                                 <span class="ldnft-loading-wrap"><?php _e( 'Please wait, while we are syncing the freemius sales data.', LDNFT_TEXT_DOMAIN ); ?></span>
                             </div>
                             <div class="ldnft-process-freemius-data-subscription" style="display:none">
                                 <img class="ldnft-success-loader" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" />
+                                <span class="ldnft-checkmark" style="display:none">&#10003;</span>
                                 <span class="ldnft-loading-wrap"><?php _e( 'Please wait, while we are syncing the freemius subscription data.', LDNFT_TEXT_DOMAIN ); ?></span>
                             </div>
                             <div class="ldnft-process-freemius-data-reviews" style="display:none">
                                 <img class="ldnft-success-loader" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" />
+                                <span class="ldnft-checkmark" style="display:none">&#10003;</span>
                                 <span class="ldnft-loading-wrap"><?php _e( 'Please wait, while we are syncing the freemius reviews data.', LDNFT_TEXT_DOMAIN ); ?></span>
                             </div>
                         </td>    

@@ -104,6 +104,7 @@ class LDNFT_Customers extends WP_List_Table {
             case 'is_verified':
             case 'id':
             case 'is_marketing_allowed':
+            case 'products':
             case 'created':
                 return $item[$column_name];
             
@@ -112,7 +113,31 @@ class LDNFT_Customers extends WP_List_Table {
                 return print_r($item,true);
         }
     }
-    
+
+    /**
+	 * format the is_verified column
+	 */
+	public function column_products($item){
+
+        global $wpdb;
+		if( intval( $item['id'] ) > 0 ) {
+            
+            $table_name = $wpdb->prefix.'ldnft_plugins as p inner join '.$wpdb->prefix.'ldnft_customer_meta as m on (p.id=m.plugin_id) '; 
+            $results    = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $table_name where m.customer_id='%d'", $item['id'] ) );
+
+            $plugins_str = '';
+            foreach( $results as $result ) {
+                $plugins_str .= ! empty( $plugins_str ) ? ', ': '';
+                $plugins_str .= $result->title;
+            }
+
+			return $plugins_str;
+		} else {
+
+			return '-';
+		}
+	}
+
 	/**
 	 * format the is_verified column
 	 */
@@ -159,7 +184,8 @@ class LDNFT_Customers extends WP_List_Table {
             'last'                      => __( 'Last Name', LDNFT_TEXT_DOMAIN ),
             'is_verified'               => __( 'Verified?', LDNFT_TEXT_DOMAIN ),
             'created'                   => __( 'Joined', LDNFT_TEXT_DOMAIN ),
-            'is_marketing_allowed'      => __( 'Is Marketing Allowed?', LDNFT_TEXT_DOMAIN )
+            'is_marketing_allowed'      => __( 'Is Marketing Allowed?', LDNFT_TEXT_DOMAIN ),
+            'products'                  => __( 'Products', LDNFT_TEXT_DOMAIN ),
         ];
 
         return $columns;
@@ -321,26 +347,27 @@ class LDNFT_Customers extends WP_List_Table {
          * be able to use your precisely-queried data immediately.
          */
 
-        $table_name = $wpdb->prefix.'ldnft_customers'; 
+        $table_name = $wpdb->prefix.'ldnft_customers as c'; 
         $where = " where 1 = 1";
         if( ! empty( $this->selected_plugin_id )) {
-            $where .= " and plugin_id='".$this->selected_plugin_id."'";
+            $table_name = $wpdb->prefix.'ldnft_customers as c inner join '.$wpdb->prefix.'ldnft_customer_meta as m on (c.id=m.customer_id) '; 
+            $where .= " and m.plugin_id='".$this->selected_plugin_id."'";
         }
 
-        $where .= $this->selected_status != ''? " and is_verified='".$this->selected_status."' " : '';
-        $where .= $this->selected_marketing != ''? " and is_marketing_allowed='".$this->selected_marketing."' " : '';
+        $where .= $this->selected_status != ''? " and c.is_verified='".$this->selected_status."' " : '';
+        $where .= $this->selected_marketing != ''? " and c.is_marketing_allowed='".$this->selected_marketing."' " : '';
 
         if( ! empty( $this->selected_search )) {
-            $where   .= " and ( id like '%".$this->selected_search."%' or email like '%".$this->selected_search."%' or first like '%".$this->selected_search."%' or last like '%".$this->selected_search."%' )";
+            $where   .= " and ( c.id like '%".$this->selected_search."%' or c.email like '%".$this->selected_search."%' or c.first like '%".$this->selected_search."%' or c.last like '%".$this->selected_search."%' )";
         }
         
-        $total_items = $wpdb->get_var("SELECT COUNT(id) FROM $table_name".$where);
+        $total_items = $wpdb->get_var("SELECT COUNT(c.id) FROM $table_name".$where);
 
         // prepare query params, as usual current page, order by and order direction
         $offset      = isset($paged) ? intval(($paged-1) * $per_page) : 0;
         $orderby    = (isset($_REQUEST['orderby']) && in_array($_REQUEST['orderby'], array_keys($this->get_sortable_columns()))) ? sanitize_text_field( $_REQUEST['orderby'] ) : 'id';
         $order      = (isset($_REQUEST['order']) && in_array($_REQUEST['order'], array('asc', 'desc'))) ? sanitize_text_field( $_REQUEST['order'] ) : 'asc';
-        $result     = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table_name $where ORDER BY $orderby $order LIMIT %d OFFSET %d", $per_page, $offset), ARRAY_A);
+        $result     = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table_name $where ORDER BY c.$orderby $order LIMIT %d OFFSET %d", $per_page, $offset), ARRAY_A);
         
         $data = [];
         $count = 0;
