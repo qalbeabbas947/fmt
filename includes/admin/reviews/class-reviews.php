@@ -366,7 +366,7 @@ class LDNFT_Reviews extends WP_List_Table {
         }
 
         if( ! empty( $this->selected_search ) ) {
-            $where   .= ( ! empty( $where ) ? ' and ' : '' ). " ( r.user_id like '%".$this->selected_search."%' or r.title like '%".$this->selected_search."%' or r.name like '%".$this->selected_search."%' or c.email like '%".$this->selected_search."%' )";
+            $where   .= ( ! empty( $where ) ? ' and ' : '' ). " ( r.id like '%".$this->selected_search."%' or r.user_id like '%".$this->selected_search."%' or r.title like '%".$this->selected_search."%' or r.name like '%".$this->selected_search."%' or c.email like '%".$this->selected_search."%' )";
         }
 
         $total_items = $wpdb->get_var("SELECT COUNT(r.id) FROM $table_name".$where);
