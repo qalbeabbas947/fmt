@@ -56,7 +56,7 @@ class LDNFT_Customers extends WP_List_Table {
         $this->plugins = LDNFT_Freemius::$products;
         $default_plugin_id = is_array( $this->plugins) && count( $this->plugins ) > 0 ? $this->plugins[0]->id : 0;
 
-        $this->selected_plugin_id = ( isset( $_GET['ldfmt_plugins_filter'] ) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) ? intval( $_GET['ldfmt_plugins_filter'] ) : $default_plugin_id ;
+        $this->selected_plugin_id = ( isset( $_GET['ldfmt_plugins_filter'] ) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) ? intval( $_GET['ldfmt_plugins_filter'] ) : '' ;
         $this->selected_status = ( isset( $_GET['status'] )  ) ? sanitize_text_field( $_GET['status'] ) : ''; 
         $this->selected_marketing = ( isset( $_GET['marketing'] )  ) ? sanitize_text_field( $_GET['marketing'] ) : ''; 
         $this->selected_search = ( isset( $_GET['search'] )  ) ? sanitize_text_field( $_GET['search'] ) : ''; 
@@ -367,7 +367,7 @@ class LDNFT_Customers extends WP_List_Table {
         $offset      = isset($paged) ? intval(($paged-1) * $per_page) : 0;
         $orderby    = (isset($_REQUEST['orderby']) && in_array($_REQUEST['orderby'], array_keys($this->get_sortable_columns()))) ? sanitize_text_field( $_REQUEST['orderby'] ) : 'id';
         $order      = (isset($_REQUEST['order']) && in_array($_REQUEST['order'], array('asc', 'desc'))) ? sanitize_text_field( $_REQUEST['order'] ) : 'asc';
-        $result     = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table_name $where ORDER BY c.$orderby $order LIMIT %d OFFSET %d", $per_page, $offset), ARRAY_A);
+        $result     = $wpdb->get_results( "SELECT * FROM $table_name $where ORDER BY c.$orderby $order LIMIT $per_page OFFSET $offset", ARRAY_A );
         
         $data = [];
         $count = 0;
