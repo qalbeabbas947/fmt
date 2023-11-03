@@ -29,8 +29,6 @@
                 }
                 $('.ldfmt-subscription-plan_id-filter').attr('disabled', true).html("");
                 jQuery.post( LDNFT.ajaxURL, data, function( response ) {
-                    console.log(response);
-
                     $('.ldfmt-subscription-plan_id-filter').attr( 'disabled', false ).html( response );
                 } ); 
             },
@@ -83,7 +81,7 @@
                 $('.ldfmt-subscription-country-filter').select2({minimumInputLength: 3, allowClear: true});
             },
             import_cron_status: function() {
-                console.log( LDNFT.import_cron_status + '--' + LDNFT.is_cron_page_check );
+                
                 if( LDNFT.is_cron_page_check=='yes' ) {
                     if( LDNFT.import_cron_status != 'complete' ) {
                         LDNFTbackEnd.timeout_obj = setInterval(LDNFTbackEnd.check_cron_status, 3000);
@@ -216,15 +214,18 @@
             },
             ldnft_is_featured_enabled: function(e){
                 $('#ldnft-reviews-filter').find('.ldnft_is_featured_enabled_click').attr('disabled', true);
-                var cid = $(this).data('id');
-                var status = $(this).prop('checked');
+                var cid         = $(this).data('id');
+                var pid         = $(this).data('plugin_id');
+                var status_str  = $(this).prop('checked');
+                
                 $.ajax({
                     url: ajaxurl,
                     dataType: 'json',
                     data: {
                         action: 'ldnft_reviews_enable_disable',
                         id: cid,
-                        status: status
+                        plugin_id: pid,
+                        status: status_str
                     },
                     success: function (response) {
                         $('#ldnft-reviews-filter').find('.ldnft_is_featured_enabled_click').attr('disabled', false);
@@ -485,7 +486,7 @@
                             if (Object.hasOwnProperty.call(response.countries, key)) {
                                 const element = response.countries[key];
                                 list_items += '<li>'+element.country_name+': '+element.gross+'</li>';
-                                console.log(element)
+                                
                             }
                         }
                         list_items += '</ul>';
@@ -609,7 +610,7 @@
                             if (Object.hasOwnProperty.call(response.countries, key)) {
                                 const element = response.countries[key];
                                 list_items += '<li>'+element.country_name+': '+element.gross+'</li>';
-                                console.log(element)
+                               
                             }
                         }
                         list_items += '</ul>';
@@ -667,7 +668,7 @@
                 
              },
             /**
-            * Display the popup.
+            * Display the popup. 
             *
             * @param e
             */

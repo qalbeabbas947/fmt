@@ -168,7 +168,7 @@ class LDNFT_Crons_Settings {
     public function process_freemius_sales( $plugin_id,  $start = 0, $limit = 50 ) {
         
         global $wpdb;
-        error_log( 'ldnft_process_freemius_sales:'.$plugin_id.',  '.$start.', '.$limit );
+        
         $table_name = $wpdb->prefix.'ldnft_transactions';
         if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
             $wpdb->query( "CREATE TABLE $table_name (
@@ -298,16 +298,11 @@ class LDNFT_Crons_Settings {
                         'limit' => $limit
                     ];
                 
-                error_log( 'ldnft_process_freemius_sales passing:'.$plugin_id.',  '.$start + $limit.', '.$limit.'  ');
-                
                 wp_schedule_single_event( time() , 'ldnft_process_freemius_sales_data', $data );
             }
         }
 
         $this->check_and_complete( 'ldnft_process_freemius_sales_stats',  'subscription' );
-
-        error_log( print_r(['inserted' => $inserted, 'updated'=>$updatednum, 'message' => sprintf( __('Inserted: %d, Updated: %d', 'MWC'), $inserted, $updatednum)], true) );
-        //return ['inserted' => $inserted, 'updated'=>$updatednum, 'message' => sprintf( __('Inserted: %d, Updated: %d', 'MWC'), $inserted, $updatednum)]; 
     }
 
     /**
@@ -317,7 +312,6 @@ class LDNFT_Crons_Settings {
         
         global $wpdb;
 
-        error_log( 'ldnft_process_freemius_subscription:'.$plugin_id.',  '.$start.', '.$limit );
         $table_name = $wpdb->prefix.'ldnft_subscription';
         if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
             $wpdb->query( "CREATE TABLE $table_name (
@@ -497,16 +491,12 @@ class LDNFT_Crons_Settings {
                         'limit' => $limit
                     ];
                 
-                error_log( 'ldnft_process_freemius_subscription passing:'.$plugin_id.',  '.$start + $limit.', '.$limit.'  ');
-                
                 wp_schedule_single_event( time() , 'ldnft_process_freemius_subscription_data', $data );
             }
         }
 
         $this->check_and_complete( 'ldnft_process_freemius_subscription_stats',  'reviews' );
 
-        error_log( print_r(['inserted' => $inserted, 'updated'=>$updatednum, 'message' => sprintf( __('Inserted: %d, Updated: %d', 'MWC'), $inserted, $updatednum)], true) );
-        //return ['inserted' => $inserted, 'updated'=>$updatednum, 'message' => sprintf( __('Inserted: %d, Updated: %d', 'MWC'), $inserted, $updatednum)]; 
     }
 
     /**
@@ -515,7 +505,7 @@ class LDNFT_Crons_Settings {
     public function process_freemius_reviews( $plugin_id,  $start = 0, $limit = 50 ) {
         
         global $wpdb;
-        error_log( 'ldnft_process_freemius_reviews:'.$plugin_id.',  '.$start.', '.$limit );
+        
         $table_name = $wpdb->prefix.'ldnft_reviews';
         if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
             $wpdb->query( "CREATE TABLE $table_name (
@@ -622,8 +612,6 @@ class LDNFT_Crons_Settings {
                         'start' => $new_start + $limit,
                         'limit' => $limit
                     ];
-                
-                error_log( 'ldnft_process_freemius_reviews passing:'.$plugin_id.',  '.$start + $limit.', '.$limit.'  ');
                 
                 wp_schedule_single_event( time() , 'ldnft_process_freemius_reviews_data', $data );
             }
@@ -913,7 +901,6 @@ class LDNFT_Crons_Settings {
 		
         global $wpdb;
 
-        error_log( 'ldnft_process_freemius_plugins_data:'.$start.', '.$limit);
         $table_name = $wpdb->prefix.'ldnft_plugins';
         if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
             $wpdb->query( "CREATE TABLE $table_name (
@@ -1018,7 +1005,6 @@ class LDNFT_Crons_Settings {
 		
         global $wpdb;
 
-        error_log( 'ldnft_process_freemius_customers:'.$plugin_id.',  '.$start.', '.$limit );
         $table_name = $wpdb->prefix.'ldnft_customers';
         if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
             $wpdb->query( "CREATE TABLE $table_name (
@@ -1122,7 +1108,6 @@ class LDNFT_Crons_Settings {
                             'limit' => $limit
                         ];
                     
-                    error_log( 'ldnft_process_freemius_customers passing:'.$plugin_id.',  '.$start + $limit.', '.$limit.'  ' );
                     wp_schedule_single_event( time() , 'ldnft_process_freemius_customers_data', $data );
                 }
             }
@@ -1136,21 +1121,17 @@ class LDNFT_Crons_Settings {
                         'limit' => $limit
                     ];
                 
-                error_log( 'ldnft_process_freemius_customers reschedule passing:'.$plugin_id.',  '.$start + $limit.', '.$limit.'  ' );
                 wp_schedule_single_event( time() , 'ldnft_process_freemius_customers_data', $data );
             }
         }
-        error_log( print_r(['inserted' => $inserted, 'updated'=>$updatednum, 'message' => sprintf( __('Inserted: %d, Updated: %d', 'MWC'), $inserted, $updatednum)], true) );
-        //return ['inserted' => $inserted, 'updated'=>$updatednum, 'message' => sprintf( __('Inserted: %d, Updated: %d', 'MWC'), $inserted, $updatednum)];
 	}
 
     /**
 	 * check and mark as complete if all plugins data is imported
 	 */
     public function check_and_complete( $stats_key,  $next_step ) {
-        error_log( 'check_and_complete' );error_log( $next_step );
-        error_log( $stats_key );
-        $active_crons = get_option( $stats_key );error_log( print_r($active_crons, true) );
+        
+        $active_crons = get_option( $stats_key );
         $done_customers = 0;
         
         if( is_array( $active_crons ) && count( $active_crons ) > 0 ) {

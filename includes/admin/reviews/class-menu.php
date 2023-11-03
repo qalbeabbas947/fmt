@@ -48,11 +48,13 @@ class LDNFT_Reviews_Menu {
      */
     public function reviews_enable_disable() {
         
+        global $wpdb;
+        
         header('Content-Type: application/json; charset=utf-8');
 
         $id         = isset( $_REQUEST['id'] ) ? sanitize_text_field( $_REQUEST['id'] ) : 0;
-        $status     = sanitize_text_field( $_REQUEST['status'] );
-        $status     = $status == true ? true : false;
+        $plugin_id  = isset( $_REQUEST['plugin_id'] ) ? sanitize_text_field( $_REQUEST['plugin_id'] ) : 0;
+        $status     = $_REQUEST['status'] == "true" ? true : false;
 
         if( intval( $id ) == 0 ) {
             echo json_encode([ 'status'=> 'error', 'message' => __('Invalid review id.', LDNFT_TEXT_DOMAIN) ]);
@@ -62,7 +64,13 @@ class LDNFT_Reviews_Menu {
         $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
         $result = $api->Api('plugins/'.$plugin_id.'/reviews/'.$id.'.json', 'PUT', [ 'is_featured' => $status ] );
         
-        echo json_encode([ 'status'=> 'success', 'data'=> $result, 'message' => __('Record is updated.', LDNFT_TEXT_DOMAIN) ]);
+        $table_name = $wpdb->prefix.'ldnft_reviews';
+        $wpdb->update($table_name, 
+                        array(
+                            'is_featured'                => $status
+                        ), array('id'=>$id));
+        $result = $api->Api('plugins/'.$plugin_id.'/reviews/'.$id.'.json', 'PUT', [ 'is_featured' => $status ] );
+        echo json_encode([ 'status'=> 'success', 's'=> $status,  'data'=> $result, 'message' => __('Record is updated.', LDNFT_TEXT_DOMAIN) ]);
         exit;
     }
 
@@ -195,7 +203,7 @@ class LDNFT_Reviews_Menu {
             $selected_featured = intval( $_GET['featured'] ); 
         }
 
-        $selected_verified = '';
+        $selected_verified = ''; 
         if( isset( $_GET['verified'] ) && intval( $_GET['verified'] ) > 0 ) {
             $selected_verified = intval( $_GET['verified'] ); 
         }

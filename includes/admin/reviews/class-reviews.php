@@ -191,12 +191,10 @@ class LDNFT_Reviews extends WP_List_Table {
 	*/
 	public function column_is_featured($item){
        //return LDNFT_Admin::get_bar_preloader().' != '. $item['is_featured'];
-        if( LDNFT_Admin::get_bar_preloader() !=  $item['is_featured'] ) 
-        {
-            
-            return '<input class="ldnft_is_featured_enabled_click" type="checkbox" '.(intval( $item['is_featured'] ) == 1?'checked':'').' id="is_featured_'.$item['id'].'" data-id="'.$item['id'].'" name="is_featured[]" value="'.$item['is_featured'].'" />';
+        if( LDNFT_Admin::get_bar_preloader() !=  $item['is_featured'] ) {
+            return '<input class="ldnft_is_featured_enabled_click" type="checkbox" '.(intval( $item['is_featured'] ) == 1?'checked':'').' id="is_featured_'.$item['id'].'" data-plugin_id="'.$item['plugin_id'].'" data-id="'.$item['id'].'" name="is_featured[]" value="'.$item['is_featured'].'" />';
         } elseif( $item['is_featured'] == 1 ) {
-            return '<input class="ldnft_is_featured_enabled_click" type="checkbox" '.(intval( $item['is_featured'] ) == 1?'checked':'').' id="is_featured_'.$item['id'].'" data-id="'.$item['id'].'" name="is_featured[]" value="'.$item['is_featured'].'" />';
+            return '<input class="ldnft_is_featured_enabled_click" type="checkbox" '.(intval( $item['is_featured'] ) == 1?'checked':'').' id="is_featured_'.$item['id'].'" data-plugin_id="'.$item['plugin_id'].'" data-id="'.$item['id'].'" name="is_featured[]" value="'.$item['is_featured'].'" />';
         } else {
             return $item['is_featured'];
         }

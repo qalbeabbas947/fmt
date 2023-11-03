@@ -248,9 +248,6 @@ class LDNFT_Subscriptions_Menu {
         
         global $wpdb;
         
-        ini_set('display_errors', 'On');
-        error_reporting(E_ALL);
-
         $selected_plugin_id = 0;
         if( isset($_GET['ldfmt_plugins_filter']) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) {
             $selected_plugin_id = intval( $_GET['ldfmt_plugins_filter'] ); 

@@ -10,7 +10,7 @@
                 var plan_id_value = $('#ldnft-checkout-plan_id').val();
                 var public_key_value = $('#ldnft-checkout-public_key').val();
                 var image_value = $('#ldnft-checkout-image').val();
-                console.log( plugin_id_value + ' - ' + plan_id_value + ' - ' + public_key_value + ' - ' + image_value )
+                
                 var handler = FS.Checkout.configure({
                     plugin_id: plugin_id_value,
                     plan_id: plan_id_value,
