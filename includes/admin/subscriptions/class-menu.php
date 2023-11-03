@@ -247,6 +247,9 @@ class LDNFT_Subscriptions_Menu {
      public function ldnft_subscriptions_summary_callback() {
         
         global $wpdb;
+        
+        ini_set('display_errors', 'On');
+        error_reporting(E_ALL);
 
         $selected_plugin_id = 0;
         if( isset($_GET['ldfmt_plugins_filter']) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) {
@@ -296,31 +299,47 @@ class LDNFT_Subscriptions_Menu {
 
         $result = $wpdb->get_results( "SELECT t.* FROM $table_name $where");
         $gross_total = 0; 
+        $gross_total_count = 0;
         $tax_rate_total = 0;
         $total_number_of_sales = 0;
-        $total_new_subscriptions = 0;
-        $total_new_renewals = 0;
+        $failed_payments = 0;
         
+        $total_new_subscriptions = 0;
+        $total_new_subscriptions_amount = 0;
+        $total_new_renewals = 0;
+        $total_new_renewals_amount = 0;
+
         if( isset($result) && isset($result) ) {
             foreach( $result as $obj ) {
-                    
+                $gross_total_count++;
                 $gross_total += $obj->gross;
-                $tax_rate_total += $obj->vat;
+                $tax_rate_total += $obj->tax_rate;
                 $total_number_of_sales++;
-                if( $obj->is_renewal == '1' || $obj->is_renewal == 1 ) {
-                    $total_new_renewals++;
-                } else {
-                    $total_new_subscriptions++;
-                }
+                $failed_payments += $obj->failed_payments;
             }
         }
 
+        $records = $wpdb->get_results( "select country_code, sum(gross) as gross from $table_name $where group by country_code order by gross desc limit 3" );
+        $countries = [];
+        foreach( $records as $rec ) {
+            $countries[] = [
+                'country_code' => $rec->country_code,
+                'gross' => number_format($rec->gross, 2),
+                'country_name' => LDNFT_Freemius::get_country_name_by_code( strtoupper( $rec->country_code ) )
+            ];
+        }
+
         $data = [
+            'gross_total_count' => $gross_total_count,
             'gross_total' => number_format($gross_total, 2),
             'tax_rate_total' => number_format($tax_rate_total, 2),
             'total_number_of_sales' => $total_number_of_sales,
             'total_new_subscriptions' => $total_new_subscriptions,
-            'total_new_renewals' => $total_new_renewals
+            'total_new_subscriptions_amount' => number_format($total_new_subscriptions_amount, 2),
+            'total_new_renewals_amount' => number_format($total_new_renewals_amount, 2),
+            'failed_payments'       => $failed_payments,
+            'total_new_renewals'    => $total_new_renewals,
+            'countries' => $countries
         ];
         
         die(
@@ -568,20 +587,20 @@ class LDNFT_Subscriptions_Menu {
                             </div>
                         </div>
                         <div class="ldfmt-new-subscriptions-box ldfmt-sales-box">
-                            <label><?php echo __('New subscriptions', LDNFT_TEXT_DOMAIN);?></label>
-                            <div class="ldnft_new_subscriptions_count">
-                                <span class="ldnft_subscription_new_subscriptions_count"></span>
+                            <label><?php echo __('Total Failed Attempts', LDNFT_TEXT_DOMAIN);?></label>
+                            <div class="ldnft_new_attempts_count">
+                                <span class="ldnft_subscription_new_attempts_count"></span>
                                 <?php echo LDNFT_Admin::get_bar_preloader("ldnft-subssummary-loader");?>
                             </div>
                         </div>
-                        <div class="ldfmt-renewals-count-box ldfmt-sales-box">
-                            <label><?php echo __('Total Renewals', LDNFT_TEXT_DOMAIN);?></label>
-                            <div class="ldnft_renewals_count">
-                                <span class="ldnft_subscription_renewals_count"></span>
+                        <div class="ldfmt-top3-countries-count-box ldfmt-sales-box">
+                            <label><?php echo __('Top 3 Countries', LDNFT_TEXT_DOMAIN);?></label>
+                            <div class="ldnft_subscription_top3_countries_main">
+                                <div class="ldnft_subscription_top3_countries"></div>
                                 <?php echo LDNFT_Admin::get_bar_preloader("ldnft-subssummary-loader");?>
                             </div>
                         </div>
-                    </div>
+                    </div> 
                     <div id="ldnft-admin-modal" class="ldnft-admin-modal">
                         <!-- Modal content -->
                         <div class="ldnft-admin-modal-content">

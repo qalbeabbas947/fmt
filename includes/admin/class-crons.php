@@ -13,9 +13,8 @@ class LDNFT_Crons_Settings {
     public function __construct() {
         
         global $wpdb;
-
-        //import data via cron work
         
+        //import data via cron work
         add_action( 'wp_ajax_ldnft_check_cron_status',          [ $this, 'check_cron_status' ], 100 );
         add_action( 'ldnft_process_freemius_customers_data', [ $this, 'ldnft_process_freemius_customers' ], 10, 3 );
         add_action( 'ldnft_process_freemius_plugins_data', [ $this, 'ldnft_process_freemius_plugins' ], 10, 2 );
@@ -325,10 +324,12 @@ class LDNFT_Crons_Settings {
                 `id` int(11) NOT NULL,
                 `plugin_id` int(11) NOT NULL,
                 `user_id` int(11) NOT NULL,
+                `user_card_id` int(11) DEFAULT NULL,
                 `install_id` int(11) DEFAULT NULL,
                 `amount_per_cycle` float DEFAULT NULL,
                 `billing_cycle` int(11) DEFAULT NULL,
                 `gross` float DEFAULT NULL,
+                `tax_rate` float DEFAULT NULL,
                 `outstanding_balance` float DEFAULT NULL,
                 `failed_payments` int(11) DEFAULT NULL,
                 `gateway` varchar(50) DEFAULT NULL,
@@ -338,8 +339,13 @@ class LDNFT_Crons_Settings {
                 `created` datetime DEFAULT NULL,
                 `updated_at` datetime DEFAULT NULL,
                 `currency` varchar(3) DEFAULT NULL,
+                `zip_postal_code` varchar(10) DEFAULT NULL,
                 `external_id` varchar(35) DEFAULT NULL,
+                `ip` varchar(15) DEFAULT NULL,
                 `plan_id` int(11) DEFAULT NULL,
+                `vat_id` int(11) DEFAULT NULL,
+                `source` int(11) DEFAULT NULL,
+                `environment` int(11) DEFAULT NULL,
                 `country_code` varchar(2) DEFAULT NULL,
                 `pricing_id` int(11) DEFAULT NULL,
                 `initial_amount` float DEFAULT NULL,
@@ -349,13 +355,14 @@ class LDNFT_Crons_Settings {
                 `license_id` int(11) DEFAULT NULL
             )" );     
         }
-        
+
         $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
         $inserted = 0;
         $updatednum = 0;
 
         $subobj = $api->Api('plugins/'.$plugin_id.'/subscriptions.json?count='.$limit.'&offset='.$start, 'GET', []);
         foreach( $subobj->subscriptions as $subscription ) {
+            
             $total_gross = $subscription->total_gross; 
             $amount_per_cycle = $subscription->amount_per_cycle; 
             $initial_amount = $subscription->initial_amount; 
@@ -372,27 +379,36 @@ class LDNFT_Crons_Settings {
             $plan_id = $subscription->plan_id; 
             $pricing_id = $subscription->pricing_id; 
             $license_id = $subscription->license_id; 
-            $ip = $subscription->ip; 
             $country_code = $subscription->country_code; 
-            $vat_id = $subscription->vat_id; 
             $coupon_id = $subscription->coupon_id; 
             $user_card_id = $subscription->user_card_id; 
-            $source = $subscription->source; 
             $plugin_id = $subscription->plugin_id; 
             $external_id = $subscription->external_id; 
             $gateway = $subscription->gateway; 
-            $environment = $subscription->environment; 
             $id = $subscription->id; 
             $created = $subscription->created; 
             $updated = $subscription->updated; 
             $currency = $subscription->currency; 
-            
+            $tax_rate = $subscription->tax_rate;
+            $ip = $subscription->ip;
+            $zip_postal_code = $subscription->zip_postal_code; 
+            $vat_id = $subscription->vat_id; 
+            $source = $subscription->source; 
+            $environment = $subscription->environment; 
+
             $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_name." where id=%d", $id ));
             if( count( $res ) == 0 ) {
                 $wpdb->insert(
                     $table_name,
                     array(
                         'id'                        => $id,
+                        'tax_rate'                  => $tax_rate,
+                        'ip'                        => $ip,
+                        'zip_postal_code'           => $zip_postal_code,
+                        'vat_id'                    => $vat_id,
+                        'source'                    => $source,
+                        'user_card_id'              => $user_card_id,
+                        'environment'               => $environment,
                         'plugin_id'                 => $plugin_id,
                         'user_id'                   => $user_id,
                         'install_id'                => $install_id,
@@ -425,6 +441,13 @@ class LDNFT_Crons_Settings {
                     array(
                         'plugin_id'                 => $plugin_id,
                         'user_id'                   => $user_id,
+                        'tax_rate'                  => $tax_rate,
+                        'ip'                        => $ip,
+                        'zip_postal_code'           => $zip_postal_code,
+                        'user_card_id'              => $user_card_id,
+                        'vat_id'                    => $vat_id,
+                        'source'                    => $source,
+                        'environment'               => $environment,
                         'install_id'                => $install_id,
                         'amount_per_cycle'          => $amount_per_cycle,
                         'billing_cycle'             => $billing_cycle,

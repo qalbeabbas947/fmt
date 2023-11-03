@@ -602,8 +602,18 @@
                         $('.ldnft_subscription_new_sales_count').html(response.total_number_of_sales).css('display', 'block');
                         $('.ldnft_subscription_new_subscriptions_count').html(response.total_new_subscriptions).css('display', 'block');
                         $('.ldnft_subscription_renewals_count').html(response.total_new_renewals).css('display', 'block');
+                        $('.ldnft_subscription_new_attempts_count').html(response.failed_payments).css('display', 'block');
                         $('.ldnft-subssummary-loader').css('display', 'none');
-                        
+                        var list_items = '<ul>';
+                        for (const key in response.countries ) {
+                            if (Object.hasOwnProperty.call(response.countries, key)) {
+                                const element = response.countries[key];
+                                list_items += '<li>'+element.country_name+': '+element.gross+'</li>';
+                                console.log(element)
+                            }
+                        }
+                        list_items += '</ul>';
+                        $('.ldnft_subscription_top3_countries').html(list_items).css('display', 'block');
                     }
                 });
             },
