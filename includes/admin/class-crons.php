@@ -1014,8 +1014,7 @@ class LDNFT_Crons_Settings {
                 `last` varchar(255) DEFAULT NULL,
                 `is_verified` tinyint(1) DEFAULT NULL,
                 `is_marketing_allowed` tinyint(1) DEFAULT NULL,
-                `created` datetime DEFAULT NULL,
-                `status` varchar(20) DEFAULT NULL
+                `created` datetime DEFAULT NULL
             )" );     
         }
         

@@ -86,7 +86,8 @@
                     if( LDNFT.import_cron_status != 'complete' ) {
                         LDNFTbackEnd.timeout_obj = setInterval(LDNFTbackEnd.check_cron_status, 3000);
                     } else {
-                        //$('.ldnft-process-freemius-data-info').css('display', 'none');
+                        $('.ldnft-process-freemius-data-reviews').find('.ldnft-success-loader').css( 'display', 'none' );
+                        $('.ldnft-process-freemius-data-reviews').find('.ldnft-checkmark').css( 'display', 'inline' );
                         LDNFT.import_cron_status = 'complete';
                         clearInterval(LDNFTbackEnd.timeout_obj);
                     }
@@ -98,12 +99,15 @@
                 }
                
                 jQuery.post( LDNFT.ajaxURL, data, function( response ) {
+                    var sub_status = response.individual_status;
                     if( response.status == 'complete' ) {
-                        //$('.ldnft-process-freemius-data-info').css('display', 'none');
+                        $('.ldnft-process-freemius-data-reviews').css('display', 'block');
+                        $('.ldnft-process-freemius-data-reviews').find('.ldnft-loading-wrap').html( sub_status.Reviewsmsg );
+                        $('.ldnft-process-freemius-data-reviews').find('.ldnft-success-loader').css( 'display', 'none' );
+                        $('.ldnft-process-freemius-data-reviews').find('.ldnft-checkmark').css( 'display', 'inline' );
                         LDNFT.import_cron_status = 'complete';
                         clearInterval(LDNFTbackEnd.timeout_obj);
                     } else {
-                        var sub_status = response.individual_status;
                         switch( response.status ) {
                             case 'plans':
                                 $('.ldnft-process-freemius-data-plugins').css('display', 'block');
@@ -201,7 +205,10 @@
                                 $('.ldnft-process-freemius-data-reviews').find('.ldnft-loading-wrap').html(sub_status.Reviewsmsg);
                                 break; 
                             case 'complete':
-                                //$('.ldnft-process-freemius-data-info').css('display', 'none');
+                                $('.ldnft-process-freemius-data-reviews').css('display', 'block');
+                                $('.ldnft-process-freemius-data-reviews').find('.ldnft-loading-wrap').html( sub_status.Reviewsmsg );
+                                $('.ldnft-process-freemius-data-reviews').find('.ldnft-success-loader').css( 'display', 'none' );
+                                $('.ldnft-process-freemius-data-reviews').find('.ldnft-checkmark').css( 'display', 'inline' );
                                 break;
                             default:
                                 $('.ldnft-process-freemius-data-plugins').css('display', 'block');
