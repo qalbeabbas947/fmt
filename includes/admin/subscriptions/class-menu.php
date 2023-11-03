@@ -478,7 +478,7 @@ class LDNFT_Subscriptions_Menu {
                     <div class="alignleft actions bulkactions">
                         <span class="ldnft_filter_labels"><?php _e( 'Filters:', LDNFT_TEXT_DOMAIN ); ?></span>
                         <select name="ldfmt-plugins-filter" class="ldfmt-plugins-filter ldfmt-plugins-subscription-filter">
-                            <option value=""><?php echo __( 'All Plugin/Product', LDNFT_TEXT_DOMAIN );?></option>
+                            <option value=""><?php echo __( 'All Plugins/Products', LDNFT_TEXT_DOMAIN );?></option>
                             <?php
                                 foreach( $products as $plugin ) {
                                     if( $selected_plugin_id == 0 ) {
@@ -500,7 +500,7 @@ class LDNFT_Subscriptions_Menu {
                             $plans = $wpdb->get_results($wpdb->prepare("SELECT id, title FROM $table_name where plugin_id = %d", $selected_plugin_id ) );
                         ?>
                         <select name="ldfmt-sales-plan_id-filter" class="ldfmt-subscription-plan_id-filter">
-                            <option value=""><?php _e( 'Filter by Plan', LDNFT_TEXT_DOMAIN ); ?></option>
+                            <option value=""><?php _e( 'All Plans', LDNFT_TEXT_DOMAIN ); ?></option>
                             <?php
                             if( isset( $plans ) && is_array( $plans ) ) {
                                 foreach( $plans as $plan ) {
@@ -538,7 +538,7 @@ class LDNFT_Subscriptions_Menu {
                             $gateways      = $wpdb->get_results( "SELECT distinct( gateway ) as gateway FROM $table_name" );
                         ?>
                         <select name="ldfmt-subscription-gateway-filter" class="ldfmt-subscription-gateway-filter">
-                            <option value=""><?php _e( 'Filter by Gateway', LDNFT_TEXT_DOMAIN ); ?></option>
+                            <option value=""><?php _e( 'All Gateways', LDNFT_TEXT_DOMAIN ); ?></option>
                             <?php
                             if( isset( $gateways ) && is_array( $gateways ) ) {
                                 foreach( $gateways as $gateway ) {

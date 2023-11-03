@@ -77,8 +77,8 @@
                     LDNFTbackEnd.display_reviews();
                 }
 
-                $('.ldfmt-sales-country-filter').select2({minimumInputLength: 3, allowClear: true});
-                $('.ldfmt-subscription-country-filter').select2({minimumInputLength: 3, allowClear: true});
+                $('.ldfmt-sales-country-filter').select2({minimumInputLength: 3, allowClear: true, width: '150px'});
+                $('.ldfmt-subscription-country-filter').select2({minimumInputLength: 3, allowClear: true, width: '150px'});
             },
             import_cron_status: function() {
                 
