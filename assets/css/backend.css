@@ -145,6 +145,11 @@
     color: white;
     text-align: center;
 }
+
+#ldnft-dat-not-imported-message a {
+    color:white;
+}
+
 .mailpoet_unable_to_import{
     color:red;
 }

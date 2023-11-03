@@ -760,37 +760,6 @@ class LDNFT_Crons_Settings {
     }
     
     /**
-	 * initialize the crons based on the plugins.
-	 */
-    // public function ldnft_run_cron_based_on_plugins() {
-        
-    //     $service = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
-    //     $plugins = $service->Api('plugins.json?fields=id,title', 'GET', []);
-        
-    //     $inserted = 0;
-    //     $updatednum = 0;
-        
-    //     if( isset( $plugins->plugins ) &&  count($plugins->plugins) > 0 ) {
-    //         update_option('ldnft_run_cron_based_on_plugins', 'running' );
-
-            
-
-    //         foreach( $plugins->plugins as $plugin ) { 
-    //             if( intval( $plugin->id ) > 0 ) {
-    //                 $active_crons = get_option('ldnft_process_freemius_customers_stats' );
-    //                 $active_crons[$plugin->id] = [ 0, 0 ]; //first param is used for count and second to check if cron is complete.
-    //                 update_option('ldnft_process_freemius_customers_stats', $active_crons );
-    
-    //                 $this->ldnft_process_freemius_customers( $plugin->id );
-    //             }
-    //         }
-    //     } else {
-    //         update_option('ldnft_run_cron_based_on_plugins', 'complete' );
-    //     }
-    // }
-
-
-    /**
 	 * process plans data.
 	 */
 	public function ldnft_process_freemius_plans( $start = 0, $limit = 50 ) {
@@ -832,7 +801,7 @@ class LDNFT_Crons_Settings {
             $plans_obj = $api->Api('plugins/'.$plugin->id.'/plans.json', 'GET', []);
             foreach( $plans_obj->plans as $plan ) {
                 
-                $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_name." where id=%d", $plugin->id ));
+                $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_name." where id=%d", $plan->id ));
                 if( count( $res ) == 0 ) {
                     $wpdb->insert(
                         $table_name,
