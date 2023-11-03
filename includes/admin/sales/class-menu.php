@@ -211,37 +211,34 @@ class LDNFT_Sales_Menu {
     public function admin_menu_page() { 
         
         $user_id = get_current_user_id();
-        if( FS__API_CONNECTION  ) {
-                
-            $hook = add_submenu_page ( 
-                'ldnft-freemius',
-                __( 'Sales', LDNFT_TEXT_DOMAIN ),
-                __( 'Sales', LDNFT_TEXT_DOMAIN ),
-                'manage_options',
-                'freemius-sales',
-                [ $this,'sales_page' ],
-                1
-            );
-            
-            if( get_user_option( 'sales_hidden_columns_set', $user_id) != 'Yes' ) {
-                update_user_option( $user_id, 'managefreemius-toolkit_page_freemius-salescolumnshidden', $default_hidden_columns );
-                update_user_option( $user_id, 'sales_hidden_columns_set', 'Yes' );
-            }
-
-            add_action( "load-$hook", function () {
-                
-                global $ldnftSalesListTable;
-                
-                $option = 'per_page';
-                $args = [
-                        'label' => 'Sales Per Page',
-                        'default' => 10,
-                        'option' => 'sales_per_page'
-                    ];
-                add_screen_option( $option, $args );
-                $ldnftSalesListTable = new LDNFT_Sales();
-            } );
+        $hook = add_submenu_page ( 
+            'ldnft-freemius',
+            __( 'Sales', LDNFT_TEXT_DOMAIN ),
+            __( 'Sales', LDNFT_TEXT_DOMAIN ),
+            'manage_options',
+            'freemius-sales',
+            [ $this,'sales_page' ],
+            1
+        );
+        
+        if( get_user_option( 'sales_hidden_columns_set', $user_id) != 'Yes' ) {
+            update_user_option( $user_id, 'managefreemius-toolkit_page_freemius-salescolumnshidden', $default_hidden_columns );
+            update_user_option( $user_id, 'sales_hidden_columns_set', 'Yes' );
         }
+
+        add_action( "load-$hook", function () {
+            
+            global $ldnftSalesListTable;
+            
+            $option = 'per_page';
+            $args = [
+                    'label' => 'Sales Per Page',
+                    'default' => 10,
+                    'option' => 'sales_per_page'
+                ];
+            add_screen_option( $option, $args );
+            $ldnftSalesListTable = new LDNFT_Sales();
+        } );
     }
 
     /**
@@ -252,17 +249,6 @@ class LDNFT_Sales_Menu {
     public static function sales_page( ) {
         
         global $wpdb;
-
-        if( !FS__HAS_PLUGINS ) {
-            ?>
-                <div class="wrap">
-                    <h2><?php _e( 'Sales', LDNFT_TEXT_DOMAIN ); ?></h2>
-                    <p><?php _e( 'No product(s) exists in your freemius account. Please, add a product on freemius and reload the page.', LDNFT_TEXT_DOMAIN ); ?></p>
-                </div>
-            <?php
-
-            return;
-        }
 
         $table_name = $wpdb->prefix.'ldnft_transactions';
         if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
@@ -276,6 +262,17 @@ class LDNFT_Sales_Menu {
             return;
         }
         
+        if( !FS__HAS_PLUGINS ) {
+            ?>
+                <div class="wrap">
+                    <h2><?php _e( 'Sales', LDNFT_TEXT_DOMAIN ); ?></h2>
+                    <p id="ldnft-dat-not-imported-message"><?php _e( 'No product(s) exists in your freemius account. Please, add a product on freemius and reload the page.', LDNFT_TEXT_DOMAIN ); ?></p>
+                </div>
+            <?php
+
+            return;
+        }
+
         $products = LDNFT_Freemius::$products;
         
         $selected_plugin_id = 0;

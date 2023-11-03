@@ -369,37 +369,34 @@ class LDNFT_Subscriptions_Menu {
     public function admin_menu_page() { 
         
         $user_id = get_current_user_id();
-        if( FS__API_CONNECTION  ) {
-                
-            $hook = add_submenu_page( 
-                'ldnft-freemius',
-                __( 'Subscriptions', LDNFT_TEXT_DOMAIN ),
-                __( 'Subscriptions', LDNFT_TEXT_DOMAIN ),
-                'manage_options',
-                'freemius-subscriptions',
-                [ $this, 'subscribers_page' ],
-                0
-            );
-            
-            if( get_user_option( 'subscription_hidden_columns_set', $user_id ) != 'Yes' ) {
-                update_user_option( $user_id, 'managefreemius-toolkit_page_freemius-subscriptionscolumnshidden', $this->default_hidden_columns );
-                update_user_option( $user_id, 'subscription_hidden_columns_set', 'Yes' );
-            }
-
-            add_action( "load-$hook", function () {
-                
-                global $ldnftSubscriptionsListTable;
-                
-                $option = 'per_page';
-                $args = [
-                        'label' => 'Subsriptions Per Page',
-                        'default' => 10,
-                        'option' => 'subscriptions_per_page'
-                    ];
-                add_screen_option( $option, $args );
-                $ldnftSubscriptionsListTable = new LDNFT_Subscriptions();
-            } );
+        $hook = add_submenu_page( 
+            'ldnft-freemius',
+            __( 'Subscriptions', LDNFT_TEXT_DOMAIN ),
+            __( 'Subscriptions', LDNFT_TEXT_DOMAIN ),
+            'manage_options',
+            'freemius-subscriptions',
+            [ $this, 'subscribers_page' ],
+            0
+        );
+        
+        if( get_user_option( 'subscription_hidden_columns_set', $user_id ) != 'Yes' ) {
+            update_user_option( $user_id, 'managefreemius-toolkit_page_freemius-subscriptionscolumnshidden', $this->default_hidden_columns );
+            update_user_option( $user_id, 'subscription_hidden_columns_set', 'Yes' );
         }
+
+        add_action( "load-$hook", function () {
+            
+            global $ldnftSubscriptionsListTable;
+            
+            $option = 'per_page';
+            $args = [
+                    'label' => 'Subsriptions Per Page',
+                    'default' => 10,
+                    'option' => 'subscriptions_per_page'
+                ];
+            add_screen_option( $option, $args );
+            $ldnftSubscriptionsListTable = new LDNFT_Subscriptions();
+        } );
     }
 
     /**
@@ -410,17 +407,6 @@ class LDNFT_Subscriptions_Menu {
     public function subscribers_page() {
         
         global $wpdb;
-
-        if( !FS__HAS_PLUGINS ) {
-            ?>
-                <div class="wrap">
-                    <h2><?php _e( 'Subscriptions', LDNFT_TEXT_DOMAIN ); ?></h2>
-                    <p><?php _e( 'No product(s) exists in your freemius account. Please, add a product on freemius and reload the page.', LDNFT_TEXT_DOMAIN ); ?></p>
-                </div>
-            <?php
-
-            return;
-        }
 
         $table_name = $wpdb->prefix.'ldnft_subscription';
         if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
@@ -433,6 +419,18 @@ class LDNFT_Subscriptions_Menu {
 
             return;
         }
+
+        if( !FS__HAS_PLUGINS ) {
+            ?>
+                <div class="wrap">
+                    <h2><?php _e( 'Subscriptions', LDNFT_TEXT_DOMAIN ); ?></h2>
+                    <p id="ldnft-dat-not-imported-message"><?php _e( 'No product(s) exists in your freemius account. Please, add a product on freemius and reload the page.', LDNFT_TEXT_DOMAIN ); ?></p>
+                </div>
+            <?php
+
+            return;
+        }
+
 
         /**
          * Create an instance of our package class... 

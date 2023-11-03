@@ -54,7 +54,7 @@ class LDNFT_Reviews extends WP_List_Table {
         global $status, $page;
 
 		$this->plugins = LDNFT_Freemius::$products;
-        $this->selected_plugin_id = ( isset( $_GET['ldfmt_plugins_filter'] ) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) ? intval( $_GET['ldfmt_plugins_filter'] ) : $this->plugins[0]->id;
+        $this->selected_plugin_id = ( isset( $_GET['ldfmt_plugins_filter'] ) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) ? intval( $_GET['ldfmt_plugins_filter'] ) : '';
         
         $this->selected_featured   = isset( $_REQUEST['featured'] ) ? sanitize_text_field( $_REQUEST['featured'] ) : '';
         $this->selected_search     = isset( $_REQUEST['search'] ) ? sanitize_text_field( $_REQUEST['search'] ) : '';

@@ -279,9 +279,20 @@ class LDNFT_Crons_Settings {
 
         if( intval( $plugin_id ) > 0 ) {
             $active_crons = get_option('ldnft_process_freemius_sales_stats' );
-            $active_crons[$plugin_id][0] = intval( $active_crons[$plugin_id][0] ) + count( $pmtobj->payments );
+            $active_crons[$plugin_id][0] = intval( $active_crons[ $plugin_id ][0] ) + count( $pmtobj->payments );
             if( count( $pmtobj->payments ) < $limit) {
                 $active_crons[$plugin_id][1] = 1;
+                
+                $meta_table_name = $wpdb->prefix.'ldnft_customer_meta';
+                $records = $wpdb->get_results( $wpdb->prepare("select * from ".$meta_table_name." where plugin_id=%d", $plugin_id ) );
+                foreach( $records as $record ) {
+                    $status = $wpdb->get_var( $wpdb->prepare("select type from ".$table_name." where plugin_id=%d and user_id=%d order by id desc limit 1", $plugin_id, $record->customer_id ) );
+                    
+                    $wpdb->update( $meta_table_name, 
+                        array(
+                            'status'                => $status
+                        ), array( 'plugin_id' => $plugin_id, 'customer_id' => $record->customer_id  ) );
+                }
             }
 
             update_option('ldnft_process_freemius_sales_stats', $active_crons );

@@ -119,44 +119,33 @@ class LDNFT_Reviews_Menu {
         
         $user_id = get_current_user_id();
         
-        $api = new Freemius_Api_WordPress( FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
-        try {
-            
-            $plugins = $api->Api('plugins.json?fields=id,title', 'GET', []);
-            
-            if( ! isset( $plugins->error )  ) {
-                
-                $hook = add_submenu_page( 
-                    'ldnft-freemius',
-                    __( 'Reviews', LDNFT_TEXT_DOMAIN ),
-                    __( 'Reviews', LDNFT_TEXT_DOMAIN ),
-                    'manage_options',
-                    'freemius-reviews',
-                    [ $this,'reviews_page']
-                );
+        $hook = add_submenu_page( 
+            'ldnft-freemius',
+            __( 'Reviews', LDNFT_TEXT_DOMAIN ),
+            __( 'Reviews', LDNFT_TEXT_DOMAIN ),
+            'manage_options',
+            'freemius-reviews',
+            [ $this,'reviews_page']
+        );
 
-                if( get_user_option( 'reviews_hidden_columns_set', $user_id) != 'Yes' ) {
-                    update_user_option( $user_id, 'managefreemius-toolkit_page_freemius-reviewscolumnshidden', $this->default_hidden_columns );
-                    update_user_option( $user_id, 'reviews_hidden_columns_set', 'Yes' );
-                }
-
-                add_action( "load-$hook", function () {
-                    
-                    global $ldnftReviewsListTable;
-                    
-                    $option = 'per_page';
-                    $args = [
-                            'label' => 'Reviews Per Page',
-                            'default' => 10,
-                            'option' => 'reviews_per_page'
-                        ];
-                    add_screen_option( $option, $args );
-                    $ldnftReviewsListTable = new LDNFT_Reviews();
-                } );
-            }
-        } catch(Exception $e) {
-            
+        if( get_user_option( 'reviews_hidden_columns_set', $user_id) != 'Yes' ) {
+            update_user_option( $user_id, 'managefreemius-toolkit_page_freemius-reviewscolumnshidden', $this->default_hidden_columns );
+            update_user_option( $user_id, 'reviews_hidden_columns_set', 'Yes' );
         }
+
+        add_action( "load-$hook", function () {
+            
+            global $ldnftReviewsListTable;
+            
+            $option = 'per_page';
+            $args = [
+                    'label' => 'Reviews Per Page',
+                    'default' => 10,
+                    'option' => 'reviews_per_page'
+                ];
+            add_screen_option( $option, $args );
+            $ldnftReviewsListTable = new LDNFT_Reviews();
+        } );
     }
 
     /**
@@ -167,17 +156,6 @@ class LDNFT_Reviews_Menu {
     public static function reviews_page( ) {
         
         global $wpdb;
-
-		if( !FS__HAS_PLUGINS ) {
-            ?> 
-                <div class="wrap">
-                    <h2><?php _e( 'Reviews', LDNFT_TEXT_DOMAIN ); ?></h2>
-                    <p><?php _e( 'No product(s) exists in your freemius account. Please, add a product on freemius and reload the page.', LDNFT_TEXT_DOMAIN ); ?></p>
-                </div>
-            <?php
-
-            return;
-        }
 
         $table_name = $wpdb->prefix.'ldnft_reviews';
         if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
@@ -191,6 +169,17 @@ class LDNFT_Reviews_Menu {
             return;
         }
 		
+		if( !FS__HAS_PLUGINS ) {
+            ?> 
+                <div class="wrap">
+                    <h2><?php _e( 'Reviews', LDNFT_TEXT_DOMAIN ); ?></h2>
+                    <p id="ldnft-dat-not-imported-message"><?php _e( 'No product(s) exists in your freemius account. Please, add a product on freemius and reload the page.', LDNFT_TEXT_DOMAIN ); ?></p>
+                </div>
+            <?php
+
+            return;
+        }
+
 		$products = LDNFT_Freemius::$products;
 		
 		$selected_plugin_id = 0;

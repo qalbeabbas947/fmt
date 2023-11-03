@@ -85,45 +85,34 @@ class LDNFT_Customers_Menu {
         
         $user_id = get_current_user_id();
         
-        $api = new Freemius_Api_WordPress( FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
-        try {
-            
-            $plugins = $api->Api('plugins.json?fields=id,title', 'GET', []);
-            
-            if( ! isset( $plugins->error )  ) {
-                
-                $hook = add_submenu_page( 
-                    'ldnft-freemius',
-                    __( 'Customers', LDNFT_TEXT_DOMAIN ),
-                    __( 'Customers', LDNFT_TEXT_DOMAIN ),
-                    'manage_options',
-                    'freemius-customers',
-                    [ $this,'customers_page'],
-                    2
-                );
+        $hook = add_submenu_page( 
+            'ldnft-freemius',
+            __( 'Customers', LDNFT_TEXT_DOMAIN ),
+            __( 'Customers', LDNFT_TEXT_DOMAIN ),
+            'manage_options',
+            'freemius-customers',
+            [ $this,'customers_page'],
+            2 
+        );
 
-                if( get_user_option( 'customers_hidden_columns_set', $user_id) != 'Yes' ) {
-                    update_user_option( $user_id, 'managefreemius-toolkit_page_freemius-customerscolumnshidden', $default_hidden_columns );
-                    update_user_option( $user_id, 'customers_hidden_columns_set', 'Yes' );
-                }
-
-                add_action( "load-$hook", function () {
-                    
-                    global $ldnftCustomersListTable;
-                    
-                    $option = 'per_page';
-                    $args = [
-                            'label' => 'Customers Per Page',
-                            'default' => 10,
-                            'option' => 'customers_per_page'
-                        ];
-                    add_screen_option( $option, $args );
-                    $ldnftCustomersListTable = new LDNFT_Customers();
-                } );
-            }
-        } catch(Exception $e) {
-            
+        if( get_user_option( 'customers_hidden_columns_set', $user_id) != 'Yes' ) {
+            update_user_option( $user_id, 'managefreemius-toolkit_page_freemius-customerscolumnshidden', $default_hidden_columns );
+            update_user_option( $user_id, 'customers_hidden_columns_set', 'Yes' );
         }
+
+        add_action( "load-$hook", function () {
+            
+            global $ldnftCustomersListTable;
+            
+            $option = 'per_page';
+            $args = [
+                    'label' => 'Customers Per Page',
+                    'default' => 10,
+                    'option' => 'customers_per_page'
+                ];
+            add_screen_option( $option, $args );
+            $ldnftCustomersListTable = new LDNFT_Customers();
+        } );
     }
 
     /**
@@ -135,16 +124,6 @@ class LDNFT_Customers_Menu {
 
         global $wpdb;
         
-		if( !FS__HAS_PLUGINS ) {
-            ?>
-                <div class="wrap">
-                    <h2><?php _e( 'Customers', LDNFT_TEXT_DOMAIN ); ?></h2>
-                    <p><?php _e( 'No product(s) exists in your freemius account. Please, add a product on freemius and reload the page.', LDNFT_TEXT_DOMAIN ); ?></p>
-                </div>
-            <?php
-
-            return;
-        }
 		
         $table_name = $wpdb->prefix.'ldnft_customers';
         if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
@@ -152,6 +131,17 @@ class LDNFT_Customers_Menu {
                 <div class="wrap">
                     <h2><?php _e( 'Customers', LDNFT_TEXT_DOMAIN ); ?></h2>
                     <p id="ldnft-dat-not-imported-message"><?php _e( 'Customers are not imported yet. Please, click <a href="admin.php?page=freemius-settings&tab=freemius-api">here</a> to open the setting page and start the import process automatically.', LDNFT_TEXT_DOMAIN ); ?></p>
+                </div>
+            <?php
+
+            return;
+        }
+		
+        if( !FS__HAS_PLUGINS ) {
+            ?>
+                <div class="wrap">
+                    <h2><?php _e( 'Customers', LDNFT_TEXT_DOMAIN ); ?></h2>
+                    <p id="ldnft-dat-not-imported-message"><?php _e( 'No product(s) exists in your freemius account. Please, add a product on freemius and reload the page.', LDNFT_TEXT_DOMAIN ); ?></p>
                 </div>
             <?php
 
