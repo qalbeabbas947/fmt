@@ -111,7 +111,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
             'amount_per_cycle'      => __( 'Price',LDNFT_TEXT_DOMAIN ),
             'discount'              => __( 'Discount', LDNFT_TEXT_DOMAIN ),
             'billing_cycle'         => __( 'Billing Cycle (months)',LDNFT_TEXT_DOMAIN ),
-            'total_gross'           => __( 'Total Amount',LDNFT_TEXT_DOMAIN ),
+            'gross'                 => __( 'Total Amount',LDNFT_TEXT_DOMAIN ),
             'gateway'               => __( 'Gateway',LDNFT_TEXT_DOMAIN ),
             'renewal_amount'        => __( 'Next Renewal Amount', LDNFT_TEXT_DOMAIN ),
             'outstanding_balance'   => __( 'Balance',LDNFT_TEXT_DOMAIN ), 
@@ -208,7 +208,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
                     'amount_per_cycle'      => LDNFT_Admin::get_bar_preloader(), 
                     'discount'              => LDNFT_Admin::get_bar_preloader(), 
                     'billing_cycle'         => LDNFT_Admin::get_bar_preloader(), 
-                    'total_gross'           => LDNFT_Admin::get_bar_preloader(), 
+                    'gross'           => LDNFT_Admin::get_bar_preloader(), 
                     'gateway'               => LDNFT_Admin::get_bar_preloader(), 
                     'renewal_amount'        => LDNFT_Admin::get_bar_preloader(), 
                     'outstanding_balance'   => LDNFT_Admin::get_bar_preloader(), 
@@ -331,7 +331,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
     
                 if( !empty( $subscription->renewals_discount ) && floatval( $subscription->renewals_discount ) > 0 ) {
                     if( strtolower( $subscription->renewals_discount_type ) == 'percentage' ) {
-                        $data[$count]['discount']  = ''.$subscription->renewals_discount.'% - (' .number_format( ( $subscription->renewals_discount*$subscription->total_gross ) / 100, 2 ).$subscription->currency.')';
+                        $data[$count]['discount']  = ''.$subscription->renewals_discount.'% - (' .number_format( ( $subscription->renewals_discount*$subscription->gross ) / 100, 2 ).$subscription->currency.')';
                     } else {
                         $data[$count]['discount']  = __( 'Fixed - ', LDNFT_TEXT_DOMAIN ).'('.$subscription->renewals_discount.$subscription->currency.')';
                     }
