@@ -93,12 +93,14 @@ $cron_status    = get_option('ldnft_run_cron_based_on_plugins');
         </table>
        
         <div class="submit-button" style="padding-top:10px">
+            <div id="ldnft-settings-import-mailpoet-message" style="display:none;" class="ldnft-settings-sync-data-message"></div>
             <?php wp_nonce_field( 'ldnft_nounce', 'ldnft_nounce_field' ); ?>
             <input type="hidden" name="action" value="ldnft_submit_action" />
             <input type="hidden" id="ldnft_api_scope" name="ldnft_settings[api_scope]" value="developer">
             <input type="submit" class="button button-primary ldnft-save-setting" name="ldnft_submit_form" value="<?php _e( 'Test & Save', LDNFT_TEXT_DOMAIN ); ?>">
-            <input type="button" class="button button-primary ldnft-sync-data-setting" name="ldnft_sync_data" value="<?php _e( 'Sync Data', LDNFT_TEXT_DOMAIN ); ?>">
-            <div id="ldnft-settings-import-mailpoet-message" style="display:none;" class="ldnft-settings-sync-data-message"></div>
+            <?php if( FS__API_CONNECTION ) { ?>
+                <input type="button" class="button button-primary ldnft-sync-data-setting" name="ldnft_sync_data" value="<?php _e( 'Sync Data', LDNFT_TEXT_DOMAIN ); ?>">
+            <?php } ?>
         </div>
     </form>
 </div>
