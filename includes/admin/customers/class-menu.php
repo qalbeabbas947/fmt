@@ -216,7 +216,7 @@ class LDNFT_Customers_Menu {
                                     <option value="0" <?php echo $selected_marketing=='0'?'selected':''; ?>><?php _e('Marketing Not Allowed', LDNFT_TEXT_DOMAIN);?></option>
                                 </select>
                                 <!-- <input type="text" value="<?php echo $search;?>" name="ldnft-customers-general-search" class="form-control ldnft-customers-general-search" placeholder="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>"> -->
-                                <input type="button" name="ldnft-customer-search-button" value="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>" class="btn button ldnft-customer-search-button" />
+                                <input type="button" name="ldnft-customer-search-button" value="<?php _e('Filter', LDNFT_TEXT_DOMAIN);?>" class="btn button ldnft-customer-search-button" />
                             </div>
                         </form>
                         <form id="ldnft-reviews-filter-text" method="post">
