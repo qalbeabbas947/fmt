@@ -188,21 +188,7 @@ class LDNFT_Sales extends WP_List_Table {
     public function get_sortable_columns() {
         
         $sortable_columns = array(
-            'id'                => array('id',false),     //true means it's already sorted
-            'plugin_title'      => array('plugin_title',false),
-            'user_id'           => array('user_id',false),
-            'username'          => array('username',false),
-            'useremail'         => array('useremail',false),
-            'subscription_id'   => array('subscription_id',false),
-            'gateway_fee'       => array('gateway_fee',false),
-            'gross'             => array('gross',false),
-            'gateway'           => array('gateway',false),
-            'license_id'        => array('license_id',false),
-            'gateway'           => array('gateway',false),
-            'country_code'      => array('country_code',false),
-            'created'           => array('created',false),
-            'is_renewal'        => array('is_renewal',false),
-            'type'              => array('type',false),
+            'created' => array('created',false),
         );
 
         return $sortable_columns;
