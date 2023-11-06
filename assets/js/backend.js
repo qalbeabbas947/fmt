@@ -16,7 +16,7 @@
                 $('.ldnft-settings-mailpoet').on('submit', LDNFTbackEnd.post_mailpoet_form);
                 $('.ldnft_check_load_next').on('click', LDNFTbackEnd.check_load_next);
                 $('.ldnft-sync-data-setting').on('click', LDNFTbackEnd.sync_data_from_freemius);
-                $('.ldfmt-plugins-subscription-filter').on('change', LDNFTbackEnd.subscription_plans_dropdown);
+                $('.ldfmt-plugins-subscription-filter').on('change', LDNFTbackEnd.subscription_plans_dropdown).trigger('change');
                 $('#ldnft_subscriptions_data').on('click', '.ldnft_subscribers_view_detail', LDNFTbackEnd.subscribers_view_detail);
                 $('#ldnft_sales_data').on('click', '.ldnft_sales_view_detail', LDNFTbackEnd.sales_view_detail);
                 $('.ldnft-admin-modal-close').on('click', LDNFTbackEnd.ldnft_subsciber_modal_close);
