@@ -217,8 +217,9 @@ class LDNFT_Reviews_Menu {
                 
                 <h2><?php _e( 'Reviews', LDNFT_TEXT_DOMAIN ); ?></h2>                
                 <!-- Forms are NOT created automatically, so you need to wrap the table in one to use features like bulk actions -->
-                <form id="ldnft-reviews-filter" method="get">
-					<div class="ldnft_filters_top">
+                
+                <div class="ldnft_filters_top">
+                    <form id="ldnft-reviews-filter" method="get">
 						<div class="alignleft actions bulkactions">
 							<span class="ldnft_filter_labels"><?php _e( 'Filters:', LDNFT_TEXT_DOMAIN ); ?></span>
 							<select name="ldfmt-plugins-filter" class="ldfmt-plugins-filter ldfmt-plugins-reviews-filter">
@@ -245,20 +246,26 @@ class LDNFT_Reviews_Menu {
                                 <option value="1" <?php echo $selected_featured=='1'?'selected':''; ?>><?php _e('Featured', LDNFT_TEXT_DOMAIN);?></option>
                                 <option value="0" <?php echo $selected_featured=='0'?'selected':''; ?>><?php _e('Not Featured', LDNFT_TEXT_DOMAIN);?></option>
                             </select>
-                            <input class="form-control" type="text" value = "<?php echo $search;?>" name = "ldnft-reviews-general-search" id = "ldnft-reviews-general-search" placeholder="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>">
-                            <input type="button" name="ldnft-reviews-search-button" value="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>" class="btn button ldnft-reviews-search-button" />
+                            <!-- <input class="form-control" type="text" value = "<?php echo $search;?>" name = "ldnft-reviews-general-search" id = "ldnft-reviews-general-search" placeholder="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>"> -->
+                            <input type="button" name="ldnft-reviews-search-button" value="<?php _e('Filter', LDNFT_TEXT_DOMAIN);?>" class="btn button ldnft-reviews-search-button" />
 						</div>
-		                <div id="ldnft_reviews_data">	
-							<!-- Now we can render the completed list table -->
-							<?php $testListTable->display() ?>
-						</div>
-					</div>	
-					<!-- For plugins, we also need to ensure that the form posts back to our current page -->
-                    <input type="hidden" class="ldnft-freemius-order" name="order" value="id" />
-                    <input type="hidden" class="ldnft-freemius-orderby" name="orderby" value="asc" />
-					<input type="hidden" class="ldnft-freemius-page" name="page" value="1" />
-					<input type="hidden" class="ldnft-script-freemius-type" name="ldnft-script-freemius-type" value="reviews" />
-                </form>
+                    </form>
+                    <form id="ldnft-reviews-filter-text" method="post">
+                        <input class="form-control" type="text" value = "<?php echo $search;?>" name = "ldnft-reviews-general-search" id = "ldnft-reviews-general-search" placeholder="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>">
+                        <input type="submit" name="ldnft-reviews-search-button-text" value="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>" class="btn button ldnft-reviews-search-button" />
+						 
+                    </form>
+                    <div id="ldnft_reviews_data">	
+                        <!-- Now we can render the completed list table -->
+                        <?php $testListTable->display() ?>
+                    </div>
+                </div>	
+                <!-- For plugins, we also need to ensure that the form posts back to our current page -->
+                <input type="hidden" class="ldnft-freemius-order" name="order" value="id" />
+                <input type="hidden" class="ldnft-freemius-orderby" name="orderby" value="asc" />
+                <input type="hidden" class="ldnft-freemius-page" name="page" value="1" />
+                <input type="hidden" class="ldnft-script-freemius-type" name="ldnft-script-freemius-type" value="reviews" />
+                
                 <div id="ldnft-admin-modal" class="ldnft-admin-modal">
 					<!-- Modal content -->
 					<div class="ldnft-admin-modal-content">

@@ -185,38 +185,44 @@ class LDNFT_Customers_Menu {
                 <h2><?php _e( 'Customers', LDNFT_TEXT_DOMAIN ); ?></h2>
                 
                 <!-- Forms are NOT created automatically, so you need to wrap the table in one to use features like bulk actions -->
-                <form id="ldnft-customer-filter" method="get">
+                
                     <div class="ldnft_filters_top">
-						<div class="alignleft actions bulkactions">
-							<span class="ldnft_filter_labels"><?php _e( 'Filters:', LDNFT_TEXT_DOMAIN ); ?></span>
-							<select name="ldfmt-plugins-filter" class="ldfmt-plugins-filter ldfmt-plugins-customers-filter" >
-                                <option value=""><?php echo __( 'All Plugin/Product', LDNFT_TEXT_DOMAIN );?></option>
-								<?php
-									foreach( $products as $plugin ) {
-										
-										$selected = '';
-										if( $selected_plugin_id == $plugin->id ) {
-											$selected = ' selected = "selected"';   
-										}
-										?>
-											<option value="<?php echo $plugin->id; ?>" <?php echo $selected; ?>><?php echo $plugin->title; ?></option>
-										<?php   
-									}
-								?>
-							</select>&nbsp;&nbsp;
-							<select name="ldfmt-plugins-status" class="ldfmt-plugins-customers-status">
-								<option value=""><?php _e('All Statuses', LDNFT_TEXT_DOMAIN);?></option>
-								<option value="1" <?php echo $selected_status=='1'?'selected':''; ?>><?php _e('Verified', LDNFT_TEXT_DOMAIN);?></option>
-								<option value="0" <?php echo $selected_status=='0'?'selected':''; ?>><?php _e('Unverified', LDNFT_TEXT_DOMAIN);?></option>
-							</select>
-                            <select name="ldfmt-plugins-marketing" class="ldfmt-plugins-customers-marketing">
-								<option value=""><?php _e('All Marketing', LDNFT_TEXT_DOMAIN);?></option>
-								<option value="1" <?php echo $selected_marketing=='1'?'selected':''; ?>><?php _e('Is Marketing Allowed', LDNFT_TEXT_DOMAIN);?></option>
-								<option value="0" <?php echo $selected_marketing=='0'?'selected':''; ?>><?php _e('Marketing Not Allowed', LDNFT_TEXT_DOMAIN);?></option>
-							</select>
+                        <form id="ldnft-customer-filter" method="get">
+                            <div class="alignleft actions bulkactions">
+                                <span class="ldnft_filter_labels"><?php _e( 'Filters:', LDNFT_TEXT_DOMAIN ); ?></span>
+                                <select name="ldfmt-plugins-filter" class="ldfmt-plugins-filter ldfmt-plugins-customers-filter" >
+                                    <option value=""><?php echo __( 'All Plugin/Product', LDNFT_TEXT_DOMAIN );?></option>
+                                    <?php
+                                        foreach( $products as $plugin ) {
+                                            
+                                            $selected = '';
+                                            if( $selected_plugin_id == $plugin->id ) {
+                                                $selected = ' selected = "selected"';   
+                                            }
+                                            ?>
+                                                <option value="<?php echo $plugin->id; ?>" <?php echo $selected; ?>><?php echo $plugin->title; ?></option>
+                                            <?php   
+                                        }
+                                    ?>
+                                </select>&nbsp;&nbsp;
+                                <select name="ldfmt-plugins-status" class="ldfmt-plugins-customers-status">
+                                    <option value=""><?php _e('All Statuses', LDNFT_TEXT_DOMAIN);?></option>
+                                    <option value="1" <?php echo $selected_status=='1'?'selected':''; ?>><?php _e('Verified', LDNFT_TEXT_DOMAIN);?></option>
+                                    <option value="0" <?php echo $selected_status=='0'?'selected':''; ?>><?php _e('Unverified', LDNFT_TEXT_DOMAIN);?></option>
+                                </select>
+                                <select name="ldfmt-plugins-marketing" class="ldfmt-plugins-customers-marketing">
+                                    <option value=""><?php _e('All Marketing', LDNFT_TEXT_DOMAIN);?></option>
+                                    <option value="1" <?php echo $selected_marketing=='1'?'selected':''; ?>><?php _e('Is Marketing Allowed', LDNFT_TEXT_DOMAIN);?></option>
+                                    <option value="0" <?php echo $selected_marketing=='0'?'selected':''; ?>><?php _e('Marketing Not Allowed', LDNFT_TEXT_DOMAIN);?></option>
+                                </select>
+                                <!-- <input type="text" value="<?php echo $search;?>" name="ldnft-customers-general-search" class="form-control ldnft-customers-general-search" placeholder="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>"> -->
+                                <input type="button" name="ldnft-customer-search-button" value="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>" class="btn button ldnft-customer-search-button" />
+                            </div>
+                        </form>
+                        <form id="ldnft-reviews-filter-text" method="post">
                             <input type="text" value="<?php echo $search;?>" name="ldnft-customers-general-search" class="form-control ldnft-customers-general-search" placeholder="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>">
-                            <input type="button" name="ldnft-customer-search-button" value="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>" class="btn button ldnft-customer-search-button" />
-						</div>
+                            <input type="submit" name="ldnft-customer-search-button-txt" value="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>" class="btn button ldnft-customer-search-button-txt" />
+                        </form>
                 		<div id="ldnft_customers_data">
 							<!-- Now we can render the completed list table -->
 							<?php $testListTable->display() ?>
