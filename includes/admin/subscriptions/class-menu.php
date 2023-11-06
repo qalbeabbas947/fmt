@@ -575,7 +575,7 @@ class LDNFT_Subscriptions_Menu {
                         
                     </div>
                     <div class="ldfmt-new-sales-box ldfmt-sales-box">
-                        <label><?php echo __('Total Sales Count', LDNFT_TEXT_DOMAIN);?></label>
+                        <label><?php echo __('Total Subscriptions', LDNFT_TEXT_DOMAIN);?></label>
                         <div class="ldnft_new_sales_count">
                             <span class="ldnft_subscription_new_sales_count"></span>
                             <?php echo LDNFT_Admin::get_bar_preloader("ldnft-subssummary-loader");?>
