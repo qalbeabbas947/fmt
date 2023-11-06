@@ -55,7 +55,6 @@ class LDNFT_Reviews extends WP_List_Table {
 
 		$this->plugins = LDNFT_Freemius::$products;
         $this->selected_plugin_id = ( isset( $_GET['ldfmt_plugins_filter'] ) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) ? intval( $_GET['ldfmt_plugins_filter'] ) : '';
-        
         $this->selected_featured   = isset( $_REQUEST['featured'] ) ? sanitize_text_field( $_REQUEST['featured'] ) : '';
         $this->selected_search     = isset( $_REQUEST['search'] ) ? sanitize_text_field( $_REQUEST['search'] ) : '';
         $this->selected_verified    = isset( $_REQUEST['verified'] ) ? sanitize_text_field( $_REQUEST['verified'] ) : '';
@@ -366,7 +365,7 @@ class LDNFT_Reviews extends WP_List_Table {
         }
 
         if( ! empty( $this->selected_search ) ) {
-            $where   .= ( ! empty( $where ) ? ' and ' : '' ). " ( r.id like '%".$this->selected_search."%' or r.user_id like '%".$this->selected_search."%' or r.title like '%".$this->selected_search."%' or r.name like '%".$this->selected_search."%' or c.email like '%".$this->selected_search."%' )";
+            $where   .= ( ! empty( $where ) ? ' and ' : '' ). " ( r.id like '%".$this->selected_search."%' or r.user_id like '%".$this->selected_search."%' or r.title like '%".$this->selected_search."%' or r.name like '%".$this->selected_search."%' or c.email like '%".$this->selected_search."%' or r.text like '%".$this->selected_search."%'  )";
         }
 
         $total_items = $wpdb->get_var("SELECT COUNT(r.id) FROM $table_name".$where);

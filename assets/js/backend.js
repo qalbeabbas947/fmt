@@ -1,7 +1,8 @@
 (function( $ ) { 'use strict';
     $( document ).ready( function() {
-        var LDNFTbackEnd = {
+        var LDNFTbackEnd = { 
             ajax_url_new: ajaxurl,
+            display_subscriptions_type: 'filter',
             init: function() {
                 LDNFTbackEnd.hooks();
                 LDNFTbackEnd.listing_pages();
@@ -56,6 +57,7 @@
                 if( script_type == 'subscribers' ) {
                     //$('.ldfmt-subscription-country-filter, .ldfmt-subscription-interval-filter, .ldfmt-subscription-plan_id-filter, .ldfmt-plugins-subscription-filter').on('change', LDNFTbackEnd.display_subscriptions_plus_summary);
                     $('.ldnft-subscription-search-button').on('click', LDNFTbackEnd.display_subscriptions_plus_summary);
+                    $('#ldnft-subscription-filter-form-text').on('submit', LDNFTbackEnd.display_subscriptions_plus_summary_submit);
                     $('#ldnft_subscriptions_data').on('click', '.tablenav-pages a, th a', LDNFTbackEnd.display_new_page_subscriptions);
                     LDNFTbackEnd.display_subscriptions_plus_summary();					
                 } else if( script_type == 'sales' ) { 
@@ -518,15 +520,27 @@
              * Show subscription summary
              */
             display_subscriptions_plus_summary: function() {
+                LDNFTbackEnd.display_subscriptions_type = 'filter';
                 var page = $('.ldnft-freemius-page').val($(this).data('paged'));
                 LDNFTbackEnd.display_subscriptions();
                 LDNFTbackEnd.load_subscription_summary();
             },
             /**
+             * Show subscription summary
+             */
+            display_subscriptions_plus_summary_submit: function( e ) {
+                e.preventDefault();
+                LDNFTbackEnd.display_subscriptions_type = 'text';
+                var page = $('.ldnft-freemius-page').val($(this).data('paged'));
+                LDNFTbackEnd.display_subscriptions();
+                LDNFTbackEnd.load_subscription_summary();
+            },
+            
+            /**
              * Display the subscriptions data based on ajax calls
              */
             display_subscriptions: function() {
-                
+                console.log(LDNFTbackEnd.display_subscriptions_type);
                 var columns_count = $('#ldnft_subscriptions_data table thead tr:eq(0)').find('th:not(.hidden)').length; 
                 var placeholder = '<tr>';
                 for( var i = 0; i < columns_count; i++ ) {
@@ -536,14 +550,26 @@
                 $('#ldnft_subscriptions_data table tbody').html( placeholder );
                
                 var ldnftpage       = $('.ldnft-freemius-page').val();
-                var ldnftplugin     = $('.ldfmt-plugins-filter').val();
-                var ldnftinterval   = $('.ldfmt-subscription-interval-filter').val();
-                var ldnftcountry     = $('.ldfmt-subscription-country-filter').val();
-                var ldnftplan_id    = $('.ldfmt-subscription-plan_id-filter').val();
-                var order_str       = $('.ldnft-freemius-order').val();
-                var orderby_str     = $('.ldnft-freemius-orderby').val();
-                var gateway_str     = $('.ldfmt-subscription-gateway-filter').val();
-                var search_str      = $('.ldnft-subscription-general-search').val();
+                if( LDNFTbackEnd.display_subscriptions_type == 'filter' ) {
+                    var ldnftplugin     = $('.ldfmt-plugins-filter').val();
+                    var ldnftinterval   = $('.ldfmt-subscription-interval-filter').val();
+                    var ldnftcountry     = $('.ldfmt-subscription-country-filter').val();
+                    var ldnftplan_id    = $('.ldfmt-subscription-plan_id-filter').val();
+                    var order_str       = $('.ldnft-freemius-order').val();
+                    var orderby_str     = $('.ldnft-freemius-orderby').val();
+                    var gateway_str     = $('.ldfmt-subscription-gateway-filter').val();
+                    var search_str      = '';
+                } else {
+                    var ldnftplugin     = '';
+                    var ldnftinterval   = '';
+                    var ldnftcountry     = '';
+                    var ldnftplan_id    = '';
+                    var order_str       = $('.ldnft-freemius-order').val();
+                    var orderby_str     = $('.ldnft-freemius-orderby').val();
+                    var gateway_str     = '';
+                    var search_str      = $('.ldnft-subscription-general-search').val();
+                }
+                
                 $.ajax({
 
                     url: ajaxurl,

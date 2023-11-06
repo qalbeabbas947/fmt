@@ -357,6 +357,9 @@
 .setting-table-wrapper .ldnft-table-content {
     line-height: 3;
 }
+#ldnft-subscription-filter-form-text{
+    float:right;
+}
 .select2-container{
     width:150px;
 }

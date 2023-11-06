@@ -205,12 +205,12 @@ class LDNFT_Customers_Menu {
 								?>
 							</select>&nbsp;&nbsp;
 							<select name="ldfmt-plugins-status" class="ldfmt-plugins-customers-status">
-								<option value=""><?php _e('Filter by status', LDNFT_TEXT_DOMAIN);?></option>
+								<option value=""><?php _e('All Statuses', LDNFT_TEXT_DOMAIN);?></option>
 								<option value="1" <?php echo $selected_status=='1'?'selected':''; ?>><?php _e('Verified', LDNFT_TEXT_DOMAIN);?></option>
 								<option value="0" <?php echo $selected_status=='0'?'selected':''; ?>><?php _e('Unverified', LDNFT_TEXT_DOMAIN);?></option>
 							</select>
                             <select name="ldfmt-plugins-marketing" class="ldfmt-plugins-customers-marketing">
-								<option value=""><?php _e('Filter by Marketing', LDNFT_TEXT_DOMAIN);?></option>
+								<option value=""><?php _e('All Marketing', LDNFT_TEXT_DOMAIN);?></option>
 								<option value="1" <?php echo $selected_marketing=='1'?'selected':''; ?>><?php _e('Is Marketing Allowed', LDNFT_TEXT_DOMAIN);?></option>
 								<option value="0" <?php echo $selected_marketing=='0'?'selected':''; ?>><?php _e('Marketing Not Allowed', LDNFT_TEXT_DOMAIN);?></option>
 							</select>
