@@ -85,8 +85,8 @@
                     LDNFTbackEnd.display_reviews();
                 }
 
-                $('.ldfmt-sales-country-filter').select2({minimumInputLength: 3, allowClear: true, width: '150px'});
-                $('.ldfmt-subscription-country-filter').select2({minimumInputLength: 3, allowClear: true, width: '150px'});
+                $('.ldfmt-sales-country-filter').select2({minimumInputLength: 3, allowClear: true, width: '150px', placeholder: "Select a Country"});
+                $('.ldfmt-subscription-country-filter').select2({minimumInputLength: 3, allowClear: true, width: '150px', placeholder: "Select a Country"});
             },
             import_cron_status: function() {
                 
