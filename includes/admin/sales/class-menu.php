@@ -311,57 +311,59 @@ class LDNFT_Sales_Menu {
         $testListTable->prepare_items();
         ?>
             <div class="wrap">
-                <form id="ldnft-sales-filter" method="get">
+                
                     
                     <div class="ldnft_filters_top">
-                        <div class="alignleft actions bulkactions">
-                            <h2><?php _e( 'Sales', LDNFT_TEXT_DOMAIN ); ?></h2>
-                            <select name="ldfmt-plugins-filter" class="ldfmt-plugins-filter ldfmt-plugins-sales-filter">
-                                <option value=""><?php echo __( 'All Plugin/Product', LDNFT_TEXT_DOMAIN );?></option>
-                                <?php
-                                    foreach( $products as $plugin )  {
-                                        
-                                        $selected = '';
-                                        if( $selected_plugin_id == $plugin->id ) {
-                                            $selected = ' selected = "selected"';   
+                        <form id="ldnft-sales-filter" method="get">
+                            <div class="alignleft actions bulkactions">
+                                <h2><?php _e( 'Sales', LDNFT_TEXT_DOMAIN ); ?></h2>
+                                <select name="ldfmt-plugins-filter" class="ldfmt-plugins-filter ldfmt-plugins-sales-filter">
+                                    <option value=""><?php echo __( 'All Plugin/Product', LDNFT_TEXT_DOMAIN );?></option>
+                                    <?php
+                                        foreach( $products as $plugin )  {
+                                            
+                                            $selected = '';
+                                            if( $selected_plugin_id == $plugin->id ) {
+                                                $selected = ' selected = "selected"';   
+                                            }
+                                            ?>
+                                                <option value="<?php echo $plugin->id; ?>" <?php echo $selected; ?>><?php echo $plugin->title; ?></option>
+                                            <?php   
                                         }
-                                        ?>
-                                            <option value="<?php echo $plugin->id; ?>" <?php echo $selected; ?>><?php echo $plugin->title; ?></option>
-                                        <?php   
-                                    }
-                                ?>
-                            </select>
-                            <select name="ldfmt-sales-interval-filter" class="ldfmt-sales-interval-filter">
-                                <option value=""><?php echo __( 'All Time', LDNFT_TEXT_DOMAIN );?></option>
-                                <option value="today" <?php echo $selected_interval=='today'?'selected':'';?>><?php echo __( 'Today', LDNFT_TEXT_DOMAIN );?></option>
-                                <option value="current_week" <?php echo $selected_interval=='current_week'?'selected':'';?>><?php echo __( 'Current Week', LDNFT_TEXT_DOMAIN );?></option>
-                                <option value="last_week" <?php echo $selected_interval=='last_week'?'selected':'';?>><?php echo __( 'Last Week', LDNFT_TEXT_DOMAIN );?></option>
-                                <option value="current_month" <?php echo $selected_interval=='current_month'?'selected':'';?>><?php echo __( 'Current Month', LDNFT_TEXT_DOMAIN );?></option>
-                                <option value="last_month" <?php echo $selected_interval=='last_month'?'selected':'';?>><?php echo __( 'Last Month', LDNFT_TEXT_DOMAIN );?></option>
-                            </select>
-                            <select name="ldfmt-sales-filter" class="ldfmt-sales-filter">
-                                <option value="all"><?php echo __( 'All Status', LDNFT_TEXT_DOMAIN );?></option>
-                                <option value="not_refunded" <?php echo $selected_filter=='not_refunded'?'selected':'';?>><?php echo __( 'Active', LDNFT_TEXT_DOMAIN );?></option>
-                                <option value="refunds" <?php echo $selected_filter=='refunds'?'selected':'';?>><?php echo __( 'Refunds', LDNFT_TEXT_DOMAIN );?></option>
-                                <!-- <option value="chargeback" <?php echo $selected_filter=='chargeback'?'selected':'';?>><?php echo __( 'Chargeback', LDNFT_TEXT_DOMAIN );?></option>
-                                <option value="lost_dispute" <?php echo $selected_filter=='lost_dispute'?'selected':'';?>><?php echo __( 'Lost Dispute', LDNFT_TEXT_DOMAIN );?></option> -->
-                            </select>
-                            <select name="ldnft-sales-payment-types" class="ldnft-sales-payment-types">
-                                <option value=""><?php echo __( 'Paymet Types', LDNFT_TEXT_DOMAIN );?></option>
-                                <option value="0" <?php echo $selected_filter == 'new'?'selected':'';?>><?php echo __( 'New Sales', LDNFT_TEXT_DOMAIN );?></option>
-                                <option value="1" <?php echo $selected_filter == 'renewal'?'selected':'';?>><?php echo __( 'Renewal', LDNFT_TEXT_DOMAIN );?></option>
-                            </select>
-                            <select name="ldfmt-sales-country-filter" class="ldfmt-sales-country-filter">
-                                <option value=""><?php echo __( 'All Countries', LDNFT_TEXT_DOMAIN );?></option>
-                                <?php $countries = LDNFT_Freemius::get_country_name_by_code( 'list' ); 
-                                    foreach( $countries as $key=>$value ) {
-                                ?>
-                                    <option value="<?php echo $key;?>" <?php echo $selected_country==$key?'selected':'';?>><?php echo $value;?></option>
-                                <?php } ?>
-                            </select>
-                            <input type="text" value="<?php echo $search;?>" name="ldnft-sales-general-search" class="form-control ldnft-sales-general-search" placeholder="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>">
-                            <input type="button" name="ldnft-sales-search-button" value="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>" class="btn button ldnft-sales-search-button" />
-                        </div>
+                                    ?>
+                                </select>
+                                <select name="ldfmt-sales-interval-filter" class="ldfmt-sales-interval-filter">
+                                    <option value=""><?php echo __( 'All Time', LDNFT_TEXT_DOMAIN );?></option>
+                                    <option value="today" <?php echo $selected_interval=='today'?'selected':'';?>><?php echo __( 'Today', LDNFT_TEXT_DOMAIN );?></option>
+                                    <option value="current_week" <?php echo $selected_interval=='current_week'?'selected':'';?>><?php echo __( 'Current Week', LDNFT_TEXT_DOMAIN );?></option>
+                                    <option value="last_week" <?php echo $selected_interval=='last_week'?'selected':'';?>><?php echo __( 'Last Week', LDNFT_TEXT_DOMAIN );?></option>
+                                    <option value="current_month" <?php echo $selected_interval=='current_month'?'selected':'';?>><?php echo __( 'Current Month', LDNFT_TEXT_DOMAIN );?></option>
+                                    <option value="last_month" <?php echo $selected_interval=='last_month'?'selected':'';?>><?php echo __( 'Last Month', LDNFT_TEXT_DOMAIN );?></option>
+                                </select>
+                                <select name="ldfmt-sales-filter" class="ldfmt-sales-filter">
+                                    <option value="all"><?php echo __( 'All Status', LDNFT_TEXT_DOMAIN );?></option>
+                                    <option value="not_refunded" <?php echo $selected_filter=='not_refunded'?'selected':'';?>><?php echo __( 'Active', LDNFT_TEXT_DOMAIN );?></option>
+                                    <option value="refunds" <?php echo $selected_filter=='refunds'?'selected':'';?>><?php echo __( 'Refunds', LDNFT_TEXT_DOMAIN );?></option>
+                                    <!-- <option value="chargeback" <?php echo $selected_filter=='chargeback'?'selected':'';?>><?php echo __( 'Chargeback', LDNFT_TEXT_DOMAIN );?></option>
+                                    <option value="lost_dispute" <?php echo $selected_filter=='lost_dispute'?'selected':'';?>><?php echo __( 'Lost Dispute', LDNFT_TEXT_DOMAIN );?></option> -->
+                                </select>
+                                <select name="ldnft-sales-payment-types" class="ldnft-sales-payment-types">
+                                    <option value=""><?php echo __( 'Paymet Types', LDNFT_TEXT_DOMAIN );?></option>
+                                    <option value="0" <?php echo $selected_filter == 'new'?'selected':'';?>><?php echo __( 'New Sales', LDNFT_TEXT_DOMAIN );?></option>
+                                    <option value="1" <?php echo $selected_filter == 'renewal'?'selected':'';?>><?php echo __( 'Renewal', LDNFT_TEXT_DOMAIN );?></option>
+                                </select>
+                                <select name="ldfmt-sales-country-filter" class="ldfmt-sales-country-filter">
+                                    <option value=""><?php echo __( 'All Countries', LDNFT_TEXT_DOMAIN );?></option>
+                                    <?php $countries = LDNFT_Freemius::get_country_name_by_code( 'list' ); 
+                                        foreach( $countries as $key=>$value ) {
+                                    ?>
+                                        <option value="<?php echo $key;?>" <?php echo $selected_country==$key?'selected':'';?>><?php echo $value;?></option>
+                                    <?php } ?>
+                                </select>
+                                <!-- <input type="text" value="<?php echo $search;?>" name="ldnft-sales-general-search" class="form-control ldnft-sales-general-search" placeholder="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>"> -->
+                                <input type="button" name="ldnft-sales-search-button" value="<?php _e('Filter', LDNFT_TEXT_DOMAIN);?>" class="btn button ldnft-sales-search-button" />
+                            </div>
+                        </form>
                         <div style="clear:both">&nbsp;</div> 
                         <div class="ldfmt-sales-upper-info">
                             <div class="ldfmt-gross-sales-box ldfmt-sales-box">
@@ -494,6 +496,10 @@ class LDNFT_Sales_Menu {
 								</div>
                             </div>
                         </div>
+                        <form id="ldnft-sales-filter-text" method="post">
+                            <input type="text" value="<?php echo $search;?>" name="ldnft-sales-general-search" class="form-control ldnft-sales-general-search" placeholder="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>">
+                            <input type="submit" name="ldnft-sales-search-button-text" value="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>" class="btn button ldnft-sales-search-button-text" />                              
+                        </form>
                     </div>
                     <!-- Forms are NOT created automatically, so you need to wrap the table in one to use features like bulk actions -->
                     
