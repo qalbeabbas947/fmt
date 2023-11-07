@@ -397,7 +397,7 @@ class LDNFT_Sales extends WP_List_Table {
         }
 
         if( ! empty( $this->selected_search ) ) {
-            $where   .= " and ( t.license_id like '%".$this->selected_search."%' or t.user_id like '%".$this->selected_search."%' or t.id like '%".$this->selected_search."%' or c.first like '%".$this->selected_search."%' or c.last like '%".$this->selected_search."%' or c.email like '%".$this->selected_search."%' )";
+            $where   .= " and ( t.license_id like '%".$this->selected_search."%' or t.user_id like '%".$this->selected_search."%' or t.id like '%".$this->selected_search."%' or lower(c.first) like '%".strtolower($this->selected_search)."%' or lower(c.last) like '%".strtolower($this->selected_search)."%' or lower(c.email) like '%".strtolower($this->selected_search)."%' )";
         }
 
         $total_items = $wpdb->get_var("SELECT COUNT(t.id) FROM $table_name".$where.$where_interval);

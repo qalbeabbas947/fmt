@@ -358,7 +358,7 @@ class LDNFT_Customers extends WP_List_Table {
         $where .= $this->selected_marketing != ''? " and c.is_marketing_allowed='".$this->selected_marketing."' " : '';
 
         if( ! empty( $this->selected_search )) {
-            $where   .= " and ( c.id like '%".$this->selected_search."%' or c.email like '%".$this->selected_search."%' or c.first like '%".$this->selected_search."%' or c.last like '%".$this->selected_search."%' )";
+            $where   .= " and ( c.id like '%".$this->selected_search."%' or lower(c.email) like '%".strtolower($this->selected_search)."%' or lower(c.first) like '%".strtolower($this->selected_search)."%' or lower(c.last) like '%".strtolower($this->selected_search)."%' )";
         }
         
         $total_items = $wpdb->get_var("SELECT COUNT(c.id) FROM $table_name".$where);

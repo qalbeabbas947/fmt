@@ -246,9 +246,6 @@ class LDNFT_Subscriptions_Menu {
      */
      public function ldnft_subscriptions_summary_callback() {
         
-        ini_set('display_errors', 1);
-        error_reporting(E_ALL);
-
         global $wpdb;
         
         $selected_plugin_id = 0;
@@ -294,7 +291,7 @@ class LDNFT_Subscriptions_Menu {
         $where .= $_GET['gateway'] != ''? " and t.gateway='".sanitize_text_field( $_GET['gateway'] )."' " : '';
         $search = sanitize_text_field( $_GET['search'] );
         if( ! empty( $search )) {
-            $where   .= " and ( t.id like '%".$search."%' or t.user_id like '%".$search."%' or c.email like '%".$search."%' or c.first like '%".$search."%' or c.last like '%".$search."%' )";
+            $where   .= " and ( t.id like '%".$search."%' or t.user_id like '%".$search."%' or lower(c.email) like '%".strtolower($search)."%' or lower(c.first) like '%".strtolower($search)."%' or lower(c.last) like '%".strtolower($search)."%' )";
         }
 
         $result = $wpdb->get_results( "SELECT t.* FROM $table_name $where");
@@ -338,7 +335,7 @@ class LDNFT_Subscriptions_Menu {
 
                 $country_gross = [];
                 foreach( $currency_keys as $key ) {
-                    $currency_where = " and t.currency='".$key."'";
+                    $currency_where = " and t.currency='".$key."' and t.country_code='".$rec->country_code."'";
                     $country_gross[$key] = $wpdb->get_var( "select sum(gross) as gross from $table_name $where $currency_where limit 1" );
                     $country_gross[$key] = number_format( $country_gross[ $key ], 2 );
                 }

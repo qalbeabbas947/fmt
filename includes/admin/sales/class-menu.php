@@ -91,7 +91,7 @@ class LDNFT_Sales_Menu {
         }
 
         if( ! empty( $selected_search ) ) {
-            $where   .= " and ( t.license_id like '%".$selected_search."%' or t.user_id like '%".$selected_search."%' or t.id like '%".$selected_search."%' or c.first like '%".$this->selected_search."%' or c.last like '%".$this->selected_search."%' or c.email like '%".$selected_search."%' )";
+            $where   .= " and ( t.license_id like '%".$selected_search."%' or t.user_id like '%".$selected_search."%' or t.id like '%".$selected_search."%' or lower(c.first) like '%".strtolower($this->selected_search)."%' or lower(c.last) like '%".strtolower($this->selected_search)."%' or lower(c.email) like '%".strtolower($selected_search)."%' )";
         }
 
         if( $selected_status != 'all' ) {
@@ -180,7 +180,7 @@ class LDNFT_Sales_Menu {
             foreach( $records as $rec ) {
                 $country_gross = [];
                 foreach( $currency_keys as $key ) {
-                    $currency_where = " and t.currency='".$key."'";
+                    $currency_where = " and t.currency='".$key."' and t.country_code='".$rec->country_code."'";
                     $country_gross[$key] = $wpdb->get_var( "select sum(gross) as gross from $table_name $where $where_interval $currency_where limit 1" );
                     $country_gross[$key] = number_format( $country_gross[ $key ], 2 );
                 }
