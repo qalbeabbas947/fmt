@@ -237,12 +237,12 @@ class LDNFT_Reviews_Menu {
 								?>
 							</select>
                             <select name="ldfmt-plugins-status" class="ldfmt-plugins-reviews-verified">
-								<option value=""><?php _e('All Verified', LDNFT_TEXT_DOMAIN);?></option>
+								<option value=""><?php _e('All', LDNFT_TEXT_DOMAIN);?></option>
 								<option value="1" <?php echo $selected_verified=='1'?'selected':''; ?>><?php _e('Verified', LDNFT_TEXT_DOMAIN);?></option>
 								<option value="0" <?php echo $selected_verified=='0'?'selected':''; ?>><?php _e('Unverified', LDNFT_TEXT_DOMAIN);?></option>
 							</select>
                             <select name="ldfmt-plugins-featured" class="ldfmt-plugins-reviews-featured">
-                                <option value=""><?php _e('All Featured', LDNFT_TEXT_DOMAIN);?></option>
+                                <option value=""><?php _e('All', LDNFT_TEXT_DOMAIN);?></option>
                                 <option value="1" <?php echo $selected_featured=='1'?'selected':''; ?>><?php _e('Featured', LDNFT_TEXT_DOMAIN);?></option>
                                 <option value="0" <?php echo $selected_featured=='0'?'selected':''; ?>><?php _e('Not Featured', LDNFT_TEXT_DOMAIN);?></option>
                             </select>
