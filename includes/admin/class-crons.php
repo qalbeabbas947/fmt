@@ -16,13 +16,13 @@ class LDNFT_Crons_Settings {
         
         //import data via cron work
         add_action( 'wp_ajax_ldnft_check_cron_status',          [ $this, 'check_cron_status' ], 100 );
-        add_action( 'ldnft_process_freemius_customers_data', [ $this, 'ldnft_process_freemius_customers' ], 10, 3 );
-        add_action( 'ldnft_process_freemius_plugins_data', [ $this, 'ldnft_process_freemius_plugins' ], 10, 2 );
-        add_action( 'ldnft_process_freemius_sales_data', [ $this, 'process_freemius_sales' ], 10, 3 );
+        add_action( 'ldnft_process_freemius_customers_data',    [ $this, 'ldnft_process_freemius_customers' ], 10, 3 );
+        add_action( 'ldnft_process_freemius_plugins_data',      [ $this, 'ldnft_process_freemius_plugins' ], 10, 2 );
+        add_action( 'ldnft_process_freemius_sales_data',        [ $this, 'process_freemius_sales' ], 10, 3 );
         add_action( 'ldnft_process_freemius_subscription_data', [ $this, 'process_freemius_subscription' ], 10, 3 );
-        add_action( 'ldnft_process_freemius_reviews_data', [ $this, 'process_freemius_reviews' ], 10, 3 );
-        add_action( 'wp_ajax_ldnft_run_freemius_import', [ $this, 'run_freemius_import' ], 10, 0 );
-
+        add_action( 'ldnft_process_freemius_reviews_data',      [ $this, 'process_freemius_reviews' ], 10, 3 );
+        add_action( 'wp_ajax_ldnft_run_freemius_import',        [ $this, 'run_freemius_import' ], 10, 0 );
+        
         if( FS__API_CONNECTION  ) {
 
             $cron_status    = get_option( 'ldnft_run_cron_based_on_plugins' );
@@ -183,16 +183,24 @@ class LDNFT_Crons_Settings {
                 `external_id` varchar(50) DEFAULT NULL,
                 `gateway` varchar(50) DEFAULT NULL,
                 `coupon_id` int(11) DEFAULT NULL,
+                `pricing_id` int(11) DEFAULT NULL,
+                `vat_id` int(11) DEFAULT NULL,
+                `environment` int(11) DEFAULT NULL,
                 `country_code` varchar(3) DEFAULT NULL,
                 `bound_payment_id` int(11) DEFAULT NULL,
+                `source` int(11) DEFAULT NULL,
                 `created` datetime DEFAULT NULL,
                 `updated` datetime DEFAULT NULL,
                 `vat` float DEFAULT NULL,
-                `is_renewal` tinyint(1) NOT NULL,
-                `type` varchar(15) NOT NULL,
+                `is_renewal` tinyint(1) DEFAULT NULL,
+                `type` varchar(15) DEFAULT NULL,
+                `ip` varchar(15) DEFAULT NULL,
+                `zip_postal_code` varchar(10) DEFAULT NULL,
+                `currency` varchar(3) DEFAULT NULL,
                 `license_id` int(11) DEFAULT NULL
             )" );     
         }
+        
         
         $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
         $inserted = 0;
@@ -222,6 +230,14 @@ class LDNFT_Crons_Settings {
             $coupon_id = $payment->coupon_id; 
             $created = $payment->created; 
             $updated = $payment->updated; 
+        
+            $ip = $payment->ip; 
+            $pricing_id = $payment->pricing_id; 
+            $zip_postal_code = $payment->zip_postal_code; 
+            $vat_id = $payment->vat_id; 
+            $source = $payment->source; 
+            $environment = $payment->environment; 
+            $currency = $payment->currency; 
             
             $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_name." where id=%d", $id ));
             if( count( $res ) == 0 ) {
@@ -229,6 +245,12 @@ class LDNFT_Crons_Settings {
                     $table_name,
                     array(
                         'id'                        => $id,
+                        'ip'                        => $ip,
+                        'pricing_id'                => $pricing_id,
+                        'zip_postal_code'           => $zip_postal_code,
+                        'source'                    => $source,
+                        'environment'               => $environment,
+                        'currency'                  => $currency,
                         'plugin_id'                 => $plugin_id,
                         'user_id'                   => $user_id,
                         'country_code'              => $country_code,
@@ -254,6 +276,12 @@ class LDNFT_Crons_Settings {
                 $wpdb->update($table_name, 
                     array(
                         'id'                        => $id,
+                        'ip'                        => $ip,
+                        'pricing_id'                => $pricing_id,
+                        'zip_postal_code'           => $zip_postal_code,
+                        'source'                    => $source,
+                        'environment'               => $environment,
+                        'currency'                  => $currency,
                         'plugin_id'                 => $plugin_id,
                         'user_id'                   => $user_id,
                         'country_code'              => $country_code,
@@ -1003,7 +1031,8 @@ class LDNFT_Crons_Settings {
             $wpdb->query( "CREATE TABLE $meta_table_name (
                 `plugin_id` int(11) NOT NULL,
                 `customer_id` int(11) NOT NULL,
-                `status` varchar(20) DEFAULT NULL
+                `status` varchar(20) DEFAULT NULL,
+                `created` datetime DEFAULT NULL
             )" );     
         }
         
@@ -1035,6 +1064,7 @@ class LDNFT_Crons_Settings {
                         array(
                             'plugin_id'               => $plugin_id,
                             'customer_id'             => $user->id,
+                            'created'                 => $user->created,
                             'status'                  => ''
                         )
                     );
@@ -1058,6 +1088,7 @@ class LDNFT_Crons_Settings {
                             array(
                                 'plugin_id'               => $plugin_id,
                                 'customer_id'             => $user->id,
+                                'created'                 => $user->created,
                                 'status'                  => ''
                             )
                         );
