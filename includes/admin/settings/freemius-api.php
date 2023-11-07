@@ -53,7 +53,29 @@ $cron_status    = get_option('ldnft_run_cron_based_on_plugins');
                         </p>
                     </td>    
                 </tr>
-                <?php if( $cron_status != 'complete' && FS__API_CONNECTION ) { ?>
+                <?php 
+                $fs_connection  = get_option( 'ldnft__freemius_connected' ) == 'yes'? true : false;
+                if( ! $fs_connection ) {
+                    $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
+                    try {
+                        $products = $api->Api('plugins.json?fields=id,title', 'GET', []);
+                        update_option( 'ldnft__HAS_PLUGINS', 'no' );
+                        if( ! isset( $products->error )  ) {
+                
+                            update_option( 'ldnft__freemius_connected', 'yes' );
+                            $fs_connection = true;
+                            if( is_array( $products->plugins ) && count( $products->plugins ) > 0 ) {
+                                update_option( 'ldnft__HAS_PLUGINS', 'yes' );
+                            }
+                        } else {
+                            update_option( 'ldnft__freemius_connected', 'no' );
+                        }
+                    } catch( Exception $e ) {
+                        update_option( 'ldnft__freemius_connected', 'no' );    
+                    }
+                }
+                
+                if( $cron_status != 'complete' && $fs_connection ) { ?>
                     <tr> 
                         <td colspan="2" class="ldnft-process-freemius-data-info">
                             <div class="ldnft-process-freemius-data-plugins" style="display:none">
@@ -98,7 +120,10 @@ $cron_status    = get_option('ldnft_run_cron_based_on_plugins');
             <input type="hidden" name="action" value="ldnft_submit_action" />
             <input type="hidden" id="ldnft_api_scope" name="ldnft_settings[api_scope]" value="developer">
             <input type="submit" class="button button-primary ldnft-save-setting" name="ldnft_submit_form" value="<?php _e( 'Test & Save', LDNFT_TEXT_DOMAIN ); ?>">
-            <?php if( FS__API_CONNECTION ) { ?>
+            <?php 
+                
+                
+                if( $fs_connection ) { ?>
                 <input type="button" class="button button-primary ldnft-sync-data-setting" name="ldnft_sync_data" value="<?php _e( 'Sync Data', LDNFT_TEXT_DOMAIN ); ?>">
             <?php } ?>
         </div>
