@@ -246,6 +246,9 @@ class LDNFT_Subscriptions_Menu {
      */
      public function ldnft_subscriptions_summary_callback() {
         
+        ini_set('display_errors', 1);
+        error_reporting(E_ALL);
+
         global $wpdb;
         
         $selected_plugin_id = 0;
@@ -295,9 +298,9 @@ class LDNFT_Subscriptions_Menu {
         }
 
         $result = $wpdb->get_results( "SELECT t.* FROM $table_name $where");
-        $gross_total = 0; 
+        $gross_total = []; 
         $gross_total_count = 0;
-        $tax_rate_total = 0;
+        $tax_rate_total = [];
         $total_number_of_sales = 0;
         $failed_payments = 0;
         
@@ -309,34 +312,56 @@ class LDNFT_Subscriptions_Menu {
         if( isset($result) && isset($result) ) {
             foreach( $result as $obj ) {
                 $gross_total_count++;
-                $gross_total += $obj->gross;
-                $tax_rate_total += $obj->tax_rate;
+                if( ! array_key_exists( $obj->currency, $gross_total ) ) {
+                    $gross_total[ $obj->currency ] = 0;    
+                }
+
+                $gross_total[ $obj->currency ] = number_format( floatval( $gross_total[ $obj->currency ] ) + floatval($obj->gross), 2);
+
+                if( ! array_key_exists( $obj->currency, $tax_rate_total ) ) {
+                    $tax_rate_total[ $obj->currency ] = 0;    
+                }
+                $tax_rate_total[ $obj->currency ] = number_format( floatval( $tax_rate_total[ $obj->currency ] ) + floatval($obj->tax_rate), 2);
+
+                // $gross_total += $obj->gross;
+                // $tax_rate_total += $obj->tax_rate;
                 $total_number_of_sales++;
                 $failed_payments += $obj->failed_payments;
             }
         }
-
-        $records = $wpdb->get_results( "select country_code, sum(gross) as gross from $table_name $where group by country_code order by gross desc limit 3" );
+        
         $countries = [];
-        foreach( $records as $rec ) {
-            $countries[] = [
-                'country_code' => $rec->country_code,
-                'gross' => number_format($rec->gross, 2),
-                'country_name' => LDNFT_Freemius::get_country_name_by_code( strtoupper( $rec->country_code ) )
-            ];
-        }
+        $currency_keys = array_keys($gross_total);
+        if( is_array( $currency_keys ) && count( $currency_keys ) > 0 ) {
+            $records = $wpdb->get_results( "select country_code, sum(gross) as gross, currency from $table_name $where group by country_code order by gross desc limit 3" );
+            foreach( $records as $rec ) {
 
+                $country_gross = [];
+                foreach( $currency_keys as $key ) {
+                    $currency_where = " and t.currency='".$key."'";
+                    $country_gross[$key] = $wpdb->get_var( "select sum(gross) as gross from $table_name $where $currency_where limit 1" );
+                    $country_gross[$key] = number_format( $country_gross[ $key ], 2 );
+                }
+
+                $countries[] = [
+                    'country_code' => $rec->country_code,
+                    'gross' => $country_gross,
+                    'country_name' => LDNFT_Freemius::get_country_name_by_code( strtoupper( $rec->country_code ) )
+                ];
+            }
+        }
         $data = [
             'gross_total_count' => $gross_total_count,
-            'gross_total' => number_format($gross_total, 2),
-            'tax_rate_total' => number_format($tax_rate_total, 2),
+            'gross_total' => $gross_total,
+            'tax_rate_total' => $tax_rate_total,
             'total_number_of_sales' => $total_number_of_sales,
             'total_new_subscriptions' => $total_new_subscriptions,
             'total_new_subscriptions_amount' => number_format($total_new_subscriptions_amount, 2),
             'total_new_renewals_amount' => number_format($total_new_renewals_amount, 2),
             'failed_payments'       => $failed_payments,
             'total_new_renewals'    => $total_new_renewals,
-            'countries' => $countries
+            'countries' => $countries,
+            'currency_keys' => $currency_keys
         ];
         
         die(

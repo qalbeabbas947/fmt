@@ -1,20 +1,31 @@
+
+.ldnft_sales_points ul, .ldnft_sales_tax_fee ul, .ldnft_subscription_points ul, .ldnft_subscription_tax_fee ul {
+    text-align: left;
+    margin: 0px 10px;
+}
+
 .ldfmt-sales-box {
     width: 14%;
-    height: 100px;
+    height: 120px;
     border: 1px solid #ddd;
     background: white;
     margin: 20px 5px;
 }
+
+.ldnft-course-currency-totals tr td:first-child{
+    text-align: left;
+}
+
 .ldfmt-sales-box label {
     margin: 10px;
     display: inline-block;    
     font-weight: bolder; 
 }
+
 .ldfmt-gross-sales-box {
     float: left;
     border-radius: 5px; 
     font-size: 2em;
-
     text-align: center;
     padding:5px;
 }
@@ -23,27 +34,28 @@
     float: left;
     border-radius: 5px; 
     font-size: 1em;
-
     text-align: center;
     padding:5px;
 }
+
 .ldnft-checked {
     color: orange;
 }
-.ldfmt-gross-gateway-box{
+
+.ldfmt-gross-gateway-box {
     float: left;
     border-radius: 5px; 
     font-size: 1em;
-    margin-left: 50px;
+    margin-left: 20px;
     text-align: center;
     padding:5px; 
 }
 
-.ldfmt-new-sales-box{
+.ldfmt-new-sales-box {
     float: left;
     border-radius: 5px; 
     font-size: 1em;
-    margin-left: 50px;
+    margin-left: 20px;
     text-align: center;
     padding:5px; 
 }
@@ -52,43 +64,54 @@
     float: left;
     border-radius: 5px; 
     font-size: 1em;
-    margin-left: 50px;
+    margin-left: 20px;
     text-align: center;
     padding:5px; 
 }
+
 .ldfmt-top3-countries-count-box{
     float: left;
     border-radius: 5px; 
     font-size: 1em;
-    margin-left: 50px;
+    margin-left: 20px;
     text-align: center;
     padding:5px; 
-
+    width: 28%;
 }
+
+.ldnft-course-currency-totals{
+    width: 100%;
+}
+
 .ldfmt-top3-countries-count-box label {
     margin: 0px;
 }
+
 .ldfmt-top3-countries-count-box ul{
     font-size: 11px;
     text-wrap: nowrap;
     text-align: left;
     line-height: 11px;
 }
+
 .ldfmt-renewals-count-box{
     float: left;
     border-radius: 5px; 
     font-size: 1em;
-    margin-left: 50px;
+    margin-left: 20px;
     text-align: center;
     padding:5px; 
 }
+
 #ldnft-sales-filter h3{
     padding: 6px;
 }
+
 .ldnft-general-settings{
     width: 50%;
     float:left;
 }
+
 /* Setting Page */
 .ldfmt-tab-data-heading {
     padding: 14px;

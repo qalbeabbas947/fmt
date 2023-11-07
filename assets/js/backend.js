@@ -563,23 +563,63 @@
                     },
                     success: function ( response ) {
 
-                        $('.ldnft_sales_points').html(response.gross_total).css('display', 'block');
+                        var list_items = '<ul>';
+                        for (const key in response.gross_total ) {
+                            if (Object.hasOwnProperty.call(response.gross_total, key)) {
+                               
+                                list_items += '<li>'+key+': '+response.gross_total[key]+'</li>';
+                                
+                            }
+                        }
+                        list_items += '</ul>';
+                        $('.ldnft_sales_points').html(list_items).css('display', 'block');
                         $('.ldnft_sales_points_count').html('(' + response.gross_total_count+')');
-                        $('.ldnft_sales_tax_fee').html(response.tax_rate_total).css('display', 'block');
+                        
+                        var tax_rate_total = '<ul>';
+                        for (const key in response.tax_rate_total ) {
+                            if (Object.hasOwnProperty.call(response.tax_rate_total, key)) {
+                               
+                                tax_rate_total += '<li>'+key+': '+response.tax_rate_total[key]+'</li>';
+                                
+                            }
+                        }
+                        tax_rate_total += '</ul>';
+                        $('.ldnft_sales_tax_fee').html(tax_rate_total).css('display', 'block');
+                        
                         $('.ldnft_sales_renewals_amount').html(response.total_new_renewals_amount).css('display', 'block');
                         $('.ldnft_new_renewals_count').html('(' + response.total_new_renewals + ')');
                         $('.ldnft-subssummary-loader').css('display', 'none');
                         $('.ldnft_sales_new_subscriptions').html(response.total_new_subscriptions_amount).css('display', 'block');
                         $('.ldnft_new_subscriptions_count').html('(' + response.total_new_subscriptions+')');
-                        var list_items = '<ul>';
+                        var list_items = '<table class="ldnft-course-currency-totals">';
+                        
+                        var idx = 0;
                         for (const key in response.countries ) {
+                            if( idx == 0 ) {
+                                list_items += '<tr>';
+                                list_items += '<th>Country</th>';
+                                for (const key in response.currency_keys ) {
+                                    list_items += '<th>'+response.currency_keys[key]+'</th>';
+                                }
+                                list_items += '</tr>';
+                                
+                            }
+                            idx++;
                             if (Object.hasOwnProperty.call(response.countries, key)) {
                                 const element = response.countries[key];
-                                list_items += '<li>'+element.country_name+': '+element.gross+'</li>';
-                                
+                                var gross_str = '';
+
+                                list_items += '<tr>';
+                                list_items += '<td>'+element.country_name+'</td>';
+                                for (const key in element.gross ) {
+                                    list_items += '<td>'+element.gross[key]+'</td>';
+                                }
+                                list_items += '</tr>';
                             }
                         }
                         list_items += '</ul>';
+
+                        
                         $('.ldnft_sales_top3_countries').html(list_items).css('display', 'block');
 
                     }
@@ -725,22 +765,73 @@
                     },
                     success: function ( response ) {
 
-                        $('.ldnft_subscription_points').html(response.gross_total).css('display', 'block');
-                        $('.ldnft_subscription_tax_fee').html(response.tax_rate_total).css('display', 'block');
+                        var list_items = '<ul>';
+                        for (const key in response.gross_total ) {
+                            if (Object.hasOwnProperty.call(response.gross_total, key)) {
+                               
+                                list_items += '<li>'+key+': '+response.gross_total[key]+'</li>';
+                                
+                            }
+                        }
+                        list_items += '</ul>';
+                        $('.ldnft_subscription_points').html(list_items).css('display', 'block');
+                        
+                        var tax_rate_total = '<ul>';
+                        for (const key in response.tax_rate_total ) {
+                            if (Object.hasOwnProperty.call(response.tax_rate_total, key)) {
+                               
+                                tax_rate_total += '<li>'+key+': '+response.tax_rate_total[key]+'</li>';
+                                
+                            }
+                        }
+                        tax_rate_total += '</ul>';
+                        $('.ldnft_subscription_tax_fee').html(tax_rate_total).css('display', 'block');
+
+                        //$('.ldnft_subscription_points').html(response.gross_total).css('display', 'block');
+                        //$('.ldnft_subscription_tax_fee').html(response.tax_rate_total).css('display', 'block');
                         $('.ldnft_subscription_new_sales_count').html(response.total_number_of_sales).css('display', 'block');
                         $('.ldnft_subscription_new_subscriptions_count').html(response.total_new_subscriptions).css('display', 'block');
                         $('.ldnft_subscription_renewals_count').html(response.total_new_renewals).css('display', 'block');
                         $('.ldnft_subscription_new_attempts_count').html(response.failed_payments).css('display', 'block');
                         $('.ldnft-subssummary-loader').css('display', 'none');
-                        var list_items = '<ul>';
+
+
+                        var list_items = '<table class="ldnft-course-currency-totals">';
+                        var idx = 0;
                         for (const key in response.countries ) {
+                            if( idx == 0 ) {
+                                list_items += '<tr>';
+                                list_items += '<th>Country</th>';
+                                for (const key in response.currency_keys ) {
+                                    list_items += '<th>'+response.currency_keys[key]+'</th>';
+                                }
+                                list_items += '</tr>';
+                                
+                            }
+                            idx++;
                             if (Object.hasOwnProperty.call(response.countries, key)) {
                                 const element = response.countries[key];
-                                list_items += '<li>'+element.country_name+': '+element.gross+'</li>';
-                               
+                                var gross_str = '';
+
+                                list_items += '<tr>';
+                                list_items += '<td>'+element.country_name+'</td>';
+                                for (const key in element.gross ) {
+                                    list_items += '<td>'+element.gross[key]+'</td>';
+                                }
+                                list_items += '</tr>';
                             }
                         }
                         list_items += '</ul>';
+
+                        // var list_items = '<ul>';
+                        // for (const key in response.countries ) {
+                        //     if (Object.hasOwnProperty.call(response.countries, key)) {
+                        //         const element = response.countries[key];
+                        //         list_items += '<li>'+element.country_name+': '+element.gross+'</li>';
+                               
+                        //     }
+                        // }
+                        // list_items += '</ul>';
                         $('.ldnft_subscription_top3_countries').html(list_items).css('display', 'block');
                     }
                 });
