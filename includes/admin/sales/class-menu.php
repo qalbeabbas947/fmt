@@ -152,13 +152,13 @@ class LDNFT_Sales_Menu {
                     $gross_total[ $pmt->currency ] = 0;    
                 }
 
-                $gross_total[ $pmt->currency ] = number_format( floatval( $gross_total[ $pmt->currency ] ) + floatval($pmt->gross), 2);
+                $gross_total[ $pmt->currency ] =  floatval( $gross_total[ $pmt->currency ] ) + floatval($pmt->gross);
                 
                 if( ! array_key_exists( $pmt->currency, $tax_rate_total ) ) {
                     $tax_rate_total[ $pmt->currency ] = 0;    
                 }
 
-                $tax_rate_total[ $pmt->currency ] = number_format( floatval( $tax_rate_total[ $pmt->currency ] ) + floatval($pmt->vat), 2);
+                $tax_rate_total[ $pmt->currency ] = floatval( $tax_rate_total[ $pmt->currency ] ) + floatval($pmt->vat);
 
                 $total_number_of_sales++;
                 if( $pmt->is_renewal == '1' || $pmt->is_renewal == 1 ) {
@@ -193,14 +193,22 @@ class LDNFT_Sales_Menu {
             }
         }
 
+        foreach( $gross_total as $key => $value ) {
+            $gross_total[$key] = number_format( $gross_total[$key] , 2 );
+        }
+
+        foreach( $tax_rate_total as $key => $value ) {
+            $tax_rate_total[$key] = number_format( $tax_rate_total[$key] , 2 );
+        }
+
         $data = [
             'gross_total_count' => $gross_total_count,
             'gross_total' => $gross_total,
             'tax_rate_total' => $tax_rate_total,
             'total_number_of_sales' => $total_number_of_sales,
             'total_new_subscriptions' => $total_new_subscriptions,
-            'total_new_subscriptions_amount' => $total_new_subscriptions_amount,
-            'total_new_renewals_amount' => $total_new_renewals_amount,
+            'total_new_subscriptions_amount' => number_format( $total_new_subscriptions_amount , 2 ),
+            'total_new_renewals_amount' => number_format( $total_new_renewals_amount, 2 ) ,
             'total_new_renewals' => $total_new_renewals,
             'countries' => $countries,
             'currency_keys' => $currency_keys

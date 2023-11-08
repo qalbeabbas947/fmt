@@ -313,12 +313,12 @@ class LDNFT_Subscriptions_Menu {
                     $gross_total[ $obj->currency ] = 0;    
                 }
 
-                $gross_total[ $obj->currency ] = number_format( floatval( $gross_total[ $obj->currency ] ) + floatval($obj->gross), 2);
+                $gross_total[ $obj->currency ] = floatval( $gross_total[ $obj->currency ] ) + floatval($obj->gross);
 
                 if( ! array_key_exists( $obj->currency, $tax_rate_total ) ) {
                     $tax_rate_total[ $obj->currency ] = 0;    
                 }
-                $tax_rate_total[ $obj->currency ] = number_format( floatval( $tax_rate_total[ $obj->currency ] ) + floatval($obj->tax_rate), 2);
+                $tax_rate_total[ $obj->currency ] = floatval( $tax_rate_total[ $obj->currency ] ) + floatval($obj->tax_rate);
 
                 // $gross_total += $obj->gross;
                 // $tax_rate_total += $obj->tax_rate;
@@ -347,6 +347,15 @@ class LDNFT_Subscriptions_Menu {
                 ];
             }
         }
+
+        foreach( $gross_total as $key => $value ) {
+            $gross_total[$key] = number_format( $gross_total[$key] , 2 );
+        }
+
+        foreach( $tax_rate_total as $key => $value ) {
+            $tax_rate_total[$key] = number_format( $tax_rate_total[$key] , 2 );
+        }
+
         $data = [
             'gross_total_count' => $gross_total_count,
             'gross_total' => $gross_total,
