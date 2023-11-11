@@ -6,6 +6,7 @@
             display_sales_type: 'filter',
             display_review_type: 'filter',
             display_customer_type: 'filter',
+            current_cron_step: 'plugins',
             init: function() {
                 LDNFTbackEnd.hooks();
                 LDNFTbackEnd.listing_pages();
@@ -22,6 +23,16 @@
                 $('.ldnft-admin-modal-close').on('click', LDNFTbackEnd.ldnft_subsciber_modal_close);
 				$('#ldnft_reviews_data').on('click', '.ldnft_review_view_detail', LDNFTbackEnd.review_view_detail);
                 $('#ldnft-reviews-filter').on('click', '.ldnft_is_featured_enabled_click', LDNFTbackEnd.ldnft_is_featured_enabled);
+            },
+            print_asterik_line: function( ) {
+
+                let line = '';
+
+                for( let i = 0; i < 150; i++ ) {
+                    line += '*';
+                }
+
+                return line;
             },
             subscription_plans_dropdown: function(){
 
@@ -89,13 +100,12 @@
                 $('.ldfmt-subscription-country-filter').select2({minimumInputLength: 3, allowClear: true, width: '150px', placeholder: "Select a Country"});
             },
             import_cron_status: function() {
-                
+                console.log(LDNFT);
                 if( LDNFT.is_cron_page_check=='yes' ) {
                     if( LDNFT.import_cron_status != 'complete' ) {
-                        LDNFTbackEnd.timeout_obj = setTimeout(LDNFTbackEnd.check_cron_status, 6000);
+                        $('.ldnft-process-freemius-data-log').html(LDNFT.plugins_start_msg);
+                        LDNFTbackEnd.timeout_obj = setTimeout(LDNFTbackEnd.check_cron_status, 3000);
                     } else {
-                        $('.ldnft-process-freemius-data-reviews').find('.ldnft-success-loader').css( 'display', 'none' );
-                        $('.ldnft-process-freemius-data-reviews').find('.ldnft-checkmark').css( 'display', 'inline' );
                         LDNFT.import_cron_status = 'complete';
                         clearTimeout(LDNFTbackEnd.timeout_obj);
                     }
@@ -104,132 +114,66 @@
             check_cron_status: function() {
                 
                 var data = {
-                    action: 'ldnft_check_cron_status'
+                    action: 'ldnft_check_cron_status',
+                    state: LDNFTbackEnd.current_cron_step
                 }
-               
+                
                 jQuery.post( LDNFT.ajaxURL, data, function( response ) {
-                    var sub_status = response.individual_status;
+                    
                     if( response.status == 'complete' ) {
-                        $('.ldnft-process-freemius-data-reviews').css('display', 'block');
-                        $('.ldnft-process-freemius-data-reviews').find('.ldnft-loading-wrap').html( sub_status.Reviewsmsg );
-                        $('.ldnft-process-freemius-data-reviews').find('.ldnft-success-loader').css( 'display', 'none' );
-                        $('.ldnft-process-freemius-data-reviews').find('.ldnft-checkmark').css( 'display', 'inline' );
+                        $('.ldnft-process-freemius-data-log').append('<br>'+LDNFT.complete_msg);
                         LDNFT.import_cron_status = 'complete';
                         clearTimeout(LDNFTbackEnd.timeout_obj);
                     } else {
+                        $('.ldnft-process-freemius-data-log').css( 'display', 'block' );
                         switch( response.status ) {
                             case 'plans':
-                                $('.ldnft-process-freemius-data-plugins').css('display', 'block');
-                                $('.ldnft-process-freemius-data-plugins').find('.ldnft-loading-wrap').html(sub_status.Pluginmsg);
-                                $('.ldnft-process-freemius-data-plugins').find('.ldnft-success-loader').css('display', 'none');
-                                $('.ldnft-process-freemius-data-plugins').find('.ldnft-checkmark').css('display', 'inline');
-                                $('.ldnft-process-freemius-data-plans').css('display', 'block');
-                                $('.ldnft-process-freemius-data-plans').find('.ldnft-loading-wrap').html(sub_status.Planmsg);
+                                $('.ldnft-process-freemius-data-log').append('<br>'+response.Planmsg);
+                                if( parseInt( response.Plans ) == 1 ) {
+                                    LDNFTbackEnd.current_cron_step = 'customers';
+                                    $('.ldnft-process-freemius-data-log').append('<br>'+LDNFTbackEnd.print_asterik_line() );
+                                    $('.ldnft-process-freemius-data-log').append('<br>'+LDNFT.customer_start_msg);
+                                }
                                 break;
                             case 'customers':
-                                $('.ldnft-process-freemius-data-plugins').css('display', 'block');
-                                $('.ldnft-process-freemius-data-plugins').find('.ldnft-loading-wrap').html(sub_status.Pluginmsg);
-                                $('.ldnft-process-freemius-data-plugins').find('.ldnft-success-loader').css('display', 'none');
-                                $('.ldnft-process-freemius-data-plugins').find('.ldnft-checkmark').css('display', 'inline');
-                                $('.ldnft-process-freemius-data-plans').css('display', 'block');
-                                $('.ldnft-process-freemius-data-plans').find('.ldnft-loading-wrap').html(sub_status.Planmsg);
-                                $('.ldnft-process-freemius-data-plans').find('.ldnft-success-loader').css('display', 'none');
-                                $('.ldnft-process-freemius-data-plans').find('.ldnft-checkmark').css('display', 'inline');
-                                $('.ldnft-process-freemius-data-customers').css('display', 'block');
-                                $('.ldnft-process-freemius-data-customers').find('.ldnft-loading-wrap').html(sub_status.Customermsg);
+                                $('.ldnft-process-freemius-data-log').append('<br>'+response.Customermsg);
+                                if( parseInt( response.Customers ) == 1 ) {
+                                    LDNFTbackEnd.current_cron_step = 'sales';
+                                    $('.ldnft-process-freemius-data-log').append('<br>'+LDNFTbackEnd.print_asterik_line() );
+                                    $('.ldnft-process-freemius-data-log').append('<br>'+LDNFT.sales_start_msg);
+                                }
                                 break;
                             case 'sales':
-                                $('.ldnft-process-freemius-data-plugins').css('display', 'block');
-                                $('.ldnft-process-freemius-data-plugins').find('.ldnft-loading-wrap').html(sub_status.Pluginmsg);
-                                $('.ldnft-process-freemius-data-plugins').find('.ldnft-success-loader').css('display', 'none');
-                                $('.ldnft-process-freemius-data-plugins').find('.ldnft-checkmark').css('display', 'inline');
-                                $('.ldnft-process-freemius-data-plans').css('display', 'block');
-                                $('.ldnft-process-freemius-data-plans').find('.ldnft-loading-wrap').html(sub_status.Planmsg);
-                                $('.ldnft-process-freemius-data-plans').find('.ldnft-success-loader').css('display', 'none');
-                                $('.ldnft-process-freemius-data-plans').find('.ldnft-checkmark').css('display', 'inline');
-                                $('.ldnft-process-freemius-data-customers').css('display', 'block');
-                                $('.ldnft-process-freemius-data-customers').find('.ldnft-loading-wrap').html(sub_status.Customermsg);
-                                $('.ldnft-process-freemius-data-customers').find('.ldnft-success-loader').css('display', 'none');
-                                $('.ldnft-process-freemius-data-customers').find('.ldnft-checkmark').css('display', 'inline');
-                                $('.ldnft-process-freemius-data-sales').css('display', 'block');
-                                $('.ldnft-process-freemius-data-sales').find('.ldnft-loading-wrap').html(sub_status.Salesmsg);
+                                $('.ldnft-process-freemius-data-log').append('<br>'+response.Salesmsg);
+                                if( parseInt( response.Sales ) == 1 ) {
+                                    LDNFTbackEnd.current_cron_step = 'subscription';
+                                    $('.ldnft-process-freemius-data-log').append('<br>'+LDNFTbackEnd.print_asterik_line() );
+                                    $('.ldnft-process-freemius-data-log').append('<br>'+LDNFT.subscription_start_msg);
+                                }
                                 break;
                             case 'subscription':
-                                $('.ldnft-process-freemius-data-plugins').css('display', 'block');
-                                $('.ldnft-process-freemius-data-plugins').find('.ldnft-loading-wrap').html(sub_status.Pluginmsg);
-                                $('.ldnft-process-freemius-data-plugins').find('.ldnft-success-loader').css('display', 'none');
-                                $('.ldnft-process-freemius-data-plugins').find('.ldnft-checkmark').css('display', 'inline');
-                                $('.ldnft-process-freemius-data-plans').css('display', 'block');
-                                $('.ldnft-process-freemius-data-plans').find('.ldnft-loading-wrap').html(sub_status.Planmsg);
-                                $('.ldnft-process-freemius-data-plans').find('.ldnft-success-loader').css('display', 'none');
-                                $('.ldnft-process-freemius-data-plans').find('.ldnft-checkmark').css('display', 'inline');
-                                $('.ldnft-process-freemius-data-customers').css('display', 'block');
-                                $('.ldnft-process-freemius-data-customers').find('.ldnft-loading-wrap').html(sub_status.Customermsg);
-                                $('.ldnft-process-freemius-data-customers').find('.ldnft-success-loader').css('display', 'none');
-                                $('.ldnft-process-freemius-data-customers').find('.ldnft-checkmark').css('display', 'inline');
-                                $('.ldnft-process-freemius-data-sales').css('display', 'block');
-                                $('.ldnft-process-freemius-data-sales').find('.ldnft-loading-wrap').html(sub_status.Salesmsg);
-                                $('.ldnft-process-freemius-data-sales').find('.ldnft-success-loader').css('display', 'none');
-                                $('.ldnft-process-freemius-data-sales').find('.ldnft-checkmark').css('display', 'inline');
-                                $('.ldnft-process-freemius-data-subscription').css('display', 'block');
-                                $('.ldnft-process-freemius-data-subscription').find('.ldnft-loading-wrap').html(sub_status.Subscriptionmsg);
+                                $('.ldnft-process-freemius-data-log').append('<br>'+response.Subscriptionmsg);
+                                if( parseInt( response.Subscription ) == 1 ) {
+                                    LDNFTbackEnd.current_cron_step = 'reviews';
+                                    $('.ldnft-process-freemius-data-log').append('<br>'+LDNFTbackEnd.print_asterik_line() );
+                                    $('.ldnft-process-freemius-data-log').append('<br>'+LDNFT.reviews_start_msg);
+                                }
                                 break;
                             case 'reviews':
-                                $('.ldnft-process-freemius-data-plugins').css('display', 'block');
-                                $('.ldnft-process-freemius-data-plugins').find('.ldnft-loading-wrap').html(sub_status.Pluginmsg);
-                                $('.ldnft-process-freemius-data-plugins').find('.ldnft-success-loader').css('display', 'none');
-                                $('.ldnft-process-freemius-data-plugins').find('.ldnft-checkmark').css('display', 'inline');
-                                $('.ldnft-process-freemius-data-plans').css('display', 'block');
-                                $('.ldnft-process-freemius-data-plans').find('.ldnft-loading-wrap').html(sub_status.Planmsg);
-                                $('.ldnft-process-freemius-data-plans').find('.ldnft-success-loader').css('display', 'none');
-                                $('.ldnft-process-freemius-data-plans').find('.ldnft-checkmark').css('display', 'inline');
-                                $('.ldnft-process-freemius-data-customers').css('display', 'block');
-                                $('.ldnft-process-freemius-data-customers').find('.ldnft-loading-wrap').html(sub_status.Customermsg);
-                                $('.ldnft-process-freemius-data-customers').find('.ldnft-success-loader').css('display', 'none');
-                                $('.ldnft-process-freemius-data-customers').find('.ldnft-checkmark').css('display', 'inline');
-                                $('.ldnft-process-freemius-data-sales').css('display', 'block');
-                                $('.ldnft-process-freemius-data-sales').find('.ldnft-loading-wrap').html(sub_status.Salesmsg);
-                                $('.ldnft-process-freemius-data-sales').find('.ldnft-success-loader').css('display', 'none');
-                                $('.ldnft-process-freemius-data-sales').find('.ldnft-checkmark').css('display', 'inline');
-                                $('.ldnft-process-freemius-data-subscription').css('display', 'block');
-                                $('.ldnft-process-freemius-data-subscription').find('.ldnft-loading-wrap').html(sub_status.Subscriptionmsg);
-                                $('.ldnft-process-freemius-data-subscription').find('.ldnft-success-loader').css('display', 'none');
-                                $('.ldnft-process-freemius-data-subscription').find('.ldnft-checkmark').css('display', 'inline');
-                                $('.ldnft-process-freemius-data-reviews').css('display', 'block');
-                                $('.ldnft-process-freemius-data-reviews').find('.ldnft-loading-wrap').html(sub_status.Reviewsmsg);
+                                $('.ldnft-process-freemius-data-log').append('<br>'+response.Reviewsmsg);
+                                if( parseInt( response.Reviews ) == 1 ) {
+                                    LDNFTbackEnd.current_cron_step = 'complete';
+                                    $('.ldnft-process-freemius-data-log').append('<br>'+LDNFTbackEnd.print_asterik_line() );
+                                }
                                 break; 
-                            case 'complete':
-
-                                $('.ldnft-process-freemius-data-plugins').css('display', 'block');
-                                $('.ldnft-process-freemius-data-plugins').find('.ldnft-loading-wrap').html(sub_status.Pluginmsg);
-                                $('.ldnft-process-freemius-data-plugins').find('.ldnft-success-loader').css('display', 'none');
-                                $('.ldnft-process-freemius-data-plugins').find('.ldnft-checkmark').css('display', 'inline');
-                                $('.ldnft-process-freemius-data-plans').css('display', 'block');
-                                $('.ldnft-process-freemius-data-plans').find('.ldnft-loading-wrap').html(sub_status.Planmsg);
-                                $('.ldnft-process-freemius-data-plans').find('.ldnft-success-loader').css('display', 'none');
-                                $('.ldnft-process-freemius-data-plans').find('.ldnft-checkmark').css('display', 'inline');
-                                $('.ldnft-process-freemius-data-customers').css('display', 'block');
-                                $('.ldnft-process-freemius-data-customers').find('.ldnft-loading-wrap').html(sub_status.Customermsg);
-                                $('.ldnft-process-freemius-data-customers').find('.ldnft-success-loader').css('display', 'none');
-                                $('.ldnft-process-freemius-data-customers').find('.ldnft-checkmark').css('display', 'inline');
-                                $('.ldnft-process-freemius-data-sales').css('display', 'block');
-                                $('.ldnft-process-freemius-data-sales').find('.ldnft-loading-wrap').html(sub_status.Salesmsg);
-                                $('.ldnft-process-freemius-data-sales').find('.ldnft-success-loader').css('display', 'none');
-                                $('.ldnft-process-freemius-data-sales').find('.ldnft-checkmark').css('display', 'inline');
-
-                                $('.ldnft-process-freemius-data-subscription').css('display', 'block');
-                                $('.ldnft-process-freemius-data-subscription').find('.ldnft-loading-wrap').html(sub_status.Subscriptionmsg);
-                                $('.ldnft-process-freemius-data-subscription').find('.ldnft-success-loader').css('display', 'none');
-                                $('.ldnft-process-freemius-data-subscription').find('.ldnft-checkmark').css('display', 'inline');
-                                
-                                $('.ldnft-process-freemius-data-reviews').css('display', 'block');
-                                $('.ldnft-process-freemius-data-reviews').find('.ldnft-loading-wrap').html( sub_status.Reviewsmsg );
-                                $('.ldnft-process-freemius-data-reviews').find('.ldnft-success-loader').css( 'display', 'none' );
-                                $('.ldnft-process-freemius-data-reviews').find('.ldnft-checkmark').css( 'display', 'inline' );
-                                break;
                             default:
-                                $('.ldnft-process-freemius-data-plugins').css('display', 'block');
-                                $('.ldnft-process-freemius-data-plugins').find('.ldnft-loading-wrap').html(sub_status.Pluginmsg);
+                                
+                                $('.ldnft-process-freemius-data-log').append('<br>'+response.Pluginmsg);
+                                if( parseInt( response.Plugins ) == 1 ) {
+                                    LDNFTbackEnd.current_cron_step = 'plans';
+                                    $('.ldnft-process-freemius-data-log').append('<br>'+LDNFTbackEnd.print_asterik_line() );
+                                    $('.ldnft-process-freemius-data-log').append('<br>'+LDNFT.plans_start_msg);
+                                }
                                 break;
                         }
 

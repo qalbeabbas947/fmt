@@ -74,43 +74,18 @@ $cron_status    = get_option('ldnft_run_cron_based_on_plugins');
                         update_option( 'ldnft__freemius_connected', 'no' );    
                     }
                 }
-                
-                if( $cron_status != 'complete' && $fs_connection ) { ?>
+                if( $cron_status != 'complete' && $fs_connection ) 
+                { 
+                    ?>
                     <tr> 
                         <td colspan="2" class="ldnft-process-freemius-data-info">
-                            <div class="ldnft-process-freemius-data-plugins" style="display:none">
-                                <img class="ldnft-success-loader" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" />
-                                <span class="ldnft-checkmark" style="display:none">&#10003;</span>
-                                <span class="ldnft-loading-wrap"><?php _e( 'Please wait, while we are syncing the freemius plugins data.', LDNFT_TEXT_DOMAIN ); ?></span>
+                            <div class="ldnft-process-freemius-data-log" style="display:none">
                             </div>
-                            <div class="ldnft-process-freemius-data-plans" style="display:none">
-                                <img class="ldnft-success-loader" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" />
-                                <span class="ldnft-checkmark" style="display:none">&#10003;</span>
-                                <span class="ldnft-loading-wrap"><?php _e( 'Please wait, while we are syncing the freemius plans data.', LDNFT_TEXT_DOMAIN ); ?></span>
-                            </div>
-                            <div class="ldnft-process-freemius-data-customers" style="display:none">
-                                <img class="ldnft-success-loader" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" />
-                                <span class="ldnft-checkmark" style="display:none">&#10003;</span>
-                                <span class="ldnft-loading-wrap"><?php _e( 'Please wait, while we are syncing the freemius customers data.', LDNFT_TEXT_DOMAIN ); ?></span>
-                            </div>
-                            <div class="ldnft-process-freemius-data-sales" style="display:none">
-                                <img class="ldnft-success-loader" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" />
-                                <span class="ldnft-checkmark" style="display:none">&#10003;</span>
-                                <span class="ldnft-loading-wrap"><?php _e( 'Please wait, while we are syncing the freemius sales data.', LDNFT_TEXT_DOMAIN ); ?></span>
-                            </div>
-                            <div class="ldnft-process-freemius-data-subscription" style="display:none">
-                                <img class="ldnft-success-loader" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" />
-                                <span class="ldnft-checkmark" style="display:none">&#10003;</span>
-                                <span class="ldnft-loading-wrap"><?php _e( 'Please wait, while we are syncing the freemius subscription data.', LDNFT_TEXT_DOMAIN ); ?></span>
-                            </div>
-                            <div class="ldnft-process-freemius-data-reviews" style="display:none">
-                                <img class="ldnft-success-loader" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" />
-                                <span class="ldnft-checkmark" style="display:none">&#10003;</span>
-                                <span class="ldnft-loading-wrap"><?php _e( 'Please wait, while we are syncing the freemius reviews data.', LDNFT_TEXT_DOMAIN ); ?></span>
-                            </div>
-                        </td>    
+                        </td>
                     </tr>
-                <?php } ?>
+                    <?php
+                }
+                ?>
             </tbody>
         </table>
        
@@ -120,10 +95,7 @@ $cron_status    = get_option('ldnft_run_cron_based_on_plugins');
             <input type="hidden" name="action" value="ldnft_submit_action" />
             <input type="hidden" id="ldnft_api_scope" name="ldnft_settings[api_scope]" value="developer">
             <input type="submit" class="button button-primary ldnft-save-setting" name="ldnft_submit_form" value="<?php _e( 'Test & Save', LDNFT_TEXT_DOMAIN ); ?>">
-            <?php 
-                
-                
-                if( $fs_connection ) { ?>
+            <?php if( $fs_connection ) { ?>
                 <input type="button" class="button button-primary ldnft-sync-data-setting" name="ldnft_sync_data" value="<?php _e( 'Sync Data', LDNFT_TEXT_DOMAIN ); ?>">
             <?php } ?>
         </div>

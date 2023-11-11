@@ -111,7 +111,14 @@
     width: 50%;
     float:left;
 }
-
+.ldnft-process-freemius-data-log{
+    height: 300px;
+    width: 100%;
+    overflow: scroll;
+    background-color: #222222;
+    color: white;
+    border-radius: 5px;
+}
 /* Setting Page */
 .ldfmt-tab-data-heading {
     padding: 14px;

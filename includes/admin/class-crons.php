@@ -37,11 +37,12 @@ class LDNFT_Crons_Settings {
                                 if( intval( $plugin->id ) > 0 ) {
                                     $opt = get_option( 'ldnft_process_freemius_customers_stats' );
                                     if( empty( $opt ) ) {
-                                        $active_crons[$plugin->id] = [0,0]; //first param is used for count and second to check if cron is complete.
+                                        $active_crons[$plugin->id] = 0; //first param is used for count and second to check if cron is complete.
                                         update_option('ldnft_process_freemius_customers_stats', $active_crons );
                                     }
 
                                     $start = get_option( 'ldnft_process_freemius_customers_index_'.$plugin->id );
+                                    update_option( 'ldnft_process_freemius_customers_index_old_'.$plugin->id, $start );   
                                     $this->ldnft_process_freemius_customers( $plugin->id, intval($start) );
                                 }
                             }
@@ -51,10 +52,12 @@ class LDNFT_Crons_Settings {
                         if( $cron_started != 'yes' ) {
                             $opt = get_option( 'ldnft_process_freemius_plans_stats' );
                             if( empty( $opt ) ) {
-                                $active_crons = [ 0, 0 ]; //first param is used for count and second to check if cron is complete.
+                                $active_crons = 0; //first param is used for count and second to check if cron is complete.
                                 update_option( 'ldnft_process_freemius_plans_stats', $active_crons );
                             }
-
+                            
+                            $start = get_option( 'ldnft_process_freemius_plan_index' );
+                            update_option( 'ldnft_process_freemius_plan_index_old', $start );    
                             $this->ldnft_process_freemius_plans( );
                         }
                         break;
@@ -65,11 +68,12 @@ class LDNFT_Crons_Settings {
                                 if( intval( $plugin->id ) > 0 ) {
                                     $opt = get_option( 'ldnft_process_freemius_sales_stats' );
                                     if( empty( $opt ) ) {
-                                        $active_crons[$plugin->id] = [0,0]; //first param is used for count and second to check if cron is complete.
+                                        $active_crons[$plugin->id] = 0; //first param is used for count and second to check if cron is complete.
                                         update_option( 'ldnft_process_freemius_sales_stats', $active_crons );
                                     }
 
                                     $start = get_option( 'ldnft_process_freemius_sales_index_'.$plugin->id );
+                                    update_option( 'ldnft_process_freemius_sales_index_old_'.$plugin->id, $start );
                                     $this->process_freemius_sales( $plugin->id, intval($start) );
                                 }
                             }
@@ -84,11 +88,12 @@ class LDNFT_Crons_Settings {
                                 if( intval( $plugin->id ) > 0 ) {
                                     $opt = get_option( 'ldnft_process_freemius_subscription_stats' );
                                     if( empty( $opt ) ) {
-                                        $active_crons[$plugin->id] = [0,0]; //first param is used for count and second to check if cron is complete.
+                                        $active_crons[$plugin->id] = 0; //first param is used for count and second to check if cron is complete.
                                         update_option( 'ldnft_process_freemius_subscription_stats', $active_crons );
                                     }
 
                                     $start = get_option( 'ldnft_process_freemius_subscription_index_'.$plugin->id );
+                                    update_option( 'ldnft_process_freemius_subscription_index_old_'.$plugin->id, $start );
                                     $this->process_freemius_subscription( $plugin->id, intval($start) );
                                 }
                             }
@@ -102,11 +107,12 @@ class LDNFT_Crons_Settings {
                                 if( intval( $plugin->id ) > 0 ) {
                                     $opt = get_option( 'ldnft_process_freemius_reviews_stats' );
                                     if( empty( $opt ) ) {
-                                        $active_crons[$plugin->id] = [0,0]; //first param is used for count and second to check if cron is complete.
+                                        $active_crons[$plugin->id] = 0; //first param is used for count and second to check if cron is complete.
                                         update_option( 'ldnft_process_freemius_reviews_stats', $active_crons );
                                     }
 
                                     $start = get_option( 'ldnft_process_freemius_reviews_index_'.$plugin->id );
+                                    update_option( 'ldnft_process_freemius_reviews_index_old_'.$plugin->id, $start );
                                     $this->process_freemius_reviews( $plugin->id, intval($start) );
                                 }
                             }
@@ -116,11 +122,12 @@ class LDNFT_Crons_Settings {
                         if( $cron_started != 'yes' ) {
                             $opt = get_option( 'ldnft_process_freemius_plugins_stats' );
                             if( empty( $opt ) ) {
-                                $active_crons = [ 0, 0 ]; //first param is used for count and second to check if cron is complete.
+                                $active_crons = 0; //first param is used for count and second to check if cron is complete.
                                 update_option( 'ldnft_process_freemius_plugins_stats', $active_crons );
                             }
                             
                             $start = get_option( 'ldnft_process_freemius_plugins_index' );
+                            update_option( 'ldnft_process_freemius_plugins_index_old', $start );
                             $this->ldnft_process_freemius_plugins( intval($start) );
                         }
                         
@@ -332,9 +339,8 @@ class LDNFT_Crons_Settings {
 
         if( intval( $plugin_id ) > 0 ) {
             $active_crons = get_option('ldnft_process_freemius_sales_stats' );
-            $active_crons[$plugin_id][0] = intval( $active_crons[ $plugin_id ][0] ) + count( $pmtobj->payments );
             if( count( $pmtobj->payments ) < $limit) {
-                $active_crons[$plugin_id][1] = 1;
+                $active_crons[$plugin_id] = 1;
                 
                 $meta_table_name = $wpdb->prefix.'ldnft_customer_meta';
                 $records = $wpdb->get_results( $wpdb->prepare("select * from ".$meta_table_name." where plugin_id=%d", $plugin_id ) );
@@ -536,9 +542,8 @@ class LDNFT_Crons_Settings {
 
         if( intval( $plugin_id ) > 0 ) {
             $active_crons = get_option('ldnft_process_freemius_subscription_stats' );
-            $active_crons[$plugin_id][0] = intval( $active_crons[$plugin_id][0] ) + count( $subobj->subscriptions );
             if( count( $subobj->subscriptions ) < $limit) {
-                $active_crons[$plugin_id][1] = 1;
+                $active_crons[$plugin_id] = 1;
             }
 
             update_option('ldnft_process_freemius_subscription_stats', $active_crons );
@@ -658,9 +663,8 @@ class LDNFT_Crons_Settings {
 
         if( intval( $plugin_id ) > 0 ) {
             $active_crons = get_option('ldnft_process_freemius_reviews_stats' );
-            $active_crons[$plugin_id][0] = intval( $active_crons[$plugin_id][0] ) + count( $reviewsobj->reviews );
             if( count( $reviewsobj->reviews ) < $limit) {
-                $active_crons[$plugin_id][1] = 1;
+                $active_crons[$plugin_id] = 1;
             }
 
             update_option('ldnft_process_freemius_reviews_stats', $active_crons );
@@ -692,7 +696,7 @@ class LDNFT_Crons_Settings {
 
         header('Content-Type: application/json; charset=utf-8');
         
-        echo self::calculate_cron_process();
+        echo json_encode(self::calculate_cron_process());
         exit;
     }
     
@@ -700,155 +704,340 @@ class LDNFT_Crons_Settings {
 	 * checks if crons is complete.
 	 */
     public static function calculate_cron_process( ) {
-        
+
         $active_crons = get_option('ldnft_process_freemius_plugins_stats' );
-        
-        $status = [ 'Plugins' => 0, 'Pluginrecs' => 0, 'Pluginmsg' => __('Plugins are synced with freemius.', LDNFT_TEXT_DOMAIN) ];
-        $plg_updated = get_option('ldnft_process_plg_updated' );
-        if( $plg_updated == 'yes' ) {
-            $status[ 'Plugins' ] = 1;
-            $status[ 'Pluginmsg' ] = __('Plugins are synced with freemius.', LDNFT_TEXT_DOMAIN);
-        } else {
-            if( is_array( $active_crons ) && count( $active_crons ) > 0 ) {
-                if( array_key_exists( 1, $active_crons ) ) {
-                    if( $active_crons[1] == 1 || $active_crons[1] == "1" ) {
+        $state = isset( $_REQUEST['state'] ) ? sanitize_text_field( $_REQUEST['state'] ) : 'plugins';
+        $status = ['status'=>$state];
+        switch( $state ){
+            case "plugins":
+                // $plg_updated = get_option('ldnft_process_plg_updated' );
+                // if( $plg_updated == 'yes' ) {
+                //     $status[ 'Plugins' ] = 1;
+                //     $status[ 'Pluginmsg' ] = __('1plugins -> done', LDNFT_TEXT_DOMAIN);
+                // } else {
+
+                    $start = get_option( 'ldnft_process_freemius_plugins_index' );
+                    $start_old = get_option( 'ldnft_process_freemius_plugins_index_old');
+
+                    if( $active_crons == 1 || $active_crons == "1" ) {
                         $status[ 'Plugins' ] = 1;
                         update_option('ldnft_process_plg_updated', 'yes' );
-                        $status[ 'Pluginrecs' ] = $active_crons[0];
-                        $status[ 'Pluginmsg' ] = __('Plugins are synced with freemius.', LDNFT_TEXT_DOMAIN);
+                        $status[ 'Pluginmsg' ] = sprintf(__('%d plugins are synced.', LDNFT_TEXT_DOMAIN), intval( $start ) - intval( $start_old ) );
+                        $status[ 'Pluginmsg' ] .= '<br>'.__('plugins -> done.', LDNFT_TEXT_DOMAIN);
+                    } else {
+                        
+                        $status[ 'Plugins' ] = 0;
+                        $status[ 'Pluginmsg' ] = sprintf(__('%d plugins are synced.', LDNFT_TEXT_DOMAIN), intval( $start ) - intval( $start_old ) );
                     }
-                }
-            }
-        }
-        
-        $status[ 'Plans' ] = 0;
-        $status[ 'Planrecs' ] = 0;
-        $status[ 'Planmsg' ] = __('Plans are synced with freemius.', LDNFT_TEXT_DOMAIN);
-        $plan_updated = get_option('ldnft_process_plan_updated' );
-        if( $plan_updated == 'yes' ) {
-            $status[ 'Plans' ] = 1;
-            $status[ 'Planmsg' ] = __( 'Plans are synced with freemius.', LDNFT_TEXT_DOMAIN );
-        } else {
-            $active_crons = get_option('ldnft_process_freemius_plans_stats' );
-            if( is_array( $active_crons ) && count( $active_crons ) > 0 ) {
-                if( array_key_exists( 1, $active_crons ) ) {
-                    if( $active_crons[1] == 1 || $active_crons[1] == "1" ) {
+                //}
+                break;
+            case "plans":
+                // $plan_updated = get_option('ldnft_process_plan_updated' );
+                // if( $plan_updated == 'yes' ) {
+                //     $status[ 'Plans' ] = 1;
+                //     $status[ 'Planmsg' ] = __( '1plans -> done.', LDNFT_TEXT_DOMAIN );
+                // } else {
+                    $active_crons = get_option('ldnft_process_freemius_plans_stats' );
+                    $start = get_option( 'ldnft_process_freemius_plan_index' );
+                    $start_old = get_option( 'ldnft_process_freemius_plan_index_old' );    
+                    if( $active_crons == 1 || $active_crons == "1" ) {
                         $status[ 'Plans' ] = 1;
                         update_option('ldnft_process_plan_updated', 'yes' );
-                        $status[ 'Planrecs' ] = $active_crons[0];
-                        $status[ 'Planmsg' ] = __( 'Plans are synced with freemius.', LDNFT_TEXT_DOMAIN );
+                        $status[ 'Planmsg' ] = sprintf(__( '%d plans are synced', LDNFT_TEXT_DOMAIN ), intval( $start ) - intval( $start_old ) );
+                        $status[ 'Planmsg' ] .= '<br>'.__( 'plans -> done.', LDNFT_TEXT_DOMAIN );
+                    } else {
+                        $status[ 'Plans' ] = 0;
+                        $status[ 'Planmsg' ] = sprintf(__( '%d plans are synced', LDNFT_TEXT_DOMAIN ), intval( $start ) - intval( $start_old ) );
                     }
-                }
-            }
-        }
+                //}
+                break;
+            case "customers":
+                $active_crons = get_option( 'ldnft_process_freemius_customers_stats' );
+                $done_customers = 0;
+                // $customer_updated = get_option('ldnft_process_customers_updated' );
+                // if( $customer_updated == 'yes' ) {
+                //     $status[ 'Customers' ] = 1;
+                //     $status[ 'Customermsg' ] = __( '1Customers -> done.', LDNFT_TEXT_DOMAIN );
+                // } else {
+                    $new_import = 0;
+                    foreach( $active_crons as $key => $value ) {
+
+                        $start = get_option( 'ldnft_process_freemius_customers_index_'.$key );
+                        $start_old = get_option( 'ldnft_process_freemius_customers_index_old_'.$key );
+                        $new_import += intval( $start ) - intval( $start_old );
+                        if( intval( $value ) == 1 ) {
+                            $done_customers++;
+                        }   
+                    }
+    
+                    if( $done_customers == count( $active_crons ) ) {
+                        $status[ 'Customers' ] = 1;
+                        update_option('ldnft_process_customers_updated', 'yes' );
+                        $status[ 'Customermsg' ] = sprintf(__( '%d customers are synced', LDNFT_TEXT_DOMAIN ), $new_import );
+                        $status[ 'Customermsg' ] .= '<br>'.__( 'customers -> done.', LDNFT_TEXT_DOMAIN );
+                    } else {
+                        $status[ 'Customers' ] = 0;
+                        $status[ 'Customermsg' ] = sprintf(__( '%d customers are synced', LDNFT_TEXT_DOMAIN ), $new_import );
+                    }
+                //}
+                break;
+            case "sales":
+                $active_crons = get_option( 'ldnft_process_freemius_sales_stats' );
+                $done_sales = 0;
+                // $sale_updated = get_option('ldnft_process_sale_updated' );
+                // if( $sale_updated == 'yes' ) {
+                //     $status[ 'Sales' ] = 1;
+                //     $status[ 'Salesmsg' ] = __( '1sales -> done.', LDNFT_TEXT_DOMAIN );
+                // } else {
+                    $new_import = 0;
+                    if( is_array( $active_crons ) && count( $active_crons ) > 0 ) {
+                        foreach( $active_crons as $key => $value ) {
+                            
+                            $start = get_option( 'ldnft_process_freemius_sales_index_'.$key );
+                            $start_old = get_option( 'ldnft_process_freemius_sales_index_old_'.$key );
+
+                            $new_import += intval( $start ) - intval( $start_old );
+                            if( intval( $value ) == 1 ) {
+                                $done_sales++;
+                            }
+                        }
         
+                        if( $done_sales == count( $active_crons ) ) {
+                            $status[ 'Sales' ] = 1;
+                            update_option('ldnft_process_sale_updated', 'yes' );
+                            $status[ 'Salesmsg' ] = sprintf(__( '%d sales are synced', LDNFT_TEXT_DOMAIN ), $new_import );
+                            $status[ 'Salesmsg' ] .= '<br>'.__( 'sales -> done.', LDNFT_TEXT_DOMAIN );
+                        } else {
+                            $status[ 'Sales' ] = 0;
+                            $status[ 'Salesmsg' ] = sprintf(__( '%d sales are synced', LDNFT_TEXT_DOMAIN ), $new_import );
+                        }
+                    } 
+                //}
+                break;
+            case "subscription":
+                $active_crons = get_option( 'ldnft_process_freemius_subscription_stats' );
+                $done_subscription = 0;
+                // $subscription_updated = get_option('ldnft_process_subscription_updated' );
+                // if( $subscription_updated == 'yes' ) {
+                //     $status[ 'Subscription' ] = 1;
+                //     $status[ 'Subscriptionmsg' ] = __( '1Subscription -> done.', LDNFT_TEXT_DOMAIN );
+                // } else {
+                    $new_import = 0;
+                    foreach( $active_crons as $key => $value ) {
+                        
+                        $start = get_option( 'ldnft_process_freemius_subscription_index_'.$key );
+                        $start_old = get_option( 'ldnft_process_freemius_subscription_index_old_'.$key );
 
-        $status[ 'Customers' ] = 0;
-        $status[ 'Customerrecs' ] = 0;
-        $status[ 'Customermsg' ] = __( 'Customers are synced with freemius.', LDNFT_TEXT_DOMAIN );
-        $active_crons = get_option( 'ldnft_process_freemius_customers_stats' );
-        $done_customers = 0;
-        $customer_updated = get_option('ldnft_process_customers_updated' );
-        if( $customer_updated == 'yes' ) {
-            $status[ 'Customers' ] = 1;
-            $status[ 'Customermsg' ] = __( 'Customers are synced with freemius.', LDNFT_TEXT_DOMAIN );
-        } else {
-            if( is_array( $active_crons ) && count( $active_crons ) > 0 ) {
-                foreach( $active_crons as $key => $value ) {
-                    if( array_key_exists(1, $value) && intval( $value[1] ) == 1 ) {
-                        $done_customers++;
-                        $status[ 'Customerrecs' ] = $value[0];
-                    }   
-                }
+                        $new_import += intval( $start ) - intval( $start_old );
+                        if( intval( $value ) == 1 ) {
+                            $done_subscription++;
+                        }
+                        
+                    }
 
-                if( $done_customers == count( $active_crons ) ) {
-                    $status[ 'Customers' ] = 1;
-                    update_option('ldnft_process_customers_updated', 'yes' );
-                    $status[ 'Customermsg' ] = __( 'Customers are synced with freemius.', LDNFT_TEXT_DOMAIN );
-                }
-            } 
+                    if( $done_subscription == count( $active_crons ) ) {
+                        $status[ 'Subscription' ] = 1;
+                        update_option('ldnft_process_subscription_updated', 'yes' );
+                        $status[ 'Subscriptionmsg' ] = sprintf(__( '%d subscription are synced', LDNFT_TEXT_DOMAIN ), $new_import );
+                        $status[ 'Subscriptionmsg' ] .= '<br>'.__( 'Subscription -> done.', LDNFT_TEXT_DOMAIN );
+                    } else {
+                        $status[ 'Subscription' ] = 0;
+                        $status[ 'Subscriptionmsg' ] = sprintf(__( '%d subscription are synced', LDNFT_TEXT_DOMAIN ), $new_import );
+                    }
+                //}
+                break;
+            case "reviews":
+                $active_crons               = get_option( 'ldnft_process_freemius_reviews_stats' );
+                $done_reviews               = 0;
+                // $reviews_updated = get_option('ldnft_process_reviews_updated' );
+                // if( $reviews_updated == 'yes' ) {
+                //     $status[ 'Reviews' ] = 1;
+                //     $status[ 'Reviewsmsg' ] = __( '1Reviews -> done.', LDNFT_TEXT_DOMAIN );
+                // } else {
+                    $new_import = 0;
+                    if( is_array( $active_crons ) && count( $active_crons ) > 0 ) {
+                        foreach( $active_crons as $key => $value ) {
+                            $start = get_option( 'ldnft_process_freemius_reviews_index_'.$key );
+                            $start_old = get_option( 'ldnft_process_freemius_reviews_index_old_'.$key );
+                            
+                            $new_import += intval( $start ) - intval( $start_old );
+                            if( intval( $value ) == 1 ) {
+                                $done_reviews++;
+                            }   
+                        }
+
+                        if( $done_reviews == count( $active_crons ) ) {
+                            $status[ 'Reviews' ] = 1;
+                            update_option('ldnft_process_reviews_updated', 'yes' );
+                            $status[ 'Reviewsmsg' ] = sprintf(__( '%d reviews are synced', LDNFT_TEXT_DOMAIN ), $new_import );
+                            $status[ 'Reviewsmsg' ] .= '<br>'.__( 'Reviews -> done.', LDNFT_TEXT_DOMAIN );
+                        } else {
+                            $status[ 'Reviews' ] = 0;
+                            $status[ 'Reviewsmsg' ] = sprintf(__( '%d reviews are synced', LDNFT_TEXT_DOMAIN ), $new_import );
+                        }
+                    } 
+                //}
+                break;
+                        
         }
 
-        $status[ 'Sales' ] = 0;
-        $status[ 'Salesrecs' ] = 0;
-        $status[ 'Salesmsg' ] = __( 'Customers are synced with freemius.', LDNFT_TEXT_DOMAIN );
-        $active_crons = get_option( 'ldnft_process_freemius_sales_stats' );
-        $done_sales = 0;
-        $sale_updated = get_option('ldnft_process_sale_updated' );
-        if( $sale_updated == 'yes' ) {
-            $status[ 'Sales' ] = 1;
-            $status[ 'Salesmsg' ] = __( 'Sales are synced with freemius.', LDNFT_TEXT_DOMAIN );
-        } else {
-            if( is_array( $active_crons ) && count( $active_crons ) > 0 ) {
-                foreach( $active_crons as $key => $value ) {
-                    if( array_key_exists(1, $value) && intval( $value[1] ) == 1 ) {
-                        $done_sales++;
-                        $status[ 'Salesrecs' ] = $value[0];
-                    }   
-                }
-
-                if( $done_sales == count( $active_crons ) ) {
-                    $status[ 'Sales' ] = 1;
-                    update_option('ldnft_process_sale_updated', 'yes' );
-                    $status[ 'Salesmsg' ] = __( 'Sales are synced with freemius.', LDNFT_TEXT_DOMAIN );
-                }
-            } 
-        }
-
-        $status[ 'Subscription' ]       = 0;
-        $status[ 'Subscriptionrecs' ]   = 0;
-        $status[ 'Subscriptionmsg' ]    = __( 'Subscription are synced with freemius.', LDNFT_TEXT_DOMAIN );
-        $active_crons                   = get_option( 'ldnft_process_freemius_subscription_stats' );
-        $done_subscription = 0;
-        $reviews_updated = get_option('ldnft_process_subscription_updated' );
-        if( $reviews_updated == 'yes' ) {
-            $status[ 'Subscription' ] = 1;
-            $status[ 'Subscriptionmsg' ] = __( 'Subscription are synced with freemius.', LDNFT_TEXT_DOMAIN );
-        } else {
-            if( is_array( $active_crons ) && count( $active_crons ) > 0 ) {
-                foreach( $active_crons as $key => $value ) {
-                    if( array_key_exists(1, $value) && intval( $value[1] ) == 1 ) {
-                        $done_subscription++;
-                        $status[ 'Subscriptionrecs' ] = $value[0];
-                    }   
-                }
-
-                if( $done_subscription == count( $active_crons ) ) {
-                    $status[ 'Subscription' ] = 1;
-                    update_option('ldnft_process_subscription_updated', 'yes' );
-                    $status[ 'Subscriptionmsg' ] = __( 'Subscription are synced with freemius.', LDNFT_TEXT_DOMAIN );
-                }
-            } 
-        }
-
-        $status[ 'Reviews' ]        = 0;
-        $status[ 'Reviewsrecs' ]    = 0;
-        $status[ 'Reviewsmsg' ]     = __( 'Reviews are synced with freemius.', LDNFT_TEXT_DOMAIN );
-        $active_crons               = get_option( 'ldnft_process_freemius_reviews_stats' );
-        $done_reviews               = 0;
-        $reviews_updated = get_option('ldnft_process_reviews_updated' );
-        if( $reviews_updated == 'yes' ) {
-            $status[ 'Reviews' ] = 1;
-            $status[ 'Reviewsmsg' ] = __( 'Reviews are synced with freemius.', LDNFT_TEXT_DOMAIN );
-        } else {
-            if( is_array( $active_crons ) && count( $active_crons ) > 0 ) {
-                foreach( $active_crons as $key => $value ) {
-                    if( array_key_exists(1, $value) && intval( $value[1] ) == 1 ) {
-                        $done_reviews++;
-                        $status[ 'Reviewsrecs' ] = $value[0];
-                    }   
-                }
-
-                if( $done_reviews == count( $active_crons ) ) {
-                    $status[ 'Reviews' ] = 1;
-                    update_option('ldnft_process_reviews_updated', 'yes' );
-                    $status[ 'Reviewsmsg' ] = __( 'Reviews are synced with freemius.', LDNFT_TEXT_DOMAIN );
-                }
-            } 
-        }
+        return $status;
         
-        return json_encode( [ 'status' => get_option('ldnft_run_cron_based_on_plugins'), 'individual_status' => $status ]);
     }
+
+    /**
+	 * checks if crons is complete.
+	 */
+    // public static function calculate_cron_process1( ) {
+        
+    //     $active_crons = get_option('ldnft_process_freemius_plugins_stats' );
+        
+    //     $status = [ 'Plugins' => 0, 'Pluginrecs' => 0, 'Pluginmsg' => __('Plugins are synced with freemius.', LDNFT_TEXT_DOMAIN) ];
+    //     $plg_updated = get_option('ldnft_process_plg_updated' );
+    //     if( $plg_updated == 'yes' ) {
+    //         $status[ 'Plugins' ] = 1;
+    //         $status[ 'Pluginmsg' ] = __('Plugins are synced with freemius.', LDNFT_TEXT_DOMAIN);
+    //     } else {
+    //         if( is_array( $active_crons ) && count( $active_crons ) > 0 ) {
+    //             if( array_key_exists( 1, $active_crons ) ) {
+    //                 if( $active_crons[1] == 1 || $active_crons[1] == "1" ) {
+    //                     $status[ 'Plugins' ] = 1;
+    //                     update_option('ldnft_process_plg_updated', 'yes' );
+    //                     $status[ 'Pluginrecs' ] = $active_crons[0];
+    //                     $status[ 'Pluginmsg' ] = __('Plugins are synced with freemius.', LDNFT_TEXT_DOMAIN);
+    //                 }
+    //             }
+    //         }
+    //     }
+        
+    //     $status[ 'Plans' ] = 0;
+    //     $status[ 'Planrecs' ] = 0;
+    //     $status[ 'Planmsg' ] = __('Plans are synced with freemius.', LDNFT_TEXT_DOMAIN);
+    //     $plan_updated = get_option('ldnft_process_plan_updated' );
+    //     if( $plan_updated == 'yes' ) {
+    //         $status[ 'Plans' ] = 1;
+    //         $status[ 'Planmsg' ] = __( 'Plans are synced with freemius.', LDNFT_TEXT_DOMAIN );
+    //     } else {
+    //         $active_crons = get_option('ldnft_process_freemius_plans_stats' );
+    //         if( is_array( $active_crons ) && count( $active_crons ) > 0 ) {
+    //             if( array_key_exists( 1, $active_crons ) ) {
+    //                 if( $active_crons[1] == 1 || $active_crons[1] == "1" ) {
+    //                     $status[ 'Plans' ] = 1;
+    //                     update_option('ldnft_process_plan_updated', 'yes' );
+    //                     $status[ 'Planrecs' ] = $active_crons[0];
+    //                     $status[ 'Planmsg' ] = __( 'Plans are synced with freemius.', LDNFT_TEXT_DOMAIN );
+    //                 }
+    //             }
+    //         }
+    //     }
+        
+
+    //     $status[ 'Customers' ] = 0;
+    //     $status[ 'Customerrecs' ] = 0;
+    //     $status[ 'Customermsg' ] = __( 'Customers are synced with freemius.', LDNFT_TEXT_DOMAIN );
+    //     $active_crons = get_option( 'ldnft_process_freemius_customers_stats' );
+    //     $done_customers = 0;
+    //     $customer_updated = get_option('ldnft_process_customers_updated' );
+    //     if( $customer_updated == 'yes' ) {
+    //         $status[ 'Customers' ] = 1;
+    //         $status[ 'Customermsg' ] = __( 'Customers are synced with freemius.', LDNFT_TEXT_DOMAIN );
+    //     } else {
+    //         if( is_array( $active_crons ) && count( $active_crons ) > 0 ) {
+    //             foreach( $active_crons as $key => $value ) {
+    //                 if( array_key_exists(1, $value) && intval( $value[1] ) == 1 ) {
+    //                     $done_customers++;
+    //                     $status[ 'Customerrecs' ] = $value[0];
+    //                 }   
+    //             }
+
+    //             if( $done_customers == count( $active_crons ) ) {
+    //                 $status[ 'Customers' ] = 1;
+    //                 update_option('ldnft_process_customers_updated', 'yes' );
+    //                 $status[ 'Customermsg' ] = __( 'Customers are synced with freemius.', LDNFT_TEXT_DOMAIN );
+    //             }
+    //         } 
+    //     }
+
+    //     $status[ 'Sales' ] = 0;
+    //     $status[ 'Salesrecs' ] = 0;
+    //     $status[ 'Salesmsg' ] = __( 'Customers are synced with freemius.', LDNFT_TEXT_DOMAIN );
+    //     $active_crons = get_option( 'ldnft_process_freemius_sales_stats' );
+    //     $done_sales = 0;
+    //     $sale_updated = get_option('ldnft_process_sale_updated' );
+    //     if( $sale_updated == 'yes' ) {
+    //         $status[ 'Sales' ] = 1;
+    //         $status[ 'Salesmsg' ] = __( 'Sales are synced with freemius.', LDNFT_TEXT_DOMAIN );
+    //     } else {
+    //         if( is_array( $active_crons ) && count( $active_crons ) > 0 ) {
+    //             foreach( $active_crons as $key => $value ) {
+    //                 if( array_key_exists(1, $value) && intval( $value[1] ) == 1 ) {
+    //                     $done_sales++;
+    //                     $status[ 'Salesrecs' ] = $value[0];
+    //                 }   
+    //             }
+
+    //             if( $done_sales == count( $active_crons ) ) {
+    //                 $status[ 'Sales' ] = 1;
+    //                 update_option('ldnft_process_sale_updated', 'yes' );
+    //                 $status[ 'Salesmsg' ] = __( 'Sales are synced with freemius.', LDNFT_TEXT_DOMAIN );
+    //             }
+    //         } 
+    //     }
+
+    //     $status[ 'Subscription' ]       = 0;
+    //     $status[ 'Subscriptionrecs' ]   = 0;
+    //     $status[ 'Subscriptionmsg' ]    = __( 'Subscription are synced with freemius.', LDNFT_TEXT_DOMAIN );
+    //     $active_crons                   = get_option( 'ldnft_process_freemius_subscription_stats' );
+    //     $done_subscription = 0;
+    //     $reviews_updated = get_option('ldnft_process_subscription_updated' );
+    //     if( $reviews_updated == 'yes' ) {
+    //         $status[ 'Subscription' ] = 1;
+    //         $status[ 'Subscriptionmsg' ] = __( 'Subscription are synced with freemius.', LDNFT_TEXT_DOMAIN );
+    //     } else {
+    //         if( is_array( $active_crons ) && count( $active_crons ) > 0 ) {
+    //             foreach( $active_crons as $key => $value ) {
+    //                 if( array_key_exists(1, $value) && intval( $value[1] ) == 1 ) {
+    //                     $done_subscription++;
+    //                     $status[ 'Subscriptionrecs' ] = $value[0];
+    //                 }   
+    //             }
+
+    //             if( $done_subscription == count( $active_crons ) ) {
+    //                 $status[ 'Subscription' ] = 1;
+    //                 update_option('ldnft_process_subscription_updated', 'yes' );
+    //                 $status[ 'Subscriptionmsg' ] = __( 'Subscription are synced with freemius.', LDNFT_TEXT_DOMAIN );
+    //             }
+    //         } 
+    //     }
+
+    //     $status[ 'Reviews' ]        = 0;
+    //     $status[ 'Reviewsrecs' ]    = 0;
+    //     $status[ 'Reviewsmsg' ]     = __( 'Reviews are synced with freemius.', LDNFT_TEXT_DOMAIN );
+    //     $active_crons               = get_option( 'ldnft_process_freemius_reviews_stats' );
+    //     $done_reviews               = 0;
+    //     $reviews_updated = get_option('ldnft_process_reviews_updated' );
+    //     if( $reviews_updated == 'yes' ) {
+    //         $status[ 'Reviews' ] = 1;
+    //         $status[ 'Reviewsmsg' ] = __( 'Reviews are synced with freemius.', LDNFT_TEXT_DOMAIN );
+    //     } else {
+    //         if( is_array( $active_crons ) && count( $active_crons ) > 0 ) {
+    //             foreach( $active_crons as $key => $value ) {
+    //                 if( array_key_exists(1, $value) && intval( $value[1] ) == 1 ) {
+    //                     $done_reviews++;
+    //                     $status[ 'Reviewsrecs' ] = $value[0];
+    //                 }   
+    //             }
+
+    //             if( $done_reviews == count( $active_crons ) ) {
+    //                 $status[ 'Reviews' ] = 1;
+    //                 update_option('ldnft_process_reviews_updated', 'yes' );
+    //                 $status[ 'Reviewsmsg' ] = __( 'Reviews are synced with freemius.', LDNFT_TEXT_DOMAIN );
+    //             }
+    //         } 
+    //     }
+        
+    //     return json_encode( [ 'status' => get_option('ldnft_run_cron_based_on_plugins'), 'individual_status' => $status ]);
+    // }
     
     /**
 	 * process plans data.
@@ -950,12 +1139,12 @@ class LDNFT_Crons_Settings {
             }
 
             $active_crons = get_option('ldnft_process_freemius_plans_stats' );
-            $active_crons = [ $updatednum + $inserted, 0 ]; //first param is used for count and second to check if cron is complete.
+            $active_crons = 0; //first param is used for count and second to check if cron is complete.
             update_option( 'ldnft_process_freemius_plans_stats', $active_crons );
         }
 
         $active_crons = get_option('ldnft_process_freemius_plans_stats' );
-        $active_crons = [ $updatednum + $inserted, 1 ]; //first param is used for count and second to check if cron is complete.
+        $active_crons = 1; //first param is used for count and second to check if cron is complete.
         update_option( 'ldnft_process_freemius_plans_stats', $active_crons );
 
         $new_start = $this->processed_records_update( 'ldnft_process_freemius_plan_index', count( $plans_obj->plans ) );
@@ -1028,13 +1217,12 @@ class LDNFT_Crons_Settings {
         }
 
         $active_crons = get_option('ldnft_process_freemius_plugins_stats' );
-        $active_crons[0] = intval( $active_crons[0] ) + count( $plugins->plugins );
         if( count( $plugins->plugins ) < $limit) {
-            $active_crons[1] = 1;
+            $active_crons = 1;
             update_option( 'ldnft_run_cron_based_on_plugins_started', 'no' );
             update_option('ldnft_run_cron_based_on_plugins', 'plans');
         } else {
-            $active_crons[1] = 0;
+            $active_crons = 0;
         }
 
         update_option('ldnft_process_freemius_plugins_stats', $active_crons );
@@ -1162,9 +1350,9 @@ class LDNFT_Crons_Settings {
 
             if( intval( $plugin_id ) > 0 ) {
                 $active_crons = get_option('ldnft_process_freemius_customers_stats' );
-                $active_crons[$plugin_id][0] = intval( $active_crons[$plugin_id][0] ) + count( $usrobj->users );
+                
                 if( count( $usrobj->users ) < $limit) {
-                    $active_crons[$plugin_id][1] = 1;
+                    $active_crons[$plugin_id] = 1;
                 }
                 
                 update_option( 'ldnft_process_freemius_customers_stats', $active_crons );
@@ -1210,7 +1398,7 @@ class LDNFT_Crons_Settings {
         if( is_array( $active_crons ) && count( $active_crons ) > 0 ) {
             foreach( $active_crons as $key => $value ) {
                 
-                if( array_key_exists(1, $value) && intval( $value[1] ) > 0 ) {
+                if( intval( $value ) > 0 ) {
                     $done_customers++;
                 }
             }

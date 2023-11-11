@@ -151,18 +151,18 @@ class LDNFT_Freemius {
         /**
          * Directory
         */
-        define( 'LDNFT_DIR', plugin_dir_path ( __FILE__ ) );
-        define( 'LDNFT_DIR_FILE', LDNFT_DIR . basename ( __FILE__ ) );
-        define( 'LDNFT_INCLUDES_DIR', trailingslashit ( LDNFT_DIR . 'includes' ) );
-        define( 'LDNFT_SHORTCODES_DIR', trailingslashit ( LDNFT_INCLUDES_DIR . 'shortcodes' ) );
-        define( 'LDNFT_SHORTCODES_TEMPLATES_DIR', trailingslashit ( LDNFT_SHORTCODES_DIR . 'templates' ) );
-        define( 'LDNFT_BASE_DIR', plugin_basename(__FILE__));
+        define( 'LDNFT_DIR',                        plugin_dir_path ( __FILE__ ) );
+        define( 'LDNFT_DIR_FILE',                   LDNFT_DIR . basename ( __FILE__ ) );
+        define( 'LDNFT_INCLUDES_DIR',               trailingslashit ( LDNFT_DIR . 'includes' ) );
+        define( 'LDNFT_SHORTCODES_DIR',             trailingslashit ( LDNFT_INCLUDES_DIR . 'shortcodes' ) );
+        define( 'LDNFT_SHORTCODES_TEMPLATES_DIR',   trailingslashit ( LDNFT_SHORTCODES_DIR . 'templates' ) );
+        define( 'LDNFT_BASE_DIR',                   plugin_basename(__FILE__));
 
         /**
          * URLs
         */
-        define( 'LDNFT_URL', trailingslashit ( plugins_url ( '', __FILE__ ) ) );
-        define( 'LDNFT_ASSETS_URL', trailingslashit ( LDNFT_URL . 'assets' ) );
+        define( 'LDNFT_URL',                        trailingslashit ( plugins_url ( '', __FILE__ ) ) );
+        define( 'LDNFT_ASSETS_URL',                 trailingslashit ( LDNFT_URL . 'assets' ) );
         
         /**
          * Plugin version
@@ -180,69 +180,72 @@ class LDNFT_Freemius {
      */
     private function includes() {       
 
-        
-        if( file_exists( LDNFT_INCLUDES_DIR .'admin/class-crons.php' ) ) {
+        if( file_exists( LDNFT_INCLUDES_DIR . 'admin/class-webhooks.php' ) ) {
+            require_once LDNFT_INCLUDES_DIR . 'admin/class-webhooks.php';
+        }        
+
+        if( file_exists( LDNFT_INCLUDES_DIR . 'admin/class-crons.php' ) ) {
             require_once LDNFT_INCLUDES_DIR . 'admin/class-crons.php';
         }        
         
-        if( file_exists( LDNFT_INCLUDES_DIR .'admin/settings.php' ) ) {
+        if( file_exists( LDNFT_INCLUDES_DIR . 'admin/settings.php' ) ) {
             require_once LDNFT_INCLUDES_DIR . 'admin/settings.php';
         }        
 
-        if( file_exists( LDNFT_INCLUDES_DIR .'admin/class-admin.php' ) ) {
+        if( file_exists( LDNFT_INCLUDES_DIR . 'admin/class-admin.php' ) ) {
             require_once LDNFT_INCLUDES_DIR . 'admin/class-admin.php';
         }        
         
-        if( file_exists( LDNFT_INCLUDES_DIR .'admin/customers/class-menu.php' ) ) {
+        if( file_exists( LDNFT_INCLUDES_DIR . 'admin/customers/class-menu.php' ) ) {
             require_once LDNFT_INCLUDES_DIR . 'admin/customers/class-menu.php';
         }
 
-        if( file_exists( LDNFT_INCLUDES_DIR .'admin/customers/class-customers.php' ) ) {
+        if( file_exists( LDNFT_INCLUDES_DIR . 'admin/customers/class-customers.php' ) ) {
             require_once LDNFT_INCLUDES_DIR . 'admin/customers/class-customers.php';
         }
 
-        if( file_exists( LDNFT_INCLUDES_DIR .'admin/reviews/class-menu.php' ) ) {
+        if( file_exists( LDNFT_INCLUDES_DIR . 'admin/reviews/class-menu.php' ) ) {
             require_once LDNFT_INCLUDES_DIR . 'admin/reviews/class-menu.php';
         }
 
-        if( file_exists( LDNFT_INCLUDES_DIR .'admin/reviews/class-reviews.php' ) ) {
+        if( file_exists( LDNFT_INCLUDES_DIR . 'admin/reviews/class-reviews.php' ) ) {
             require_once LDNFT_INCLUDES_DIR . 'admin/reviews/class-reviews.php';
         }
         
-        if( file_exists( LDNFT_INCLUDES_DIR .'admin/subscriptions/class-menu.php' ) ) {
+        if( file_exists( LDNFT_INCLUDES_DIR . 'admin/subscriptions/class-menu.php' ) ) {
             require_once LDNFT_INCLUDES_DIR . 'admin/subscriptions/class-menu.php';
         }
 
-        if( file_exists( LDNFT_INCLUDES_DIR .'admin/subscriptions/class-subscriptions.php' ) ) {
+        if( file_exists( LDNFT_INCLUDES_DIR . 'admin/subscriptions/class-subscriptions.php' ) ) {
             require_once LDNFT_INCLUDES_DIR . 'admin/subscriptions/class-subscriptions.php';
         }
 
-        if( file_exists( LDNFT_INCLUDES_DIR .'admin/sales/class-menu.php' ) ) {
+        if( file_exists( LDNFT_INCLUDES_DIR . 'admin/sales/class-menu.php' ) ) {
             require_once LDNFT_INCLUDES_DIR . 'admin/sales/class-menu.php';
         }
 
-        if( file_exists( LDNFT_INCLUDES_DIR .'admin/sales/class-sales.php' ) ) {
+        if( file_exists( LDNFT_INCLUDES_DIR . 'admin/sales/class-sales.php' ) ) {
             require_once LDNFT_INCLUDES_DIR . 'admin/sales/class-sales.php';
         }
 
-        if( file_exists( LDNFT_INCLUDES_DIR.'shortcodes/class-reviews.php' ) ) {
-            require_once LDNFT_INCLUDES_DIR.'shortcodes/class-reviews.php';
+        if( file_exists( LDNFT_INCLUDES_DIR . 'shortcodes/class-reviews.php' ) ) {
+            require_once LDNFT_INCLUDES_DIR . 'shortcodes/class-reviews.php';
         }
 
-        if( file_exists( LDNFT_INCLUDES_DIR.'shortcodes/class-sales.php' ) ) {
-            require_once LDNFT_INCLUDES_DIR.'shortcodes/class-sales.php';
+        if( file_exists( LDNFT_INCLUDES_DIR . 'shortcodes/class-sales.php' ) ) {
+            require_once LDNFT_INCLUDES_DIR . 'shortcodes/class-sales.php';
         }
 
-        if( file_exists( LDNFT_INCLUDES_DIR.'shortcodes/class-checkout.php' ) ) {
-            require_once LDNFT_INCLUDES_DIR.'shortcodes/class-checkout.php';
+        if( file_exists( LDNFT_INCLUDES_DIR . 'shortcodes/class-checkout.php' ) ) {
+            require_once LDNFT_INCLUDES_DIR . 'shortcodes/class-checkout.php';
         }
 
-        if( file_exists( LDNFT_INCLUDES_DIR.'shortcodes/class-product-ratings.php' ) ) {
-            require_once LDNFT_INCLUDES_DIR.'shortcodes/class-product-ratings.php';
+        if( file_exists( LDNFT_INCLUDES_DIR . 'shortcodes/class-product-ratings.php' ) ) {
+            require_once LDNFT_INCLUDES_DIR . 'shortcodes/class-product-ratings.php';
         }
 
-        if( file_exists( LDNFT_INCLUDES_DIR.'shortcodes/class-number-of-sales.php' ) ) {
-            require_once LDNFT_INCLUDES_DIR.'shortcodes/class-number-of-sales.php';
+        if( file_exists( LDNFT_INCLUDES_DIR . 'shortcodes/class-number-of-sales.php' ) ) {
+            require_once LDNFT_INCLUDES_DIR . 'shortcodes/class-number-of-sales.php';
         }
     }
 
