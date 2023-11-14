@@ -1,7 +1,13 @@
 
-.ldnft_sales_points ul, .ldnft_sales_tax_fee ul, .ldnft_subscription_points ul, .ldnft_subscription_tax_fee ul {
+.ldfmt-subscription-plan_id-filter {
+    width: 298px;
+}
+.ldnft-course-currency-totals tbody th:first-child {
     text-align: left;
-    margin: 0px 10px;
+}
+.ldnft_sales_points ul, .ldnft_sales_tax_fee ul, .ldnft_subscription_points ul, .ldnft_subscription_tax_fee ul {
+    text-align: center;
+    text-transform: uppercase;
 }
 
 .ldfmt-sales-box {
@@ -68,7 +74,9 @@
     text-align: center;
     padding:5px; 
 }
-
+.ldfmt-new-subscriptions-box .ldnft_new_attempts_count {
+    margin-top: 10px;
+}
 .ldfmt-top3-countries-count-box{
     float: left;
     border-radius: 5px; 
@@ -355,6 +363,7 @@
 }
 .ldnft_renewals_count, .ldnft_points, .ldnft_tax_fee, .ldnft_new_sales_count, .ldnft_new_subscriptions_count {
     text-align: center;
+    margin-top: 10px;
 }
 .ldnft-admin-modal-body {
     padding: 2px 16px;
