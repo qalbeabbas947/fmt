@@ -22,7 +22,7 @@
                 $('#ldnft_sales_data').on('click', '.ldnft_sales_view_detail', LDNFTbackEnd.sales_view_detail);
                 $('.ldnft-admin-modal-close').on('click', LDNFTbackEnd.ldnft_subsciber_modal_close);
 				$('#ldnft_reviews_data').on('click', '.ldnft_review_view_detail', LDNFTbackEnd.review_view_detail);
-                $('#ldnft-reviews-filter').on('click', '.ldnft_is_featured_enabled_click', LDNFTbackEnd.ldnft_is_featured_enabled);
+                $('#ldnft_reviews_data').on('click', '.ldnft_is_featured_enabled_click', LDNFTbackEnd.ldnft_is_featured_enabled);
             },
             print_asterik_line: function( ) {
 
@@ -182,6 +182,7 @@
                 } );
             },
             ldnft_is_featured_enabled: function(e){
+                
                 $('#ldnft-reviews-filter').find('.ldnft_is_featured_enabled_click').attr('disabled', true);
                 var cid         = $(this).data('id');
                 var pid         = $(this).data('plugin_id');
