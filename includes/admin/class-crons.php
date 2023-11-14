@@ -747,35 +747,56 @@ class LDNFT_Crons_Settings {
         $active_crons = get_option('ldnft_process_freemius_plugins_stats' );
         $state = isset( $_REQUEST['state'] ) ? sanitize_text_field( $_REQUEST['state'] ) : 'plugins';
         $status = ['status'=>$state];
+        
         switch( $state ){
             case "plugins":
                 $start = get_option( 'ldnft_process_freemius_plugins_index' );
                 $start_old = get_option( 'ldnft_process_freemius_plugins_index_old');
                 $status[ 'active_crons' ] = $active_crons;
+                $new_rec_diff = intval( $start ) - intval( $start_old );
                 if( $active_crons == 1 || $active_crons == "1" ) {
                     $status[ 'Plugins' ] = 1;
                     update_option('ldnft_process_plg_updated', 'yes' );
-                    $status[ 'Pluginmsg' ] = sprintf(__('%d plugins are synced.', LDNFT_TEXT_DOMAIN), intval( $start ) - intval( $start_old ) );
+                    if( $new_rec_diff <= 1 ) {
+                        $status[ 'Pluginmsg' ] .= __('already synced.', LDNFT_TEXT_DOMAIN);
+                    } else {
+                        $status[ 'Pluginmsg' ] = sprintf(__('%d plugin(s) are synced.', LDNFT_TEXT_DOMAIN), $new_rec_diff );
+                    }
+                    
                     $status[ 'Pluginmsg' ] .= '<br>'.__('plugins -> done.', LDNFT_TEXT_DOMAIN);
                 } else {
                     
                     $status[ 'Plugins' ] = 0;
-                    $status[ 'Pluginmsg' ] = sprintf(__('%d plugins are synced.', LDNFT_TEXT_DOMAIN), intval( $start ) - intval( $start_old ) );
+                    if( $new_rec_diff <= 1 ) {
+                        $status[ 'Pluginmsg' ] .= __('already synced.', LDNFT_TEXT_DOMAIN);
+                    } else {
+                        $status[ 'Pluginmsg' ] = sprintf(__('%d plugin(s) are synced.', LDNFT_TEXT_DOMAIN), $new_rec_diff );
+                    }
                 }
                 break;
             case "plans":
                 $active_crons = get_option('ldnft_process_freemius_plans_stats' );
                 $status[ 'active_crons' ] = $active_crons;
                 $start = get_option( 'ldnft_process_freemius_plan_index' );
-                $start_old = get_option( 'ldnft_process_freemius_plan_index_old' );    
+                $start_old = get_option( 'ldnft_process_freemius_plan_index_old' );   
+                $new_rec_diff = intval( $start ) - intval( $start_old ); 
                 if( $active_crons == 1 || $active_crons == "1" ) {
                     $status[ 'Plans' ] = 1;
                     update_option('ldnft_process_plan_updated', 'yes' );
-                    $status[ 'Planmsg' ] = sprintf(__( '%d plans are synced', LDNFT_TEXT_DOMAIN ), intval( $start ) - intval( $start_old ) );
+                    if( $new_rec_diff <= 1 ) {
+                        $status[ 'Planmsg' ] .= __('already synced.', LDNFT_TEXT_DOMAIN);
+                    } else {
+                        $status[ 'Planmsg' ] = sprintf(__( '%d plan(s) are synced', LDNFT_TEXT_DOMAIN ), $new_rec_diff );
+                    }
+                    
                     $status[ 'Planmsg' ] .= '<br>'.__( 'plans -> done.', LDNFT_TEXT_DOMAIN );
                 } else {
                     $status[ 'Plans' ] = 0;
-                    $status[ 'Planmsg' ] = sprintf(__( '%d plans are synced', LDNFT_TEXT_DOMAIN ), intval( $start ) - intval( $start_old ) );
+                    if( $new_rec_diff <= 1 ) {
+                        $status[ 'Planmsg' ] .= __('already synced.', LDNFT_TEXT_DOMAIN);
+                    } else {
+                        $status[ 'Planmsg' ] = sprintf(__( '%d plan(s) are synced', LDNFT_TEXT_DOMAIN ), $new_rec_diff );
+                    }
                 }
                 break;
             case "customers":
@@ -798,11 +819,22 @@ class LDNFT_Crons_Settings {
                 if( $done_customers == count( $active_crons ) ) {
                     $status[ 'Customers' ] = 1;
                     update_option('ldnft_process_customers_updated', 'yes' );
-                    $status[ 'Customermsg' ] = sprintf(__( '%d customers are synced', LDNFT_TEXT_DOMAIN ), $new_import );
+                    if( $new_import <= 1 ) {
+                        $status[ 'Customermsg' ] .= __('already synced.', LDNFT_TEXT_DOMAIN);
+                    } else {
+                        $status[ 'Customermsg' ] = sprintf(__( '%d customer(s) are synced', LDNFT_TEXT_DOMAIN ), $new_import );
+                    }
+                    
                     $status[ 'Customermsg' ] .= '<br>'.__( 'customers -> done.', LDNFT_TEXT_DOMAIN );
                 } else {
                     $status[ 'Customers' ] = 0;
-                    $status[ 'Customermsg' ] = sprintf(__( '%d customers are synced', LDNFT_TEXT_DOMAIN ), $new_import );
+
+                    if( $new_import <= 1 ) {
+                        $status[ 'Customermsg' ] .= __('already synced.', LDNFT_TEXT_DOMAIN);
+                    } else {
+                        $status[ 'Customermsg' ] = sprintf(__( '%d customer(s) are synced', LDNFT_TEXT_DOMAIN ), $new_import );
+                    }
+                    
                 }
                 break;
             case "sales":
@@ -825,11 +857,22 @@ class LDNFT_Crons_Settings {
                     if( $done_sales == count( $active_crons ) ) {
                         $status[ 'Sales' ] = 1;
                         update_option('ldnft_process_sale_updated', 'yes' );
-                        $status[ 'Salesmsg' ] = sprintf(__( '%d sales are synced', LDNFT_TEXT_DOMAIN ), $new_import );
+                        
+                        if( $new_import <= 1 ) {
+                            $status[ 'Salesmsg' ] .= __('already synced.', LDNFT_TEXT_DOMAIN);
+                        } else {
+                            $status[ 'Salesmsg' ] = sprintf(__( '%d sale(s) are synced', LDNFT_TEXT_DOMAIN ), $new_import );
+                        }
+                        
                         $status[ 'Salesmsg' ] .= '<br>'.__( 'sales -> done.', LDNFT_TEXT_DOMAIN );
                     } else {
                         $status[ 'Sales' ] = 0;
-                        $status[ 'Salesmsg' ] = sprintf(__( '%d sales are synced', LDNFT_TEXT_DOMAIN ), $new_import );
+                        
+                        if( $new_import <= 1 ) {
+                            $status[ 'Salesmsg' ] .= __('already synced.', LDNFT_TEXT_DOMAIN);
+                        } else {
+                            $status[ 'Salesmsg' ] = sprintf(__( '%d sale(s) are synced', LDNFT_TEXT_DOMAIN ), $new_import );
+                        }
                     }
                 } 
                 break;
@@ -853,11 +896,20 @@ class LDNFT_Crons_Settings {
                 if( $done_subscription == count( $active_crons ) ) {
                     $status[ 'Subscription' ] = 1;
                     update_option('ldnft_process_subscription_updated', 'yes' );
-                    $status[ 'Subscriptionmsg' ] = sprintf(__( '%d subscription are synced', LDNFT_TEXT_DOMAIN ), $new_import );
+                    if( $new_import <= 1 ) {
+                        $status[ 'Subscriptionmsg' ] .= __('already synced.', LDNFT_TEXT_DOMAIN);
+                    } else {
+                        $status[ 'Subscriptionmsg' ] = sprintf(__( '%d subscription(s) are synced', LDNFT_TEXT_DOMAIN ), $new_import );
+                    }
+                    
                     $status[ 'Subscriptionmsg' ] .= '<br>'.__( 'Subscription -> done.', LDNFT_TEXT_DOMAIN );
                 } else {
                     $status[ 'Subscription' ] = 0;
-                    $status[ 'Subscriptionmsg' ] = sprintf(__( '%d subscription are synced', LDNFT_TEXT_DOMAIN ), $new_import );
+                    if( $new_import <= 1 ) {
+                        $status[ 'Subscriptionmsg' ] .= __('already synced.', LDNFT_TEXT_DOMAIN);
+                    } else {
+                        $status[ 'Subscriptionmsg' ] = sprintf(__( '%d subscriptions(s) are synced', LDNFT_TEXT_DOMAIN ), $new_import );
+                    }
                 }
                 
                 break;
@@ -881,11 +933,21 @@ class LDNFT_Crons_Settings {
                     if( $done_reviews == count( $active_crons ) ) {
                         $status[ 'Reviews' ] = 1;
                         update_option('ldnft_process_reviews_updated', 'yes' );
-                        $status[ 'Reviewsmsg' ] = sprintf(__( '%d reviews are synced', LDNFT_TEXT_DOMAIN ), $new_import );
+                        if( $new_import <= 1 ) {
+                            $status[ 'Reviewsmsg' ] .= __('already synced.', LDNFT_TEXT_DOMAIN);
+                        } else {
+                            $status[ 'Reviewsmsg' ] = sprintf(__( '%d review(s) are synced', LDNFT_TEXT_DOMAIN ), $new_import );
+                        }
+                        
                         $status[ 'Reviewsmsg' ] .= '<br>'.__( 'Reviews -> done.', LDNFT_TEXT_DOMAIN );
                     } else {
                         $status[ 'Reviews' ] = 0;
-                        $status[ 'Reviewsmsg' ] = sprintf(__( '%d reviews are synced', LDNFT_TEXT_DOMAIN ), $new_import );
+                        if( $new_import <= 1 ) {
+                            $status[ 'Reviewsmsg' ] .= __('already synced.', LDNFT_TEXT_DOMAIN);
+                        } else {
+                            $status[ 'Reviewsmsg' ] = sprintf(__( '%d review(s) are synced', LDNFT_TEXT_DOMAIN ), $new_import );
+                        }
+                        
                     }
                 } 
                 break;
