@@ -355,7 +355,7 @@ class LDNFT_Customers extends WP_List_Table {
         }
 
         $where .= $this->selected_status != ''? " and c.is_verified='".$this->selected_status."' " : '';
-        $where .= $this->selected_marketing != ''? " and c.is_marketing_allowed='".$this->selected_marketing."' " : '';
+        $where .= $this->selected_marketing != ''? ( $this->selected_marketing == '1'? " and c.is_marketing_allowed='1' ": " and ( c.is_marketing_allowed='0' or c.is_marketing_allowed is Null) ") : '';
 
         if( ! empty( $this->selected_search )) {
             $where   .= " and ( c.id like '%".$this->selected_search."%' or lower(c.email) like '%".strtolower($this->selected_search)."%' or lower(c.first) like '%".strtolower($this->selected_search)."%' or lower(c.last) like '%".strtolower($this->selected_search)."%' )";
@@ -393,8 +393,8 @@ class LDNFT_Customers extends WP_List_Table {
             'total_items'   => $total_items,
             'per_page'      => $per_page,
             'paged'         => $paged,
-            'current_recs'  => count($this->items),
-            'total_pages'   => ceil($total_items / $per_page)
+            'current_recs'  => count( $this->items ),
+            'total_pages'   => ceil( $total_items / $per_page )
         ] );
     }
 	
