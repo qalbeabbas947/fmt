@@ -28,7 +28,7 @@
 
                 let line = '';
 
-                for( let i = 0; i < 150; i++ ) {
+                for( let i = 0; i < 50; i++ ) {
                     line += '*';
                 }
 
