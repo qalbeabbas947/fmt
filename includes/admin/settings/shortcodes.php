@@ -35,10 +35,10 @@ function ldfmt_add_info_title( $info_text ) {
         <code> [LDNFT_Reviews product_id="?" listing_type="[ pagination | onetime | slider ]" limit="?" ] </code>
         <?php echo ldfmt_add_info_title( "Displays attached product's reviews based on the attached product/plugin id on the frontend. List type parameters allows you to switch the display from  listing to slider. Limit parameter allows you to restrict the display of records at a time in screen." ); ?>
     </div>
-    <div class="ldfmt-tab-shortcode-data">
+    <!-- <div class="ldfmt-tab-shortcode-data">
         <code> [LDNFT_Sales product_id = "?" show="[ summary  |  listing  |  both ]"] </code>
         <?php echo ldfmt_add_info_title( 'This shortcode displays the plugin sales summary and listing based on the attached product/plugin id on the frontend. Show parameter allows the user to control the display. Default value of the show parameter is both.' ); ?>
-    </div>
+    </div> -->
     <div class="ldfmt-tab-shortcode-data">
         <code> [LDNFT_Number_of_Sales product_id="?"] </code>
         <?php echo ldfmt_add_info_title( 'This shortcode displays the total number of plugin/products sales based on the product_id/plugin_id.' ); ?>

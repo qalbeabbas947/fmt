@@ -232,9 +232,9 @@ class LDNFT_Freemius {
             require_once LDNFT_INCLUDES_DIR . 'shortcodes/class-reviews.php';
         }
 
-        if( file_exists( LDNFT_INCLUDES_DIR . 'shortcodes/class-sales.php' ) ) {
-            require_once LDNFT_INCLUDES_DIR . 'shortcodes/class-sales.php';
-        }
+        // if( file_exists( LDNFT_INCLUDES_DIR . 'shortcodes/class-sales.php' ) ) {
+        //     require_once LDNFT_INCLUDES_DIR . 'shortcodes/class-sales.php';
+        // }
 
         if( file_exists( LDNFT_INCLUDES_DIR . 'shortcodes/class-checkout.php' ) ) {
             require_once LDNFT_INCLUDES_DIR . 'shortcodes/class-checkout.php';

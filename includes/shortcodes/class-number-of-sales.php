@@ -51,9 +51,9 @@ class LDNFT_Number_of_Sales_Shortcode {
             'product_id' => 0,
         ), $atts );
 
-        $plugin_id  = sanitize_text_field($attributes['product_id']);
-        $table_name = $wpdb->prefix.'ldnft_subscription';  
-        $total_sales = $wpdb->get_var($wpdb->prepare("SELECT count(id) as id FROM $table_name where plugin_id=%d", $plugin_id));
+        $plugin_id  = sanitize_text_field( $attributes['product_id'] );
+        $table_name = $wpdb->prefix.'ldnft_transactions';  
+        $total_sales = $wpdb->get_var( $wpdb->prepare( "SELECT count(id) as id FROM $table_name where `type`='payment' and plugin_id=%d", $plugin_id ) );
 
         return $total_sales;
     }
