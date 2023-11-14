@@ -696,7 +696,7 @@
                 $('.ldnft_subscription_new_sales_count').css('display', 'none');
                 $('.ldnft_subscription_new_subscriptions_count').css('display', 'none');
                 $('.ldnft_subscription_renewals_count').css('display', 'none');
-
+                $('.ldnft_subscription_new_attempts_count').css('display', 'none');
                 var ldnftpage       = $('.ldnft-freemius-page').val();
                 if( LDNFTbackEnd.display_subscriptions_type == 'filter' ) {
                     var ldnftplugin     = $('.ldfmt-plugins-filter').val();
@@ -771,8 +771,6 @@
                         $('.ldnft_subscription_renewals_count').html(response.total_new_renewals).css('display', 'block');
                         $('.ldnft_subscription_new_attempts_count').html(response.failed_payments).css('display', 'block');
                         $('.ldnft-subssummary-loader').css('display', 'none');
-
-
                         
                         var idx = 0;
                         if( parseInt( response.gross_total_count ) > 0 ) {

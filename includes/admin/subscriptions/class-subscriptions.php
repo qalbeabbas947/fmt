@@ -308,7 +308,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
             $orderby_prefix = "";
         }
         
-        $result = $wpdb->get_results($wpdb->prepare("SELECT t.*, concat(c.first, ' ', c.first) as username, c.email as useremail FROM $table_name $where $where_interval ORDER BY $orderby_prefix$orderby $order LIMIT %d OFFSET %d", $per_page, $offset));
+        $result = $wpdb->get_results( "SELECT t.*, concat(c.first, ' ', c.first) as username, c.email as useremail FROM $table_name $where $where_interval ORDER BY $orderby_prefix$orderby $order LIMIT ".$per_page." OFFSET ".$offset );
         
         $data = [];
         $count = 0;
