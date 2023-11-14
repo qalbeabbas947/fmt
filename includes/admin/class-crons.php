@@ -268,7 +268,8 @@ class LDNFT_Crons_Settings {
                 `ip` varchar(15) DEFAULT NULL,
                 `zip_postal_code` varchar(10) DEFAULT NULL,
                 `currency` varchar(3) DEFAULT NULL,
-                `license_id` int(11) DEFAULT NULL
+                `license_id` int(11) DEFAULT NULL, 
+                PRIMARY KEY (`id`)
             )" );     
         }
         
@@ -455,7 +456,8 @@ class LDNFT_Crons_Settings {
                 `renewal_amount` float DEFAULT NULL,
                 `renewals_discount` float DEFAULT NULL,
                 `renewals_discount_type` varchar(12) DEFAULT NULL,
-                `license_id` int(11) DEFAULT NULL
+                `license_id` int(11) DEFAULT NULL, 
+                PRIMARY KEY (`id`)
             )" );     
         }
 
@@ -636,7 +638,8 @@ class LDNFT_Crons_Settings {
                 `environment` int(11) DEFAULT NULL,
                 `sharable_img` varchar(255) DEFAULT NULL,
                 `created` datetime DEFAULT NULL,
-                `updated` datetime DEFAULT NULL
+                `updated` datetime DEFAULT NULL, 
+                PRIMARY KEY (`id`)
             )" );     
         }
         
@@ -987,7 +990,8 @@ class LDNFT_Crons_Settings {
                 `is_success_manager` varchar(255) DEFAULT NULL,
                 `is_featured` tinyint(1) DEFAULT NULL,
                 `is_hidden` tinyint(1) DEFAULT NULL,
-                `created` datetime DEFAULT NULL
+                `created` datetime DEFAULT NULL, 
+                PRIMARY KEY (`id`)
              )" ); 
          }
 
@@ -1090,7 +1094,8 @@ class LDNFT_Crons_Settings {
                 `plans` varchar(255) DEFAULT NULL,
                 `features` varchar(255) DEFAULT NULL,
                 `money_back_period` int(11) Default NULL,
-                `created` datetime DEFAULT NULL
+                `created` datetime DEFAULT NULL, 
+                PRIMARY KEY (`id`)
             )" ); 
         }
 
@@ -1189,7 +1194,8 @@ class LDNFT_Crons_Settings {
                 `last` varchar(255) DEFAULT NULL,
                 `is_verified` tinyint(1) DEFAULT NULL,
                 `is_marketing_allowed` tinyint(1) DEFAULT NULL,
-                `created` datetime DEFAULT NULL
+                `created` datetime DEFAULT NULL, 
+                PRIMARY KEY (`id`)
             )" );     
         }
         
@@ -1199,7 +1205,8 @@ class LDNFT_Crons_Settings {
                 `plugin_id` int(11) NOT NULL,
                 `customer_id` int(11) NOT NULL,
                 `status` varchar(20) DEFAULT NULL,
-                `created` datetime DEFAULT NULL
+                `created` datetime DEFAULT NULL, 
+                PRIMARY KEY ( `plugin_id`, `customer_id` )
             )" );     
         }
         
