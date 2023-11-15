@@ -141,17 +141,26 @@ class LDNFT_Crons_Settings {
         }
     }
 
-    public function run_freemius_import(){
+    public function run_freemius_import() {
         
         global $wpdb;
-        
+        ini_set('display_errors', 'On');
+        error_reporting(E_ALL);
         header('Content-Type: application/json; charset=utf-8');
-
+        
         $cron_status    = get_option( 'ldnft_run_cron_based_on_plugins' );
         $cron_started   = get_option( 'ldnft_run_cron_based_on_plugins_started' );
+
+        $service = new Freemius_Api_WordPress( FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY );
+        $plugins = $service->Api('plugins.json?count=1', 'GET', []);
+
+        if( isset( $plugins->error )  ) {
+            $response = [ 'is_cron_page_check' => 'No', 'import_cron_status' => $cron_status, 'message' => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ];
+            die(json_encode($response));
+        }
         
         $response = [];
-        if( $cron_status != 'complete' ) { 
+        if( $cron_status != 'complete' ) {  
             $table_name = $wpdb->prefix.'ldnft_plugins';
             if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
                 update_option( 'ldnft_run_cron_based_on_plugins', 'plugins' );
@@ -163,6 +172,9 @@ class LDNFT_Crons_Settings {
                 update_option('ldnft_process_reviews_updated', 'no' );
                 update_option('ldnft_process_subscription_updated', 'no' );
 
+                update_option('ldnft_process_freemius_plugins_stats', 0 );
+                update_option('ldnft_process_freemius_plans_stats', 0 );
+                
                 $start = get_option( 'ldnft_process_freemius_plugins_index' );
                 update_option( 'ldnft_process_freemius_plugins_index_old', $start );
 
@@ -170,6 +182,7 @@ class LDNFT_Crons_Settings {
                 update_option( 'ldnft_process_freemius_plan_index_old', $start );
 
                 $plugins = $wpdb->get_results( 'select id from '.$wpdb->prefix.'ldnft_plugins' );
+                $active_crons = [];
                 foreach( $plugins as $plugin ) {
                     $start = get_option( 'ldnft_process_freemius_customers_index_'.$plugin->id );
                     update_option( 'ldnft_process_freemius_customers_index_old_'.$plugin->id, $start ); 
@@ -182,13 +195,20 @@ class LDNFT_Crons_Settings {
 
                     $start = get_option( 'ldnft_process_freemius_reviews_index_'.$plugin->id );
                     update_option( 'ldnft_process_freemius_reviews_index_old_'.$plugin->id, $start );
+
+                    $active_crons[$plugin->id] = 0; //first param is used for count and second to check if cron is complete.
                 }
                 
+                update_option( 'ldnft_process_freemius_sales_stats', $active_crons );
+                update_option('ldnft_process_freemius_customers_stats', $active_crons );
+                update_option('ldnft_process_freemius_subscription_stats', $active_crons );
+                update_option('ldnft_process_freemius_reviews_stats', $active_crons );
+
                 $this->ldnft_process_freemius_plugins( intval($start) );
 
                 $response = [ 'is_cron_page_check' => 'Yes', 'import_cron_status' => $cron_status, 'message' => __('Sync process has been started.', LDNFT_TEXT_DOMAIN) ];
             } else {
-                $response = [ 'is_cron_page_check' => 'No', 'import_cron_status' => $cron_status, 'message' => __('Sync process is already running.', LDNFT_TEXT_DOMAIN) ];
+                $response = [ 'is_cron_page_check' => 'No', 'import_cron_status' => $cron_status, 'message' => __('Sync process is already running. Please try again by reloading the page if process is not started yet.', LDNFT_TEXT_DOMAIN) ];
             }
         } else {
             if( $cron_started != 'yes' ) {
@@ -201,6 +221,9 @@ class LDNFT_Crons_Settings {
                 update_option('ldnft_process_sale_updated', 'no' );
                 update_option('ldnft_process_reviews_updated', 'no' );
                 update_option('ldnft_process_subscription_updated', 'no' );
+                
+                update_option('ldnft_process_freemius_plugins_stats', 0 );
+                update_option('ldnft_process_freemius_plans_stats', 0 );
 
                 $start = get_option( 'ldnft_process_freemius_plugins_index' );
                 update_option( 'ldnft_process_freemius_plugins_index_old', $start );
@@ -208,6 +231,7 @@ class LDNFT_Crons_Settings {
                 $start = get_option( 'ldnft_process_freemius_plan_index' );
                 update_option( 'ldnft_process_freemius_plan_index_old', $start );
 
+                $active_crons = [];
                 $plugins = $wpdb->get_results( 'select id from '.$wpdb->prefix.'ldnft_plugins' );
                 foreach( $plugins as $plugin ) {
                     $start = get_option( 'ldnft_process_freemius_customers_index_'.$plugin->id );
@@ -221,12 +245,20 @@ class LDNFT_Crons_Settings {
 
                     $start = get_option( 'ldnft_process_freemius_reviews_index_'.$plugin->id );
                     update_option( 'ldnft_process_freemius_reviews_index_old_'.$plugin->id, $start );
+
+                    $active_crons[$plugin->id] = 0; //first param is used for count and second to check if cron is complete.
                 }
+
+                update_option( 'ldnft_process_freemius_sales_stats', $active_crons );
+                update_option('ldnft_process_freemius_customers_stats', $active_crons );
+                update_option('ldnft_process_freemius_subscription_stats', $active_crons );
+                update_option('ldnft_process_freemius_reviews_stats', $active_crons );
+
                 $this->ldnft_process_freemius_plugins( intval($start) );
 
                 $response = [ 'is_cron_page_check' => 'Yes', 'import_cron_status' => $cron_status, 'message' => __('Sync process has been started.', LDNFT_TEXT_DOMAIN) ];
             } else{
-                $response = [ 'is_cron_page_check' => 'No', 'import_cron_status' => $cron_status, 'message' => __('Sync process is already running.', LDNFT_TEXT_DOMAIN) ];
+                $response = [ 'is_cron_page_check' => 'No', 'import_cron_status' => $cron_status, 'message' => __('Sync process is already running. Please try again by reloading the page if process is not started yet.', LDNFT_TEXT_DOMAIN) ];
             }
         }
         
@@ -279,140 +311,142 @@ class LDNFT_Crons_Settings {
         $updatednum = 0;
 
         $pmtobj = $api->Api('plugins/'.$plugin_id.'/payments.json?count='.$limit.'&offset='.$start, 'GET', []);
-        foreach( $pmtobj->payments as $payment ) {
-            
-            $country_code = $payment->country_code; 
-            $id = $payment->id; 
-            $user_id = $payment->user_id; 
-            $plugin_id = $payment->plugin_id; 
-            $install_id = $payment->install_id; 
-            $subscription_id = $payment->subscription_id; 
-            $plan_id = $payment->plan_id; 
-            $gross = $payment->gross; 
-            $license_id = $payment->license_id; 
-            $bound_payment_id = $payment->bound_payment_id; 
-            $external_id = $payment->external_id; 
-            $gateway = $payment->gateway; 
-            $gateway_fee = $payment->gateway_fee; 
-            $vat = $payment->vat; 
-            $vat_id = $payment->vat_id;
-            $pricing_id = $payment->pricing_id;
-            $type = $payment->type; 
-            $is_renewal = $payment->is_renewal;
-            $coupon_id = $payment->coupon_id; 
-            $created = $payment->created; 
-            $updated = $payment->updated; 
-        
-            $ip = $payment->ip; 
-            $pricing_id = $payment->pricing_id; 
-            $zip_postal_code = $payment->zip_postal_code; 
-            $vat_id = $payment->vat_id; 
-            $source = $payment->source; 
-            $environment = $payment->environment; 
-            $currency = $payment->currency; 
-            
-            $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_name." where id=%d", $id ));
-            if( count( $res ) == 0 ) {
-                $wpdb->insert(
-                    $table_name,
-                    array(
-                        'id'                        => $id,
-                        'ip'                        => $ip,
-                        'pricing_id'                => $pricing_id,
-                        'zip_postal_code'           => $zip_postal_code,
-                        'source'                    => $source,
-                        'environment'               => $environment,
-                        'currency'                  => $currency,
-                        'plugin_id'                 => $plugin_id,
-                        'user_id'                   => $user_id,
-                        'country_code'              => $country_code,
-                        'subscription_id'           => $subscription_id,
-                        'plan_id'                   => $plan_id,
-                        'gross'                     => $gross,
-                        'bound_payment_id'          => $bound_payment_id,
-                        'external_id'               => $external_id,
-                        'gateway'                   => $gateway,
-                        'gateway_fee'               => $gateway_fee,
-                        'vat'                       => $vat,
-                        'type'                      => $type,
-                        'is_renewal'                => $is_renewal,
-                        'coupon_id'                 => $coupon_id,
-                        'install_id'                => $install_id,
-                        'license_id'                => $license_id,
-                        'created'                   => $created,
-                        'updated'                   => $updated,
-                    )
-                );
-                $inserted++;
-            } else {
-                $wpdb->update($table_name, 
-                    array(
-                        'id'                        => $id,
-                        'ip'                        => $ip,
-                        'pricing_id'                => $pricing_id,
-                        'zip_postal_code'           => $zip_postal_code,
-                        'source'                    => $source,
-                        'environment'               => $environment,
-                        'currency'                  => $currency,
-                        'plugin_id'                 => $plugin_id,
-                        'user_id'                   => $user_id,
-                        'country_code'              => $country_code,
-                        'subscription_id'           => $subscription_id,
-                        'plan_id'                   => $plan_id,
-                        'gross'                     => $gross,
-                        'bound_payment_id'          => $bound_payment_id,
-                        'external_id'               => $external_id,
-                        'gateway'                   => $gateway,
-                        'gateway_fee'               => $gateway_fee,
-                        'vat'                       => $vat,
-                        'type'                      => $type,
-                        'is_renewal'                => $is_renewal,
-                        'coupon_id'                => $coupon_id,
-                        'install_id'                => $install_id,
-                        'license_id'                => $license_id,
-                        'created'                   => $created,
-                        'updated'                   => $updated,
-                    ), array('id'=>$id));
-                $updatednum++;
-            }
-        }
-
-        if( intval( $plugin_id ) > 0 ) {
-            $active_crons = get_option('ldnft_process_freemius_sales_stats' );
-            if( count( $pmtobj->payments ) < $limit) {
-                $active_crons[$plugin_id] = 1;
+        if( ! isset( $pmtobj->error )  ) {
+            foreach( $pmtobj->payments as $payment ) {
                 
-                $meta_table_name = $wpdb->prefix.'ldnft_customer_meta';
-                $records = $wpdb->get_results( $wpdb->prepare("select * from ".$meta_table_name." where plugin_id=%d", $plugin_id ) );
-                foreach( $records as $record ) {
-                    $status = $wpdb->get_var( $wpdb->prepare("select type from ".$table_name." where plugin_id=%d and user_id=%d order by id desc limit 1", $plugin_id, $record->customer_id ) );
-                    
-                    $wpdb->update( $meta_table_name, 
+                $country_code = $payment->country_code; 
+                $id = $payment->id; 
+                $user_id = $payment->user_id; 
+                $plugin_id = $payment->plugin_id; 
+                $install_id = $payment->install_id; 
+                $subscription_id = $payment->subscription_id; 
+                $plan_id = $payment->plan_id; 
+                $gross = $payment->gross; 
+                $license_id = $payment->license_id; 
+                $bound_payment_id = $payment->bound_payment_id; 
+                $external_id = $payment->external_id; 
+                $gateway = $payment->gateway; 
+                $gateway_fee = $payment->gateway_fee; 
+                $vat = $payment->vat; 
+                $vat_id = $payment->vat_id;
+                $pricing_id = $payment->pricing_id;
+                $type = $payment->type; 
+                $is_renewal = $payment->is_renewal;
+                $coupon_id = $payment->coupon_id; 
+                $created = $payment->created; 
+                $updated = $payment->updated; 
+            
+                $ip = $payment->ip; 
+                $pricing_id = $payment->pricing_id; 
+                $zip_postal_code = $payment->zip_postal_code; 
+                $vat_id = $payment->vat_id; 
+                $source = $payment->source; 
+                $environment = $payment->environment; 
+                $currency = $payment->currency; 
+                
+                $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_name." where id=%d", $id ));
+                if( count( $res ) == 0 ) {
+                    $wpdb->insert(
+                        $table_name,
                         array(
-                            'status'                => $status
-                        ), array( 'plugin_id' => $plugin_id, 'customer_id' => $record->customer_id  ) );
+                            'id'                        => $id,
+                            'ip'                        => $ip,
+                            'pricing_id'                => $pricing_id,
+                            'zip_postal_code'           => $zip_postal_code,
+                            'source'                    => $source,
+                            'environment'               => $environment,
+                            'currency'                  => $currency,
+                            'plugin_id'                 => $plugin_id,
+                            'user_id'                   => $user_id,
+                            'country_code'              => $country_code,
+                            'subscription_id'           => $subscription_id,
+                            'plan_id'                   => $plan_id,
+                            'gross'                     => $gross,
+                            'bound_payment_id'          => $bound_payment_id,
+                            'external_id'               => $external_id,
+                            'gateway'                   => $gateway,
+                            'gateway_fee'               => $gateway_fee,
+                            'vat'                       => $vat,
+                            'type'                      => $type,
+                            'is_renewal'                => $is_renewal,
+                            'coupon_id'                 => $coupon_id,
+                            'install_id'                => $install_id,
+                            'license_id'                => $license_id,
+                            'created'                   => $created,
+                            'updated'                   => $updated,
+                        )
+                    );
+                    $inserted++;
+                } else {
+                    $wpdb->update($table_name, 
+                        array(
+                            'id'                        => $id,
+                            'ip'                        => $ip,
+                            'pricing_id'                => $pricing_id,
+                            'zip_postal_code'           => $zip_postal_code,
+                            'source'                    => $source,
+                            'environment'               => $environment,
+                            'currency'                  => $currency,
+                            'plugin_id'                 => $plugin_id,
+                            'user_id'                   => $user_id,
+                            'country_code'              => $country_code,
+                            'subscription_id'           => $subscription_id,
+                            'plan_id'                   => $plan_id,
+                            'gross'                     => $gross,
+                            'bound_payment_id'          => $bound_payment_id,
+                            'external_id'               => $external_id,
+                            'gateway'                   => $gateway,
+                            'gateway_fee'               => $gateway_fee,
+                            'vat'                       => $vat,
+                            'type'                      => $type,
+                            'is_renewal'                => $is_renewal,
+                            'coupon_id'                => $coupon_id,
+                            'install_id'                => $install_id,
+                            'license_id'                => $license_id,
+                            'created'                   => $created,
+                            'updated'                   => $updated,
+                        ), array('id'=>$id));
+                    $updatednum++;
                 }
             }
 
-            update_option('ldnft_process_freemius_sales_stats', $active_crons );
-        }
+            if( intval( $plugin_id ) > 0 ) {
+                $active_crons = get_option('ldnft_process_freemius_sales_stats' );
+                if( count( $pmtobj->payments ) < $limit) {
+                    $active_crons[$plugin_id] = 1;
+                    
+                    $meta_table_name = $wpdb->prefix.'ldnft_customer_meta';
+                    $records = $wpdb->get_results( $wpdb->prepare("select * from ".$meta_table_name." where plugin_id=%d", $plugin_id ) );
+                    foreach( $records as $record ) {
+                        $status = $wpdb->get_var( $wpdb->prepare("select type from ".$table_name." where plugin_id=%d and user_id=%d order by id desc limit 1", $plugin_id, $record->customer_id ) );
+                        
+                        $wpdb->update( $meta_table_name, 
+                            array(
+                                'status'                => $status
+                            ), array( 'plugin_id' => $plugin_id, 'customer_id' => $record->customer_id  ) );
+                    }
+                }
 
-        $new_start = $this->processed_records_update( 'ldnft_process_freemius_sales_index_'.$plugin_id, count( $pmtobj->payments ) );
-
-        if( count( $pmtobj->payments ) == $limit) {
-            
-            if ( ! wp_next_scheduled( 'ldnft_process_freemius_sales_data' ) ) {
-                $data = [
-                        'plugin_id' => $plugin_id,
-                        'start' => $new_start + $limit,
-                        'limit' => $limit
-                    ];
-                
-                wp_schedule_single_event( time() , 'ldnft_process_freemius_sales_data', $data );
+                update_option('ldnft_process_freemius_sales_stats', $active_crons );
             }
-        }
 
-        $this->check_and_complete( 'ldnft_process_freemius_sales_stats',  'subscription' );
+            $new_start = $this->processed_records_update( 'ldnft_process_freemius_sales_index_'.$plugin_id, count( $pmtobj->payments ) );
+
+            if( count( $pmtobj->payments ) == $limit) {
+                
+                if ( ! wp_next_scheduled( 'ldnft_process_freemius_sales_data' ) ) {
+                    $data = [
+                            'plugin_id' => $plugin_id,
+                            'start' => $new_start + $limit,
+                            'limit' => $limit
+                        ];
+                    
+                    wp_schedule_single_event( time() , 'ldnft_process_freemius_sales_data', $data );
+                }
+            }
+
+            $this->check_and_complete( 'ldnft_process_freemius_sales_stats',  'subscription' );
+        }
     }
 
     /**
@@ -466,147 +500,148 @@ class LDNFT_Crons_Settings {
         $updatednum = 0;
 
         $subobj = $api->Api('plugins/'.$plugin_id.'/subscriptions.json?count='.$limit.'&offset='.$start, 'GET', []);
-        foreach( $subobj->subscriptions as $subscription ) {
-            
-            $total_gross = $subscription->total_gross; 
-            $amount_per_cycle = $subscription->amount_per_cycle; 
-            $initial_amount = $subscription->initial_amount; 
-            $renewal_amount = $subscription->renewal_amount; 
-            $renewals_discount = $subscription->renewals_discount; 
-            $renewals_discount_type = $subscription->renewals_discount_type; 
-            $billing_cycle = $subscription->billing_cycle; 
-            $outstanding_balance = $subscription->outstanding_balance; 
-            $failed_payments = $subscription->failed_payments; 
-            $trial_ends = $subscription->trial_ends; 
-            $next_payment = $subscription->next_payment; 
-            $user_id = $subscription->user_id; 
-            $install_id = $subscription->install_id; 
-            $plan_id = $subscription->plan_id; 
-            $pricing_id = $subscription->pricing_id; 
-            $license_id = $subscription->license_id; 
-            $country_code = $subscription->country_code; 
-            $coupon_id = $subscription->coupon_id; 
-            $user_card_id = $subscription->user_card_id; 
-            $plugin_id = $subscription->plugin_id; 
-            $external_id = $subscription->external_id; 
-            $gateway = $subscription->gateway; 
-            $id = $subscription->id; 
-            $created = $subscription->created; 
-            $updated = $subscription->updated; 
-            $currency = $subscription->currency; 
-            $tax_rate = $subscription->tax_rate;
-            $ip = $subscription->ip;
-            $zip_postal_code = $subscription->zip_postal_code; 
-            $vat_id = $subscription->vat_id; 
-            $source = $subscription->source; 
-            $environment = $subscription->environment; 
-
-            $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_name." where id=%d", $id ));
-            if( count( $res ) == 0 ) {
-                $wpdb->insert(
-                    $table_name,
-                    array(
-                        'id'                        => $id,
-                        'tax_rate'                  => $tax_rate,
-                        'ip'                        => $ip,
-                        'zip_postal_code'           => $zip_postal_code,
-                        'vat_id'                    => $vat_id,
-                        'source'                    => $source,
-                        'user_card_id'              => $user_card_id,
-                        'environment'               => $environment,
-                        'plugin_id'                 => $plugin_id,
-                        'user_id'                   => $user_id,
-                        'install_id'                => $install_id,
-                        'amount_per_cycle'          => $amount_per_cycle,
-                        'billing_cycle'             => $billing_cycle,
-                        'gross'                     => $total_gross,
-                        'outstanding_balance'       => $outstanding_balance,
-                        'failed_payments'           => $failed_payments,
-                        'gateway'                   => $gateway,
-                        'coupon_id'                 => $coupon_id,
-                        'trial_ends'                => $trial_ends,
-                        'next_payment'              => $next_payment,
-                        'created'                   => $created,
-                        'updated_at'                => $updated,
-                        'currency'                  => $currency,
-                        'pricing_id'                => $pricing_id,
-                        'country_code'              => $country_code,
-                        'plan_id'                   => $plan_id,
-                        'external_id'               => $external_id,
-                        'initial_amount'            => $initial_amount,
-                        'renewal_amount'            => $renewal_amount,
-                        'renewals_discount'         => $renewals_discount,
-                        'renewals_discount_type'    => $renewals_discount_type,
-                        'license_id'               => $license_id,
-                    )
-                );
-                $inserted++;
-            } else {
-                $wpdb->update($table_name, 
-                    array(
-                        'plugin_id'                 => $plugin_id,
-                        'user_id'                   => $user_id,
-                        'tax_rate'                  => $tax_rate,
-                        'ip'                        => $ip,
-                        'zip_postal_code'           => $zip_postal_code,
-                        'user_card_id'              => $user_card_id,
-                        'vat_id'                    => $vat_id,
-                        'source'                    => $source,
-                        'environment'               => $environment,
-                        'install_id'                => $install_id,
-                        'amount_per_cycle'          => $amount_per_cycle,
-                        'billing_cycle'             => $billing_cycle,
-                        'gross'                     => $total_gross,
-                        'outstanding_balance'       => $outstanding_balance,
-                        'failed_payments'           => $failed_payments,
-                        'gateway'                   => $gateway,
-                        'coupon_id'                 => $coupon_id,
-                        'trial_ends'                => $trial_ends,
-                        'next_payment'              => $next_payment,
-                        'created'                   => $created,
-                        'updated_at'                => $updated,
-                        'currency'                  => $currency,
-                        'pricing_id'                => $pricing_id,
-                        'country_code'              => $country_code,
-                        'plan_id'                   => $plan_id,
-                        'external_id'               => $external_id,
-                        'initial_amount'            => $initial_amount,
-                        'renewal_amount'            => $renewal_amount,
-                        'renewals_discount'         => $renewals_discount,
-                        'renewals_discount_type'    => $renewals_discount_type,
-                        'license_id'               => $license_id
-                    ), array('id'=>$id));
-                    $updatednum++;
-            }
-            
-        }
-
-        if( intval( $plugin_id ) > 0 ) {
-            $active_crons = get_option('ldnft_process_freemius_subscription_stats' );
-            if( count( $subobj->subscriptions ) < $limit) {
-                $active_crons[$plugin_id] = 1;
-            }
-
-            update_option('ldnft_process_freemius_subscription_stats', $active_crons );
-        }
-        
-        $new_start = $this->processed_records_update( 'ldnft_process_freemius_subscription_index_'.$plugin_id, count( $subobj->subscriptions ) );
-
-        if( count( $subobj->subscriptions ) == $limit) {
-            
-            if ( ! wp_next_scheduled( 'ldnft_process_freemius_subscription_data' ) ) {
-                $data = [
-                        'plugin_id' => $plugin_id,
-                        'start' => $new_start + $limit,
-                        'limit' => $limit
-                    ];
+        if( ! isset( $subobj->error )  ) {
+            foreach( $subobj->subscriptions as $subscription ) {
                 
-                wp_schedule_single_event( time() , 'ldnft_process_freemius_subscription_data', $data );
+                $total_gross = $subscription->total_gross; 
+                $amount_per_cycle = $subscription->amount_per_cycle; 
+                $initial_amount = $subscription->initial_amount; 
+                $renewal_amount = $subscription->renewal_amount; 
+                $renewals_discount = $subscription->renewals_discount; 
+                $renewals_discount_type = $subscription->renewals_discount_type; 
+                $billing_cycle = $subscription->billing_cycle; 
+                $outstanding_balance = $subscription->outstanding_balance; 
+                $failed_payments = $subscription->failed_payments; 
+                $trial_ends = $subscription->trial_ends; 
+                $next_payment = $subscription->next_payment; 
+                $user_id = $subscription->user_id; 
+                $install_id = $subscription->install_id; 
+                $plan_id = $subscription->plan_id; 
+                $pricing_id = $subscription->pricing_id; 
+                $license_id = $subscription->license_id; 
+                $country_code = $subscription->country_code; 
+                $coupon_id = $subscription->coupon_id; 
+                $user_card_id = $subscription->user_card_id; 
+                $plugin_id = $subscription->plugin_id; 
+                $external_id = $subscription->external_id; 
+                $gateway = $subscription->gateway; 
+                $id = $subscription->id; 
+                $created = $subscription->created; 
+                $updated = $subscription->updated; 
+                $currency = $subscription->currency; 
+                $tax_rate = $subscription->tax_rate;
+                $ip = $subscription->ip;
+                $zip_postal_code = $subscription->zip_postal_code; 
+                $vat_id = $subscription->vat_id; 
+                $source = $subscription->source; 
+                $environment = $subscription->environment; 
+
+                $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_name." where id=%d", $id ));
+                if( count( $res ) == 0 ) {
+                    $wpdb->insert(
+                        $table_name,
+                        array(
+                            'id'                        => $id,
+                            'tax_rate'                  => $tax_rate,
+                            'ip'                        => $ip,
+                            'zip_postal_code'           => $zip_postal_code,
+                            'vat_id'                    => $vat_id,
+                            'source'                    => $source,
+                            'user_card_id'              => $user_card_id,
+                            'environment'               => $environment,
+                            'plugin_id'                 => $plugin_id,
+                            'user_id'                   => $user_id,
+                            'install_id'                => $install_id,
+                            'amount_per_cycle'          => $amount_per_cycle,
+                            'billing_cycle'             => $billing_cycle,
+                            'gross'                     => $total_gross,
+                            'outstanding_balance'       => $outstanding_balance,
+                            'failed_payments'           => $failed_payments,
+                            'gateway'                   => $gateway,
+                            'coupon_id'                 => $coupon_id,
+                            'trial_ends'                => $trial_ends,
+                            'next_payment'              => $next_payment,
+                            'created'                   => $created,
+                            'updated_at'                => $updated,
+                            'currency'                  => $currency,
+                            'pricing_id'                => $pricing_id,
+                            'country_code'              => $country_code,
+                            'plan_id'                   => $plan_id,
+                            'external_id'               => $external_id,
+                            'initial_amount'            => $initial_amount,
+                            'renewal_amount'            => $renewal_amount,
+                            'renewals_discount'         => $renewals_discount,
+                            'renewals_discount_type'    => $renewals_discount_type,
+                            'license_id'               => $license_id,
+                        )
+                    );
+                    $inserted++;
+                } else {
+                    $wpdb->update($table_name, 
+                        array(
+                            'plugin_id'                 => $plugin_id,
+                            'user_id'                   => $user_id,
+                            'tax_rate'                  => $tax_rate,
+                            'ip'                        => $ip,
+                            'zip_postal_code'           => $zip_postal_code,
+                            'user_card_id'              => $user_card_id,
+                            'vat_id'                    => $vat_id,
+                            'source'                    => $source,
+                            'environment'               => $environment,
+                            'install_id'                => $install_id,
+                            'amount_per_cycle'          => $amount_per_cycle,
+                            'billing_cycle'             => $billing_cycle,
+                            'gross'                     => $total_gross,
+                            'outstanding_balance'       => $outstanding_balance,
+                            'failed_payments'           => $failed_payments,
+                            'gateway'                   => $gateway,
+                            'coupon_id'                 => $coupon_id,
+                            'trial_ends'                => $trial_ends,
+                            'next_payment'              => $next_payment,
+                            'created'                   => $created,
+                            'updated_at'                => $updated,
+                            'currency'                  => $currency,
+                            'pricing_id'                => $pricing_id,
+                            'country_code'              => $country_code,
+                            'plan_id'                   => $plan_id,
+                            'external_id'               => $external_id,
+                            'initial_amount'            => $initial_amount,
+                            'renewal_amount'            => $renewal_amount,
+                            'renewals_discount'         => $renewals_discount,
+                            'renewals_discount_type'    => $renewals_discount_type,
+                            'license_id'               => $license_id
+                        ), array('id'=>$id));
+                        $updatednum++;
+                }
+                
             }
+        
+            if( intval( $plugin_id ) > 0 ) {
+                $active_crons = get_option('ldnft_process_freemius_subscription_stats' );
+                if( count( $subobj->subscriptions ) < $limit) {
+                    $active_crons[$plugin_id] = 1;
+                }
+
+                update_option('ldnft_process_freemius_subscription_stats', $active_crons );
+            }
+            
+            $new_start = $this->processed_records_update( 'ldnft_process_freemius_subscription_index_'.$plugin_id, count( $subobj->subscriptions ) );
+
+            if( count( $subobj->subscriptions ) == $limit) {
+                
+                if ( ! wp_next_scheduled( 'ldnft_process_freemius_subscription_data' ) ) {
+                    $data = [
+                            'plugin_id' => $plugin_id,
+                            'start' => $new_start + $limit,
+                            'limit' => $limit
+                        ];
+                    
+                    wp_schedule_single_event( time() , 'ldnft_process_freemius_subscription_data', $data );
+                }
+            }
+
+            $this->check_and_complete( 'ldnft_process_freemius_subscription_stats',  'reviews' );
         }
-
-        $this->check_and_complete( 'ldnft_process_freemius_subscription_stats',  'reviews' );
-
     }
 
     /**
@@ -647,88 +682,89 @@ class LDNFT_Crons_Settings {
         $inserted = 0;
         $updatednum = 0;
         $reviewsobj = $api->Api('plugins/'.$plugin_id.'/reviews.json?count='.$limit.'&offset='.$start, 'GET', []);
-        foreach( $reviewsobj->reviews as $review ) {
-            
-            $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_name." where id=%d", $review->id ));
-            if( count( $res ) == 0 ) {
-                $wpdb->insert(
-                    $table_name,
-                    array(
-                        'id'                        => $review->id,
-                        'plugin_id'                 => $review->plugin_id,
-                        'user_id'                   => $review->user_id,
-                        'external_id'               => $review->external_id,
-                        'rate'                      => $review->rate,
-                        'title'                     => $review->title,
-                        'text'                      => $review->text,
-                        'name'                      => $review->name,
-                        'job_title'                 => $review->job_title,
-                        'company'                   => $review->company,
-                        'company_url'               => $review->company_url,
-                        'picture'                   => $review->picture,
-                        'profile_url'               => $review->profile_url,
-                        'license_id'                => $review->license_id,
-                        'is_verified'               => $review->is_verified,
-                        'is_featured'               => $review->is_featured,
-                        'environment'               => $review->environment,
-                        'sharable_img'              => $review->sharable_img,
-                        'created'                   => $review->created,
-                        'updated'                   => $review->updated
-                    )
-                );
-                $inserted++;
-            } else {
-                $wpdb->update($table_name, 
-                    array(
-                        'plugin_id'                 => $review->plugin_id,
-                        'user_id'                   => $review->user_id,
-                        'external_id'               => $review->external_id,
-                        'rate'                      => $review->rate,
-                        'title'                     => $review->title,
-                        'text'                      => $review->text,
-                        'name'                      => $review->name,
-                        'job_title'                 => $review->job_title,
-                        'company'                   => $review->company,
-                        'company_url'               => $review->company_url,
-                        'picture'                   => $review->picture,
-                        'profile_url'               => $review->profile_url,
-                        'license_id'                => $review->license_id,
-                        'is_verified'               => $review->is_verified,
-                        'is_featured'               => $review->is_featured,
-                        'environment'               => $review->environment,
-                        'sharable_img'              => $review->sharable_img,
-                        'updated'                   => $review->updated
-                    ), array('id'=>$review->id));
-                $updatednum++;
-            }
-        }
-
-        if( intval( $plugin_id ) > 0 ) {
-            $active_crons = get_option('ldnft_process_freemius_reviews_stats' );
-            if( count( $reviewsobj->reviews ) < $limit) {
-                $active_crons[$plugin_id] = 1;
-            }
-
-            update_option('ldnft_process_freemius_reviews_stats', $active_crons );
-        }
-        
-        $new_start = $this->processed_records_update( 'ldnft_process_freemius_reviews_index_'.$plugin_id, count( $reviewsobj->reviews ) );
-
-        if( count( $reviewsobj->reviews ) == $limit) {
-            
-            if ( ! wp_next_scheduled( 'ldnft_process_freemius_reviews_data' ) ) {
-                $data = [
-                        'plugin_id' => $plugin_id,
-                        'start' => $new_start + $limit,
-                        'limit' => $limit
-                    ];
+        if( ! isset( $reviewsobj->error )  ) {
+            foreach( $reviewsobj->reviews as $review ) {
                 
-                wp_schedule_single_event( time() , 'ldnft_process_freemius_reviews_data', $data );
+                $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_name." where id=%d", $review->id ));
+                if( count( $res ) == 0 ) {
+                    $wpdb->insert(
+                        $table_name,
+                        array(
+                            'id'                        => $review->id,
+                            'plugin_id'                 => $review->plugin_id,
+                            'user_id'                   => $review->user_id,
+                            'external_id'               => $review->external_id,
+                            'rate'                      => $review->rate,
+                            'title'                     => $review->title,
+                            'text'                      => $review->text,
+                            'name'                      => $review->name,
+                            'job_title'                 => $review->job_title,
+                            'company'                   => $review->company,
+                            'company_url'               => $review->company_url,
+                            'picture'                   => $review->picture,
+                            'profile_url'               => $review->profile_url,
+                            'license_id'                => $review->license_id,
+                            'is_verified'               => $review->is_verified,
+                            'is_featured'               => $review->is_featured,
+                            'environment'               => $review->environment,
+                            'sharable_img'              => $review->sharable_img,
+                            'created'                   => $review->created,
+                            'updated'                   => $review->updated
+                        )
+                    );
+                    $inserted++;
+                } else {
+                    $wpdb->update($table_name, 
+                        array(
+                            'plugin_id'                 => $review->plugin_id,
+                            'user_id'                   => $review->user_id,
+                            'external_id'               => $review->external_id,
+                            'rate'                      => $review->rate,
+                            'title'                     => $review->title,
+                            'text'                      => $review->text,
+                            'name'                      => $review->name,
+                            'job_title'                 => $review->job_title,
+                            'company'                   => $review->company,
+                            'company_url'               => $review->company_url,
+                            'picture'                   => $review->picture,
+                            'profile_url'               => $review->profile_url,
+                            'license_id'                => $review->license_id,
+                            'is_verified'               => $review->is_verified,
+                            'is_featured'               => $review->is_featured,
+                            'environment'               => $review->environment,
+                            'sharable_img'              => $review->sharable_img,
+                            'updated'                   => $review->updated
+                        ), array('id'=>$review->id));
+                    $updatednum++;
+                }
             }
+
+            if( intval( $plugin_id ) > 0 ) {
+                $active_crons = get_option('ldnft_process_freemius_reviews_stats' );
+                if( count( $reviewsobj->reviews ) < $limit) {
+                    $active_crons[$plugin_id] = 1;
+                }
+
+                update_option('ldnft_process_freemius_reviews_stats', $active_crons );
+            }
+            
+            $new_start = $this->processed_records_update( 'ldnft_process_freemius_reviews_index_'.$plugin_id, count( $reviewsobj->reviews ) );
+
+            if( count( $reviewsobj->reviews ) == $limit) {
+                
+                if ( ! wp_next_scheduled( 'ldnft_process_freemius_reviews_data' ) ) {
+                    $data = [
+                            'plugin_id' => $plugin_id,
+                            'start' => $new_start + $limit,
+                            'limit' => $limit
+                        ];
+                    
+                    wp_schedule_single_event( time() , 'ldnft_process_freemius_reviews_data', $data );
+                }
+            }
+
+            $this->check_and_complete( 'ldnft_process_freemius_reviews_stats',  'complete' );
         }
-
-        $this->check_and_complete( 'ldnft_process_freemius_reviews_stats',  'complete' );
-
     }
 
     /**
@@ -749,8 +785,35 @@ class LDNFT_Crons_Settings {
 
         $active_crons = get_option('ldnft_process_freemius_plugins_stats' );
         $state = isset( $_REQUEST['state'] ) ? sanitize_text_field( $_REQUEST['state'] ) : 'plugins';
-        $status = ['status'=>$state];
+        $status = ['status'=>$state, 'error' => 0 ];
         
+        $service = new Freemius_Api_WordPress( FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY );
+        $plugins = $service->Api('plugins.json?count=1', 'GET', []);
+        if( isset( $plugins->error )  ) {
+            switch( $state ){
+                case "plugins":
+                    $status = [ 'status' => $state, 'error' => 1,  'Plugins' => 0, 'Pluginmsg' => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ];
+                    break;
+                case "plans":
+                    $status = [ 'status' => $state, 'error' => 1, 'Plans' => 0, 'Planmsg' => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ];
+                    break;
+                case "customers":
+                    $status = [ 'status' => $state, 'error' => 1, 'Customers' => 0, 'Customermsg' => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ];
+                    break;
+                case "sales":
+                    $status = [ 'status' => $state, 'error' => 1, 'Sales' => 0, 'Salesmsg' => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ];
+                    break;
+                case "subscription":
+                    $status = [ 'status' => $state, 'error' => 1, 'Subscription' => 0, 'Subscriptionmsg' => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ];
+                    break;
+                case "reviews":
+                    $status = [ 'status' => $state, 'error' => 1, 'Reviews' => 0, 'Reviewsmsg' => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ];
+                    break;
+            }
+
+            return  $status;
+        }
+
         switch( $state ){
             case "plugins":
                 $start = get_option( 'ldnft_process_freemius_plugins_index' );
@@ -761,7 +824,7 @@ class LDNFT_Crons_Settings {
                     $status[ 'Plugins' ] = 1;
                     update_option('ldnft_process_plg_updated', 'yes' );
                     if( $new_rec_diff <= 1 ) {
-                        $status[ 'Pluginmsg' ] .= __('already synced.', LDNFT_TEXT_DOMAIN);
+                        $status[ 'Pluginmsg' ] = __('already synced.', LDNFT_TEXT_DOMAIN);
                     } else {
                         $status[ 'Pluginmsg' ] = sprintf(__('%d plugin(s) are synced.', LDNFT_TEXT_DOMAIN), $new_rec_diff );
                     }
@@ -771,7 +834,7 @@ class LDNFT_Crons_Settings {
                     
                     $status[ 'Plugins' ] = 0;
                     if( $new_rec_diff <= 1 ) {
-                        $status[ 'Pluginmsg' ] .= __('already synced.', LDNFT_TEXT_DOMAIN);
+                        $status[ 'Pluginmsg' ] = __('already synced.', LDNFT_TEXT_DOMAIN);
                     } else {
                         $status[ 'Pluginmsg' ] = sprintf(__('%d plugin(s) are synced.', LDNFT_TEXT_DOMAIN), $new_rec_diff );
                     }
@@ -787,7 +850,7 @@ class LDNFT_Crons_Settings {
                     $status[ 'Plans' ] = 1;
                     update_option('ldnft_process_plan_updated', 'yes' );
                     if( $new_rec_diff <= 1 ) {
-                        $status[ 'Planmsg' ] .= __('already synced.', LDNFT_TEXT_DOMAIN);
+                        $status[ 'Planmsg' ] = __('already synced.', LDNFT_TEXT_DOMAIN);
                     } else {
                         $status[ 'Planmsg' ] = sprintf(__( '%d plan(s) are synced', LDNFT_TEXT_DOMAIN ), $new_rec_diff );
                     }
@@ -796,7 +859,7 @@ class LDNFT_Crons_Settings {
                 } else {
                     $status[ 'Plans' ] = 0;
                     if( $new_rec_diff <= 1 ) {
-                        $status[ 'Planmsg' ] .= __('already synced.', LDNFT_TEXT_DOMAIN);
+                        $status[ 'Planmsg' ] = __('already synced.', LDNFT_TEXT_DOMAIN);
                     } else {
                         $status[ 'Planmsg' ] = sprintf(__( '%d plan(s) are synced', LDNFT_TEXT_DOMAIN ), $new_rec_diff );
                     }
@@ -823,7 +886,7 @@ class LDNFT_Crons_Settings {
                     $status[ 'Customers' ] = 1;
                     update_option('ldnft_process_customers_updated', 'yes' );
                     if( $new_import <= 1 ) {
-                        $status[ 'Customermsg' ] .= __('already synced.', LDNFT_TEXT_DOMAIN);
+                        $status[ 'Customermsg' ] = __('already synced.', LDNFT_TEXT_DOMAIN);
                     } else {
                         $status[ 'Customermsg' ] = sprintf(__( '%d customer(s) are synced', LDNFT_TEXT_DOMAIN ), $new_import );
                     }
@@ -833,7 +896,7 @@ class LDNFT_Crons_Settings {
                     $status[ 'Customers' ] = 0;
 
                     if( $new_import <= 1 ) {
-                        $status[ 'Customermsg' ] .= __('already synced.', LDNFT_TEXT_DOMAIN);
+                        $status[ 'Customermsg' ] = __('already synced.', LDNFT_TEXT_DOMAIN);
                     } else {
                         $status[ 'Customermsg' ] = sprintf(__( '%d customer(s) are synced', LDNFT_TEXT_DOMAIN ), $new_import );
                     }
@@ -862,7 +925,7 @@ class LDNFT_Crons_Settings {
                         update_option('ldnft_process_sale_updated', 'yes' );
                         
                         if( $new_import <= 1 ) {
-                            $status[ 'Salesmsg' ] .= __('already synced.', LDNFT_TEXT_DOMAIN);
+                            $status[ 'Salesmsg' ] = __('already synced.', LDNFT_TEXT_DOMAIN);
                         } else {
                             $status[ 'Salesmsg' ] = sprintf(__( '%d sale(s) are synced', LDNFT_TEXT_DOMAIN ), $new_import );
                         }
@@ -872,7 +935,7 @@ class LDNFT_Crons_Settings {
                         $status[ 'Sales' ] = 0;
                         
                         if( $new_import <= 1 ) {
-                            $status[ 'Salesmsg' ] .= __('already synced.', LDNFT_TEXT_DOMAIN);
+                            $status[ 'Salesmsg' ] = __('already synced.', LDNFT_TEXT_DOMAIN);
                         } else {
                             $status[ 'Salesmsg' ] = sprintf(__( '%d sale(s) are synced', LDNFT_TEXT_DOMAIN ), $new_import );
                         }
@@ -893,14 +956,13 @@ class LDNFT_Crons_Settings {
                     if( intval( $value ) == 1 ) {
                         $done_subscription++;
                     }
-                    
                 }
 
                 if( $done_subscription == count( $active_crons ) ) {
                     $status[ 'Subscription' ] = 1;
                     update_option('ldnft_process_subscription_updated', 'yes' );
                     if( $new_import <= 1 ) {
-                        $status[ 'Subscriptionmsg' ] .= __('already synced.', LDNFT_TEXT_DOMAIN);
+                        $status[ 'Subscriptionmsg' ] = __('already synced.', LDNFT_TEXT_DOMAIN);
                     } else {
                         $status[ 'Subscriptionmsg' ] = sprintf(__( '%d subscription(s) are synced', LDNFT_TEXT_DOMAIN ), $new_import );
                     }
@@ -909,7 +971,7 @@ class LDNFT_Crons_Settings {
                 } else {
                     $status[ 'Subscription' ] = 0;
                     if( $new_import <= 1 ) {
-                        $status[ 'Subscriptionmsg' ] .= __('already synced.', LDNFT_TEXT_DOMAIN);
+                        $status[ 'Subscriptionmsg' ] = __('already synced.', LDNFT_TEXT_DOMAIN);
                     } else {
                         $status[ 'Subscriptionmsg' ] = sprintf(__( '%d subscriptions(s) are synced', LDNFT_TEXT_DOMAIN ), $new_import );
                     }
@@ -937,7 +999,7 @@ class LDNFT_Crons_Settings {
                         $status[ 'Reviews' ] = 1;
                         update_option('ldnft_process_reviews_updated', 'yes' );
                         if( $new_import <= 1 ) {
-                            $status[ 'Reviewsmsg' ] .= __('already synced.', LDNFT_TEXT_DOMAIN);
+                            $status[ 'Reviewsmsg' ] = __('already synced.', LDNFT_TEXT_DOMAIN);
                         } else {
                             $status[ 'Reviewsmsg' ] = sprintf(__( '%d review(s) are synced', LDNFT_TEXT_DOMAIN ), $new_import );
                         }
@@ -946,7 +1008,7 @@ class LDNFT_Crons_Settings {
                     } else {
                         $status[ 'Reviews' ] = 0;
                         if( $new_import <= 1 ) {
-                            $status[ 'Reviewsmsg' ] .= __('already synced.', LDNFT_TEXT_DOMAIN);
+                            $status[ 'Reviewsmsg' ] = __('already synced.', LDNFT_TEXT_DOMAIN);
                         } else {
                             $status[ 'Reviewsmsg' ] = sprintf(__( '%d review(s) are synced', LDNFT_TEXT_DOMAIN ), $new_import );
                         }
@@ -1001,69 +1063,72 @@ class LDNFT_Crons_Settings {
         $plugins = $wpdb->get_results( 'select id from '.$wpdb->prefix.'ldnft_plugins' );
         
         foreach( $plugins as $plugin ) {
+            
             $plans_obj = $api->Api('plugins/'.$plugin->id.'/plans.json', 'GET', []);
-            foreach( $plans_obj->plans as $plan ) {
-                
-                $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_name." where id=%d", $plan->id ));
-                if( count( $res ) == 0 ) {
-                    $wpdb->insert(
-                        $table_name,
-                        array(
-                            'id'                        => $plan->id,
-                            'title'                     => $plan->title,
-                            'name'                      => $plan->name,
-                            'description'               => $plan->description,
-                            'plugin_id'                 => $plan->plugin_id,
-                            'is_free_localhost'         => $plan->is_free_localhost,
-                            'is_block_features'         => $plan->is_block_features,
-                            'is_block_features_monthly' => $plan->is_block_features_monthly,
-                            'license_type'              => $plan->license_type,
-                            'is_https_support'          => $plan->is_https_support,
-                            'trial_period'              => $plan->trial_period,
-                            'is_require_subscription'   => $plan->is_require_subscription,
-                            'support_kb'                => $plan->support_kb,
-                            'support_forum'             => $plan->support_forum,
-                            'support_email'             => $plan->support_email,
-                            'support_phone'             => $plan->support_phone,
-                            'support_skype'             => $plan->support_skype,
-                            'is_success_manager'        => $plan->is_success_manager,
-                            'is_featured'               => $plan->is_featured,
-                            'is_hidden'                 => $plan->is_hidden,
-                            'created'                   => $plan->created
-                        )
-                    );
-                    $inserted++;
-                } else {
-                    $wpdb->update($table_name, 
-                        array(
-                            'title'                     => $plan->title,
-                            'name'                      => $plan->name,
-                            'description'               => $plan->description,
-                            'plugin_id'                 => $plan->plugin_id,
-                            'is_free_localhost'         => $plan->is_free_localhost,
-                            'is_block_features'         => $plan->is_block_features,
-                            'is_block_features_monthly' => $plan->is_block_features_monthly,
-                            'license_type'              => $plan->license_type,
-                            'is_https_support'          => $plan->is_https_support,
-                            'trial_period'              => $plan->trial_period,
-                            'is_require_subscription'   => $plan->is_require_subscription,
-                            'support_kb'                => $plan->support_kb,
-                            'support_forum'             => $plan->support_forum,
-                            'support_email'             => $plan->support_email,
-                            'support_phone'             => $plan->support_phone,
-                            'support_skype'             => $plan->support_skype,
-                            'is_success_manager'        => $plan->is_success_manager,
-                            'is_featured'               => $plan->is_featured,
-                            'is_hidden'                 => $plan->is_hidden,
-                        ), array('id'=>$plan->id));
-                    $updatednum++;
+            if( ! isset( $plans_obj->error )  ) {
+                foreach( $plans_obj->plans as $plan ) {
+                    
+                    $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_name." where id=%d", $plan->id ));
+                    if( count( $res ) == 0 ) {
+                        $wpdb->insert(
+                            $table_name,
+                            array(
+                                'id'                        => $plan->id,
+                                'title'                     => $plan->title,
+                                'name'                      => $plan->name,
+                                'description'               => $plan->description,
+                                'plugin_id'                 => $plan->plugin_id,
+                                'is_free_localhost'         => $plan->is_free_localhost,
+                                'is_block_features'         => $plan->is_block_features,
+                                'is_block_features_monthly' => $plan->is_block_features_monthly,
+                                'license_type'              => $plan->license_type,
+                                'is_https_support'          => $plan->is_https_support,
+                                'trial_period'              => $plan->trial_period,
+                                'is_require_subscription'   => $plan->is_require_subscription,
+                                'support_kb'                => $plan->support_kb,
+                                'support_forum'             => $plan->support_forum,
+                                'support_email'             => $plan->support_email,
+                                'support_phone'             => $plan->support_phone,
+                                'support_skype'             => $plan->support_skype,
+                                'is_success_manager'        => $plan->is_success_manager,
+                                'is_featured'               => $plan->is_featured,
+                                'is_hidden'                 => $plan->is_hidden,
+                                'created'                   => $plan->created
+                            )
+                        );
+                        $inserted++;
+                    } else {
+                        $wpdb->update($table_name, 
+                            array(
+                                'title'                     => $plan->title,
+                                'name'                      => $plan->name,
+                                'description'               => $plan->description,
+                                'plugin_id'                 => $plan->plugin_id,
+                                'is_free_localhost'         => $plan->is_free_localhost,
+                                'is_block_features'         => $plan->is_block_features,
+                                'is_block_features_monthly' => $plan->is_block_features_monthly,
+                                'license_type'              => $plan->license_type,
+                                'is_https_support'          => $plan->is_https_support,
+                                'trial_period'              => $plan->trial_period,
+                                'is_require_subscription'   => $plan->is_require_subscription,
+                                'support_kb'                => $plan->support_kb,
+                                'support_forum'             => $plan->support_forum,
+                                'support_email'             => $plan->support_email,
+                                'support_phone'             => $plan->support_phone,
+                                'support_skype'             => $plan->support_skype,
+                                'is_success_manager'        => $plan->is_success_manager,
+                                'is_featured'               => $plan->is_featured,
+                                'is_hidden'                 => $plan->is_hidden,
+                            ), array('id'=>$plan->id));
+                        $updatednum++;
+                    }
+
                 }
 
+                $active_crons = get_option('ldnft_process_freemius_plans_stats' );
+                $active_crons = 0; //first param is used for count and second to check if cron is complete.
+                update_option( 'ldnft_process_freemius_plans_stats', $active_crons );
             }
-
-            $active_crons = get_option('ldnft_process_freemius_plans_stats' );
-            $active_crons = 0; //first param is used for count and second to check if cron is complete.
-            update_option( 'ldnft_process_freemius_plans_stats', $active_crons );
         }
 
         $active_crons = get_option('ldnft_process_freemius_plans_stats' );
@@ -1101,67 +1166,68 @@ class LDNFT_Crons_Settings {
 
         $service = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
         $plugins = $service->Api('plugins.json?count='.$limit.'&offset='.$start, 'GET', []);
-        
-        $inserted = 0;
-        $updatednum = 0;
-        $updated_index = 0;
-        if( isset( $plugins->plugins ) &&  count($plugins->plugins) > 0 ) {
-            foreach( $plugins->plugins as $plugin ) {
-                $updated_index++;
-                $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_name." where id=%d", $plugin->id ));
-                if( count( $res ) == 0 ) {
-                    $wpdb->insert(
-                        $table_name,
-                        array(
-                            'id'                    => $plugin->id,
-                            'title'                 => $plugin->title,
-                            'slug'                  => $plugin->slug,
-                            'default_plan_id'       => $plugin->default_plan_id,
-                            'plans'                 => $plugin->plans,
-                            'features'              => $plugin->features,
-                            'money_back_period'     => $plugin->money_back_period,
-                            'created'               => $plugin->created
-                        )
-                    );
-                    $inserted++;
-                } else {
-                    $wpdb->update($table_name, 
-                        array(
-                            'title'                 => $plugin->title,
-                            'slug'                  => $plugin->slug,
-                            'default_plan_id'       => $plugin->default_plan_id,
-                            'plans'                 => $plugin->plans,
-                            'features'              => $plugin->features,
-                            'money_back_period'     => $plugin->money_back_period,
-                            'created'               => $plugin->created
-                        ), array('id'=>$plugin->id));
-                    $updatednum++;
+        if( ! isset( $plugins->error )  ) {
+            $inserted = 0;
+            $updatednum = 0;
+            $updated_index = 0;
+            if( isset( $plugins->plugins ) &&  count($plugins->plugins) > 0 ) {
+                foreach( $plugins->plugins as $plugin ) {
+                    $updated_index++;
+                    $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_name." where id=%d", $plugin->id ));
+                    if( count( $res ) == 0 ) {
+                        $wpdb->insert(
+                            $table_name,
+                            array(
+                                'id'                    => $plugin->id,
+                                'title'                 => $plugin->title,
+                                'slug'                  => $plugin->slug,
+                                'default_plan_id'       => $plugin->default_plan_id,
+                                'plans'                 => $plugin->plans,
+                                'features'              => $plugin->features,
+                                'money_back_period'     => $plugin->money_back_period,
+                                'created'               => $plugin->created
+                            )
+                        );
+                        $inserted++;
+                    } else {
+                        $wpdb->update($table_name, 
+                            array(
+                                'title'                 => $plugin->title,
+                                'slug'                  => $plugin->slug,
+                                'default_plan_id'       => $plugin->default_plan_id,
+                                'plans'                 => $plugin->plans,
+                                'features'              => $plugin->features,
+                                'money_back_period'     => $plugin->money_back_period,
+                                'created'               => $plugin->created
+                            ), array('id'=>$plugin->id));
+                        $updatednum++;
+                    }
                 }
             }
-        }
 
-        $active_crons = get_option('ldnft_process_freemius_plugins_stats' );
-        if( count( $plugins->plugins ) < $limit) {
-            $active_crons = 1;
-            update_option( 'ldnft_run_cron_based_on_plugins_started', 'no' );
-            update_option('ldnft_run_cron_based_on_plugins', 'plans');
-        } else {
-            $active_crons = 0;
-        }
+            $active_crons = get_option('ldnft_process_freemius_plugins_stats' );
+            if( count( $plugins->plugins ) < $limit) {
+                $active_crons = 1;
+                update_option( 'ldnft_run_cron_based_on_plugins_started', 'no' );
+                update_option('ldnft_run_cron_based_on_plugins', 'plans');
+            } else {
+                $active_crons = 0;
+            }
 
-        update_option('ldnft_process_freemius_plugins_stats', $active_crons );
-        
-        $new_start = $this->processed_records_update( 'ldnft_process_freemius_plugins_index', count( $plugins->plugins ) );
-        
-        if( count( $plugins->plugins ) == $limit) {
+            update_option('ldnft_process_freemius_plugins_stats', $active_crons );
             
-            if ( ! wp_next_scheduled( 'ldnft_process_freemius_plugins_data' ) ) {
-                $data = [
-                        'start' => $new_start + $limit,
-                        'limit' => $limit
-                    ];
+            $new_start = $this->processed_records_update( 'ldnft_process_freemius_plugins_index', count( $plugins->plugins ) );
+            
+            if( count( $plugins->plugins ) == $limit) {
                 
-                wp_schedule_single_event( time() , 'ldnft_process_freemius_plugins_data', $data );
+                if ( ! wp_next_scheduled( 'ldnft_process_freemius_plugins_data' ) ) {
+                    $data = [
+                            'start' => $new_start + $limit,
+                            'limit' => $limit
+                        ];
+                    
+                    wp_schedule_single_event( time() , 'ldnft_process_freemius_plugins_data', $data );
+                }
             }
         }
 	}

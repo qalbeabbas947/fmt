@@ -55,8 +55,9 @@ $cron_status    = get_option('ldnft_run_cron_based_on_plugins');
                 </tr>
                 <?php 
                 $fs_connection  = get_option( 'ldnft__freemius_connected' ) == 'yes'? true : false;
-                if( ! $fs_connection ) {
-                    $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
+                $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
+                if( ! $fs_connection ) 
+                {
                     try {
                         $products = $api->Api('plugins.json?fields=id,title', 'GET', []);
                         update_option( 'ldnft__HAS_PLUGINS', 'no' );
@@ -74,6 +75,7 @@ $cron_status    = get_option('ldnft_run_cron_based_on_plugins');
                         update_option( 'ldnft__freemius_connected', 'no' );    
                     }
                 }
+
                 if( $cron_status != 'complete' && $fs_connection ) 
                 { 
                     ?>
@@ -98,6 +100,7 @@ $cron_status    = get_option('ldnft_run_cron_based_on_plugins');
             <?php if( $fs_connection ) { ?>
                 <input type="button" class="button button-primary ldnft-sync-data-setting" name="ldnft_sync_data" value="<?php _e( 'Sync Data', LDNFT_TEXT_DOMAIN ); ?>">
             <?php } ?>
+            <span id="ldnft-settings-import-error-message" style="display:none;" class="ldnft-settings-sync-data-message1"></span>
         </div>
     </form>
 </div>

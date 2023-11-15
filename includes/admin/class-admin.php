@@ -207,6 +207,7 @@ class LDNFT_Admin {
                     'subscription_start_msg'   => __('Subscriptions are updating.....', LDNFT_TEXT_DOMAIN),
                     'reviews_start_msg'   => __('Reviews are updating.....', LDNFT_TEXT_DOMAIN),
                     'complete_msg'   => __('Import is complete', LDNFT_TEXT_DOMAIN),
+                    'ldnft_error_reload_message'   => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN),
                 ] );
             }
         }  

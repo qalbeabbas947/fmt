@@ -117,7 +117,7 @@
                     action: 'ldnft_check_cron_status',
                     state: LDNFTbackEnd.current_cron_step
                 }
-                
+                $('#ldnft-settings-import-error-message').html('').css( 'display', 'none' );
                 jQuery.post( LDNFT.ajaxURL, data, function( response ) {
                     
                     if( response.status == 'complete' ) {
@@ -179,7 +179,15 @@
 
                         LDNFTbackEnd.timeout_obj = setTimeout(LDNFTbackEnd.check_cron_status, 3000);
                     }
-                } );
+
+                    if( response.error == 1 ) {
+                        clearTimeout(LDNFTbackEnd.timeout_obj);
+                     } 
+
+                } ).fail(function(response) {
+                    $('#ldnft-settings-import-error-message').html( LDNFT.ldnft_error_reload_message ).css( 'display', 'block' );
+                    clearTimeout(LDNFTbackEnd.timeout_obj);
+                });
             },
             ldnft_is_featured_enabled: function(e){
                 
