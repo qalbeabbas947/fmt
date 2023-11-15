@@ -51,8 +51,9 @@ class LDNFT_Settings {
         
 
         $table_name = $wpdb->prefix.'ldnft_customers'; 
-        $result = $wpdb->get_results( "SELECT * FROM $table_name where plugin_id='".$ldnft_mailpeot_plugin."'", ARRAY_A );
+        $meta_table_name = $wpdb->prefix.'ldnft_customer_meta'; 
         
+        $result = $wpdb->get_results( "SELECT * FROM $table_name as c inner join $meta_table_name as m on(c.id=m.customer_id) where m.plugin_id='".$ldnft_mailpeot_plugin."'" );
         $response = [];
         $count = 0;
         $exists = 0;
@@ -60,7 +61,7 @@ class LDNFT_Settings {
         $errors = [];
         
         if( is_array( $result ) && count( $result ) > 0 ) {
-            
+
             foreach( $result as $user ) {
                 $total++;
                 $subscriber_data = [
