@@ -208,7 +208,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
                     'amount_per_cycle'      => LDNFT_Admin::get_bar_preloader(), 
                     'discount'              => LDNFT_Admin::get_bar_preloader(), 
                     'billing_cycle'         => LDNFT_Admin::get_bar_preloader(), 
-                    'gross'           => LDNFT_Admin::get_bar_preloader(), 
+                    'gross'                 => LDNFT_Admin::get_bar_preloader(), 
                     'gateway'               => LDNFT_Admin::get_bar_preloader(), 
                     'renewal_amount'        => LDNFT_Admin::get_bar_preloader(), 
                     'outstanding_balance'   => LDNFT_Admin::get_bar_preloader(), 
@@ -238,10 +238,6 @@ class LDNFT_Subscriptions extends WP_List_Table {
         
         /**
          * REQUIRED. Now we need to define our column headers. This includes a complete
-         * array of columns to be displayed (slugs & titles), a list of columns
-         * to keep hidden, and a list of columns that are sortable. Each of these
-         * can be defined in another method (as we've done here) before being
-         * used to build the value for our _column_headers property.
          */
         $columns = $this->get_columns();
         $screen = WP_Screen::get( 'freemius-toolkit_page_freemius-subscriptions' );
@@ -250,9 +246,6 @@ class LDNFT_Subscriptions extends WP_List_Table {
         
         /**
          * REQUIRED. Finally, we build an array to be used by the class for column 
-         * headers. The $this->_column_headers property takes an array which contains
-         * 3 other arrays. One for all columns, one for hidden columns, and one
-         * for sortable columns.
          */
         $this->_column_headers = [ $columns, $hidden, $sortable ];
         
@@ -296,7 +289,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
             $where   .= " and ( t.id like '%".$this->selected_search."%' or t.user_id like '%".$this->selected_search."%' or lower(c.email) like '%".strtolower($this->selected_search)."%' or lower(c.first) like '%".strtolower($this->selected_search)."%' or lower(c.last) like '%".strtolower($this->selected_search)."%' )";
         }
         
-        $total_items = $wpdb->get_var("SELECT COUNT(t.id) FROM $table_name".$where.$where_interval);
+        $total_items = $wpdb->get_var("SELECT COUNT(t.id) FROM $table_name".$where);
 
         // prepare query params, as usual current page, order by and order direction
         $offset = isset($paged) ? (intval($paged) -1) * $per_page : 0;
@@ -308,7 +301,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
             $orderby_prefix = "";
         }
         
-        $result = $wpdb->get_results( "SELECT t.*, concat(c.first, ' ', c.first) as username, c.email as useremail FROM $table_name $where $where_interval ORDER BY $orderby_prefix$orderby $order LIMIT ".$per_page." OFFSET ".$offset );
+        $result = $wpdb->get_results( "SELECT t.*, concat(c.first, ' ', c.first) as username, c.email as useremail FROM $table_name $where ORDER BY $orderby_prefix$orderby $order LIMIT ".$per_page." OFFSET ".$offset );
         
         $data = [];
         $count = 0;

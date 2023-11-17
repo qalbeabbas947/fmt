@@ -197,7 +197,7 @@ class LDNFT_Subscriptions_Menu {
                             <tr>
                                 <th><?php _e('Payment Date:', LDNFT_TEXT_DOMAIN)?></th>
                                 <td><?php echo $result->created;?></td>
-                                <th><?php _e('Gateway', LDNFT_TEXT_DOMAIN)?></th>
+                                <th><?php _e('Gateway:', LDNFT_TEXT_DOMAIN)?></th>
                                 <td><?php echo $result->gateway;?></td>
                             </tr>
                         </tbody>

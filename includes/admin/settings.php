@@ -52,7 +52,6 @@ class LDNFT_Settings {
 
         $table_name = $wpdb->prefix.'ldnft_customers'; 
         $meta_table_name = $wpdb->prefix.'ldnft_customer_meta'; 
-        
         $result = $wpdb->get_results( "SELECT * FROM $table_name as c inner join $meta_table_name as m on(c.id=m.customer_id) where m.plugin_id='".$ldnft_mailpeot_plugin."'" );
         $response = [];
         $count = 0;

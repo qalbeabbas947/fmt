@@ -36,7 +36,7 @@ class LDNFT_Freemius {
      * @return $this
      */
     public static function instance() {
-
+        
         if ( is_null( self::$instance ) && ! ( self::$instance instanceof LDNFT_Freemius ) ) {
             self::$instance = new self;
 
