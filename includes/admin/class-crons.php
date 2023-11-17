@@ -979,7 +979,7 @@ class LDNFT_Crons_Settings {
                     if( $new_import <= 1 ) {
                         $status[ 'Subscriptionmsg' ] = __('already synced.', LDNFT_TEXT_DOMAIN);
                     } else {
-                        $status[ 'Subscriptionmsg' ] = sprintf(__( '%d subscriptions(s) are synced', LDNFT_TEXT_DOMAIN ), $new_import );
+                        $status[ 'Subscriptionmsg' ] = sprintf(__( '%d subscription(s) are synced', LDNFT_TEXT_DOMAIN ), $new_import );
                     }
                 }
                 
