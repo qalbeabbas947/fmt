@@ -872,15 +872,14 @@ class LDNFT_Crons_Settings {
         $service = new Freemius_Api_WordPress( FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY );
         $plugins = $service->Api( 'plugins.json?count=1', 'GET' , [] );
         $status         = [ 'status' => $state, 'error' => 0, 'no_messgae' => 0 ];
-        $status['last_message']         = $last_message  = get_option( 'ldnft_last_log_message' );
-        $status['ldnft_last_plugins_log_message']         = $ldnft_last_plugins_log_message         = get_option( 'ldnft_last_plugins_log_message' );
-        $status['ldnft_last_plans_log_message']         = $ldnft_last_plans_log_message           = get_option( 'ldnft_last_plans_log_message' );
-        $status['ldnft_last_customers_log_message']         = $ldnft_last_customers_log_message       = get_option( 'ldnft_last_customers_log_message' );
-        $status['ldnft_last_sales_log_message']         = $ldnft_last_sales_log_message           = get_option( 'ldnft_last_sales_log_message' );
-        $status['ldnft_last_subscription_log_message']         = $ldnft_last_subscription_log_message    = get_option( 'ldnft_last_subscription_log_message' );
-        $status['ldnft_last_reviews_log_message_message']         = $ldnft_last_reviews_log_message_message = get_option( 'ldnft_last_reviews_log_message_message' );
-        $status['last_step']         = $last_step                              = get_option( 'ldnft_last_log_message_step' );
-       
+        $last_message                           = get_option( 'ldnft_last_log_message' );
+        $ldnft_last_plugins_log_message         = get_option( 'ldnft_last_plugins_log_message' );
+        $ldnft_last_plans_log_message           = get_option( 'ldnft_last_plans_log_message' );
+        $ldnft_last_customers_log_message       = get_option( 'ldnft_last_customers_log_message' );
+        $ldnft_last_sales_log_message           = get_option( 'ldnft_last_sales_log_message' );
+        $ldnft_last_subscription_log_message    = get_option( 'ldnft_last_subscription_log_message' );
+        $ldnft_last_reviews_log_message_message = get_option( 'ldnft_last_reviews_log_message_message' );
+        $last_step                              = get_option( 'ldnft_last_log_message_step' );
 
         if( isset( $plugins->error )  ) {
             switch( $state ) {
