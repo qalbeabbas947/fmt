@@ -241,11 +241,6 @@ class LDNFT_Crons_Settings {
                     $active_crons[$plugin->id] = 0; //first param is used for count and second to check if cron is complete.
                 }
                 
-                // update_option('ldnft_process_freemius_sales_stats', $active_crons );
-                // update_option('ldnft_process_freemius_customers_stats', $active_crons );
-                // update_option('ldnft_process_freemius_subscription_stats', $active_crons );
-                // update_option('ldnft_process_freemius_reviews_stats', $active_crons );
-
                 $this->ldnft_process_freemius_plugins( intval($start) );
 
                 $response = [ 'is_cron_page_check' => 'Yes', 'import_cron_status' => $cron_status, 'message' => __('Sync process has been started.', LDNFT_TEXT_DOMAIN) ];
@@ -295,11 +290,6 @@ class LDNFT_Crons_Settings {
 
                     $active_crons[$plugin->id] = 0; //first param is used for count and second to check if cron is complete.
                 }
-
-                // update_option( 'ldnft_process_freemius_sales_stats', $active_crons );
-                // update_option('ldnft_process_freemius_customers_stats', $active_crons );
-                // update_option('ldnft_process_freemius_subscription_stats', $active_crons );
-                // update_option('ldnft_process_freemius_reviews_stats', $active_crons );
 
                 $this->ldnft_process_freemius_plugins( intval($start) );
 
@@ -356,7 +346,7 @@ class LDNFT_Crons_Settings {
         }
         
         
-        $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
+        $api = new Freemius_Api_WordPress( FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY );
         $inserted = 0;
         $updatednum = 0;
 
@@ -387,7 +377,6 @@ class LDNFT_Crons_Settings {
                 $coupon_id = $payment->coupon_id; 
                 $created = $payment->created; 
                 $updated = $payment->updated; 
-            
                 $ip = $payment->ip; 
                 $pricing_id = $payment->pricing_id; 
                 $zip_postal_code = $payment->zip_postal_code; 
@@ -730,8 +719,8 @@ class LDNFT_Crons_Settings {
                 `user_id` int(11) NOT NULL,
                 `external_id` int(11) DEFAULT NULL,
                 `rate` int(11) DEFAULT NULL,
-                `title` varchar(255) DEFAULT NULL,
-                `text` varchar(255) DEFAULT NULL,
+                `title` TEXT DEFAULT NULL,
+                `text` TEXT DEFAULT NULL,
                 `name` varchar(255) DEFAULT NULL,
                 `job_title` varchar(255) DEFAULT NULL,
                 `company` varchar(255) DEFAULT NULL,
@@ -753,16 +742,15 @@ class LDNFT_Crons_Settings {
         $inserted = 0;
         $updatednum = 0;
         $reviewsobj = $api->Api('plugins/'.$plugin_id.'/reviews.json?count='.$limit.'&offset='.$start, 'GET', []);
-
         if( ! isset( $reviewsobj->error )  ) {
 
             foreach( $reviewsobj->reviews as $review ) {
-                
+                echo $wpdb->prepare("select * from ".$table_name." where id=%d", $review->id );
                 $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_name." where id=%d", $review->id ));
 
                 if( count( $res ) == 0 ) {
 
-                    $wpdb->insert(
+                    $re = $wpdb->insert(
                         $table_name,
                         array(
                             'id'                        => $review->id,
@@ -787,7 +775,7 @@ class LDNFT_Crons_Settings {
                             'updated'                   => $review->updated
                         )
                     );
-
+                    
                     $inserted++;
 
                 } else {
@@ -813,6 +801,7 @@ class LDNFT_Crons_Settings {
                             'sharable_img'              => $review->sharable_img,
                             'updated'                   => $review->updated
                         ), array('id'=>$review->id));
+                        
                     $updatednum++;
                 }
             }
@@ -883,33 +872,33 @@ class LDNFT_Crons_Settings {
 
         if( isset( $plugins->error )  ) {
             switch( $state ) {
-                        case "plugins": 
-                            $status = [ 'status' => $state, 'error' => 1,  'Plugins' => 0, 'Pluginmsg' => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ];
-                            break;
-                        case "plans":
-                            $status = [ 'status' => $state, 'error' => 1, 'Plans' => 0, 'Planmsg' => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ];
-                            break;
-                        case "customers":
-                            $status = [ 'status' => $state, 'error' => 1, 'Customers' => 0, 'Customermsg' => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ];
-                            break;
-                        case "sales":
-                            $status = [ 'status' => $state, 'error' => 1, 'Sales' => 0, 'Salesmsg' => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ];
-                            break;
-                        case "subscription":
-                            $status = [ 'status' => $state, 'error' => 1, 'Subscription' => 0, 'Subscriptionmsg' => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ];
-                            break;
-                        case "reviews":
-                            $status = [ 'status' => $state, 'error' => 1, 'Reviews' => 0, 'Reviewsmsg' => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ];
-                            break;
-                }
-                
-                if( $last_step == 'general' && $last_message == __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ) {
-                    $status['no_messgae'] = 1;
-                }
+                case "plugins": 
+                    $status = [ 'status' => $state, 'error' => 1,  'Plugins' => 0, 'Pluginmsg' => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ];
+                    break;
+                case "plans":
+                    $status = [ 'status' => $state, 'error' => 1, 'Plans' => 0, 'Planmsg' => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ];
+                    break;
+                case "customers":
+                    $status = [ 'status' => $state, 'error' => 1, 'Customers' => 0, 'Customermsg' => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ];
+                    break;
+                case "sales":
+                    $status = [ 'status' => $state, 'error' => 1, 'Sales' => 0, 'Salesmsg' => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ];
+                    break;
+                case "subscription":
+                    $status = [ 'status' => $state, 'error' => 1, 'Subscription' => 0, 'Subscriptionmsg' => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ];
+                    break;
+                case "reviews":
+                    $status = [ 'status' => $state, 'error' => 1, 'Reviews' => 0, 'Reviewsmsg' => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ];
+                    break;
+            }
+            
+            if( $last_step == 'general' && $last_message == __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ) {
+                $status['no_messgae'] = 1;
+            }
 
-                update_option( 'ldnft_last_log_message', $status['no_messgae'] );
-                update_option( 'ldnft_last_log_message_step', 'general' );
-                return  $status;
+            update_option( 'ldnft_last_log_message', $status['no_messgae'] );
+            update_option( 'ldnft_last_log_message_step', 'general' );
+            return  $status;
         }
 
         switch( $state ){
@@ -1222,9 +1211,9 @@ class LDNFT_Crons_Settings {
 
             $wpdb->query( "CREATE TABLE $table_name (
                 `id` int(11) NOT NULL,
-                `title` varchar(255) DEFAULT NULL,
+                `title` TEXT DEFAULT NULL,
                 `name` varchar(255) DEFAULT NULL,
-                `description` varchar(255) DEFAULT NULL,
+                `description` TEXT DEFAULT NULL,
                 `plugin_id` int(11) DEFAULT NULL,
                 `is_free_localhost` tinyint(1) DEFAULT NULL,
                 `is_block_features` tinyint(1) DEFAULT NULL,

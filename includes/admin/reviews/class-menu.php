@@ -223,6 +223,7 @@ class LDNFT_Reviews_Menu {
 						<div class="alignleft actions bulkactions">
 							<span class="ldnft_filter_labels"><?php _e( 'Filters:', LDNFT_TEXT_DOMAIN ); ?></span>
 							<select name="ldfmt-plugins-filter" class="ldfmt-plugins-filter ldfmt-plugins-reviews-filter">
+                                <option value=""><?php echo __( 'All Plugins/Products', LDNFT_TEXT_DOMAIN );?></option>
 								<?php
 									foreach( $products as $plugin ) {
 										

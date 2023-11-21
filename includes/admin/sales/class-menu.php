@@ -377,8 +377,8 @@ class LDNFT_Sales_Menu {
                                     <option value="all"><?php echo __( 'All Status', LDNFT_TEXT_DOMAIN );?></option>
                                     <option value="not_refunded" <?php echo $selected_filter=='not_refunded'?'selected':'';?>><?php echo __( 'Active', LDNFT_TEXT_DOMAIN );?></option>
                                     <option value="refunds" <?php echo $selected_filter=='refunds'?'selected':'';?>><?php echo __( 'Refunds', LDNFT_TEXT_DOMAIN );?></option>
-                                    <!-- <option value="chargeback" <?php echo $selected_filter=='chargeback'?'selected':'';?>><?php echo __( 'Chargeback', LDNFT_TEXT_DOMAIN );?></option>
-                                    <option value="lost_dispute" <?php echo $selected_filter=='lost_dispute'?'selected':'';?>><?php echo __( 'Lost Dispute', LDNFT_TEXT_DOMAIN );?></option> -->
+                                    <option value="chargeback" <?php echo $selected_filter=='chargeback'?'selected':'';?>><?php echo __( 'Chargeback', LDNFT_TEXT_DOMAIN );?></option>
+                                    <option value="lost_dispute" <?php echo $selected_filter=='lost_dispute'?'selected':'';?>><?php echo __( 'Lost Dispute', LDNFT_TEXT_DOMAIN );?></option>
                                 </select>
                                 <select name="ldnft-sales-payment-types" class="ldnft-sales-payment-types">
                                     <option value=""><?php echo __( 'Paymet Types', LDNFT_TEXT_DOMAIN );?></option>
