@@ -42,6 +42,8 @@ class LDNFT_Settings {
             $response = ['added'=>0, 'exists'=>0, 'message'=>'', 'errors'=> [$errormsg], 'errormsg'=> $errormsg ];
             echo json_encode($response);exit;
         }
+
+        $ldnft_mailpeot_ctype    = sanitize_text_field( $_POST['ldnft_mailpeot_ctype'] );
         
         if (!is_plugin_active('mailpoet/mailpoet.php')) {
             $errormsg = __('This section requires MailPoet to be installed and configured.', LDNFT_TEXT_DOMAIN);
@@ -52,7 +54,15 @@ class LDNFT_Settings {
 
         $table_name = $wpdb->prefix.'ldnft_customers'; 
         $meta_table_name = $wpdb->prefix.'ldnft_customer_meta'; 
-        $result = $wpdb->get_results( "SELECT * FROM $table_name as c inner join $meta_table_name as m on(c.id=m.customer_id) where m.plugin_id='".$ldnft_mailpeot_plugin."'" );
+        $where_type = '';
+        if( !empty( $ldnft_mailpeot_ctype ) ) {
+            if( $ldnft_mailpeot_ctype == 'paid' ) {
+                $where_type = " and ( m.status!='".$ldnft_mailpeot_plugin."' and m.status is not Null) ";
+            } else {
+                $where_type = " and (m.status='' or m.status is Null)";
+            }
+        }
+        $result = $wpdb->get_results( "SELECT * FROM $table_name as c inner join $meta_table_name as m on(c.id=m.customer_id) where m.plugin_id='".$ldnft_mailpeot_plugin."'$where_type" );
         $response = [];
         $count = 0;
         $exists = 0;

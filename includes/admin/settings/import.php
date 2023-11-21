@@ -92,6 +92,25 @@ $plugins = LDNFT_Freemius::$products;
                         <?php } ?> 
                     </td>    
                 </tr>
+                <tr> 
+                    <td align="left" valign="top">
+						<strong><label align = "left" for="ldnft_public_key"><?php _e( 'Customers Type:', LDNFT_TEXT_DOMAIN ); ?></label></strong>
+					</td>
+                    <td>
+                        <?php
+                            if( is_array($plugins) && count( $plugins ) > 0 ) {
+                                echo '<select id="ldnft_mailpeot_ctype" name="ldnft_mailpeot_ctype">';
+                                ?>
+                                    <option value=""><?php _e( 'All Customers', LDNFT_TEXT_DOMAIN ); ?></option>
+                                    <option value="paid"><?php _e( 'Paid Customers', LDNFT_TEXT_DOMAIN ); ?></option>
+                                    <option value="free"><?php _e( 'Free Customers', LDNFT_TEXT_DOMAIN ); ?></option>
+                                <?php   
+                                echo '</select>';
+                            }
+                        ?>
+                        
+                    </td>    
+                </tr>
             </tbody>
         </table>
         <div class="submit-button" style="padding-top:10px">
