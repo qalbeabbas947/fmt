@@ -53,7 +53,8 @@
             },
             sync_data_from_freemius: function(){
                 var data = {
-                    action: 'ldnft_run_freemius_import'
+                    action: 'ldnft_run_freemius_import',
+                    type: $(this).data('type')
                 }
                
                 jQuery.post( LDNFT.ajaxURL, data, function( response ) {
@@ -227,7 +228,8 @@
                 var cid         = $(this).data( 'id' );
                 var pid         = $(this).data( 'plugin_id' );
                 var status_str  = $(this).prop( 'checked' );
-                
+                var selected    = $(this);
+                $( '#ldnft_reviews_data' ).find( '.ldnft-checkmark' ).remove();
                 $.ajax( {
                     url: ajaxurl,
                     dataType: 'json',
@@ -238,6 +240,9 @@
                         status: status_str
                     },
                     success: function ( response ) {
+                        selected.parent().find( '.ldnft-checkmark' ).remove();
+
+                        selected.after('<div class="ldnft-checkmark">&#10003;</div>');
                         $( '#ldnft-reviews-filter' ).find( '.ldnft_is_featured_enabled_click' ).attr( 'disabled', false );
                     }
                 } );
