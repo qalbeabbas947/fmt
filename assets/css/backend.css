@@ -19,8 +19,9 @@
 }
 .ldnft_sales_top3_countries .ldnft-empty-countries-box, .ldnft_subscription_top3_countries .ldnft-empty-countries-box{
     width: 100%;
-    margin: 10px auto;
     font-size: 20px;
+    display: block;
+    margin-top: 20px;
     font-weight: bold;
 }
 .ldnft-course-currency-totals tr td:first-child{
