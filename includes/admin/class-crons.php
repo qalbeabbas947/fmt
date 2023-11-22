@@ -1032,7 +1032,7 @@ class LDNFT_Crons_Settings {
                     }
 
                     $seperator = '<br>';
-                    if( $last_step == 'plans' && $ldnft_last_plugins_log_message == $status[ 'Planmsg' ] ) {
+                    if( $last_step == 'plans' && $ldnft_last_plans_log_message == $status[ 'Planmsg' ] ) {
                         $status[ 'Planmsg' ] = '';
                         $seperator = '';
                     }
@@ -1090,7 +1090,7 @@ class LDNFT_Crons_Settings {
                     }
 
                     $seperator = '<br>';
-                    if( $last_step == 'customers' && $ldnft_last_plugins_log_message == $status[ 'Customermsg' ] ) {
+                    if( $last_step == 'customers' && $ldnft_last_customers_log_message == $status[ 'Customermsg' ] ) {
                         $status[ 'Customermsg' ] = '';
                         $seperator = '';
                     }
@@ -1149,7 +1149,7 @@ class LDNFT_Crons_Settings {
                         }
                         
                         $seperator = '<br>';
-                        if( $last_step == 'sales' && $ldnft_last_plugins_log_message == $status[ 'Salesmsg' ] ) {
+                        if( $last_step == 'sales' && $ldnft_last_sales_log_message == $status[ 'Salesmsg' ] ) {
                             $status[ 'Salesmsg' ] = '';
                             $seperator = '';
                         }
@@ -1204,7 +1204,7 @@ class LDNFT_Crons_Settings {
                     }
                     
                     $seperator = '<br>';
-                    if( $last_step == 'subscription' && $ldnft_last_plugins_log_message == $status[ 'Subscriptionmsg' ] ) {
+                    if( $last_step == 'subscription' && $ldnft_last_subscription_log_message == $status[ 'Subscriptionmsg' ] ) {
                         $status[ 'Subscriptionmsg' ] = '';
                         $seperator = '';
                     }
@@ -1263,7 +1263,7 @@ class LDNFT_Crons_Settings {
                         }
                         
                         $seperator = '<br>';
-                        if( $last_step == 'reviews' && $ldnft_last_plugins_log_message == $status[ 'Reviewsmsg' ] ) {
+                        if( $last_step == 'reviews' && $ldnft_last_reviews_log_message_message == $status[ 'Reviewsmsg' ] ) {
                             $status[ 'Reviewsmsg' ] = '';
                             $seperator = '';
                         }
