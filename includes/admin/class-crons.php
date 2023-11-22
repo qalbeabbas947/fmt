@@ -919,9 +919,9 @@ class LDNFT_Crons_Settings {
         $state          = isset( $_REQUEST[ 'state' ] ) ? sanitize_text_field( $_REQUEST[ 'state' ] ) : 'plugins';
         
         
-        $service = new Freemius_Api_WordPress( FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY );
-        $plugins = $service->Api( 'plugins.json?count=1', 'GET' , [] );
-        $status         = [ 'status' => $state, 'error' => 0, 'no_messgae' => 0 ];
+        //$service = new Freemius_Api_WordPress( FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY );
+        //$plugins = $service->Api( 'plugins.json?count=1', 'GET' , [] );
+        $status                                 = [ 'status' => $state, 'error' => 0, 'no_messgae' => 0 ];
         $last_message                           = get_option( 'ldnft_last_log_message' );
         $ldnft_last_plugins_log_message         = get_option( 'ldnft_last_plugins_log_message' );
         $ldnft_last_plans_log_message           = get_option( 'ldnft_last_plans_log_message' );
@@ -931,36 +931,36 @@ class LDNFT_Crons_Settings {
         $ldnft_last_reviews_log_message_message = get_option( 'ldnft_last_reviews_log_message_message' );
         $last_step                              = get_option( 'ldnft_last_log_message_step' );
 
-        if( isset( $plugins->error )  ) {
-            switch( $state ) {
-                case "plugins": 
-                    $status = [ 'status' => $state, 'error' => 1,  'Plugins' => 0, 'Pluginmsg' => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ];
-                    break;
-                case "plans":
-                    $status = [ 'status' => $state, 'error' => 1, 'Plans' => 0, 'Planmsg' => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ];
-                    break;
-                case "customers":
-                    $status = [ 'status' => $state, 'error' => 1, 'Customers' => 0, 'Customermsg' => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ];
-                    break;
-                case "sales":
-                    $status = [ 'status' => $state, 'error' => 1, 'Sales' => 0, 'Salesmsg' => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ];
-                    break;
-                case "subscription":
-                    $status = [ 'status' => $state, 'error' => 1, 'Subscription' => 0, 'Subscriptionmsg' => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ];
-                    break;
-                case "reviews":
-                    $status = [ 'status' => $state, 'error' => 1, 'Reviews' => 0, 'Reviewsmsg' => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ];
-                    break;
-            }
+        // if( isset( $plugins->error )  ) {
+        //     switch( $state ) {
+        //         case "plugins": 
+        //             $status = [ 'status' => $state, 'error' => 1,  'Plugins' => 0, 'Pluginmsg' => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ];
+        //             break;
+        //         case "plans":
+        //             $status = [ 'status' => $state, 'error' => 1, 'Plans' => 0, 'Planmsg' => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ];
+        //             break;
+        //         case "customers":
+        //             $status = [ 'status' => $state, 'error' => 1, 'Customers' => 0, 'Customermsg' => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ];
+        //             break;
+        //         case "sales":
+        //             $status = [ 'status' => $state, 'error' => 1, 'Sales' => 0, 'Salesmsg' => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ];
+        //             break;
+        //         case "subscription":
+        //             $status = [ 'status' => $state, 'error' => 1, 'Subscription' => 0, 'Subscriptionmsg' => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ];
+        //             break;
+        //         case "reviews":
+        //             $status = [ 'status' => $state, 'error' => 1, 'Reviews' => 0, 'Reviewsmsg' => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ];
+        //             break;
+        //     }
             
-            if( $last_step == 'general' && $last_message == __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ) {
-                $status['no_messgae'] = 1;
-            }
+        //     if( $last_step == 'general' && $last_message == __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ) {
+        //         $status['no_messgae'] = 1;
+        //     }
 
-            update_option( 'ldnft_last_log_message', $status['no_messgae'] );
-            update_option( 'ldnft_last_log_message_step', 'general' );
-            return  $status;
-        }
+        //     update_option( 'ldnft_last_log_message', __( 'There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN ) );
+        //     update_option( 'ldnft_last_log_message_step', 'general' );
+        //     return  $status;
+        // }
 
         switch( $state ){
             case "plugins":
