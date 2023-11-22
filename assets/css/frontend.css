@@ -1,4 +1,4 @@
-/* Review Style */
+/* Review item Style */
 
 .ldnft-reviews-wrapper {
   width: 100%;
@@ -40,8 +40,47 @@
   top: 3px;
   width: 19px;
 }
-/* Review Style End*/
+/* Review item Style End*/
 
+/* Loader Style */
+
+.ldnft-loading-wrapper {
+  font-size: 24px;
+  display: inline-block;
+}
+
+.ldnft-loading-dot {
+  font-size: 30px;
+  display: inline-block;
+  opacity: 0;
+  animation: loadingDots 2s infinite;
+  width: 0;
+}
+
+.ldnft-loading-dot:nth-child(1) {
+  animation-delay: 0.5s;
+}
+
+.ldnft-loading-dot:nth-child(2) {
+  animation-delay: 1s;
+}
+
+.ldnft-loading-dot:nth-child(3) {
+  animation-delay: 1.5s;
+}
+
+@keyframes loadingDots {
+  0%, 100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/*loader style end*/
+
+/* Checkout shortcode style */
 .review-container {
     background-color: white;
     border-radius: 5px;
