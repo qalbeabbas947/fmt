@@ -42,6 +42,16 @@
 }
 /* Review item Style End*/
 
+/* Checkout Section */
+.ldnft-buy-now-widget {
+  width: 100%;
+}
+.ldnft-buy-now-widget .ldnft-option-wrap {
+ margin: unset;
+}
+.ldnft-buy-now-widget .ldnft-option-wrap {
+  margin-bottom: 20px;
+}
 /* Loader Style */
 
 .ldnft-loading-wrapper {
