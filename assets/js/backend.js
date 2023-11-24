@@ -106,7 +106,7 @@
                     if( LDNFT.import_cron_status != 'complete' ) {
 
                         $('.ldnft-process-freemius-data-log').html( LDNFT.plugins_start_msg );
-                        LDNFTbackEnd.timeout_obj = setTimeout( LDNFTbackEnd.check_cron_status, 3000 );
+                        LDNFTbackEnd.timeout_obj = setTimeout( LDNFTbackEnd.check_cron_status, 6000 );
                     } else {
 
                         LDNFT.import_cron_status = 'complete';
@@ -209,7 +209,7 @@
                                 break;
                         }
 
-                        LDNFTbackEnd.timeout_obj = setTimeout( LDNFTbackEnd.check_cron_status, 3000 );
+                        LDNFTbackEnd.timeout_obj = setTimeout( LDNFTbackEnd.check_cron_status, 6000 );
                     }
 
                     if( response.error == 1 ) {

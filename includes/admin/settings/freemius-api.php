@@ -98,8 +98,7 @@ $cron_status    = get_option('ldnft_run_cron_based_on_plugins');
             <input type="hidden" id="ldnft_api_scope" name="ldnft_settings[api_scope]" value="developer">
             <input type="submit" class="button button-primary ldnft-save-setting" name="ldnft_submit_form" value="<?php _e( 'Test & Save', LDNFT_TEXT_DOMAIN ); ?>">
             <?php if( $fs_connection ) { ?>
-                <input type="button" class="button button-primary ldnft-sync-data-setting" data-type="restart" name="ldnft_sync_data_restart" value="<?php _e( 'Restart API Import', LDNFT_TEXT_DOMAIN ); ?>">
-                <input type="button" class="button button-primary ldnft-sync-data-setting" data-type="sync" name="ldnft_sync_data" value="<?php _e( 'Sync API Data', LDNFT_TEXT_DOMAIN ); ?>">
+                <input type="button" class="button button-primary ldnft-sync-data-setting" name="ldnft_sync_data_restart" value="<?php _e( 'Sync Data', LDNFT_TEXT_DOMAIN ); ?>">
             <?php } ?>
             <span id="ldnft-settings-import-error-message" style="display:none;" class="ldnft-settings-sync-data-message1"></span>
         </div>
