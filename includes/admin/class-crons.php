@@ -907,8 +907,7 @@ class LDNFT_Crons_Settings {
 	 * checks if crons is complete.
 	 */
     public static function calculate_cron_process( ) {
-        ini_set('display_errors', 'On');
-        error_reporting(E_ALL);
+        
         $active_crons   = get_option( 'ldnft_process_freemius_plugins_stats' );
         $state          = isset( $_REQUEST[ 'state' ] ) ? sanitize_text_field( $_REQUEST[ 'state' ] ) : 'plugins';
         
@@ -954,13 +953,6 @@ class LDNFT_Crons_Settings {
             update_option( 'ldnft_last_log_message_step', 'general' );
             return  $status;
         }
-        
-        $status[ 'crons_status_subscription_data' ] = wp_next_scheduled( 'ldnft_process_freemius_subscription_data' );
-        $status[ 'crons_status_plugins_data' ]      = wp_next_scheduled( 'ldnft_process_freemius_plugins_data' );
-        $status[ 'crons_status_customers_data' ]    = wp_next_scheduled( 'ldnft_process_freemius_customers_data' );
-        $status[ 'crons_status_sales_data' ]        = wp_next_scheduled( 'ldnft_process_freemius_sales_data' );
-        $status[ 'crons_status_reviews_data' ]      = wp_next_scheduled( 'ldnft_process_freemius_reviews_data' );
-
         
         switch( $state ){
             case "plugins":
