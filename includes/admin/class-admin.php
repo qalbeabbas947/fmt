@@ -164,7 +164,6 @@ class LDNFT_Admin {
 
         $screen = get_current_screen();
         if( $screen ) { 
-            
             if( $screen->id == 'freemius-toolkit_page_freemius-settings' 
                 || $screen->id == 'freemius-toolkit_page_freemius-settings-page'
                 || $screen->id == 'freemius-toolkit_page_freemius-subscriptions'
@@ -200,14 +199,14 @@ class LDNFT_Admin {
                     'import_cron_status' => $cron_status,
                     'is_cron_page_check' => $is_cron_page_check,
                     'preloader_gif_img' => $this->get_bar_preloader(),
-                    'plugins_start_msg'   => __('plugins are updating.....', LDNFT_TEXT_DOMAIN),
-                    'plans_start_msg'   => __('Plans are updating.....', LDNFT_TEXT_DOMAIN),
-                    'customer_start_msg'   => __('Customers are updating.....', LDNFT_TEXT_DOMAIN),
-                    'sales_start_msg'   => __('Sales are updating.....', LDNFT_TEXT_DOMAIN),
-                    'subscription_start_msg'   => __('Subscriptions are updating.....', LDNFT_TEXT_DOMAIN),
-                    'reviews_start_msg'   => __('Reviews are updating.....', LDNFT_TEXT_DOMAIN),
+                    'plugins_start_msg'   => __('plugins are updating', LDNFT_TEXT_DOMAIN),
+                    'plans_start_msg'   => __('Plans are updating', LDNFT_TEXT_DOMAIN),
+                    'customer_start_msg'   => __('Customers are updating', LDNFT_TEXT_DOMAIN),
+                    'sales_start_msg'   => __('Sales are updating', LDNFT_TEXT_DOMAIN),
+                    'subscription_start_msg'   => __('Subscriptions are updating', LDNFT_TEXT_DOMAIN),
+                    'reviews_start_msg'   => __('Reviews are updating', LDNFT_TEXT_DOMAIN),
                     'complete_msg'   => __('Import is complete', LDNFT_TEXT_DOMAIN),
-                    'ldnft_error_reload_message'   => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN),
+                    'ldnft_error_reload_message'   => __('There seems to be an issue with API connectivity, please try again by <a href="admin.php?page=freemius-settings">reloading the page</a>.', LDNFT_TEXT_DOMAIN),
                 ] );
             }
         }  

@@ -366,7 +366,7 @@ class LDNFT_Customers extends WP_List_Table {
         // prepare query params, as usual current page, order by and order direction
         $offset      = isset($paged) ? intval(($paged-1) * $per_page) : 0;
         $orderby    = (isset($_REQUEST['orderby']) && in_array($_REQUEST['orderby'], array_keys($this->get_sortable_columns()))) ? sanitize_text_field( $_REQUEST['orderby'] ) : 'id';
-        $order      = (isset($_REQUEST['order']) && in_array($_REQUEST['order'], array('asc', 'desc'))) ? sanitize_text_field( $_REQUEST['order'] ) : 'asc';
+        $order      = (isset($_REQUEST['order']) && in_array($_REQUEST['order'], array('asc', 'desc'))) ? sanitize_text_field( $_REQUEST['order'] ) : 'desc';
         $result     = $wpdb->get_results( "SELECT * FROM $table_name $where ORDER BY c.$orderby $order LIMIT $per_page OFFSET $offset", ARRAY_A );
         
         $data = [];

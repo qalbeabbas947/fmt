@@ -13,10 +13,10 @@ $public_key     = isset( $ldnft_settings['public_key'] ) ? sanitize_text_field( 
 $secret_key     = isset( $ldnft_settings['secret_key'] ) ? sanitize_text_field( $ldnft_settings['secret_key'] ): '';
 $cron_status    = get_option('ldnft_run_cron_based_on_plugins');
 ?>
-<div id="general_settings" class="cs_ld_tabs">
+<div  id="general_settings" class="cs_ld_tabs">
     <div class="ldfmt-tab-data-heading"><span class="fa fa-cog ldfmt-icon"></span><?php _e( ' Settings', LDNFT_TEXT_DOMAIN ); ?>
     </div> 
-    <form method="post" action="<?php echo admin_url('admin-post.php'); ?>">
+    <form id="ldnft-save-setting-form" method="post" action="<?php echo admin_url('admin-post.php'); ?>">
         <table class="setting-table-wrapper">
             <tbody class="ldnft-table-content">
                 <tr> 
@@ -81,7 +81,17 @@ $cron_status    = get_option('ldnft_run_cron_based_on_plugins');
                     ?>
                     <tr> 
                         <td colspan="2" class="ldnft-process-freemius-data-info">
-                            <div class="ldnft-process-freemius-data-log" style="display:none">
+                            <div class="ldnft-process-freemius-data-log">
+                                <div class="ldnft-loading-wrapper"><?php _e( 'Import is initiated', LDNFT_TEXT_DOMAIN ); ?>
+                                    <span class="ldnft-loading-dot ldnft-loading-dot-initial">.</span>
+                                    <span class="ldnft-loading-dot ldnft-loading-dot-initial">.</span>
+                                    <span class="ldnft-loading-dot ldnft-loading-dot-initial">.</span>
+                                    <span class="ldnft-loading-dot ldnft-loading-dot-initial">.</span>
+                                    <span class="ldnft-loading-dot ldnft-loading-dot-initial">.</span>
+                                    <span class="ldnft-loading-dot ldnft-loading-dot-initial">.</span>
+                                    <span class="ldnft-loading-dot ldnft-loading-dot-initial">.</span>
+                                </div>
+                                
                             </div>
                         </td>
                     </tr>
@@ -90,8 +100,7 @@ $cron_status    = get_option('ldnft_run_cron_based_on_plugins');
                 ?>
             </tbody>
         </table>
-       
-        <div class="submit-button" style="padding-top:10px">
+        <div class="ldnft-submit-button submit-button" style="padding-top:10px">
             <div id="ldnft-settings-import-mailpoet-message" style="display:none;" class="ldnft-settings-sync-data-message"></div>
             <?php wp_nonce_field( 'ldnft_nounce', 'ldnft_nounce_field' ); ?>
             <input type="hidden" name="action" value="ldnft_submit_action" />

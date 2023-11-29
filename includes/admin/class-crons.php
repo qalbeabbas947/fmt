@@ -162,7 +162,7 @@ class LDNFT_Crons_Settings {
 
         if( isset( $plugins->error )  ) {
 
-            $response = [ 'is_cron_page_check' => 'No', 'plugins'=>$plugins, 'import_cron_status' => $cron_status, 'message' => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ];
+            $response = [ 'is_cron_page_check' => 'No', 'plugins'=>$plugins, 'import_cron_status' => $cron_status, 'message' => __('There seems to be an issue with API connectivity, please try again by <a href="admin.php?page=freemius-settings">reloading the page</a>.', LDNFT_TEXT_DOMAIN) ];
             die(json_encode($response));
         }
         
@@ -212,7 +212,7 @@ class LDNFT_Crons_Settings {
                 $response = [ 'is_cron_page_check' => 'Yes', 'import_cron_status' => $cron_status, 'message' => __('Import process has been restarted.', LDNFT_TEXT_DOMAIN) ];
             } else {
 
-                $response = [ 'is_cron_page_check' => 'No', 'import_cron_status' => $cron_status, 'message' => __('Sync process is already running. Please try again by reloading the page if process is not started yet.', LDNFT_TEXT_DOMAIN) ];
+                $response = [ 'is_cron_page_check' => 'No', 'import_cron_status' => $cron_status, 'message' => __('Sync process is already running. Please try again by <a href="admin.php?page=freemius-settings">reloading the page</a> if process is not started yet.', LDNFT_TEXT_DOMAIN) ];
             }
 
         } else {
@@ -251,7 +251,7 @@ class LDNFT_Crons_Settings {
                 
             } else{
                 
-                $response = [ 'is_cron_page_check' => 'No', 'import_cron_status' => $cron_status, 'message' => __('Sync process is already running. Please try again by reloading the page if process is not started yet.', LDNFT_TEXT_DOMAIN) ];
+                $response = [ 'is_cron_page_check' => 'No', 'import_cron_status' => $cron_status, 'message' => __('Sync process is already running. Please try again by <a href="admin.php?page=freemius-settings">reloading the page</a> if process is not started yet.', LDNFT_TEXT_DOMAIN) ];
             }
         }
         
@@ -907,7 +907,8 @@ class LDNFT_Crons_Settings {
 	 * checks if crons is complete.
 	 */
     public static function calculate_cron_process( ) {
-        
+        ini_set('display_errors', 'On');
+        error_reporting(E_ALL);
         $active_crons   = get_option( 'ldnft_process_freemius_plugins_stats' );
         $state          = isset( $_REQUEST[ 'state' ] ) ? sanitize_text_field( $_REQUEST[ 'state' ] ) : 'plugins';
         
@@ -926,33 +927,40 @@ class LDNFT_Crons_Settings {
         if( isset( $plugins->error )  ) {
             switch( $state ) {
                 case "plugins": 
-                    $status = [ 'status' => $state, 'error' => 1,  'Plugins' => 0, 'Pluginmsg' => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ];
+                    $status = [ 'status' => $state, 'error' => 1,  'Plugins' => 0, 'Pluginmsg' => __( 'There seems to be an issue with API connectivity, please try again by <a href="admin.php?page=freemius-settings">reloading the page</a>.', LDNFT_TEXT_DOMAIN ) ];
                     break;
                 case "plans":
-                    $status = [ 'status' => $state, 'error' => 1, 'Plans' => 0, 'Planmsg' => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ];
+                    $status = [ 'status' => $state, 'error' => 1, 'Plans' => 0, 'Planmsg' => __( 'There seems to be an issue with API connectivity, please try again by <a href="admin.php?page=freemius-settings">reloading the page</a>.', LDNFT_TEXT_DOMAIN ) ];
                     break;
                 case "customers":
-                    $status = [ 'status' => $state, 'error' => 1, 'Customers' => 0, 'Customermsg' => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ];
+                    $status = [ 'status' => $state, 'error' => 1, 'Customers' => 0, 'Customermsg' => __( 'There seems to be an issue with API connectivity, please try again by <a href="admin.php?page=freemius-settings">reloading the page</a>.', LDNFT_TEXT_DOMAIN ) ];
                     break;
                 case "sales":
-                    $status = [ 'status' => $state, 'error' => 1, 'Sales' => 0, 'Salesmsg' => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ];
+                    $status = [ 'status' => $state, 'error' => 1, 'Sales' => 0, 'Salesmsg' => __( 'There seems to be an issue with API connectivity, please try again by <a href="admin.php?page=freemius-settings">reloading the page</a>.', LDNFT_TEXT_DOMAIN ) ];
                     break;
                 case "subscription":
-                    $status = [ 'status' => $state, 'error' => 1, 'Subscription' => 0, 'Subscriptionmsg' => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ];
+                    $status = [ 'status' => $state, 'error' => 1, 'Subscription' => 0, 'Subscriptionmsg' => __( 'There seems to be an issue with API connectivity, please try again by <a href="admin.php?page=freemius-settings">reloading the page</a>.', LDNFT_TEXT_DOMAIN ) ];
                     break;
                 case "reviews":
-                    $status = [ 'status' => $state, 'error' => 1, 'Reviews' => 0, 'Reviewsmsg' => __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ];
+                    $status = [ 'status' => $state, 'error' => 1, 'Reviews' => 0, 'Reviewsmsg' => __( 'There seems to be an issue with API connectivity, please try again by <a href="admin.php?page=freemius-settings">reloading the page</a>.', LDNFT_TEXT_DOMAIN ) ];
                     break;
             }
             
-            if( $last_step == 'general' && $last_message == __('There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN) ) {
+            if( $last_step == 'general' && $last_message == __( 'There seems to be an issue with API connectivity, please try again by <a href="admin.php?page=freemius-settings">reloading the page</a>.', LDNFT_TEXT_DOMAIN ) ) {
                 $status['no_messgae'] = 1;
             }
 
-            update_option( 'ldnft_last_log_message', __( 'There seems to be an issue with API connectivity, please try again by reloading the page.', LDNFT_TEXT_DOMAIN ) );
+            update_option( 'ldnft_last_log_message', __( 'There seems to be an issue with API connectivity, please try again by <a href="admin.php?page=freemius-settings">reloading the page</a>.', LDNFT_TEXT_DOMAIN ) );
             update_option( 'ldnft_last_log_message_step', 'general' );
             return  $status;
         }
+        
+        $status[ 'crons_status_subscription_data' ] = wp_next_scheduled( 'ldnft_process_freemius_subscription_data' );
+        $status[ 'crons_status_plugins_data' ]      = wp_next_scheduled( 'ldnft_process_freemius_plugins_data' );
+        $status[ 'crons_status_customers_data' ]    = wp_next_scheduled( 'ldnft_process_freemius_customers_data' );
+        $status[ 'crons_status_sales_data' ]        = wp_next_scheduled( 'ldnft_process_freemius_sales_data' );
+        $status[ 'crons_status_reviews_data' ]      = wp_next_scheduled( 'ldnft_process_freemius_reviews_data' );
+
         
         switch( $state ){
             case "plugins":
