@@ -53,10 +53,9 @@
                 } ); 
             },
             ldnft_save_setting: function() {
-                console.log($('.ldnft-submit-button input[type="button"]'))
-                $('.ldnft-submit-button input[type="button"]').attr( 'disabled', true );
-                $('.ldnft-submit-button input[type="submit"]').attr( 'disabled', true );
-
+                
+                $('.ldnft-submit-button a.ldnft-sync-data-setting').attr( 'disabled', true );
+                $('.ldnft-submit-button a.ldnft-save-setting').html(LDNFT.test_n_save + ' <img width="16px" src="'+LDNFT.loader+'">').attr( 'disabled', true );
                 $('#ldnft-save-setting-form').submit();
             },
             sync_data_from_freemius: function(){
@@ -65,8 +64,9 @@
                     type: $(this).data('type')
                 }
                 
-                $('.ldnft-submit-button input[type="button"]').attr( 'disabled', true );
-                $('.ldnft-submit-button input[type="submit"]').attr( 'disabled', true );
+                $('.ldnft-submit-button a.ldnft-save-setting').attr( 'disabled', true );
+                $('.ldnft-submit-button a.ldnft-sync-data-setting').attr( 'disabled', true ).html(LDNFT.sync_data + ' <img width="16px" src="'+LDNFT.loader+'">');
+                
                 jQuery.post( LDNFT.ajaxURL, data, function( response ) {
                     
                     LDNFT.is_cron_page_check    = response.is_cron_page_check;
@@ -75,8 +75,8 @@
                     if( response.is_cron_page_check == 'Yes' ) {
                         document.location.reload();
                     } else {
-                        $('.ldnft-submit-button input[type="button"]').attr( 'disabled', false );
-                        $('.ldnft-submit-button input[type="submit"]').attr( 'disabled', false );
+                        $('.ldnft-submit-button a.ldnft-save-setting').attr( 'disabled', false );
+                        $('.ldnft-submit-button a.ldnft-sync-data-setting').attr( 'disabled', false ).html(LDNFT.sync_data );
                     }
                     
                 } ); 

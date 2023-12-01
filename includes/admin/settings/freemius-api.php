@@ -53,6 +53,18 @@ $cron_status    = get_option('ldnft_run_cron_based_on_plugins');
                         </p>
                     </td>    
                 </tr>
+                <tr> 
+                    <td align="left" valign="top">
+						<strong><label align = "left" for="ldnft_secret_key"><?php _e( 'Webhook URL:', LDNFT_TEXT_DOMAIN ); ?></label></strong>
+					</td>
+                    <td>
+                        <label><?php echo site_url(); ?>/wp-json/lfnft/v1/webhooks</label>
+                        <p class="description" style="font-weight: normal;">
+                        <?php  _e('You can use this url to configure the webhook.', LDNFT_TEXT_DOMAIN ); ?>
+                        </p>
+                    </td>    
+                </tr>
+                
                 <?php 
                 $fs_connection  = get_option( 'ldnft__freemius_connected' ) == 'yes'? true : false;
                 $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
@@ -105,9 +117,11 @@ $cron_status    = get_option('ldnft_run_cron_based_on_plugins');
             <?php wp_nonce_field( 'ldnft_nounce', 'ldnft_nounce_field' ); ?>
             <input type="hidden" name="action" value="ldnft_submit_action" />
             <input type="hidden" id="ldnft_api_scope" name="ldnft_settings[api_scope]" value="developer">
-            <input type="submit" class="button button-primary ldnft-save-setting" name="ldnft_submit_form" value="<?php _e( 'Test & Save', LDNFT_TEXT_DOMAIN ); ?>">
+            <!-- <input type="submit" class="button button-primary ldnft-save-setting" name="ldnft_submit_form" value="<?php _e( 'Test & Save', LDNFT_TEXT_DOMAIN ); ?>"> -->
+            <a href="javascript:;" class="button button-primary ldnft-save-setting"><?php _e( 'Test & Save', LDNFT_TEXT_DOMAIN ); ?></a>
             <?php if( $fs_connection ) { ?>
-                <input type="button" class="button button-primary ldnft-sync-data-setting" name="ldnft_sync_data_restart" value="<?php _e( 'Sync Data', LDNFT_TEXT_DOMAIN ); ?>">
+                <a href="javascript:;" class="button button-primary ldnft-sync-data-setting"><?php _e( 'Sync Data', LDNFT_TEXT_DOMAIN ); ?></a>
+                <!-- <input type="button" class="button button-primary ldnft-sync-data-setting" name="ldnft_sync_data_restart" value="<?php _e( 'Sync Data', LDNFT_TEXT_DOMAIN ); ?>"> -->
             <?php } ?>
             <span id="ldnft-settings-import-error-message" style="display:none;" class="ldnft-settings-sync-data-message1"></span>
         </div>

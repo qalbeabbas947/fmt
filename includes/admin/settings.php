@@ -47,10 +47,9 @@ class LDNFT_Settings {
         
         if (!is_plugin_active('mailpoet/mailpoet.php')) {
             $errormsg = __('This section requires MailPoet to be installed and configured.', LDNFT_TEXT_DOMAIN);
-            $response = ['added'=>0, 'exists'=>0, 'message'=>'', 'errors'=> [$errormsg], 'errormsg'=> $errormsg ];
+            $response = [ 'added' => 0, 'exists' => 0, 'message' => '', 'errors' => [$errormsg], 'errormsg' => $errormsg ];
             echo json_encode($response);exit;
         }
-        
 
         $table_name = $wpdb->prefix.'ldnft_customers'; 
         $meta_table_name = $wpdb->prefix.'ldnft_customer_meta'; 
@@ -62,6 +61,7 @@ class LDNFT_Settings {
                 $where_type = " and (m.status='' or m.status is Null)";
             }
         }
+
         $result = $wpdb->get_results( "SELECT * FROM $table_name as c inner join $meta_table_name as m on(c.id=m.customer_id) where m.plugin_id='".$ldnft_mailpeot_plugin."'$where_type" );
         $response = [];
         $count = 0;
@@ -96,8 +96,7 @@ class LDNFT_Settings {
                     }
 
                     $exists++;
-                } 
-                catch(\MailPoet\API\MP\v1\APIException $exception) {
+                } catch(\MailPoet\API\MP\v1\APIException $exception) {
                     if($exception->getCode() == 4 || $exception->getCode() == '4' ) {
                         try {
                             $subscriber = \MailPoet\API\API::MP('v1')->addSubscriber($subscriber_data, [], $options); // Add to default mailing list
@@ -110,20 +109,17 @@ class LDNFT_Settings {
                                 $wpdb->query( $sql );
                                 $count++;
                             }
-                        } 
-                        catch(\MailPoet\API\MP\v1\APIException $exception) {
+                        } catch(\MailPoet\API\MP\v1\APIException $exception) {
                             if($exception->getCode() == 6 || $exception->getCode() == '6' ) {
                                 $exists++;
                                 
                                 $errors[$exception->getMessage()] = $exception->getMessage();
                             }
-                        }
-                        catch( Exception $exception ) {
+                        } catch( Exception $exception ) {
                             $errors[$exception->getMessage()] = $exception->getMessage();
                         }
                     }
-                }
-                catch( Exception $exception ) {
+                } catch( Exception $exception ) {
                     $errors[$exception->getMessage()] = $exception->getMessage();
                 }
             } 
@@ -258,6 +254,11 @@ class LDNFT_Settings {
 
             $settings_sections['shortcodes'] =  array(
                 'title' => __( 'Shortcodes', LDNFT_TEXT_DOMAIN ),
+                'icon' => 'fa-info',
+            );
+
+            $settings_sections['webhook'] =  array(
+                'title' => __( 'Webhooks', LDNFT_TEXT_DOMAIN ),
                 'icon' => 'fa-info',
             );
 

@@ -193,10 +193,11 @@ class LDNFT_Admin {
                 if( $page == 'freemius' && $tab == 'freemius-api' ) {
                     $is_cron_page_check = 'yes';
                 }
-
+                
                 wp_localize_script( 'fmt-backend-js', 'LDNFT', [  
                     'ajaxURL' => admin_url( 'admin-ajax.php' ),
                     'import_cron_status' => $cron_status,
+                    'loader' => LDNFT_ASSETS_URL .'images/spinner-2x.gif',
                     'is_cron_page_check' => $is_cron_page_check,
                     'preloader_gif_img' => $this->get_bar_preloader(),
                     'plugins_start_msg'   => __('plugins are updating', LDNFT_TEXT_DOMAIN),
@@ -206,6 +207,8 @@ class LDNFT_Admin {
                     'subscription_start_msg'   => __('Subscriptions are updating', LDNFT_TEXT_DOMAIN),
                     'reviews_start_msg'   => __('Reviews are updating', LDNFT_TEXT_DOMAIN),
                     'complete_msg'   => __('Import is complete', LDNFT_TEXT_DOMAIN),
+                    'test_n_save' => __('Test & Save', LDNFT_TEXT_DOMAIN),
+                    'sync_data' => __('Sync Data', LDNFT_TEXT_DOMAIN),
                     'ldnft_error_reload_message'   => __('There seems to be an issue with API connectivity, please try again by <a href="admin.php?page=freemius-settings">reloading the page</a>.', LDNFT_TEXT_DOMAIN),
                 ] );
             }

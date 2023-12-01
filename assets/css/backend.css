@@ -9,6 +9,15 @@
     text-align: center;
     text-transform: uppercase;
 }
+.ldnft-save-setting, .ldnft-save-setting {
+    background: #135e96;
+    border-color: #135e96;
+    box-shadow: none;
+    color: #fff;
+}
+.ldnft-save-setting:disabled, .ldnft-save-setting:disabled, button-primary:disabled {
+    background: #2271B1;
+}
 
 .ldfmt-sales-box {
     width: 14%;
