@@ -206,52 +206,20 @@
     color: green;
 }
 /* Loader Style */
+.ldnft-animated-loader::after {
+    display: inline-block;
+    animation: doted steps(1,end) 2s infinite;
+    content: '';
+}
 
-.ldnft-loading-wrapper {
-    display: inline-block;
-  }
-  .ldnft-loading-wrapper span {
-    display: inline-block;
-  }  
-  .ldnft-loading-dot {
-    font-size: 20px;
-    display: inline-block;
-    opacity: 0;
-    animation: loadingDots 2s infinite;
-    width: 0;
-  }
-  
-  .ldnft-loading-dot:nth-child(1) {
-    animation-delay: 0.5s;
-    margin-left: 6px;
-  }
-  
-  .ldnft-loading-dot:nth-child(2) {
-    animation-delay: 1s;
-    margin-left: 6px;
-  }
-  
-  .ldnft-loading-dot:nth-child(3) {
-    animation-delay: 1.5s;
-    margin-left: 6px;
-  }
-  .ldnft-loading-dot:nth-child(4) {
-    animation-delay: 2s;
-    margin-left: 6px;
-  }
-  .ldnft-loading-dot:nth-child(5) {
-    animation-delay: 2.5s;
-    margin-left: 6px;
-  }
-  @keyframes loadingDots {
-      0%, 25% {
-        opacity: 0;
-      }
-      25%, 75% {
-        opacity: 1;
-      }
-
-    }
+@keyframes doted {
+    0%   { content: ''; }
+    20%  { content: '.'; }
+    40%  { content: '..'; }
+    60%  { content: '...'; }
+    80%  { content: '....'; }
+    100% { content: ''; }
+}
   
   /*loader style end*/
 #ldnft-dat-not-imported-message{
