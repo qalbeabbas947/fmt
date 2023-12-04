@@ -122,7 +122,7 @@
                         $('.ldnft-loading-dot-initial').css('display', 'none');
                         LDNFTbackEnd.timeout_obj = setTimeout( LDNFTbackEnd.check_cron_status, 6000 );
                     } else {
-
+                        $('.ldnft-loading-dot').css('display', 'none');
                         LDNFT.import_cron_status = 'complete';
                         clearTimeout( LDNFTbackEnd.timeout_obj );
                     }
@@ -139,7 +139,7 @@
                 jQuery.post( LDNFT.ajaxURL, data, function( response ) {
                     
                     if( response.status == 'complete' ) {
-
+                        $('.ldnft-loading-dot').css('display', 'none');
                         $('.ldnft-process-freemius-data-log').append('<br>'+LDNFT.complete_msg);
                         LDNFT.import_cron_status = 'complete';
                         clearTimeout(LDNFTbackEnd.timeout_obj);
@@ -150,6 +150,7 @@
                             case 'plans':
                                 
                                 if( parseInt(response.no_messgae) != 1 ) {
+                                    $('.ldnft-loading-dot').css('display', 'none');
                                     $('.ldnft-process-freemius-data-log').append('<br>'+response.Planmsg);
                                 }
                                 
@@ -160,11 +161,11 @@
                                     $('.ldnft-process-freemius-data-log').append( '<br>' + LDNFTbackEnd.display_preloader( LDNFT.customer_start_msg, response.status ) );
                                 }
 
-                                $('.ldnft-loading-dot-'+response.status).css('display', 'none');
                                 break;
                             case 'customers':
                                 
                                 if( parseInt(response.no_messgae) != 1 ) {
+                                    $('.ldnft-loading-dot').css('display', 'none');
                                     $('.ldnft-process-freemius-data-log').append( '<br>' + response.Customermsg);
                                 }
 
@@ -175,11 +176,11 @@
                                     $('.ldnft-process-freemius-data-log').append('<br>'+LDNFTbackEnd.display_preloader( LDNFT.sales_start_msg, response.status ) );
                                 }
 
-                                $('.ldnft-loading-dot-'+response.status).css('display', 'none');
                                 break;
                             case 'sales':
                                 
                                 if( parseInt(response.no_messgae) != 1 ) {
+                                    $('.ldnft-loading-dot').css('display', 'none');
                                     $('.ldnft-process-freemius-data-log').append('<br>'+response.Salesmsg);
                                 }
 
@@ -190,10 +191,11 @@
                                     $('.ldnft-process-freemius-data-log').append( '<br>' + LDNFTbackEnd.display_preloader( LDNFT.subscription_start_msg, response.status ) );
                                 }
 
-                                $('.ldnft-loading-dot-'+response.status).css('display', 'none');
                                 break;
                             case 'subscription':
+
                                 if( parseInt(response.no_messgae) != 1 ) {
+                                    $('.ldnft-loading-dot').css('display', 'none');
                                     $('.ldnft-process-freemius-data-log').append('<br>'+response.Subscriptionmsg);
                                 }
                                 
@@ -204,11 +206,11 @@
                                     $('.ldnft-process-freemius-data-log').append( '<br>' + LDNFTbackEnd.display_preloader( LDNFT.reviews_start_msg, response.status ) );
                                 }
 
-                                $('.ldnft-loading-dot-'+response.status).css('display', 'none');
                                 break;
                             case 'reviews':
                                 
                                 if( parseInt(response.no_messgae) != 1 ) {
+                                    $('.ldnft-loading-dot').css('display', 'none');
                                     $('.ldnft-process-freemius-data-log').append( '<br>' + response.Reviewsmsg );
                                 }
 
@@ -218,21 +220,21 @@
                                     $( '.ldnft-process-freemius-data-log' ).append( '<br>' + LDNFTbackEnd.print_asterik_line() );
                                 }
 
-                                $('.ldnft-loading-dot-'+response.status).css('display', 'none');
                                 break; 
                             default:
+
                                 if( parseInt(response.no_messgae) != 1 ) {
-                                    
+                                    $('.ldnft-loading-dot').css('display', 'none');
                                     $('.ldnft-process-freemius-data-log').append( '<br>' + response.Pluginmsg );
                                 }
+
                                 if( parseInt( response.Plugins ) == 1 ) {
 
                                     LDNFTbackEnd.current_cron_step = 'plans';
                                     $( '.ldnft-process-freemius-data-log' ).append( '<br>' + LDNFTbackEnd.print_asterik_line() );
                                     $( '.ldnft-process-freemius-data-log' ).append( '<br>' + LDNFTbackEnd.display_preloader( LDNFT.plans_start_msg, response.status ) );
                                 }
-
-                                $('.ldnft-loading-dot-'+response.status).css('display', 'none');
+                                
                                 break;
                         }
 
@@ -252,11 +254,11 @@
             display_preloader: function(label, type) {
                 
                 var str = '<div class="ldnft-loading-wrapper">'+label;
-                str += '<span class="ldnft-loading-dot 1ldnft-loading-dot-'+type+'">.</span>';
-                str += '<span class="ldnft-loading-dot 1ldnft-loading-dot-'+type+'">.</span>';
-                str += '<span class="ldnft-loading-dot 1ldnft-loading-dot-'+type+'">.</span>';
-                str += '<span class="ldnft-loading-dot 1ldnft-loading-dot-'+type+'">.</span>';
-                str += '<span class="ldnft-loading-dot 1ldnft-loading-dot-'+type+'">.</span>';
+                str += '<span class="ldnft-loading-dot ldnft-loading-dot-'+type+'">.</span>';
+                str += '<span class="ldnft-loading-dot ldnft-loading-dot-'+type+'">.</span>';
+                str += '<span class="ldnft-loading-dot ldnft-loading-dot-'+type+'">.</span>';
+                str += '<span class="ldnft-loading-dot ldnft-loading-dot-'+type+'">.</span>';
+                str += '<span class="ldnft-loading-dot ldnft-loading-dot-'+type+'">.</span>';
                 str += '</div>';
 
                 return str;
