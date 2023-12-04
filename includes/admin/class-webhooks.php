@@ -18,7 +18,6 @@ class LDNFT_Webhooks {
 
     public function register_routes() {
         
-        
           add_action( 'rest_api_init', function () {
             register_rest_route( 'lfnft/v1', '/webhooks', array(
                 'methods' => 'POST',
@@ -27,6 +26,348 @@ class LDNFT_Webhooks {
             } ); 
     }
 
+    /**
+	 * process customers data.
+	 */
+    function customer_webhook_callback( $user_id, $plugin_id, $user ) {
+        
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix.'ldnft_customers';
+        if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
+
+            $wpdb->query( "CREATE TABLE $table_name (
+                `id` int(11) NOT NULL,
+                `email` varchar(255) DEFAULT NULL,
+                `first` varchar(255) DEFAULT NULL,
+                `last` varchar(255) DEFAULT NULL,
+                `is_verified` tinyint(1) DEFAULT NULL,
+                `is_marketing_allowed` tinyint(1) DEFAULT NULL,
+                `created` datetime DEFAULT NULL, 
+                PRIMARY KEY (`id`)
+            )" );     
+        }
+
+        $meta_table_name = $wpdb->prefix.'ldnft_customer_meta';
+        if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$meta_table_name'" ) ) ) {
+
+            $wpdb->query( "CREATE TABLE $meta_table_name (
+                `plugin_id` int(11) NOT NULL,
+                `customer_id` int(11) NOT NULL,
+                `status` varchar(20) DEFAULT NULL,
+                `created` datetime DEFAULT NULL, 
+                PRIMARY KEY ( `plugin_id`, `customer_id` )
+            )" );     
+        }
+
+        $res = $wpdb->get_results( $wpdb->prepare("select * from ".$table_name." where id=%d", $user_id ));
+    
+        if( count( $res ) == 0 ) {
+            
+            $wpdb->insert(
+                $table_name,
+                array(
+                    'id'                    => $user_id,
+                    'email'                 => $user['email'],
+                    'first'                 => $user['first'],
+                    'last'                  => $user['last'],
+                    'is_verified'           => $user['is_verified'],
+                    'created'               => $user['updated'],
+                    'is_marketing_allowed'  => $user['is_marketing_allowed'],
+                )
+            );
+            
+            $wpdb->insert(
+                $meta_table_name,
+                array(
+                    'plugin_id'               => $plugin_id,
+                    'customer_id'             => $user_id,
+                    'created'                 => $user['created'],
+                    'status'                  => ''
+                )
+            );
+
+            error_log('inserted new customer with user_id:'.$user_id);
+        } else {
+            
+            $wpdb->update( $table_name, 
+                array(
+                    'email'                 => $user['email'],
+                    'first'                 => $user['first'],
+                    'last'                  => $user['last'],
+                    'is_verified'           => $user['is_verified'],
+                    'created'               => $user['updated'],
+                    'is_marketing_allowed'  => $user['is_marketing_allowed'],
+                ), array( 'id' => $user_id ) );
+            
+            $res = $wpdb->get_results( $wpdb->prepare("select * from ".$meta_table_name." where customer_id=%d and plugin_id=%d", $user_id, $plugin_id ));
+
+            if( count( $res ) == 0 ) {
+
+                $wpdb->insert(
+                    $meta_table_name,
+                    array(
+                        'plugin_id'               => $plugin_id,
+                        'customer_id'             => $user_id,
+                        'created'                 => $user['created'],
+                        'status'                  => ''
+                    )
+                );
+            }
+
+            error_log('updated the customer with user_id:'.$user_id);
+        }
+    }
+
+    /**
+	 * process sales data.
+	 */
+    function sales_webhook_callback( $id, $user_id, $plugin_id, $created, $user, $cart ) {
+        
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix.'ldnft_transactions';
+        if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
+
+            $wpdb->query( "CREATE TABLE $table_name (
+                `id` int(11) NOT NULL,
+                `plugin_id` int(11) NOT NULL,
+                `user_id` int(11) NOT NULL,
+                `install_id` int(11) DEFAULT NULL,
+                `subscription_id` int(11) DEFAULT NULL,
+                `plan_id` int(11) DEFAULT NULL,
+                `gross` float DEFAULT NULL,
+                `gateway_fee` float DEFAULT NULL,
+                `external_id` varchar(50) DEFAULT NULL,
+                `gateway` varchar(50) DEFAULT NULL,
+                `coupon_id` int(11) DEFAULT NULL,
+                `pricing_id` int(11) DEFAULT NULL,
+                `vat_id` int(11) DEFAULT NULL,
+                `environment` int(11) DEFAULT NULL,
+                `country_code` varchar(3) DEFAULT NULL,
+                `bound_payment_id` int(11) DEFAULT NULL,
+                `source` int(11) DEFAULT NULL,
+                `created` datetime DEFAULT NULL,
+                `updated` datetime DEFAULT NULL,
+                `vat` float DEFAULT NULL,
+                `is_renewal` tinyint(1) DEFAULT NULL,
+                `type` varchar(15) DEFAULT NULL,
+                `ip` varchar(15) DEFAULT NULL,
+                `zip_postal_code` varchar(10) DEFAULT NULL,
+                `currency` varchar(3) DEFAULT NULL,
+                `license_id` int(11) DEFAULT NULL, 
+                PRIMARY KEY (`id`)
+            )" );     
+        }
+
+        $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_name." where id=%d", $id ));
+        if( count( $res ) == 0 ) {
+
+            $wpdb->insert(
+                $table_name,
+                
+                array(
+                    'id'                        => $id,
+                    'ip'                        => $cart['ip'],
+                    'pricing_id'                => $cart['pricing_id'],
+                    'zip_postal_code'           => $cart['zip_postal_code'],
+                    'source'                    => '',
+                    'environment'               => $cart['environment'],
+                    'currency'                  => '',
+                    'plugin_id'                 => $plugin_id,
+                    'user_id'                   => $user_id,
+                    'country_code'              => $cart['country_code'],
+                    'subscription_id'           => '',
+                    'plan_id'                   => $cart['plan_id'],
+                    'gross'                     => $cart['price'],
+                    'bound_payment_id'          => '',
+                    'external_id'               => '',
+                    'gateway'                   => '',
+                    'gateway_fee'               => '',
+                    'vat'                       => '',
+                    'type'                      => 'cart-payment',
+                    'is_renewal'                => '',
+                    'coupon_id'                 => $cart['coupon_id'],
+                    'install_id'                => $cart['install_id'],
+                    'license_id'                => $cart['license_id'],
+                    'created'                   => $cart['created'],
+                    'updated'                   => $cart['updated']
+                )
+            );
+            error_log('inserted new sale with id:'.$id);
+        } else {
+
+            $wpdb->update($table_name, 
+                array(
+                    'ip'                        => $cart['ip'],
+                    'pricing_id'                => $cart['pricing_id'],
+                    'zip_postal_code'           => $cart['zip_postal_code'],
+                    'source'                    => '',
+                    'environment'               => $cart['environment'],
+                    'currency'                  => '',
+                    'plugin_id'                 => $plugin_id,
+                    'user_id'                   => $user_id,
+                    'country_code'              => $cart['country_code'],
+                    'subscription_id'           => '',
+                    'plan_id'                   => $cart['plan_id'],
+                    'gross'                     => $cart['price'],
+                    'bound_payment_id'          => '',
+                    'external_id'               => '',
+                    'gateway'                   => '',
+                    'gateway_fee'               => '',
+                    'vat'                       => '',
+                    'type'                      => 'cart-payment',
+                    'is_renewal'                => '',
+                    'coupon_id'                 => $cart['coupon_id'],
+                    'install_id'                => $cart['install_id'],
+                    'license_id'                => $cart['license_id'],
+                    'created'                   => $cart['created'],
+                    'updated'                   => $cart['updated']
+                ), array('id'=>$id));
+            error_log('updated new sale with id:'.$id);
+        }
+
+        $meta_table_name = $wpdb->prefix.'ldnft_customer_meta';
+        $wpdb->update( $meta_table_name, 
+                array(
+                    'status'                => 'cart-payment'
+                ), array( 'plugin_id' => $plugin_id, 'customer_id' => $user_id  ) );
+
+    }
+    /**
+	 * process subscription data from the freemius.
+	 */
+    function subscription_created_webhook_callback( $id, $license_id, $user_id, $plugin_id, $subscription ) {
+
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix.'ldnft_subscription';
+        if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
+
+            $wpdb->query( "CREATE TABLE $table_name (
+                `id` int(11) NOT NULL,
+                `plugin_id` int(11) NOT NULL,
+                `user_id` int(11) NOT NULL,
+                `user_card_id` int(11) DEFAULT NULL,
+                `install_id` int(11) DEFAULT NULL,
+                `amount_per_cycle` float DEFAULT NULL,
+                `billing_cycle` int(11) DEFAULT NULL,
+                `gross` float DEFAULT NULL,
+                `tax_rate` float DEFAULT NULL,
+                `outstanding_balance` float DEFAULT NULL,
+                `failed_payments` int(11) DEFAULT NULL,
+                `gateway` varchar(50) DEFAULT NULL,
+                `coupon_id` int(11) DEFAULT NULL,
+                `trial_ends` datetime DEFAULT NULL,
+                `next_payment` datetime DEFAULT NULL,
+                `created` datetime DEFAULT NULL,
+                `updated_at` datetime DEFAULT NULL,
+                `currency` varchar(3) DEFAULT NULL,
+                `zip_postal_code` varchar(10) DEFAULT NULL,
+                `external_id` varchar(35) DEFAULT NULL,
+                `ip` varchar(15) DEFAULT NULL,
+                `plan_id` int(11) DEFAULT NULL,
+                `vat_id` int(11) DEFAULT NULL,
+                `source` int(11) DEFAULT NULL,
+                `environment` int(11) DEFAULT NULL,
+                `country_code` varchar(2) DEFAULT NULL,
+                `pricing_id` int(11) DEFAULT NULL,
+                `initial_amount` float DEFAULT NULL,
+                `renewal_amount` float DEFAULT NULL,
+                `renewals_discount` float DEFAULT NULL,
+                `renewals_discount_type` varchar(12) DEFAULT NULL,
+                `license_id` int(11) DEFAULT NULL, 
+                PRIMARY KEY (`id`)
+            )" );   
+
+        }
+
+        $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_name." where id=%d", $id ));
+
+        if( count( $res ) == 0 ) {
+
+            $wpdb->insert(
+                $table_name,
+                array(
+                    'id'                        => $id,
+                    'plugin_id'                 => $plugin_id,
+                    'user_id'                   => $user_id,
+                    'tax_rate'                  => $subscription['tax_rate'],
+                    'ip'                        => $subscription['ip'],
+                    'zip_postal_code'           => $subscription['zip_postal_code'],
+                    'vat_id'                    => $subscription['vat_id'],
+                    'source'                    => $subscription['source'],
+                    'user_card_id'              => $subscription['user_card_id'],
+                    'environment'               => $subscription['environment'],
+                    'install_id'                => $subscription['install_id'],
+                    'amount_per_cycle'          => $subscription['amount_per_cycle'],
+                    'billing_cycle'             => $subscription['billing_cycle'],
+                    'gross'                     => $subscription['total_gross'],
+                    'outstanding_balance'       => $subscription['outstanding_balance'],
+                    'failed_payments'           => $subscription['failed_payments'],
+                    'gateway'                   => $subscription['gateway'],
+                    'coupon_id'                 => $subscription['coupon_id'],
+                    'trial_ends'                => $subscription['trial_ends'],
+                    'next_payment'              => $subscription['next_payment'],
+                    'created'                   => $subscription['created'],
+                    'updated_at'                => $subscription['updated'],
+                    'currency'                  => $subscription['currency'],
+                    'pricing_id'                => $subscription['pricing_id'],
+                    'country_code'              => $subscription['country_code'],
+                    'plan_id'                   => $subscription['plan_id'],
+                    'external_id'               => $subscription['external_id'],
+                    'initial_amount'            => $subscription['initial_amount'],
+                    'renewal_amount'            => $subscription['renewal_amount'],
+                    'renewals_discount'         => $subscription['renewals_discount'],
+                    'renewals_discount_type'    => $subscription['renewals_discount_type'],
+                    'license_id'                => $subscription['license_id']
+                )
+            );
+
+            error_log('added new subscription with id:'.$id);
+        } else {
+
+            $wpdb->update($table_name, 
+                array(
+                    'plugin_id'                 => $plugin_id,
+                    'user_id'                   => $user_id,
+                    'tax_rate'                  => $subscription['tax_rate'],
+                    'ip'                        => $subscription['ip'],
+                    'zip_postal_code'           => $subscription['zip_postal_code'],
+                    'vat_id'                    => $subscription['vat_id'],
+                    'source'                    => $subscription['source'],
+                    'user_card_id'              => $subscription['user_card_id'],
+                    'environment'               => $subscription['environment'],
+                    'install_id'                => $subscription['install_id'],
+                    'amount_per_cycle'          => $subscription['amount_per_cycle'],
+                    'billing_cycle'             => $subscription['billing_cycle'],
+                    'gross'                     => $subscription['total_gross'],
+                    'outstanding_balance'       => $subscription['outstanding_balance'],
+                    'failed_payments'           => $subscription['failed_payments'],
+                    'gateway'                   => $subscription['gateway'],
+                    'coupon_id'                 => $subscription['coupon_id'],
+                    'trial_ends'                => $subscription['trial_ends'],
+                    'next_payment'              => $subscription['next_payment'],
+                    'created'                   => $subscription['created'],
+                    'updated_at'                => $subscription['updated'],
+                    'currency'                  => $subscription['currency'],
+                    'pricing_id'                => $subscription['pricing_id'],
+                    'country_code'              => $subscription['country_code'],
+                    'plan_id'                   => $subscription['plan_id'],
+                    'external_id'               => $subscription['external_id'],
+                    'initial_amount'            => $subscription['initial_amount'],
+                    'renewal_amount'            => $subscription['renewal_amount'],
+                    'renewals_discount'         => $subscription['renewals_discount'],
+                    'renewals_discount_type'    => $subscription['renewals_discount_type'],
+                    'license_id'                => $subscription['license_id']
+                ), array('id'=>$id));
+            error_log('updated the subscription with id:'.$id);
+        }
+
+    }
+    /**
+	 * process webhooks from the freemius.
+	 */
     function webhooks_callback( WP_REST_Request $request ) {
         
         global $wpdb;
@@ -39,129 +380,83 @@ class LDNFT_Webhooks {
                 $objects = $request->get_param( 'objects' );
                 if( is_array($objects ) && array_key_exists( 'user', $objects ) ) {
                     $user = $objects['user'];
-                    $table_name = $wpdb->prefix.'ldnft_customers';
-                    if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
-
-                        $wpdb->query( "CREATE TABLE $table_name (
-                            `id` int(11) NOT NULL,
-                            `email` varchar(255) DEFAULT NULL,
-                            `first` varchar(255) DEFAULT NULL,
-                            `last` varchar(255) DEFAULT NULL,
-                            `is_verified` tinyint(1) DEFAULT NULL,
-                            `is_marketing_allowed` tinyint(1) DEFAULT NULL,
-                            `created` datetime DEFAULT NULL, 
-                            PRIMARY KEY (`id`)
-                        )" );     
-                    }
-
-                    $meta_table_name = $wpdb->prefix.'ldnft_customer_meta';
-                    if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$meta_table_name'" ) ) ) {
-
-                        $wpdb->query( "CREATE TABLE $meta_table_name (
-                            `plugin_id` int(11) NOT NULL,
-                            `customer_id` int(11) NOT NULL,
-                            `status` varchar(20) DEFAULT NULL,
-                            `created` datetime DEFAULT NULL, 
-                            PRIMARY KEY ( `plugin_id`, `customer_id` )
-                        )" );     
-                    }
-
-                    $res = $wpdb->get_results( $wpdb->prepare("select * from ".$table_name." where id=%d", $user_id ));
-                
-                    if( count( $res ) == 0 ) {
-                        
-                        $wpdb->insert(
-                            $table_name,
-                            array(
-                                'id'                    => $user_id,
-                                'email'                 => $user['email'],
-                                'first'                 => $user['first'],
-                                'last'                  => $user['last'],
-                                'is_verified'           => $user['is_verified'],
-                                'created'               => $user['updated'],
-                                'is_marketing_allowed'  => $user['is_marketing_allowed'],
-                            )
-                        );
-                        
-                        $wpdb->insert(
-                            $meta_table_name,
-                            array(
-                                'plugin_id'               => $plugin_id,
-                                'customer_id'             => $user_id,
-                                'created'                 => $user['created'],
-                                'status'                  => ''
-                            )
-                        );
-                        error_log('inserted new customer with user_id:'.$user_id);
-                    } else {
-                        
-                        $wpdb->update( $table_name, 
-                            array(
-                                'email'                 => $user['email'],
-                                'first'                 => $user['first'],
-                                'last'                  => $user['last'],
-                                'is_verified'           => $user['is_verified'],
-                                'created'               => $user['updated'],
-                                'is_marketing_allowed'  => $user['is_marketing_allowed'],
-                            ), array( 'id' => $user->id ) );
-                        
-                        $res = $wpdb->get_results( $wpdb->prepare("select * from ".$meta_table_name." where customer_id=%d and plugin_id=%d", $user->id, $plugin_id ));
-
-                        if( count( $res ) == 0 ) {
-
-                            $wpdb->insert(
-                                $meta_table_name,
-                                array(
-                                    'plugin_id'               => $plugin_id,
-                                    'customer_id'             => $user_id,
-                                    'created'                 => $user['created'],
-                                    'status'                  => ''
-                                )
-                            );
-                        }  
-                        error_log('updated the customer with user_id:'.$user_id);
-                    }
+                    $this->customer_webhook_callback( $user_id, $plugin_id, $user );
                 }
-                $user = $request->get_param( 'user' );
-                error_log('user_id:'.$user_id);
-                error_log(print_r( $objects , true));
-                error_log('plugin_id:'.$plugin_id);
-                error_log(print_r( $user , true));
+                
                 break;
             case "user.email.changed":
-
+                // $user_id = $request->get_param( 'user_id' );
+                // $plugin_id = $request->get_param( 'plugin_id' );
+                // $objects = $request->get_param( 'objects' );
+                // error_log('user_id:'.$user_id);
+                // error_log(print_r( $objects , true));
+                // error_log('plugin_id:'.$plugin_id);
+                error_log('type:'.$type);
+                error_log(print_r( $request , true)); 
                 break;
             case "user.email.verified":
-
+                error_log('type:'.$type);
+                error_log(print_r( $request , true)); 
                 break;
             case "user.name.changed":
-
+                error_log('type:'.$type);
+                error_log(print_r( $request , true)); 
                 break;
             case "review.created":
-
+            case "review.requested":
+                $user_id = $request->get_param( 'user_id' );
+                $plugin_id = $request->get_param( 'plugin_id' );
+                $id = $request->get_param( 'id' );
+                $created = $request->get_param( 'created' );
+                $objects = $request->get_param( 'objects' );
+                if( is_array($objects ) && array_key_exists( 'user', $objects ) ) {
+                    $user = $objects['user'];
+                    $this->customer_webhook_callback( $user_id, $plugin_id, $user );
+                }
                 break;
             case "review.deleted":
-
+                error_log('type:'.$type);
+                error_log(print_r( $request , true)); 
                 break;
             case "review.updated":
-
+                error_log('type:'.$type);
+                error_log(print_r( $request , true)); 
                 break;
-            case "subscription.cancelled":
-
-                break;
-                    
             case "subscription.created":
-
+                $user_id            = $request->get_param( 'user_id' );
+                $plugin_id          = $request->get_param( 'plugin_id' );
+                $data               = $request->get_param( 'data' );
+                $subscription_id    = $data['subscription_id'];
+                $license_id         = $data['license_id'];
+                $id = $request->get_param( 'id' );
+                $created = $request->get_param( 'created' );
+                $objects = $request->get_param( 'objects' );
+                if( is_array($objects ) && array_key_exists( 'user', $objects ) && array_key_exists( 'subscription', $objects ) ) {
+                    $user = $objects['user'];
+                    $subscription = $objects['subscription'];
+                    $this->customer_webhook_callback( $user_id, $plugin_id, $user );
+                    $this->subscription_created_webhook_callback( $subscription_id, $license_id, $user_id, $plugin_id, $subscription );
+                }
                 break;
-                        
             case "plugin.created":
-
+                error_log('type:'.$type);
+                error_log(print_r( $request , true)); 
                 break;
             case "plugin.updated":
-
+                error_log('type:'.$type);
+                error_log(print_r( $request , true)); 
                 break;
-            case "cart.completed": //sale
-
+            case "cart.completed": //sale  sales_webhook_callback
+                $user_id    = $request->get_param( 'user_id' );
+                $plugin_id  = $request->get_param( 'plugin_id' );
+                $id         = $request->get_param( 'id' );
+                $created    = $request->get_param( 'created' );
+                $objects = $request->get_param( 'objects' );
+                if( is_array($objects ) && array_key_exists( 'user', $objects ) ) {
+                    $user = $objects['user'];
+                    $cart = $objects['cart'];
+                    $this->sales_webhook_callback( $id, $user_id, $plugin_id, $created, $user, $cart );
+                }
                 break;           
             default:
                 error_log('type:'.$type);
