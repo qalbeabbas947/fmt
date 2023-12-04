@@ -211,11 +211,10 @@
     display: inline-block;
   }
   .ldnft-loading-wrapper span {
-    font-size: 24px;
     display: inline-block;
   }  
   .ldnft-loading-dot {
-    font-size: 30px;
+    font-size: 20px;
     display: inline-block;
     opacity: 0;
     animation: loadingDots 2s infinite;
@@ -224,24 +223,35 @@
   
   .ldnft-loading-dot:nth-child(1) {
     animation-delay: 0.5s;
+    margin-left: 6px;
   }
   
   .ldnft-loading-dot:nth-child(2) {
     animation-delay: 1s;
+    margin-left: 6px;
   }
   
   .ldnft-loading-dot:nth-child(3) {
     animation-delay: 1.5s;
+    margin-left: 6px;
   }
-  
+  .ldnft-loading-dot:nth-child(4) {
+    animation-delay: 2s;
+    margin-left: 6px;
+  }
+  .ldnft-loading-dot:nth-child(5) {
+    animation-delay: 2.5s;
+    margin-left: 6px;
+  }
   @keyframes loadingDots {
-    0%, 100% {
-      opacity: 0;
+      0%, 25% {
+        opacity: 0;
+      }
+      25%, 75% {
+        opacity: 1;
+      }
+
     }
-    50% {
-      opacity: 1;
-    }
-  }
   
   /*loader style end*/
 #ldnft-dat-not-imported-message{
