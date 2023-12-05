@@ -374,18 +374,82 @@ class LDNFT_Webhooks {
     function webhooks_callback( WP_REST_Request $request ) {
         
         global $wpdb;
-
+ 
         $type = $request->get_param( 'type' );
         switch( $type ) {
             case "user.created":
                 $user_id = $request->get_param( 'user_id' );
-                $plugin_id = $request->get_param( 'plugin_id' );
-                $objects = $request->get_param( 'objects' );
-                if( is_array($objects ) && array_key_exists( 'user', $objects ) ) {
-                    $user = $objects['user'];
-                    $this->customer_webhook_callback( $user_id, $plugin_id, $user );
-                }
                 
+                $plugin_id = $request->get_param( 'plugin_id' );
+                $settings = get_option( 'ldnft_webhook_settings_'.$plugin_id );
+                $ldnft_disable_webhooks          = isset( $settings['disable_webhooks'] ) && $settings['disable_webhooks']=='yes' ? 'yes': 'no';
+                if( $ldnft_disable_webhooks != 'yes' ) {
+                    $objects = $request->get_param( 'objects' );
+                    if( is_array($objects ) && array_key_exists( 'user', $objects ) ) {
+                        
+                        $user = $objects['user'];
+                        $this->customer_webhook_callback( $user_id, $plugin_id, $user );
+                        
+                        $ldnft_mailpoet_subscription    = isset( $settings['mailpoet_subscription'] ) && $settings['mailpoet_subscription']=='yes' ? 'yes': 'no';
+                        $ldnft_mailpeot_list            = intval( $settings['mailpeot_list'] );
+                        if( !empty( $user['email'] ) && $ldnft_mailpoet_subscription == 'yes' && intval( $ldnft_mailpeot_list ) > 0 ) {
+                            
+                                $status = $user['is_marketing_allowed'] == "1"? 'subscribed' : 'unconfirmed';
+                                $subscriber_data = [
+                                    'email'         => $user['email'],
+                                    'first_name'    => $user['first'],
+                                    'last_name'     => $user['last'],
+                                ];
+
+                                $options = [
+                                    'send_confirmation_email' => false // default: true
+                                    //'schedule_welcome_email' => false
+                                ];
+                
+                                $subscriber_id = 0;
+                                try {
+                                    $subscriber = \MailPoet\API\API::MP('v1')->getSubscriber( $subscriber_data['email'] );
+                                    if( !empty( $subscriber['id'] ) ) {
+                                        $list_ids = $wpdb->get_results( $wpdb->prepare("select id from `".$wpdb->prefix."mailpoet_subscriber_segment` where subscriber_id=%d and segment_id=%d", $subscriber['id'], $ldnft_mailpeot_list) );
+                                        if( count($list_ids) == 0 ) {
+                                            $sql = "insert into `".$wpdb->prefix."mailpoet_subscriber_segment`(subscriber_id, segment_id, status, created_at, updated_at) values('".$subscriber['id']."', '".$ldnft_mailpeot_list."', $status, now(), now() )";
+                                            $wpdb->query( $sql );
+                                        }
+                                    }
+                
+                                    $exists++;
+                                } catch(\MailPoet\API\MP\v1\APIException $exception) {
+                                    if($exception->getCode() == 4 || $exception->getCode() == '4' ) {
+                                        try {
+                                            $subscriber = \MailPoet\API\API::MP('v1')->addSubscriber($subscriber_data, [], $options); // Add to default mailing list
+                                            
+                                            if( !empty( $subscriber['id'] ) ) {
+                                                $sql = "update `".$wpdb->prefix."mailpoet_subscribers` set status='".$status."' WHERE id='".$subscriber['id']."'";
+                                                $wpdb->query( $sql );
+                    
+                                                $sql = "insert into `".$wpdb->prefix."mailpoet_subscriber_segment`(subscriber_id, segment_id, status, created_at, updated_at) values('".$subscriber['id']."', '".$ldnft_mailpeot_list."', $status, now(), now() )";
+                                                $wpdb->query( $sql );
+                                                $count++;
+                                            }
+                                        } catch(\MailPoet\API\MP\v1\APIException $exception) {
+                                            if($exception->getCode() == 6 || $exception->getCode() == '6' ) {
+                                                $exists++;
+                                                
+                                                $errors[$exception->getMessage()] = $exception->getMessage();
+                                            }
+                                        } catch( Exception $exception ) {
+                                            $errors[$exception->getMessage()] = $exception->getMessage();
+                                        }
+                                    }
+                                } catch( Exception $exception ) {
+                                    $errors[$exception->getMessage()] = $exception->getMessage();
+                                }
+                        }
+                    }
+                }
+
+                error_log('type:'.$type);
+                error_log(print_r( $request , true));
                 break;
             case "user.email.changed":
                 // $user_id = $request->get_param( 'user_id' );
@@ -428,31 +492,39 @@ class LDNFT_Webhooks {
             case "payment.created":
                 $user_id    = $request->get_param( 'user_id' );
                 $plugin_id  = $request->get_param( 'plugin_id' );
-                $id         = $request->get_param( 'id' );
-                $created    = $request->get_param( 'created' );
-                $objects = $request->get_param( 'objects' );
-                if( is_array($objects ) && array_key_exists( 'user', $objects ) ) {
-                    $user = $objects['user'];
-                    $payment = $objects['payment'];
-                    $this->sales_webhook_callback( $id, $user_id, $plugin_id, $created, $user, $payment );
-                }
                 
+                $settings = get_option( 'ldnft_webhook_settings_'.$plugin_id );
+                $ldnft_disable_webhooks          = isset( $settings['disable_webhooks'] ) && $settings['disable_webhooks']=='yes' ? 'yes': 'no';
+                if( $ldnft_disable_webhooks != 'yes' ) {
+                    $id         = $request->get_param( 'id' );
+                    $created    = $request->get_param( 'created' );
+                    $objects = $request->get_param( 'objects' );
+                    if( is_array( $objects ) && array_key_exists( 'user', $objects ) ) {
+                        $user = $objects['user'];
+                        $payment = $objects['payment'];
+                        $this->sales_webhook_callback( $id, $user_id, $plugin_id, $created, $user, $payment );
+                    }
+                }
                 break;
             case "subscription.created":
                
                 $user_id            = $request->get_param( 'user_id' );
                 $plugin_id          = $request->get_param( 'plugin_id' );
-                $data               = $request->get_param( 'data' );
-                $subscription_id    = $data['subscription_id'];
-                $license_id         = $data['license_id'];
-                $id = $request->get_param( 'id' );
-                $created = $request->get_param( 'created' );
-                $objects = $request->get_param( 'objects' );
-                if( is_array($objects ) && array_key_exists( 'user', $objects ) && array_key_exists( 'subscription', $objects ) ) {
-                    $user = $objects['user'];
-                    $subscription = $objects['subscription'];
-                    $this->customer_webhook_callback( $user_id, $plugin_id, $user );
-                    $this->subscription_created_webhook_callback( $subscription_id, $license_id, $user_id, $plugin_id, $subscription );
+                $settings = get_option( 'ldnft_webhook_settings_'.$plugin_id );
+                $ldnft_disable_webhooks          = isset( $settings['disable_webhooks'] ) && $settings['disable_webhooks']=='yes' ? 'yes': 'no';
+                if( $ldnft_disable_webhooks != 'yes' ) {
+                    $data               = $request->get_param( 'data' );
+                    $subscription_id    = $data['subscription_id'];
+                    $license_id         = $data['license_id'];
+                    $id = $request->get_param( 'id' );
+                    $created = $request->get_param( 'created' );
+                    $objects = $request->get_param( 'objects' );
+                    if( is_array($objects ) && array_key_exists( 'user', $objects ) && array_key_exists( 'subscription', $objects ) ) {
+                        $user = $objects['user'];
+                        $subscription = $objects['subscription'];
+                        $this->customer_webhook_callback( $user_id, $plugin_id, $user );
+                        $this->subscription_created_webhook_callback( $subscription_id, $license_id, $user_id, $plugin_id, $subscription );
+                    }
                 }
                 break;
             case "plugin.created":

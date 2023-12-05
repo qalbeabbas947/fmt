@@ -140,7 +140,7 @@ class LDNFT_Freemius {
                     foreach( self::$products as $prd ) {
                         $settings = get_option( 'ldnft_webhook_settings_'.$prd->id );
                         if( empty( $settings ) )
-                            update_option( 'ldnft_webhook_settings_'.$prd->id, [ 'enable_webhooks' => 'yes', 'mailpoet_subscription' => 'yes' ] );
+                            update_option( 'ldnft_webhook_settings_'.$prd->id, [ 'mailpeot_list' => 0, 'disable_webhooks' => 'no', 'mailpoet_subscription' => 'yes' ] );
                     }
                 }
             }

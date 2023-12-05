@@ -20,8 +20,8 @@ class LDNFT_Settings {
         add_action( 'admin_post_ldnft_submit_action',           [ $this, 'save_settings' ] );
         add_action( 'admin_notices',                            [ $this, 'ldnft_admin_notice' ] );
         add_action( 'wp_ajax_ldnft_mailpoet_submit_action',     [ $this, 'mailpoet_submit_action' ], 100 );
-        add_action( 'wp_ajax_ldnft_webhook_plugin_settings',     [ $this, 'webhook_plugin_settings' ], 100 );
-        add_action( 'wp_ajax_ldnft_save_webhook_setting',     [ $this, 'save_webhook_setting' ], 100 );
+        add_action( 'wp_ajax_ldnft_webhook_plugin_settings',    [ $this, 'webhook_plugin_settings' ], 100 );
+        add_action( 'wp_ajax_ldnft_save_webhook_setting',       [ $this, 'save_webhook_setting' ], 100 );
     }
 
     /**
@@ -35,10 +35,10 @@ class LDNFT_Settings {
             echo $errormsg;exit;
         }
 
-        $ldnft_enable_webhooks          = isset( $_POST['ldnft_enable_webhooks'] ) && $_POST['ldnft_enable_webhooks'] == 'yes' ? 'yes': 'no';
+        $ldnft_disable_webhooks          = isset( $_POST['ldnft_disable_webhooks'] ) && $_POST['ldnft_disable_webhooks'] == 'yes' ? 'yes': 'no';
         $ldnft_mailpoet_subscription    = isset( $_POST['ldnft_mailpoet_subscription'] ) && $_POST['ldnft_mailpoet_subscription'] == 'yes' ? 'yes': 'no';
-        
-        update_option( 'ldnft_webhook_settings_'.$ldnft_webhook_plugin_ddl, [ 'enable_webhooks' => $ldnft_enable_webhooks, 'mailpoet_subscription' => $ldnft_mailpoet_subscription ] );
+        $ldnft_mailpeot_list            = sanitize_text_field( $_POST['ldnft_mailpeot_list'] );
+        update_option( 'ldnft_webhook_settings_'.$ldnft_webhook_plugin_ddl, [ 'mailpeot_list' => $ldnft_mailpeot_list, 'disable_webhooks' => $ldnft_disable_webhooks, 'mailpoet_subscription' => $ldnft_mailpoet_subscription ] );
         
         $msg = __('Freemius plugin/product webhook settings are updated.', LDNFT_TEXT_DOMAIN);
         echo $msg;exit;
@@ -48,6 +48,8 @@ class LDNFT_Settings {
      * load webhook settings
      */
     public function webhook_plugin_settings() {
+
+        global $wpdb;
         
         $plugin_id  = sanitize_text_field( $_POST['plugin_id'] );
         if( ! isset( $_POST['plugin_id'] ) || empty($plugin_id) ) {
@@ -57,23 +59,56 @@ class LDNFT_Settings {
 
         $settings = get_option( 'ldnft_webhook_settings_'.$plugin_id );
         
-        $ldnft_enable_webhooks          = isset( $settings['enable_webhooks'] ) && $settings['enable_webhooks']=='yes' ? 'yes': 'no';
+        $ldnft_disable_webhooks          = isset( $settings['disable_webhooks'] ) && $settings['disable_webhooks']=='yes' ? 'yes': 'no';
         $ldnft_mailpoet_subscription    = isset( $settings['mailpoet_subscription'] ) && $settings['mailpoet_subscription']=='yes' ? 'yes': 'no';
-
+        $ldnft_mailpeot_list            = intval( $settings['mailpeot_list'] );
         ob_start();
         ?>
             <table class="setting-table-wrapper">
                 <tbody class="ldnft-table-content">
                     <tr> 
+                        <td align="left" valign="top" width="25%">
+						    <strong><label align="left" for="ldnft_disable_webhooks"><?php _e( 'Disable Webhooks:', LDNFT_TEXT_DOMAIN ); ?></label></strong>
+					    </td width="75%">
                         <td>
-                            <input type="checkbox" id="ldnft_enable_webhooks" <?php echo $ldnft_enable_webhooks=='yes'?'checked':''; ?> name="ldnft_enable_webhooks" value="yes"> <strong><label align="left" for="ldnft_enable_webhooks"><?php _e( 'Enable Webhooks', LDNFT_TEXT_DOMAIN ); ?></label></strong>
-                        </td>    
-                    </tr>   
-                    <tr> 
-                        <td>
-                            <input type="checkbox" id="ldnft_mailpoet_subscription" <?php echo $ldnft_mailpoet_subscription=='yes'?'checked':''; ?> name="ldnft_mailpoet_subscription" value="yes"> <strong><label align="left" for="ldnft_dev_id"><?php _e( 'Enable mailpoet subscriptin for new customers?', LDNFT_TEXT_DOMAIN ); ?></label></strong>
+                            <input type="checkbox" id="ldnft_disable_webhooks" <?php echo $ldnft_disable_webhooks=='yes'?'checked':''; ?> name="ldnft_disable_webhooks" value="yes"> <strong><label align="left" for="ldnft_disable_webhooks"><?php _e( 'Yes', LDNFT_TEXT_DOMAIN ); ?></label></strong>
                         </td>    
                     </tr> 
+                    <?php if (defined('MAILPOET_VERSION')) { ?>  
+                        <tr> 
+                            <td align="left" valign="top">
+                                <strong><label align = "left" for="ldnft_mailpoet_subscription"><?php _e( 'Mailpoet subscription for new customers:', LDNFT_TEXT_DOMAIN ); ?></label></strong>
+                            </td>
+                            <td>
+                                <input type="checkbox" id="ldnft_mailpoet_subscription" <?php echo $ldnft_mailpoet_subscription=='yes'?'checked':''; ?> name="ldnft_mailpoet_subscription" value="yes"> <strong><label align="left" for="ldnft_mailpoet_subscription"><?php _e( 'Yes', LDNFT_TEXT_DOMAIN ); ?></label></strong>
+                            </td>    
+                        </tr> 
+                        <tr> 
+                            <td align="left" valign="top">
+                                <strong><label align = "left" for="ldnft_mailpoet_subscription"><?php _e( 'Mailpoet List:', LDNFT_TEXT_DOMAIN ); ?></label></strong>
+                            </td>
+                            <td>
+                                <?php
+                                    
+                                        $table_name = $wpdb->prefix.'mailpoet_segments';
+                                        $list = $wpdb->get_results('select id, name from '.$table_name.'');
+                                        $is_list_available = true;
+                                        if( is_array($list) && count( $list ) > 0 ) {
+                                            echo '<select id="ldnft_mailpeot_list" name="ldnft_mailpeot_list">';
+                                            foreach( $list as $item ) {
+                                                echo '<option value="'.$item->id.'" '.($ldnft_mailpeot_list == $item->id?'selected':"" ).'>'.$item->name.'</option>';
+                                            }
+                                            echo '</select>';
+                                        }
+                                    
+                                ?>
+                            </td>
+                        </tr>
+                    <?php } else {
+                        echo '<tr><td></td><td><span class="mailpoet_unable_to_import">'.__( 'Activate the mailpoet plugin for customer subscriptions.', LDNFT_TEXT_DOMAIN ).'</span></td></tr>';
+                        $allow_import = false;
+                        $is_list_available = false;
+                    } ?>
                 </tbody>
             </table>
         <?php
@@ -132,6 +167,9 @@ class LDNFT_Settings {
 
             foreach( $result as $user ) {
                 $total++;
+
+                $status = $user->is_marketing_allowed == "1"? 'subscribed' : 'unconfirmed';
+
                 $subscriber_data = [
                     'email' => $user->email,
                     'first_name' => $user->first,
@@ -149,7 +187,7 @@ class LDNFT_Settings {
                     if( !empty( $subscriber['id'] ) ) {
                         $list_ids = $wpdb->get_results( $wpdb->prepare("select id from `".$wpdb->prefix."mailpoet_subscriber_segment` where subscriber_id=%d and segment_id=%d", $subscriber['id'], $ldnft_mailpeot_list) );
                         if( count($list_ids) == 0 ) {
-                            $sql = "insert into `".$wpdb->prefix."mailpoet_subscriber_segment`(subscriber_id, segment_id, status, created_at, updated_at) values('".$subscriber['id']."', '".$ldnft_mailpeot_list."', 'subscribed', now(), now() )";
+                            $sql = "insert into `".$wpdb->prefix."mailpoet_subscriber_segment`(subscriber_id, segment_id, status, created_at, updated_at) values('".$subscriber['id']."', '".$ldnft_mailpeot_list."', '".$status."', now(), now() )";
                             $wpdb->query( $sql );
                         }
                     }
@@ -161,10 +199,10 @@ class LDNFT_Settings {
                             $subscriber = \MailPoet\API\API::MP('v1')->addSubscriber($subscriber_data, [], $options); // Add to default mailing list
                             
                             if( !empty( $subscriber['id'] ) ) {
-                                $sql = "update `".$wpdb->prefix."mailpoet_subscribers` set status='subscribed' WHERE id='".$subscriber['id']."'";
+                                $sql = "update `".$wpdb->prefix."mailpoet_subscribers` set status='".$status."' WHERE id='".$subscriber['id']."'";
                                 $wpdb->query( $sql );
     
-                                $sql = "insert into `".$wpdb->prefix."mailpoet_subscriber_segment`(subscriber_id, segment_id, status, created_at, updated_at) values('".$subscriber['id']."', '".$ldnft_mailpeot_list."', 'subscribed', now(), now() )";
+                                $sql = "insert into `".$wpdb->prefix."mailpoet_subscriber_segment`(subscriber_id, segment_id, status, created_at, updated_at) values('".$subscriber['id']."', '".$ldnft_mailpeot_list."', '".$status."', now(), now() )";
                                 $wpdb->query( $sql );
                                 $count++;
                             }
