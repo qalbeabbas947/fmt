@@ -20,6 +20,66 @@ class LDNFT_Settings {
         add_action( 'admin_post_ldnft_submit_action',           [ $this, 'save_settings' ] );
         add_action( 'admin_notices',                            [ $this, 'ldnft_admin_notice' ] );
         add_action( 'wp_ajax_ldnft_mailpoet_submit_action',     [ $this, 'mailpoet_submit_action' ], 100 );
+        add_action( 'wp_ajax_ldnft_webhook_plugin_settings',     [ $this, 'webhook_plugin_settings' ], 100 );
+        add_action( 'wp_ajax_ldnft_save_webhook_setting',     [ $this, 'save_webhook_setting' ], 100 );
+    }
+
+    /**
+     * load webhook settings
+     */
+    public function save_webhook_setting() {
+        
+        $ldnft_webhook_plugin_ddl  = sanitize_text_field( $_POST['ldnft_webhook_plugin_ddl'] );
+        if( intval( $ldnft_webhook_plugin_ddl ) == 0 ) {
+            $errormsg = __('Freemius plugin/product is required field.', LDNFT_TEXT_DOMAIN);
+            echo $errormsg;exit;
+        }
+
+        $ldnft_enable_webhooks          = isset( $_POST['ldnft_enable_webhooks'] ) && $_POST['ldnft_enable_webhooks'] == 'yes' ? 'yes': 'no';
+        $ldnft_mailpoet_subscription    = isset( $_POST['ldnft_mailpoet_subscription'] ) && $_POST['ldnft_mailpoet_subscription'] == 'yes' ? 'yes': 'no';
+        
+        update_option( 'ldnft_webhook_settings_'.$ldnft_webhook_plugin_ddl, [ 'enable_webhooks' => $ldnft_enable_webhooks, 'mailpoet_subscription' => $ldnft_mailpoet_subscription ] );
+        
+        $msg = __('Freemius plugin/product webhook settings are updated.', LDNFT_TEXT_DOMAIN);
+        echo $msg;exit;
+    }
+
+    /**
+     * load webhook settings
+     */
+    public function webhook_plugin_settings() {
+        
+        $plugin_id  = sanitize_text_field( $_POST['plugin_id'] );
+        if( ! isset( $_POST['plugin_id'] ) || empty($plugin_id) ) {
+            $errormsg = __('Freemius plugin/product is required field.', LDNFT_TEXT_DOMAIN);
+            echo $errormsg;exit;
+        }
+
+        $settings = get_option( 'ldnft_webhook_settings_'.$plugin_id );
+        
+        $ldnft_enable_webhooks          = isset( $settings['enable_webhooks'] ) && $settings['enable_webhooks']=='yes' ? 'yes': 'no';
+        $ldnft_mailpoet_subscription    = isset( $settings['mailpoet_subscription'] ) && $settings['mailpoet_subscription']=='yes' ? 'yes': 'no';
+
+        ob_start();
+        ?>
+            <table class="setting-table-wrapper">
+                <tbody class="ldnft-table-content">
+                    <tr> 
+                        <td>
+                            <input type="checkbox" id="ldnft_enable_webhooks" <?php echo $ldnft_enable_webhooks=='yes'?'checked':''; ?> name="ldnft_enable_webhooks" value="yes"> <strong><label align="left" for="ldnft_enable_webhooks"><?php _e( 'Enable Webhooks', LDNFT_TEXT_DOMAIN ); ?></label></strong>
+                        </td>    
+                    </tr>   
+                    <tr> 
+                        <td>
+                            <input type="checkbox" id="ldnft_mailpoet_subscription" <?php echo $ldnft_mailpoet_subscription=='yes'?'checked':''; ?> name="ldnft_mailpoet_subscription" value="yes"> <strong><label align="left" for="ldnft_dev_id"><?php _e( 'Enable mailpoet subscriptin for new customers?', LDNFT_TEXT_DOMAIN ); ?></label></strong>
+                        </td>    
+                    </tr> 
+                </tbody>
+            </table>
+        <?php
+        $content = ob_get_contents();
+
+        exit;
     }
 
     /**
@@ -44,7 +104,6 @@ class LDNFT_Settings {
         }
 
         $ldnft_mailpeot_ctype    = sanitize_text_field( $_POST['ldnft_mailpeot_ctype'] );
-        
         if (!is_plugin_active('mailpoet/mailpoet.php')) {
             $errormsg = __('This section requires MailPoet to be installed and configured.', LDNFT_TEXT_DOMAIN);
             $response = [ 'added' => 0, 'exists' => 0, 'message' => '', 'errors' => [$errormsg], 'errormsg' => $errormsg ];

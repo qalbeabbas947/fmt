@@ -136,6 +136,13 @@ class LDNFT_Freemius {
             $table_name = $wpdb->prefix.'ldnft_plugins';
             if( !is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
                 self::$products = $wpdb->get_results( 'select * from '.$table_name); 
+                if( is_array( self::$products ) && count( self::$products ) > 0  ) {
+                    foreach( self::$products as $prd ) {
+                        $settings = get_option( 'ldnft_webhook_settings_'.$prd->id );
+                        if( empty( $settings ) )
+                            update_option( 'ldnft_webhook_settings_'.$prd->id, [ 'enable_webhooks' => 'yes', 'mailpoet_subscription' => 'yes' ] );
+                    }
+                }
             }
         }
 

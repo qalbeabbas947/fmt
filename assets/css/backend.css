@@ -170,7 +170,7 @@
 }
 /* Setting Page end */
 
-#ldnft-settings-import-mailpoet-message{
+#ldnft-settings-import-mailpoet-message, .ldnft-webhook-message{
     width: 80%;
     padding: 5px;
     border-radius: 4px;

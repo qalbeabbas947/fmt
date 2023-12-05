@@ -122,7 +122,7 @@ class LDNFT_Webhooks {
     /**
 	 * process sales data.
 	 */
-    function sales_webhook_callback( $id, $user_id, $plugin_id, $created, $user, $cart ) {
+    function sales_webhook_callback( $id, $user_id, $plugin_id, $created, $user, $payment ) {
         
         global $wpdb;
         
@@ -160,80 +160,83 @@ class LDNFT_Webhooks {
             )" );     
         }
 
-        $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_name." where id=%d", $id ));
+        $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_name." where id=%d", $payment['id'] ));
         if( count( $res ) == 0 ) {
 
             $wpdb->insert(
                 $table_name,
                 
                 array(
-                    'id'                        => $id,
-                    'ip'                        => $cart['ip'],
-                    'pricing_id'                => $cart['pricing_id'],
-                    'zip_postal_code'           => $cart['zip_postal_code'],
-                    'source'                    => '',
-                    'environment'               => $cart['environment'],
-                    'currency'                  => '',
+                    'id'                        => $payment['id'],
+                    'ip'                        => $payment['ip'],
+                    'pricing_id'                => $payment['pricing_id'],
+                    'zip_postal_code'           => $payment['zip_postal_code'],
+                    'source'                    => $payment['source'],
+                    'environment'               => $payment['environment'],
+                    'currency'                  => $payment['currency'],
                     'plugin_id'                 => $plugin_id,
                     'user_id'                   => $user_id,
-                    'country_code'              => $cart['country_code'],
-                    'subscription_id'           => '',
-                    'plan_id'                   => $cart['plan_id'],
-                    'gross'                     => $cart['price'],
-                    'bound_payment_id'          => '',
-                    'external_id'               => '',
-                    'gateway'                   => '',
-                    'gateway_fee'               => '',
-                    'vat'                       => '',
-                    'type'                      => 'cart-payment',
-                    'is_renewal'                => '',
-                    'coupon_id'                 => $cart['coupon_id'],
-                    'install_id'                => $cart['install_id'],
-                    'license_id'                => $cart['license_id'],
-                    'created'                   => $cart['created'],
-                    'updated'                   => $cart['updated']
+                    'country_code'              => $payment['country_code'],
+                    'subscription_id'           => $payment['subscription_id'],
+                    'plan_id'                   => $payment['plan_id'],
+                    'gross'                     => $payment['gross'],
+                    'bound_payment_id'          => $payment['bound_payment_id'],
+                    'external_id'               => $payment['external_id'],
+                    'gateway'                   => $payment['gateway'],
+                    'gateway_fee'               => $payment['gateway_fee'],
+                    'vat'                       => $payment['vat'],
+                    'vat_id'                    => $payment['vat_id'],
+                    'type'                      => $payment['type'],
+                    'is_renewal'                => $payment['is_renewal'],
+                    'coupon_id'                 => $payment['coupon_id'],
+                    'install_id'                => $payment['install_id'],
+                    'license_id'                => $payment['license_id'],
+                    'created'                   => $payment['created'],
+                    'updated'                   => $payment['updated']
                 )
             );
-            error_log('inserted new sale with id:'.$id);
+            error_log('inserted new sale with id:'.$payment['id']);
         } else {
 
             $wpdb->update($table_name, 
                 array(
-                    'ip'                        => $cart['ip'],
-                    'pricing_id'                => $cart['pricing_id'],
-                    'zip_postal_code'           => $cart['zip_postal_code'],
-                    'source'                    => '',
-                    'environment'               => $cart['environment'],
-                    'currency'                  => '',
+                    'ip'                        => $payment['ip'],
+                    'pricing_id'                => $payment['pricing_id'],
+                    'zip_postal_code'           => $payment['zip_postal_code'],
+                    'source'                    => $payment['source'],
+                    'environment'               => $payment['environment'],
+                    'currency'                  => $payment['currency'],
                     'plugin_id'                 => $plugin_id,
                     'user_id'                   => $user_id,
-                    'country_code'              => $cart['country_code'],
-                    'subscription_id'           => '',
-                    'plan_id'                   => $cart['plan_id'],
-                    'gross'                     => $cart['price'],
-                    'bound_payment_id'          => '',
-                    'external_id'               => '',
-                    'gateway'                   => '',
-                    'gateway_fee'               => '',
-                    'vat'                       => '',
-                    'type'                      => 'cart-payment',
-                    'is_renewal'                => '',
-                    'coupon_id'                 => $cart['coupon_id'],
-                    'install_id'                => $cart['install_id'],
-                    'license_id'                => $cart['license_id'],
-                    'created'                   => $cart['created'],
-                    'updated'                   => $cart['updated']
-                ), array('id'=>$id));
-            error_log('updated new sale with id:'.$id);
+                    'country_code'              => $payment['country_code'],
+                    'subscription_id'           => $payment['subscription_id'],
+                    'plan_id'                   => $payment['plan_id'],
+                    'gross'                     => $payment['gross'],
+                    'bound_payment_id'          => $payment['bound_payment_id'],
+                    'external_id'               => $payment['external_id'],
+                    'gateway'                   => $payment['gateway'],
+                    'gateway_fee'               => $payment['gateway_fee'],
+                    'vat'                       => $payment['vat'],
+                    'vat_id'                    => $payment['vat_id'],
+                    'type'                      => $payment['type'],
+                    'is_renewal'                => $payment['is_renewal'],
+                    'coupon_id'                 => $payment['coupon_id'],
+                    'install_id'                => $payment['install_id'],
+                    'license_id'                => $payment['license_id'],
+                    'created'                   => $payment['created'],
+                    'updated'                   => $payment['updated']
+                ), array('id'=>$payment['id']));
+            error_log('updated new sale with id:'.$payment['id']);
         }
 
         $meta_table_name = $wpdb->prefix.'ldnft_customer_meta';
         $wpdb->update( $meta_table_name, 
                 array(
-                    'status'                => 'cart-payment'
+                    'status'                => $payment['type']
                 ), array( 'plugin_id' => $plugin_id, 'customer_id' => $user_id  ) );
 
     }
+    
     /**
 	 * process subscription data from the freemius.
 	 */
@@ -398,31 +401,45 @@ class LDNFT_Webhooks {
                 error_log('type:'.$type);
                 error_log(print_r( $request , true)); 
                 break;
-            case "user.name.changed":
+            
                 error_log('type:'.$type);
                 error_log(print_r( $request , true)); 
                 break;
-            case "review.created":
-            case "review.requested":
-                $user_id = $request->get_param( 'user_id' );
-                $plugin_id = $request->get_param( 'plugin_id' );
-                $id = $request->get_param( 'id' );
-                $created = $request->get_param( 'created' );
+            // case "review.created":
+            // case "review.requested":
+            //     $user_id = $request->get_param( 'user_id' );
+            //     $plugin_id = $request->get_param( 'plugin_id' );
+            //     $id = $request->get_param( 'id' );
+            //     $created = $request->get_param( 'created' );
+            //     $objects = $request->get_param( 'objects' );
+            //     if( is_array($objects ) && array_key_exists( 'user', $objects ) ) {
+            //         $user = $objects['user'];
+            //         $this->customer_webhook_callback( $user_id, $plugin_id, $user );
+            //     }
+            //     break;
+            // case "review.deleted":
+            //     error_log('type:'.$type);
+            //     error_log(print_r( $request , true)); 
+            //     break;
+            // case "review.updated":
+            //     error_log('type:'.$type);
+            //     error_log(print_r( $request , true)); 
+            //    break;
+            case "payment.created":
+                $user_id    = $request->get_param( 'user_id' );
+                $plugin_id  = $request->get_param( 'plugin_id' );
+                $id         = $request->get_param( 'id' );
+                $created    = $request->get_param( 'created' );
                 $objects = $request->get_param( 'objects' );
                 if( is_array($objects ) && array_key_exists( 'user', $objects ) ) {
                     $user = $objects['user'];
-                    $this->customer_webhook_callback( $user_id, $plugin_id, $user );
+                    $payment = $objects['payment'];
+                    $this->sales_webhook_callback( $id, $user_id, $plugin_id, $created, $user, $payment );
                 }
-                break;
-            case "review.deleted":
-                error_log('type:'.$type);
-                error_log(print_r( $request , true)); 
-                break;
-            case "review.updated":
-                error_log('type:'.$type);
-                error_log(print_r( $request , true)); 
+                
                 break;
             case "subscription.created":
+               
                 $user_id            = $request->get_param( 'user_id' );
                 $plugin_id          = $request->get_param( 'plugin_id' );
                 $data               = $request->get_param( 'data' );
@@ -446,18 +463,18 @@ class LDNFT_Webhooks {
                 error_log('type:'.$type);
                 error_log(print_r( $request , true)); 
                 break;
-            case "cart.completed": //sale  sales_webhook_callback
-                $user_id    = $request->get_param( 'user_id' );
-                $plugin_id  = $request->get_param( 'plugin_id' );
-                $id         = $request->get_param( 'id' );
-                $created    = $request->get_param( 'created' );
-                $objects = $request->get_param( 'objects' );
-                if( is_array($objects ) && array_key_exists( 'user', $objects ) ) {
-                    $user = $objects['user'];
-                    $cart = $objects['cart'];
-                    $this->sales_webhook_callback( $id, $user_id, $plugin_id, $created, $user, $cart );
-                }
-                break;           
+            // case "cart.completed": //sale  sales_webhook_callback
+            //     $user_id    = $request->get_param( 'user_id' );
+            //     $plugin_id  = $request->get_param( 'plugin_id' );
+            //     $id         = $request->get_param( 'id' );
+            //     $created    = $request->get_param( 'created' );
+            //     $objects = $request->get_param( 'objects' );
+            //     if( is_array($objects ) && array_key_exists( 'user', $objects ) ) {
+            //         $user = $objects['user'];
+            //         $cart = $objects['cart'];
+            //         $this->sales_webhook_callback( $id, $user_id, $plugin_id, $created, $user, $cart );
+            //     }
+            //     break;           
             default:
                 error_log('type:'.$type);
                 error_log(print_r( $request , true));    

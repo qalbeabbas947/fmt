@@ -26,6 +26,39 @@
 				$( '#ldnft_reviews_data' ).on( 'click', '.ldnft_review_view_detail',               LDNFTbackEnd.review_view_detail );
                 $( '#ldnft_reviews_data' ).on( 'click', '.ldnft_is_featured_enabled_click',        LDNFTbackEnd.ldnft_is_featured_enabled );
                 $( '.ldnft-save-setting' ).on( 'click', LDNFTbackEnd.ldnft_save_setting );
+                $( '.ldnft-load-webhook-settings-button' ).on( 'click', LDNFTbackEnd.load_webhook_settings ).trigger('click');
+                $( '#ldnft-save-webhook-setting-form' ).on( 'submit', LDNFTbackEnd.save_webhook_settings );
+            },
+            save_webhook_settings: function( e ) {
+                e.preventDefault();
+                var form = $(this).serialize();
+                var calling_btn = $('.ldnft-save-webhook-setting');
+               
+                calling_btn.attr( 'disabled', true );
+                $('.ldnft-webhook-message').html( '' ).css('display', 'none');
+                jQuery.post( LDNFT.ajaxURL, form, function( response ) {
+                    $('.ldnft-webhook-message').html( response ).css('display', 'block');
+                    calling_btn.attr('disabled', false);
+                } ); 
+            },
+            load_webhook_settings: function( ) {
+
+                var sel_plugin_id = $('#ldnft_webhook_plugin_ddl').val();
+
+                var data = {
+                    action: 'ldnft_webhook_plugin_settings', plugin_id: sel_plugin_id
+                }
+                $('.ldnft-save-webhook-setting').attr('disabled', true);
+                $('.ldnft-plugin-ddl-loader').css('display', 'inline-block');
+                
+
+                jQuery.post( LDNFT.ajaxURL, data, function( response ) {
+                    $('.ldnft-webhook-settings-fields').html( response );
+                    $('.ldnft-webhook-message').html( '' ).css('display', 'none');
+                    $('.ldnft-save-webhook-setting').attr( 'disabled', false );
+                    $('.ldnft-plugin-ddl-loader').css('display', 'none');
+                    
+                } ); 
             },
             print_asterik_line: function( ) {
 
@@ -227,7 +260,7 @@
                                     $('.ldnft-loading-dot').css('display', 'none');
                                     $('.ldnft-process-freemius-data-log').append( '<br>' + response.Pluginmsg );
                                 }
-
+ 
                                 if( parseInt( response.Plugins ) == 1 ) {
 
                                     LDNFTbackEnd.current_cron_step = 'plans';
