@@ -18,10 +18,10 @@ $default_id = 0;
         <table class="setting-table-wrapper">
             <tbody class="ldnft-table-content">
                 <tr> 
-                    <td width="20%" align="left" valign="top">
-						<strong><label align="left" for="ldnft_dev_id"><?php _e( 'Filter by Plugin:', LDNFT_TEXT_DOMAIN ); ?></label></strong>
+                    <td width="20%" align="left" valign="top" class="ldnft_webhook_plugin_label">
+						<strong><label align="left" for="ldnft_webhook_plugin_label"><?php _e( 'Filter by Plugin:', LDNFT_TEXT_DOMAIN ); ?></label></strong>
 					</td>
-                    <td width="80%">
+                    <td width="80%" align="left" valign="top">
                         <?php
                             if( is_array($plugins) && count( $plugins ) > 0 ) {
                                 echo '<select id="ldnft_webhook_plugin_ddl" name="ldnft_webhook_plugin_ddl">';
@@ -39,7 +39,7 @@ $default_id = 0;
                             }
                         ?>
                         <input type="button"class="button button-primary ldnft-load-webhook-settings-button" value="<?php _e( 'Load Settings', LDNFT_TEXT_DOMAIN ); ?>">    
-                        <div class="ldnft-plugin-ddl-loader" style="display:none"><img class="" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" /></div>
+                        <div class="ldnft-plugin-ddl-loader" style="display:none"><img width="32px" class="" src="<?php echo LDNFT_ASSETS_URL .'images/spinner-2x.gif'; ?>" /></div>
                     </td>     
                 </tr>
                 <tr>

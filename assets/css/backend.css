@@ -179,7 +179,12 @@
     color: white;
     text-align: center;
 }
-
+.ldnft_webhook_plugin_label, #ldnft_webhook_plugin_ddl{
+    vertical-align: top;
+}
+.ldnft-load-webhook-settings-button{
+    vertical-align: middle;
+}
 #ldnft-settings-import-mailpoet-message a, #ldnft-settings-import-error-message a, .ldnft-process-freemius-data-log a{
     color: white;
     text-decoration: none;

@@ -53,7 +53,7 @@ $cron_status    = get_option('ldnft_run_cron_based_on_plugins');
                         </p>
                     </td>    
                 </tr>
-                <tr> 
+                <!-- <tr> 
                     <td align="left" valign="top">
 						<strong><label align = "left" for="ldnft_secret_key"><?php _e( 'Webhook URL:', LDNFT_TEXT_DOMAIN ); ?></label></strong>
 					</td>
@@ -63,7 +63,7 @@ $cron_status    = get_option('ldnft_run_cron_based_on_plugins');
                         <?php  _e('You can use this url to configure the webhook.', LDNFT_TEXT_DOMAIN ); ?>
                         </p>
                     </td>    
-                </tr>
+                </tr> -->
                 
                 <?php 
                 $fs_connection  = get_option( 'ldnft__freemius_connected' ) == 'yes'? true : false;
