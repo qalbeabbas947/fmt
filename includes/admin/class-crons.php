@@ -907,8 +907,7 @@ class LDNFT_Crons_Settings {
 	 * checks if crons is complete.
 	 */
     public static function calculate_cron_process( ) {
-        ini_set('display_errors', 'On');
-        error_reporting(E_ALL);
+        
         $active_crons   = get_option( 'ldnft_process_freemius_plugins_stats' );
         $state          = isset( $_REQUEST[ 'state' ] ) ? sanitize_text_field( $_REQUEST[ 'state' ] ) : 'plugins';
         

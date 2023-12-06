@@ -179,6 +179,9 @@
     color: white;
     text-align: center;
 }
+.ldnft-webhook-setting-docs{
+    
+}
 .ldnft_webhook_plugin_label, #ldnft_webhook_plugin_ddl{
     vertical-align: top;
 }

@@ -15,6 +15,8 @@ class LDNFT_Webhooks {
         $this->register_routes();
         
         // $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
+        // $reviewsobj = $api->Api('plugins/9176/reviews.json?count='.$limit.'&offset='.$start, 'GET', []);
+        // echo '<pre>';print_r($subobj);exit;
         // $eventID = '1134508997';
         // echo '<pre>';
         // $subobj = $api->Api("plugins/14427/events/{$eventID}.json", 'GET', []);
@@ -515,6 +517,7 @@ class LDNFT_Webhooks {
                     }
                 }
                 break;
+            
             case "subscription.created":
                
                 $user_id            = $request->get_param( 'user_id' );
@@ -534,6 +537,31 @@ class LDNFT_Webhooks {
                         $this->customer_webhook_callback( $user_id, $plugin_id, $user );
                         $this->subscription_created_webhook_callback( $subscription_id, $license_id, $user_id, $plugin_id, $subscription );
                     }
+                }
+                break;
+                
+            case "plan.created":
+                $plugin_id          = $request->get_param( 'plugin_id' );
+                $settings = get_option( 'ldnft_webhook_settings_'.$plugin_id );
+                $ldnft_disable_webhooks          = isset( $settings['disable_webhooks'] ) && $settings['disable_webhooks']=='yes' ? 'yes': 'no';
+                if( $ldnft_disable_webhooks != 'yes' ) {
+                    
+                    $plan_id               = $request->get_param( 'data' );
+                    $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
+                    $planobj = $api->Api('plugins/'.$plugin_id.'/plans/'.$plan_id.'.json', 'GET', []);
+                    error_log(print_r( $planobj , true)); 
+                    if( ! isset( $plans_obj->error )  ) {
+                        error_log('No errors'); 
+                    }
+// echo '<pre>';print_r($subobj);exit;
+                    
+                    //$objects = $request->get_param( 'objects' );
+                    // if( is_array($objects ) && array_key_exists( 'user', $objects ) && array_key_exists( 'subscription', $objects ) ) {
+                    //     $user = $objects['user'];
+                    //     $subscription = $objects['subscription'];
+                    //     $this->customer_webhook_callback( $user_id, $plugin_id, $user );
+                    //     $this->subscription_created_webhook_callback( $subscription_id, $license_id, $user_id, $plugin_id, $subscription );
+                    // }
                 }
                 break;
             case "plugin.created":

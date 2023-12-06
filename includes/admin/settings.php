@@ -67,9 +67,9 @@ class LDNFT_Settings {
             <table class="setting-table-wrapper">
                 <tbody class="ldnft-table-content">
                     <tr> 
-                        <td align="left" valign="top" width="25%">
+                        <td align="left" valign="top" width="42%">
 						    <strong><label align="left" for="ldnft_disable_webhooks"><?php _e( 'Disable Webhooks:', LDNFT_TEXT_DOMAIN ); ?></label></strong>
-					    </td width="75%">
+					    </td width="58%">
                         <td>
                             <input type="checkbox" id="ldnft_disable_webhooks" <?php echo $ldnft_disable_webhooks=='yes'?'checked':''; ?> name="ldnft_disable_webhooks" value="yes"> <strong><label align="left" for="ldnft_disable_webhooks"><?php _e( 'Yes', LDNFT_TEXT_DOMAIN ); ?></label></strong>
                         </td>    
@@ -95,6 +95,7 @@ class LDNFT_Settings {
                                         $is_list_available = true;
                                         if( is_array($list) && count( $list ) > 0 ) {
                                             echo '<select id="ldnft_mailpeot_list" name="ldnft_mailpeot_list">';
+                                            echo '<option value="">'.__( 'Select List', LDNFT_TEXT_DOMAIN ).'</option>';
                                             foreach( $list as $item ) {
                                                 echo '<option value="'.$item->id.'" '.($ldnft_mailpeot_list == $item->id?'selected':"" ).'>'.$item->name.'</option>';
                                             }
