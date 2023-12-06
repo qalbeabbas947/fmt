@@ -12,7 +12,7 @@ $plugins = LDNFT_Freemius::$products;
 $default_id = 0;
 ?>
 <div  id="general_settings" class="cs_ld_tabs">
-    <div class="ldfmt-tab-data-heading"><span class="fa fa-cog ldfmt-icon"></span><?php _e( ' Settings', LDNFT_TEXT_DOMAIN ); ?>
+    <div class="ldfmt-tab-data-heading"><span class="fa fa-book ldfmt-icon"></span> <?php _e( 'Webhook URL:', LDNFT_TEXT_DOMAIN ); ?> <strong><?php echo site_url(); ?>/wp-json/lfnft/v1/webhooks</strong>
     </div> 
     <form id="ldnft-save-webhook-setting-form" method="post" action="<?php echo admin_url('admin-post.php'); ?>">
         <table class="setting-table-wrapper">

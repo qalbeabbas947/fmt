@@ -346,17 +346,17 @@ class LDNFT_Settings {
         if( FS__API_CONNECTION ) {
             $settings_sections['import'] =  array (
                 'title' => __( 'Import', LDNFT_TEXT_DOMAIN ),
-                'icon' => 'fa-info',
+                'icon' => 'fa-cogs',
             );
 
             $settings_sections['shortcodes'] =  array(
                 'title' => __( 'Shortcodes', LDNFT_TEXT_DOMAIN ),
-                'icon' => 'fa-info',
+                'icon' => 'fa-code',
             );
 
             $settings_sections['webhook'] =  array(
                 'title' => __( 'Webhooks', LDNFT_TEXT_DOMAIN ),
-                'icon' => 'fa-info',
+                'icon' => 'fa-book',
             );
 
             $settings_sections = apply_filters( 'ldnft_settings_sections', $settings_sections );

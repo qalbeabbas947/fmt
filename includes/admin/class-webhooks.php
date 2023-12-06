@@ -13,7 +13,16 @@ class LDNFT_Webhooks {
     public function __construct() {
 
         $this->register_routes();
-
+        
+        // $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
+        // $eventID = '1134508997';
+        // echo '<pre>';
+        // $subobj = $api->Api("plugins/14427/events/{$eventID}.json", 'GET', []);
+        // print_r($subobj);
+        // $eventID = '1134509001';
+        // $subobj = $api->Api("plugins/14427/events/{$eventID}.json", 'GET', []);
+        // print_r($subobj);
+        // exit;
     }
 
     public function register_routes() {

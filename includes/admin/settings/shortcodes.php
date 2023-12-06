@@ -30,7 +30,7 @@ function ldfmt_add_info_title( $info_text ) {
 ?>
 
 <div id="general_settings" class="cs_ld_tabs"> 
-    <div class="ldfmt-tab-data-heading"><span class="dashicons dashicons-shortcode ldfmt-icon"></span><?php _e( 'Shortcodes', LDNFT_TEXT_DOMAIN ); ?></div>
+    <div class="ldfmt-tab-data-heading"><span class="dashicons dashicons-shortcode ldfmt-icon"></span> <?php _e( 'Shortcodes', LDNFT_TEXT_DOMAIN ); ?></div>
     <div class="ldfmt-tab-shortcode-data">
         <code> [LDNFT_Reviews product_id="?" listing_type="[ pagination | onetime | slider ]" limit="?" ] </code>
         <?php echo ldfmt_add_info_title( "Displays attached product's reviews based on the attached product/plugin id on the frontend. List type parameters allows you to switch the display from  listing to slider. Limit parameter allows you to restrict the display of records at a time in screen." ); ?>

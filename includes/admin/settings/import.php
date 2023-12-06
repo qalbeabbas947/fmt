@@ -11,7 +11,7 @@ $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_
 $plugins = LDNFT_Freemius::$products;
 ?>
 <div id="general_settings" class="cs_ld_tabs">
-    <div class="ldfmt-tab-data-heading"><span class="fa fa-info ldfmt-icon"></span><?php _e( ' Import', LDNFT_TEXT_DOMAIN ); ?></div> 
+    <div class="ldfmt-tab-data-heading"><span class="fa fa-cogs ldfmt-icon"></span> <?php _e( 'Import Mailpoet', LDNFT_TEXT_DOMAIN ); ?></div> 
     <form class="ldnft-settings-mailpoet" method="post" action="<?php echo admin_url( 'admin-post.php' ); ?>">
         <?php 
             $mail_not_active = false;

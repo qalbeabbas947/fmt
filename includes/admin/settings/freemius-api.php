@@ -14,7 +14,7 @@ $secret_key     = isset( $ldnft_settings['secret_key'] ) ? sanitize_text_field( 
 $cron_status    = get_option('ldnft_run_cron_based_on_plugins');
 ?>
 <div  id="general_settings" class="cs_ld_tabs">
-    <div class="ldfmt-tab-data-heading"><span class="fa fa-cog ldfmt-icon"></span><?php _e( ' Settings', LDNFT_TEXT_DOMAIN ); ?>
+    <div class="ldfmt-tab-data-heading"><span class="fa fa-cog ldfmt-icon"></span> <?php _e( 'API Settings', LDNFT_TEXT_DOMAIN ); ?>
     </div> 
     <form id="ldnft-save-setting-form" method="post" action="<?php echo admin_url('admin-post.php'); ?>">
         <table class="setting-table-wrapper">
