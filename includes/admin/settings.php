@@ -59,7 +59,7 @@ class LDNFT_Settings {
 
         $settings = get_option( 'ldnft_webhook_settings_'.$plugin_id );
         
-        $ldnft_disable_webhooks          = isset( $settings['disable_webhooks'] ) && $settings['disable_webhooks']=='yes' ? 'yes': 'no';
+        $ldnft_disable_webhooks         = isset( $settings['disable_webhooks'] ) && $settings['disable_webhooks']=='yes' ? 'yes': 'no';
         $ldnft_mailpoet_subscription    = isset( $settings['mailpoet_subscription'] ) && $settings['mailpoet_subscription']=='yes' ? 'yes': 'no';
         $ldnft_mailpeot_list            = intval( $settings['mailpeot_list'] );
         ob_start();

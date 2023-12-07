@@ -550,7 +550,7 @@ class LDNFT_Webhooks {
                 break;
                 
             case "plan.created":
-            //case "plan.updated":
+            case "plan.updated":
                 $plugin_id          = $request->get_param( 'plugin_id' );
                 $settings = get_option( 'ldnft_webhook_settings_'.$plugin_id );
                 $ldnft_disable_webhooks          = isset( $settings['disable_webhooks'] ) && $settings['disable_webhooks']=='yes' ? 'yes': 'no';
