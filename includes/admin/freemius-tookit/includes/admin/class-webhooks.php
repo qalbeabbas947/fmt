@@ -45,31 +45,31 @@ class LDNFT_Webhooks {
         global $wpdb;
         
         $table_name = $wpdb->prefix.'ldnft_customers';
-        // if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
+        if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
 
-        //     $wpdb->query( "CREATE TABLE $table_name (
-        //         `id` int(11) NOT NULL,
-        //         `email` varchar(255) DEFAULT NULL,
-        //         `first` varchar(255) DEFAULT NULL,
-        //         `last` varchar(255) DEFAULT NULL,
-        //         `is_verified` tinyint(1) DEFAULT NULL,
-        //         `is_marketing_allowed` tinyint(1) DEFAULT NULL,
-        //         `created` datetime DEFAULT NULL, 
-        //         PRIMARY KEY (`id`)
-        //     )" );     
-        // }
+            $wpdb->query( "CREATE TABLE $table_name (
+                `id` int(11) NOT NULL,
+                `email` varchar(255) DEFAULT NULL,
+                `first` varchar(255) DEFAULT NULL,
+                `last` varchar(255) DEFAULT NULL,
+                `is_verified` tinyint(1) DEFAULT NULL,
+                `is_marketing_allowed` tinyint(1) DEFAULT NULL,
+                `created` datetime DEFAULT NULL, 
+                PRIMARY KEY (`id`)
+            )" );     
+        }
 
         $meta_table_name = $wpdb->prefix.'ldnft_customer_meta';
-        // if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$meta_table_name'" ) ) ) {
+        if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$meta_table_name'" ) ) ) {
 
-        //     $wpdb->query( "CREATE TABLE $meta_table_name (
-        //         `plugin_id` int(11) NOT NULL,
-        //         `customer_id` int(11) NOT NULL,
-        //         `status` varchar(20) DEFAULT NULL,
-        //         `created` datetime DEFAULT NULL, 
-        //         PRIMARY KEY ( `plugin_id`, `customer_id` )
-        //     )" );     
-        // }
+            $wpdb->query( "CREATE TABLE $meta_table_name (
+                `plugin_id` int(11) NOT NULL,
+                `customer_id` int(11) NOT NULL,
+                `status` varchar(20) DEFAULT NULL,
+                `created` datetime DEFAULT NULL, 
+                PRIMARY KEY ( `plugin_id`, `customer_id` )
+            )" );     
+        }
 
         $res = $wpdb->get_results( $wpdb->prepare("select * from ".$table_name." where id=%d", $user_id ));
     
@@ -138,38 +138,38 @@ class LDNFT_Webhooks {
         global $wpdb;
         
         $table_name = $wpdb->prefix.'ldnft_transactions';
-        // if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
+        if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
 
-        //     $wpdb->query( "CREATE TABLE $table_name (
-        //         `id` int(11) NOT NULL,
-        //         `plugin_id` int(11) NOT NULL,
-        //         `user_id` int(11) NOT NULL,
-        //         `install_id` int(11) DEFAULT NULL,
-        //         `subscription_id` int(11) DEFAULT NULL,
-        //         `plan_id` int(11) DEFAULT NULL,
-        //         `gross` float DEFAULT NULL,
-        //         `gateway_fee` float DEFAULT NULL,
-        //         `external_id` varchar(50) DEFAULT NULL,
-        //         `gateway` varchar(50) DEFAULT NULL,
-        //         `coupon_id` int(11) DEFAULT NULL,
-        //         `pricing_id` int(11) DEFAULT NULL,
-        //         `vat_id` int(11) DEFAULT NULL,
-        //         `environment` int(11) DEFAULT NULL,
-        //         `country_code` varchar(3) DEFAULT NULL,
-        //         `bound_payment_id` int(11) DEFAULT NULL,
-        //         `source` int(11) DEFAULT NULL,
-        //         `created` datetime DEFAULT NULL,
-        //         `updated` datetime DEFAULT NULL,
-        //         `vat` float DEFAULT NULL,
-        //         `is_renewal` tinyint(1) DEFAULT NULL,
-        //         `type` varchar(15) DEFAULT NULL,
-        //         `ip` varchar(15) DEFAULT NULL,
-        //         `zip_postal_code` varchar(10) DEFAULT NULL,
-        //         `currency` varchar(3) DEFAULT NULL,
-        //         `license_id` int(11) DEFAULT NULL, 
-        //         PRIMARY KEY (`id`)
-        //     )" );     
-        // }
+            $wpdb->query( "CREATE TABLE $table_name (
+                `id` int(11) NOT NULL,
+                `plugin_id` int(11) NOT NULL,
+                `user_id` int(11) NOT NULL,
+                `install_id` int(11) DEFAULT NULL,
+                `subscription_id` int(11) DEFAULT NULL,
+                `plan_id` int(11) DEFAULT NULL,
+                `gross` float DEFAULT NULL,
+                `gateway_fee` float DEFAULT NULL,
+                `external_id` varchar(50) DEFAULT NULL,
+                `gateway` varchar(50) DEFAULT NULL,
+                `coupon_id` int(11) DEFAULT NULL,
+                `pricing_id` int(11) DEFAULT NULL,
+                `vat_id` int(11) DEFAULT NULL,
+                `environment` int(11) DEFAULT NULL,
+                `country_code` varchar(3) DEFAULT NULL,
+                `bound_payment_id` int(11) DEFAULT NULL,
+                `source` int(11) DEFAULT NULL,
+                `created` datetime DEFAULT NULL,
+                `updated` datetime DEFAULT NULL,
+                `vat` float DEFAULT NULL,
+                `is_renewal` tinyint(1) DEFAULT NULL,
+                `type` varchar(15) DEFAULT NULL,
+                `ip` varchar(15) DEFAULT NULL,
+                `zip_postal_code` varchar(10) DEFAULT NULL,
+                `currency` varchar(3) DEFAULT NULL,
+                `license_id` int(11) DEFAULT NULL, 
+                PRIMARY KEY (`id`)
+            )" );     
+        }
 
         $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_name." where id=%d", $payment['id'] ));
         if( count( $res ) == 0 ) {
@@ -255,46 +255,46 @@ class LDNFT_Webhooks {
 
         global $wpdb;
         
-        // $table_name = $wpdb->prefix.'ldnft_subscription';
-        // if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
+        $table_name = $wpdb->prefix.'ldnft_subscription';
+        if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
 
-        //     $wpdb->query( "CREATE TABLE $table_name (
-        //         `id` int(11) NOT NULL,
-        //         `plugin_id` int(11) NOT NULL,
-        //         `user_id` int(11) NOT NULL,
-        //         `user_card_id` int(11) DEFAULT NULL,
-        //         `install_id` int(11) DEFAULT NULL,
-        //         `amount_per_cycle` float DEFAULT NULL,
-        //         `billing_cycle` int(11) DEFAULT NULL,
-        //         `gross` float DEFAULT NULL,
-        //         `tax_rate` float DEFAULT NULL,
-        //         `outstanding_balance` float DEFAULT NULL,
-        //         `failed_payments` int(11) DEFAULT NULL,
-        //         `gateway` varchar(50) DEFAULT NULL,
-        //         `coupon_id` int(11) DEFAULT NULL,
-        //         `trial_ends` datetime DEFAULT NULL,
-        //         `next_payment` datetime DEFAULT NULL,
-        //         `created` datetime DEFAULT NULL,
-        //         `updated_at` datetime DEFAULT NULL,
-        //         `currency` varchar(3) DEFAULT NULL,
-        //         `zip_postal_code` varchar(10) DEFAULT NULL,
-        //         `external_id` varchar(35) DEFAULT NULL,
-        //         `ip` varchar(15) DEFAULT NULL,
-        //         `plan_id` int(11) DEFAULT NULL,
-        //         `vat_id` int(11) DEFAULT NULL,
-        //         `source` int(11) DEFAULT NULL,
-        //         `environment` int(11) DEFAULT NULL,
-        //         `country_code` varchar(2) DEFAULT NULL,
-        //         `pricing_id` int(11) DEFAULT NULL,
-        //         `initial_amount` float DEFAULT NULL,
-        //         `renewal_amount` float DEFAULT NULL,
-        //         `renewals_discount` float DEFAULT NULL,
-        //         `renewals_discount_type` varchar(12) DEFAULT NULL,
-        //         `license_id` int(11) DEFAULT NULL, 
-        //         PRIMARY KEY (`id`)
-        //     )" );   
+            $wpdb->query( "CREATE TABLE $table_name (
+                `id` int(11) NOT NULL,
+                `plugin_id` int(11) NOT NULL,
+                `user_id` int(11) NOT NULL,
+                `user_card_id` int(11) DEFAULT NULL,
+                `install_id` int(11) DEFAULT NULL,
+                `amount_per_cycle` float DEFAULT NULL,
+                `billing_cycle` int(11) DEFAULT NULL,
+                `gross` float DEFAULT NULL,
+                `tax_rate` float DEFAULT NULL,
+                `outstanding_balance` float DEFAULT NULL,
+                `failed_payments` int(11) DEFAULT NULL,
+                `gateway` varchar(50) DEFAULT NULL,
+                `coupon_id` int(11) DEFAULT NULL,
+                `trial_ends` datetime DEFAULT NULL,
+                `next_payment` datetime DEFAULT NULL,
+                `created` datetime DEFAULT NULL,
+                `updated_at` datetime DEFAULT NULL,
+                `currency` varchar(3) DEFAULT NULL,
+                `zip_postal_code` varchar(10) DEFAULT NULL,
+                `external_id` varchar(35) DEFAULT NULL,
+                `ip` varchar(15) DEFAULT NULL,
+                `plan_id` int(11) DEFAULT NULL,
+                `vat_id` int(11) DEFAULT NULL,
+                `source` int(11) DEFAULT NULL,
+                `environment` int(11) DEFAULT NULL,
+                `country_code` varchar(2) DEFAULT NULL,
+                `pricing_id` int(11) DEFAULT NULL,
+                `initial_amount` float DEFAULT NULL,
+                `renewal_amount` float DEFAULT NULL,
+                `renewals_discount` float DEFAULT NULL,
+                `renewals_discount_type` varchar(12) DEFAULT NULL,
+                `license_id` int(11) DEFAULT NULL, 
+                PRIMARY KEY (`id`)
+            )" );   
 
-        // }
+        }
 
         $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_name." where id=%d", $id ));
 
@@ -387,7 +387,33 @@ class LDNFT_Webhooks {
         global $wpdb;
         
         $table_name = $wpdb->prefix.'ldnft_reviews';
-        
+        // if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
+
+        //     $wpdb->query( "CREATE TABLE $table_name (
+        //         `id` int(11) NOT NULL,
+        //         `plugin_id` int(11) NOT NULL,
+        //         `user_id` int(11) DEFAULT NULL,
+        //         `external_id` int(11) DEFAULT NULL,
+        //         `rate` int(11) DEFAULT NULL,
+        //         `title` TEXT DEFAULT NULL,
+        //         `text` TEXT DEFAULT NULL,
+        //         `name` varchar(255) DEFAULT NULL,
+        //         `job_title` varchar(255) DEFAULT NULL,
+        //         `company` varchar(255) DEFAULT NULL,
+        //         `company_url` varchar(255) DEFAULT NULL,
+        //         `picture` varchar(255) DEFAULT NULL,
+        //         `profile_url` varchar(255) DEFAULT NULL,
+        //         `license_id` int(11) DEFAULT NULL,
+        //         `is_verified` tinyint(1) NOT NULL,
+        //         `is_featured` tinyint(1) NOT NULL,
+        //         `environment` int(11) DEFAULT NULL,
+        //         `sharable_img` varchar(255) DEFAULT NULL,
+        //         `created` datetime DEFAULT NULL,
+        //         `updated` datetime DEFAULT NULL, 
+        //         PRIMARY KEY (`id`)
+        //     )" );     
+        // }
+
         $res = $wpdb->get_results($wpdb->prepare("select id from ".$table_name." where id=%d", $review_id ));
                 
         if( count( $res ) == 0 ) {
@@ -456,33 +482,33 @@ class LDNFT_Webhooks {
         global $wpdb;
         
         $table_name = $wpdb->prefix.'ldnft_plans';
-        // if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
+        if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
 
-        //     $wpdb->query( "CREATE TABLE $table_name (
-        //         `id` int(11) NOT NULL,
-        //         `title` TEXT DEFAULT NULL,
-        //         `name` varchar(255) DEFAULT NULL,
-        //         `description` TEXT DEFAULT NULL,
-        //         `plugin_id` int(11) DEFAULT NULL,
-        //         `is_free_localhost` tinyint(1) DEFAULT NULL,
-        //         `is_block_features` tinyint(1) DEFAULT NULL,
-        //         `is_block_features_monthly` tinyint(1) DEFAULT NULL,
-        //         `license_type` tinyint(1) DEFAULT NULL,
-        //         `is_https_support` varchar(255) DEFAULT NULL,
-        //         `trial_period` int(11) DEFAULT NULL,
-        //         `is_require_subscription` tinyint(1) DEFAULT NULL,
-        //         `support_kb` varchar(255) DEFAULT NULL,
-        //         `support_forum` varchar(255) DEFAULT NULL,
-        //         `support_email` varchar(255) DEFAULT NULL,
-        //         `support_phone` varchar(20) DEFAULT NULL,
-        //         `support_skype` varchar(255) DEFAULT NULL,
-        //         `is_success_manager` varchar(255) DEFAULT NULL,
-        //         `is_featured` tinyint(1) DEFAULT NULL,
-        //         `is_hidden` tinyint(1) DEFAULT NULL,
-        //         `created` datetime DEFAULT NULL, 
-        //         PRIMARY KEY (`id`)
-        //      )" ); 
-        // }
+            $wpdb->query( "CREATE TABLE $table_name (
+                `id` int(11) NOT NULL,
+                `title` TEXT DEFAULT NULL,
+                `name` varchar(255) DEFAULT NULL,
+                `description` TEXT DEFAULT NULL,
+                `plugin_id` int(11) DEFAULT NULL,
+                `is_free_localhost` tinyint(1) DEFAULT NULL,
+                `is_block_features` tinyint(1) DEFAULT NULL,
+                `is_block_features_monthly` tinyint(1) DEFAULT NULL,
+                `license_type` tinyint(1) DEFAULT NULL,
+                `is_https_support` varchar(255) DEFAULT NULL,
+                `trial_period` int(11) DEFAULT NULL,
+                `is_require_subscription` tinyint(1) DEFAULT NULL,
+                `support_kb` varchar(255) DEFAULT NULL,
+                `support_forum` varchar(255) DEFAULT NULL,
+                `support_email` varchar(255) DEFAULT NULL,
+                `support_phone` varchar(20) DEFAULT NULL,
+                `support_skype` varchar(255) DEFAULT NULL,
+                `is_success_manager` varchar(255) DEFAULT NULL,
+                `is_featured` tinyint(1) DEFAULT NULL,
+                `is_hidden` tinyint(1) DEFAULT NULL,
+                `created` datetime DEFAULT NULL, 
+                PRIMARY KEY (`id`)
+             )" ); 
+        }
 
         $res = $wpdb->get_results($wpdb->prepare("select id from ".$table_name." where id=%d", $plan_id ));
         if( count( $res ) == 0 ) {
