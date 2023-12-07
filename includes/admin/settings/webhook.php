@@ -66,6 +66,7 @@ $default_id = 0;
                             <strong><?php _e( 'Disable Webhooks:', LDNFT_TEXT_DOMAIN ); ?></strong> <?php _e( 'Disables the freemius webhook events for the selected plugin/product. By default, plugin will import the customers, sales, subscriptions and plugins data from the freemius.', LDNFT_TEXT_DOMAIN ); ?><br />
                             <strong><?php _e( 'Mailpoet subscription for new customers:', LDNFT_TEXT_DOMAIN ); ?></strong> <?php _e( 'If enabled, then system will subscribe new customers with mailpoet. Customer subscription is enabled by default.', LDNFT_TEXT_DOMAIN ); ?><br />
                             <strong><?php _e( 'Mailpoet List:', LDNFT_TEXT_DOMAIN ); ?></strong> <?php _e( 'New customer will be subscribed in the selected mailpoet list.', LDNFT_TEXT_DOMAIN ); ?><br />
+                            <strong><?php _e( 'Webhooks:', LDNFT_TEXT_DOMAIN ); ?></strong> <?php _e( 'Our script supports user.created, review.created, review.updated, payment.created, subscription.created and plan.created webhooks only.', LDNFT_TEXT_DOMAIN ); ?>
                         </td>
                     </tr>
                 </table>
