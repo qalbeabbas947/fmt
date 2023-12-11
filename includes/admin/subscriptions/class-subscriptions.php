@@ -43,7 +43,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
     public $selected_interval;
 
     /**
-     * Current selected country
+     * Current selected country 
      */
     public $selected_country;
 
@@ -240,7 +240,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
          * REQUIRED. Now we need to define our column headers. This includes a complete
          */
         $columns = $this->get_columns();
-        $screen = WP_Screen::get( 'freemius-toolkit_page_freemius-subscriptions' );
+        $screen = WP_Screen::get( 'freemius-toolkit_page_freemius-subscriptions' ); 
         $hidden   = get_hidden_columns( $screen );
         $sortable = $this->get_sortable_columns();
         
@@ -301,7 +301,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
             $orderby_prefix = "";
         }
         
-        $result = $wpdb->get_results( "SELECT t.*, concat(c.first, ' ', c.first) as username, c.email as useremail FROM $table_name $where ORDER BY $orderby_prefix$orderby $order LIMIT ".$per_page." OFFSET ".$offset );
+        $result = $wpdb->get_results( "SELECT t.*, concat(c.first, ' ', c.last) as username, c.email as useremail FROM $table_name $where ORDER BY $orderby_prefix$orderby $order LIMIT ".$per_page." OFFSET ".$offset );
         
         $data = [];
         $count = 0;

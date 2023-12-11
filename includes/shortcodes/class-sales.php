@@ -80,7 +80,7 @@ class LDNFT_Sales_Shortcode {
         if( $show == 'both' || $show=='listing' ) {
             
             $table_name = $wpdb->prefix.'ldnft_subscription t inner join '.$wpdb->prefix.'ldnft_customers c on (t.user_id=c.id)'; 
-            $results    = $wpdb->get_results( $wpdb->prepare( "SELECT t.*, concat(c.first, ' ', c.first) as username, c.email FROM $table_name where t.plugin_id=%d LIMIT %d OFFSET %d", $plugin_id, $per_page, $offset ) );
+            $results    = $wpdb->get_results( $wpdb->prepare( "SELECT t.*, concat(c.first, ' ', c.last) as username, c.email FROM $table_name where t.plugin_id=%d LIMIT %d OFFSET %d", $plugin_id, $per_page, $offset ) );
         
             if( is_array( $results ) && count( $results ) > 0 ) {
                 if(  $offset == 0 ) {

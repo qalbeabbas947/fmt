@@ -74,6 +74,7 @@ class LDNFT_Sales_Menu {
         
         $selected_search        = isset( $_REQUEST['search'] ) ? sanitize_text_field( $_REQUEST['search'] ) : '';
         $selected_type          = isset( $_REQUEST['type'] ) ? sanitize_text_field( $_REQUEST['type'] ) : '';
+        $selected_gateway       = isset( $_REQUEST['gateway'] ) ? sanitize_text_field( $_REQUEST['gateway'] ) : '';
         $selected_country       = isset( $_REQUEST['country'] ) ? sanitize_text_field( $_REQUEST['country'] ) : '';
 
         $table_name = $wpdb->prefix.'ldnft_transactions t inner join '.$wpdb->prefix.'ldnft_customers c on (t.user_id=c.id)';  
@@ -86,6 +87,10 @@ class LDNFT_Sales_Menu {
             $where .= " and t.is_renewal	='".$selected_type."'";
         }
 
+        if( $selected_gateway != '' ) {
+            $where .= " and t.gateway	='".$selected_gateway."'";
+        }
+        
         if( ! empty( $selected_country ) ) {
             $where .= " and t.country_code='".$selected_country."'";
         }
@@ -333,6 +338,7 @@ class LDNFT_Sales_Menu {
             $selected_country = sanitize_text_field( $_GET['country'] ); 
         }
 
+        $selected_gateway = ( isset( $_GET['gateway'] )  ) ? sanitize_text_field( $_GET['gateway'] ) : '';
         /**
          * Create an instance of our package class... 
          */
@@ -392,6 +398,27 @@ class LDNFT_Sales_Menu {
                                     ?>
                                         <option value="<?php echo $key;?>" <?php echo $selected_country==$key?'selected':'';?>><?php echo $value;?></option>
                                     <?php } ?>
+                                </select>
+                                <?php 
+                                    $table_name = $wpdb->prefix.'ldnft_transactions'; 
+                                    $gateways      = $wpdb->get_results( "SELECT distinct( gateway ) as gateway FROM $table_name" );
+                                ?>
+                                <select name="ldfmt-sales-gateway-filter" class="ldfmt-sales-gateway-filter">
+                                    <option value=""><?php _e( 'All Gateways', LDNFT_TEXT_DOMAIN ); ?></option>
+                                    <?php
+                                    if( isset( $gateways ) && is_array( $gateways ) ) {
+                                        foreach( $gateways as $gateway ) {
+                                            
+                                            $selected = '';
+                                            if( $selected_gateway == $gateway->gateway ) {
+                                                $selected = ' selected = "selected"';   
+                                            }
+                                            ?>
+                                                <option value="<?php echo $gateway->gateway; ?>" <?php echo $selected; ?>><?php echo $gateway->gateway; ?></option>
+                                            <?php   
+                                        }
+                                    }
+                                    ?>
                                 </select>
                                 <!-- <input type="text" value="<?php echo $search;?>" name="ldnft-sales-general-search" class="form-control ldnft-sales-general-search" placeholder="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>"> -->
                                 <input type="button" name="ldnft-sales-search-button" value="<?php _e('Filter', LDNFT_TEXT_DOMAIN);?>" class="btn button ldnft-sales-search-button" />

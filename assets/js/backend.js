@@ -561,6 +561,7 @@
                     var ldnftsearch     = $('.ldnft-sales-general-search').val();
                     var country_str     = '';
                     var ldnfttypes      = '';
+                    var gateway_str     = '';
                     var order_str       = $('.ldnft-freemius-order').val();
                     var orderby_str     = $('.ldnft-freemius-orderby').val();
                 } else {
@@ -568,6 +569,7 @@
                     var ldnftinterval   = $('.ldfmt-sales-interval-filter').val();
                     var ldnftstatus     = $('.ldfmt-sales-filter').val();
                     var ldnftsearch     = '';
+                    var gateway_str     = $('.ldfmt-sales-gateway-filter').val();
                     var country_str     = $('.ldfmt-sales-country-filter').val();
                     var ldnfttypes      = $('.ldnft-sales-payment-types').val();
                     var order_str       = $('.ldnft-freemius-order').val();
@@ -585,6 +587,7 @@
                         search: ldnftsearch,
                         country: country_str,
                         type: ldnfttypes,
+                        gateway: gateway_str,
                         order: order_str,
                         orderby: orderby_str,
                         status: ldnftstatus
@@ -622,6 +625,7 @@
                     var ldnftsearch     = $('.ldnft-sales-general-search').val();
                     var country_str     = '';
                     var ldnfttypes      = '';
+                    var gateway_str     = '';
                     var order_str       = $('.ldnft-freemius-order').val();
                     var orderby_str     = $('.ldnft-freemius-orderby').val();
                 } else {
@@ -629,6 +633,7 @@
                     var ldnftinterval   = $('.ldfmt-sales-interval-filter').val();
                     var ldnftstatus     = $('.ldfmt-sales-filter').val();
                     var ldnftsearch     = '';
+                    var gateway_str     = $('.ldfmt-sales-gateway-filter').val();
                     var country_str     = $('.ldfmt-sales-country-filter').val();
                     var ldnfttypes      = $('.ldnft-sales-payment-types').val();
                     var order_str       = $('.ldnft-freemius-order').val();
@@ -644,6 +649,7 @@
                         ldfmt_plugins_filter: ldnftplugin,
                         interval: ldnftinterval,
                         search: ldnftsearch,
+                        gateway: gateway_str,
                         type: ldnfttypes,
                         country: country_str,
                         order: order_str,
