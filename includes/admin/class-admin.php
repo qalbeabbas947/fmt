@@ -161,7 +161,23 @@ class LDNFT_Admin {
      * @return bool
      */
     public function admin_enqueue_scripts_callback() {
-
+        $page_id = sanitize_text_field( $_REQUEST[ 'page' ] );
+        $current_page = '';
+        switch ( $page_id ) {
+            case "freemius-customers":
+                $current_page = 'customers';
+                break;
+            case "freemius-reviews":
+                $current_page = 'reviews';
+                break;
+            case "freemius-sales":
+                $current_page = 'sales';
+                break;
+            case "freemius-subscriptions":
+                $current_page = 'subscriptions';
+                break;
+        }
+        
         $screen = get_current_screen();
         if( $screen ) { 
             if( $screen->id == 'freemius-toolkit_page_freemius-settings' 
@@ -184,6 +200,8 @@ class LDNFT_Admin {
                  * enqueue admin js
                  */
                 wp_enqueue_script( 'fmt-select2-js', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js?'.time(), [ 'jquery' ], LDNFT_VERSION, true ); 
+                wp_enqueue_script( 'fmt-backendcookie-js', LDNFT_ASSETS_URL . 'js/jquery.cookie.js?'.time(), [ 'jquery' ], LDNFT_VERSION, true ); 
+
                 wp_enqueue_script( 'fmt-backend-js', LDNFT_ASSETS_URL . 'js/backend.js?'.time(), [ 'jquery' ], LDNFT_VERSION, true ); 
                 $cron_status    = get_option('ldnft_run_cron_based_on_plugins');
 
@@ -195,21 +213,22 @@ class LDNFT_Admin {
                 }
                 
                 wp_localize_script( 'fmt-backend-js', 'LDNFT', [  
-                    'ajaxURL' => admin_url( 'admin-ajax.php' ),
-                    'import_cron_status' => $cron_status,
-                    'loader' => LDNFT_ASSETS_URL .'images/spinner-2x.gif',
-                    'is_cron_page_check' => $is_cron_page_check,
-                    'preloader_gif_img' => $this->get_bar_preloader(),
-                    'plugins_start_msg'   => __('plugins are updating', LDNFT_TEXT_DOMAIN),
-                    'plans_start_msg'   => __('Plans are updating', LDNFT_TEXT_DOMAIN),
-                    'customer_start_msg'   => __('Customers are updating', LDNFT_TEXT_DOMAIN),
-                    'sales_start_msg'   => __('Sales are updating', LDNFT_TEXT_DOMAIN),
-                    'subscription_start_msg'   => __('Subscriptions are updating', LDNFT_TEXT_DOMAIN),
-                    'reviews_start_msg'   => __('Reviews are updating', LDNFT_TEXT_DOMAIN),
-                    'complete_msg'   => __('Import is complete', LDNFT_TEXT_DOMAIN),
-                    'test_n_save' => __('Test & Save', LDNFT_TEXT_DOMAIN),
-                    'sync_data' => __('Sync Data', LDNFT_TEXT_DOMAIN),
-                    'ldnft_error_reload_message'   => __('There seems to be an issue with API connectivity, please try again by <a href="admin.php?page=freemius-settings">reloading the page</a>.', LDNFT_TEXT_DOMAIN),
+                    'ajaxURL'                       => admin_url( 'admin-ajax.php' ),
+                    'import_cron_status'            => $cron_status,
+                    'loader'                        => LDNFT_ASSETS_URL .'images/spinner-2x.gif',
+                    'is_cron_page_check'            => $is_cron_page_check,
+                    'preloader_gif_img'             => $this->get_bar_preloader(),
+                    'current_page'                  => $current_page,
+                    'plugins_start_msg'             => __('plugins are updating', LDNFT_TEXT_DOMAIN),
+                    'plans_start_msg'               => __('Plans are updating', LDNFT_TEXT_DOMAIN),
+                    'customer_start_msg'            => __('Customers are updating', LDNFT_TEXT_DOMAIN),
+                    'sales_start_msg'               => __('Sales are updating', LDNFT_TEXT_DOMAIN),
+                    'subscription_start_msg'        => __('Subscriptions are updating', LDNFT_TEXT_DOMAIN),
+                    'reviews_start_msg'             => __('Reviews are updating', LDNFT_TEXT_DOMAIN),
+                    'complete_msg'                  => __('Import is complete', LDNFT_TEXT_DOMAIN),
+                    'test_n_save'                   => __('Test & Save', LDNFT_TEXT_DOMAIN),
+                    'sync_data'                     => __('Sync Data', LDNFT_TEXT_DOMAIN),
+                    'ldnft_error_reload_message'    => __('There seems to be an issue with API connectivity, please try again by <a href="admin.php?page=freemius-settings">reloading the page</a>.', LDNFT_TEXT_DOMAIN),
                 ] );
             }
         }  
