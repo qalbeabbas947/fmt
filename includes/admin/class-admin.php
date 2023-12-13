@@ -161,22 +161,8 @@ class LDNFT_Admin {
      * @return bool
      */
     public function admin_enqueue_scripts_callback() {
-        $page_id = sanitize_text_field( $_REQUEST[ 'page' ] );
-        $current_page = '';
-        switch ( $page_id ) {
-            case "freemius-customers":
-                $current_page = 'customers';
-                break;
-            case "freemius-reviews":
-                $current_page = 'reviews';
-                break;
-            case "freemius-sales":
-                $current_page = 'sales';
-                break;
-            case "freemius-subscriptions":
-                $current_page = 'subscriptions';
-                break;
-        }
+        
+        
         
         $screen = get_current_screen();
         if( $screen ) { 
@@ -212,6 +198,27 @@ class LDNFT_Admin {
                     $is_cron_page_check = 'yes';
                 }
                 
+                $page_id = '';
+                if( isset($_REQUEST[ 'page' ]) ) {
+                    $page_id = sanitize_text_field( $_REQUEST[ 'page' ] );
+                }
+                
+                $current_page = '';
+                switch ( $page_id ) {
+                    case "freemius-customers":
+                        $current_page = 'customers';
+                        break;
+                    case "freemius-reviews":
+                        $current_page = 'reviews';
+                        break;
+                    case "freemius-sales":
+                        $current_page = 'sales';
+                        break;
+                    case "freemius-subscriptions":
+                        $current_page = 'subscriptions';
+                        break;
+                }
+
                 wp_localize_script( 'fmt-backend-js', 'LDNFT', [  
                     'ajaxURL'                       => admin_url( 'admin-ajax.php' ),
                     'import_cron_status'            => $cron_status,
