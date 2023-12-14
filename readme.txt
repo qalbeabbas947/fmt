@@ -2,7 +2,7 @@
 Contributors: ldninjas, farooqabdullah
 Tags: learndash, LMS, Reset progress, Reset course, reset course learndash, learndash rest by group
 Requires at least: 5.0
-Tested up to: 6.0
+Tested up to: 6.0 
 Requires PHP: 7.0
 Stable tag: 1.5
 License: GPLv3
