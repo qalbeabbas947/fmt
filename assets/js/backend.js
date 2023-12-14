@@ -532,11 +532,14 @@
                     var ldnftplugin     = '';
                     var ldnftstatus     = '';
                     var ldnftsearch     = $('.ldnft-customers-general-search').val();
+                    var pmtstatus_str   = '';
                     var marketing_str   = '';
+
                 } else {
                     var ldnftplugin     = $('.ldfmt-plugins-filter').val();
                     var ldnftstatus     = $('.ldfmt-plugins-customers-status').val();
                     var ldnftsearch     = '';
+                    var pmtstatus_str   = $('.ldfmt-payment-status').val();
                     var marketing_str   = $('.ldfmt-plugins-customers-marketing').val();
                 }
 
@@ -551,6 +554,7 @@
                         status: ldnftstatus,
                         order: order_str,
                         search: ldnftsearch,
+                        pmtstatus: pmtstatus_str,
                         marketing: marketing_str,
                         orderby: orderby_str,
                     },

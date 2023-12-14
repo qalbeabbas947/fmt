@@ -29,7 +29,6 @@ class LDNFT_Customers_Menu {
         ];
 
         add_action( 'admin_menu', [ $this, 'admin_menu_page' ] );
-		
 		add_action('wp_ajax_ldnft_customers_display', 		[ $this, 'ldnft_customers_display' ], 100 );
         add_action( 'wp_ajax_ldnft_customers_check_next',      [ $this, 'customers_check_next' ], 100 );
 	}
@@ -61,7 +60,6 @@ class LDNFT_Customers_Menu {
         $per_page       = isset($_REQUEST['per_page']) && intval($_REQUEST['per_page'])>0?intval($_REQUEST['per_page']):10;
         $offset         = isset($_REQUEST['offset']) && intval($_REQUEST['offset'])>0?intval($_REQUEST['offset']):1;
         $current_recs   = isset($_REQUEST['current_recs']) && intval($_REQUEST['current_recs'])>0?intval($_REQUEST['current_recs']):0;
-
         $plugin_id      = isset($_REQUEST['plugin_id']) && intval($_REQUEST['plugin_id'])>0?intval($_REQUEST['plugin_id']):0;
         $interval       = isset($_REQUEST['status']) && intval($_REQUEST['status'])>0?intval($_REQUEST['status']):'';
         $offset_rec     = ($offset-1) * $per_page;
@@ -168,6 +166,11 @@ class LDNFT_Customers_Menu {
             $selected_marketing = sanitize_text_field( $_GET['marketing'] ); 
         }
 
+        $selected_paymentstatus = '';
+        if( isset( $_GET['pmtstatus'] )  ) {
+            $selected_paymentstatus = sanitize_text_field( $_GET['pmtstatus'] ); 
+        }
+        
 		$products = LDNFT_Freemius::$products;
 		
         /**
@@ -214,6 +217,11 @@ class LDNFT_Customers_Menu {
                                     <option value=""><?php _e('All', LDNFT_TEXT_DOMAIN);?></option>
                                     <option value="1" <?php echo $selected_marketing=='1'?'selected':''; ?>><?php _e('Is Marketing Allowed', LDNFT_TEXT_DOMAIN);?></option>
                                     <option value="0" <?php echo $selected_marketing=='0'?'selected':''; ?>><?php _e('Marketing Not Allowed', LDNFT_TEXT_DOMAIN);?></option>
+                                </select>
+                                <select name="ldfmt-payment-status" class="ldfmt-payment-status">
+                                    <option value=""><?php _e('All Payment Status', LDNFT_TEXT_DOMAIN);?></option>
+                                    <option value="paid" <?php echo $selected_paymentstatus=='paid'?'selected':''; ?>><?php _e('Paid', LDNFT_TEXT_DOMAIN);?></option>
+                                    <option value="free" <?php echo $selected_paymentstatus=='free'?'selected':''; ?>><?php _e('Free', LDNFT_TEXT_DOMAIN);?></option>
                                 </select>
                                 <!-- <input type="text" value="<?php echo $search;?>" name="ldnft-customers-general-search" class="form-control ldnft-customers-general-search" placeholder="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>"> -->
                                 <input type="button" name="ldnft-customer-search-button" value="<?php _e('Filter', LDNFT_TEXT_DOMAIN);?>" class="btn button ldnft-customer-search-button" />

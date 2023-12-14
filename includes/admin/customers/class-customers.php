@@ -33,7 +33,13 @@ class LDNFT_Customers extends WP_List_Table {
      * Customer marketing
      */
     public $selected_marketing;
-                        
+      
+    /**
+     * Customer marketing
+     */
+    public $selected_paymentstatus;
+
+    
     /**
      * Freemius API object
      */
@@ -56,12 +62,12 @@ class LDNFT_Customers extends WP_List_Table {
         $this->plugins = LDNFT_Freemius::$products;
         $default_plugin_id = is_array( $this->plugins) && count( $this->plugins ) > 0 ? $this->plugins[0]->id : 0;
 
-        $this->selected_plugin_id = ( isset( $_GET['ldfmt_plugins_filter'] ) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) ? intval( $_GET['ldfmt_plugins_filter'] ) : '' ;
-        $this->selected_status = ( isset( $_GET['status'] )  ) ? sanitize_text_field( $_GET['status'] ) : ''; 
-        $this->selected_marketing = ( isset( $_GET['marketing'] )  ) ? sanitize_text_field( $_GET['marketing'] ) : ''; 
-        $this->selected_search = ( isset( $_GET['search'] )  ) ? sanitize_text_field( $_GET['search'] ) : ''; 
-
-
+        $this->selected_plugin_id       = ( isset( $_GET['ldfmt_plugins_filter'] ) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) ? intval( $_GET['ldfmt_plugins_filter'] ) : '' ;
+        $this->selected_status          = ( isset( $_GET['status'] )  ) ? sanitize_text_field( $_GET['status'] ) : ''; 
+        $this->selected_marketing       = ( isset( $_GET['marketing'] )  ) ? sanitize_text_field( $_GET['marketing'] ) : ''; 
+        $this->selected_search          = ( isset( $_GET['search'] )  ) ? sanitize_text_field( $_GET['search'] ) : ''; 
+        $this->selected_paymentstatus   = ( isset( $_GET['pmtstatus'] )  ) ? sanitize_text_field( $_GET['pmtstatus'] ) : ''; 
+        
         /**
          * Set parent defaults
          */
@@ -349,9 +355,25 @@ class LDNFT_Customers extends WP_List_Table {
 
         $table_name = $wpdb->prefix.'ldnft_customers as c'; 
         $where = " where 1 = 1";
-        if( ! empty( $this->selected_plugin_id )) {
+       
+        if( ! empty( $this->selected_plugin_id ) || ! empty( $this->selected_paymentstatus ) ) {
             $table_name = $wpdb->prefix.'ldnft_customers as c inner join '.$wpdb->prefix.'ldnft_customer_meta as m on (c.id=m.customer_id) '; 
-            $where .= " and m.plugin_id='".$this->selected_plugin_id."'";
+            
+            if( ! empty( $this->selected_plugin_id ) ) {
+                $where .= " and m.plugin_id='".$this->selected_plugin_id."'";
+            }
+            
+            if( ! empty( $this->selected_paymentstatus ) ) {
+                switch( $this->selected_paymentstatus ) {
+                    case "paid":
+                        $where .= " and m.status='payment'";
+                        break;
+                    case "free":
+                        $where .= " and ( m.status is Null or m.status='' )";
+                        break;
+                }
+            }
+            
         }
 
         $where .= $this->selected_status != ''? " and c.is_verified='".$this->selected_status."' " : '';
@@ -360,6 +382,7 @@ class LDNFT_Customers extends WP_List_Table {
         if( ! empty( $this->selected_search )) {
             $where   .= " and ( c.id like '%".$this->selected_search."%' or lower(c.email) like '%".strtolower($this->selected_search)."%' or lower(c.first) like '%".strtolower($this->selected_search)."%' or lower(c.last) like '%".strtolower($this->selected_search)."%' )";
         }
+        
         
         $total_items = $wpdb->get_var("SELECT COUNT(c.id) FROM $table_name".$where);
 
@@ -545,13 +568,14 @@ class LDNFT_Customers extends WP_List_Table {
             $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&laquo;</span>';
         } else {
             $page_links[] = sprintf( 
-                "<a data-action='ldnft_customers_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-marketing='%d' data-search='%s' data-per_page='%d' class='first-page button ldnft_check_load_next' data-paged='1' href='javascript:;'>" .
+                "<a data-action='ldnft_customers_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-marketing='%d' data-pmtstatus='%d' data-search='%s' data-per_page='%d' class='first-page button ldnft_check_load_next' data-paged='1' href='javascript:;'>" .
                     "<span class='screen-reader-text'>%s</span>" .
                     "<span aria-hidden='true'>%s</span>" .
                 '</a>',
                 $this->selected_plugin_id,
                 $this->selected_status,
                 $this->selected_marketing,
+                $this->selected_paymentstatus,
                 $this->selected_search,
                 $per_page,
                 /* translators: Hidden accessibility text. */
@@ -564,13 +588,14 @@ class LDNFT_Customers extends WP_List_Table {
             $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&lsaquo;</span>';
         } else {
             $page_links[] = sprintf(
-                "<a data-action='ldnft_customers_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-marketing='%d' data-search='%s' data-per_page='%d' class='prev-page button ldnft_check_load_next' data-paged='%d' href='javascript:;'>" .
+                "<a data-action='ldnft_customers_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-marketing='%d' data-pmtstatus='%d' data-search='%s' data-per_page='%d' class='prev-page button ldnft_check_load_next' data-paged='%d' href='javascript:;'>" .
                     "<span class='screen-reader-text'>%s</span>" .
                     "<span aria-hidden='true'>%s</span>" .
                 '</a>',
                 $this->selected_plugin_id,
                 $this->selected_status,
                 $this->selected_marketing,
+                $this->selected_paymentstatus,
                 $this->selected_search,
                 $per_page,
                 intval($paged)>1?intval($paged)-1:1,
@@ -603,13 +628,14 @@ class LDNFT_Customers extends WP_List_Table {
             $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&rsaquo;</span>';
         } else {
             $page_links[] = sprintf(
-                "<a data-action='ldnft_customers_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-marketing='%d' data-search='%s' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
+                "<a data-action='ldnft_customers_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-marketing='%d' data-pmtstatus='%d' data-search='%s' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
                     "<span class='screen-reader-text'>%s</span>" .
                     "<span aria-hidden='true'>%s</span>" .
                 '</a>',
                 $this->selected_plugin_id,
                 $this->selected_status,
                 $this->selected_marketing,
+                $this->selected_paymentstatus,
                 $this->selected_search,
                 $per_page,
                 $paged+1,
@@ -624,13 +650,14 @@ class LDNFT_Customers extends WP_List_Table {
             $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&raquo;</span>';
         } else {
             $page_links[] = sprintf(
-                "<a  data-action='ldnft_customers_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-marketing='%d' data-search='%s' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='last-page button ldnft_check_load_next' href='javascript:;'>" .
+                "<a  data-action='ldnft_customers_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-marketing='%d' data-pmtstatus='%d' data-search='%s' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='last-page button ldnft_check_load_next' href='javascript:;'>" .
                     "<span class='screen-reader-text'>%s</span>" .
                     "<span aria-hidden='true'>%s</span>" .
                 '</a>',
                 $this->selected_plugin_id,
                 $this->selected_status,
                 $this->selected_marketing,
+                $this->selected_paymentstatus,
                 $this->selected_search,
                 $per_page,
                 $total_pages,
