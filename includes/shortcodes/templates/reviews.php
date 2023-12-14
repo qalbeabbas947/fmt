@@ -7,7 +7,7 @@ $attributes = shortcode_atts( array(
     'listing_type'   => 'pagination',  //pagination, onetime, slider
     'limit'   => 10
 ), $atts );
-sasad
+
 $listing_type = isset( $atts['listing_type'] ) ? $atts['listing_type'] : 'pagination';
 $limit = isset( $atts['limit'] ) ? $atts['limit'] : 10;
 $product_id = isset( $atts['product_id'] ) ? $atts['product_id'] : 0;
