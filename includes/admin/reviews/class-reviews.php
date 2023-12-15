@@ -104,9 +104,9 @@ class LDNFT_Reviews extends WP_List_Table {
 		}
 		
         if( !empty($item['company_url']) ) {
-			return '<a target="_blank" href="'.$item['company_url'].'">'.$item[$column_name].'</a>';
+			return '<a target="_blank" href="'.$item['company_url'].'">'.$item['company'].'</a>';
 		} else {
-			return $item[$column_name];
+			return $item['company'];
 		}
 			
     }
