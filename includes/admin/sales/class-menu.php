@@ -177,6 +177,8 @@ class LDNFT_Sales_Menu {
         }
         
         $countries = [];
+        $countries_msg = '';
+
         $currency_keys = array_keys($gross_total);
         if( is_array( $currency_keys ) && count( $currency_keys ) > 0 ) {
             
@@ -196,27 +198,45 @@ class LDNFT_Sales_Menu {
                     'country_name' => LDNFT_Freemius::get_country_name_by_code( strtoupper( $rec->country_code ) )
                 ];
             }
+
+            if( count($countries) > 0 ) {
+                $countries_msg = sprintf(__( 'Gross sales of the top %d countries.', LDNFT_TEXT_DOMAIN ), count($countries) );
+            } else {
+                $countries_msg = sprintf(__( 'No countries data found.', LDNFT_TEXT_DOMAIN ), count($countries) );
+            }
+            
         }
 
+        $gross_str = '';
         foreach( $gross_total as $key => $value ) {
             $gross_total[$key] = number_format( $gross_total[$key] , 2 );
+            $gross_str .= !empty($gross_str)? ", ":"";
+            $gross_str .= $gross_total[$key].$key;
         }
-
+        
+        $tax_str = '';
         foreach( $tax_rate_total as $key => $value ) {
             $tax_rate_total[$key] = number_format( $tax_rate_total[$key] , 2 );
+            $tax_str .= !empty($tax_str)? ", ":"";
+            $tax_str .= $tax_rate_total[$key].$key;
         }
 
         $data = [
             'gross_total_count' => $gross_total_count,
             'gross_total' => $gross_total,
+            'gross_message' => sprintf(__( 'Gross sales of %d sales items is %s.', LDNFT_TEXT_DOMAIN ), $gross_total_count, $gross_str),
             'tax_rate_total' => $tax_rate_total,
             'total_number_of_sales' => $total_number_of_sales,
+            'tax_message' => sprintf(__( 'Total tax of %d sales items is %s.', LDNFT_TEXT_DOMAIN ), $gross_total_count, $tax_str),
             'total_new_subscriptions' => $total_new_subscriptions,
             'total_new_subscriptions_amount' => number_format( $total_new_subscriptions_amount , 2 ),
+            'new_subscriptions_message' => sprintf(__( '%d new subscriptions total is %s.', LDNFT_TEXT_DOMAIN ), $total_new_subscriptions, number_format( $total_new_subscriptions_amount , 2 )),
             'total_new_renewals_amount' => number_format( $total_new_renewals_amount, 2 ) ,
             'total_new_renewals' => $total_new_renewals,
+            'new_renewals_message' => sprintf(__( '%d new renewals total is %s.', LDNFT_TEXT_DOMAIN ), $total_new_renewals, number_format( $total_new_renewals_amount , 2 )),
             'countries' => $countries,
-            'currency_keys' => $currency_keys
+            'currency_keys' => $currency_keys,
+            'countries_message' => $countries_msg,
         ];
         
         die(
@@ -427,7 +447,7 @@ class LDNFT_Sales_Menu {
                         <div style="clear:both">&nbsp;</div> 
                         <div class="ldfmt-sales-upper-info">
                             <div class="ldfmt-gross-sales-box ldfmt-sales-box ldnft-tooltip-container">
-                                <label><?php echo __( 'Gross Sales', LDNFT_TEXT_DOMAIN );?><span class="ldnft_sales_points_count"></span><span class="lndft-tooltip"><?php echo __( 'Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum 1', LDNFT_TEXT_DOMAIN ); ?></span></label>
+                                <label><?php echo __( 'Gross Sales', LDNFT_TEXT_DOMAIN );?><span class="ldnft_sales_points_count"></span><span class="lndft-tooltip ldnft_sales_points_tooltip"><?php echo __( 'Loading details...', LDNFT_TEXT_DOMAIN ); ?></span></label>
                                 <div class="ldnft_points">
                                     <span class="ldnft_sales_points"></span>
                                     <?php echo LDNFT_Admin::get_bar_preloader("ldnft-subssummary-loader");?>
@@ -435,7 +455,7 @@ class LDNFT_Sales_Menu {
                             </div>
                             <div class="ldfmt-gross-gateway-box ldfmt-sales-box ldnft-tooltip-container">
                                 <label><?php echo __('Total Tax Rate', LDNFT_TEXT_DOMAIN);?>
-                                    <span class="lndft-tooltip"><?php echo __( 'Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum 2', LDNFT_TEXT_DOMAIN ); ?></span>
+                                    <span class="lndft-tooltip ldnft_sales_tax_fee_tooltip"><?php echo __( 'Loading details...', LDNFT_TEXT_DOMAIN ); ?></span>
                                 </label>
                                 <div class="ldnft_tax_fee">
                                     <span class="ldnft_sales_tax_fee"></span>
@@ -445,7 +465,7 @@ class LDNFT_Sales_Menu {
                             <div class="ldfmt-new-sales-box ldfmt-sales-box ldnft-tooltip-container">
                                 <label><?php echo __('New Subscriptions', LDNFT_TEXT_DOMAIN);?>
                                     <span class="ldnft_new_subscriptions_count"></span>
-                                    <span class="lndft-tooltip"><?php echo __( 'Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum 3', LDNFT_TEXT_DOMAIN ); ?></span>
+                                    <span class="lndft-tooltip ldnft_new_subscriptions_tooltip"><?php echo __( 'Loading details...', LDNFT_TEXT_DOMAIN ); ?></span>
                                 </label>
                                 <div class="ldnft_new_sales_count">
                                     <span class="ldnft_sales_new_subscriptions"></span>
@@ -455,7 +475,7 @@ class LDNFT_Sales_Menu {
                             <div class="ldfmt-renewals-count-box ldfmt-sales-box ldnft-tooltip-container">
                                 <label><?php echo __('Total Renewals', LDNFT_TEXT_DOMAIN);?>
                                     <span class="ldnft_new_renewals_count"></span>
-                                    <span class="lndft-tooltip"><?php echo __( 'Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum 4', LDNFT_TEXT_DOMAIN ); ?></span>
+                                    <span class="lndft-tooltip ldnft_sales_renewals_tooltip"><?php echo __( 'Loading details...', LDNFT_TEXT_DOMAIN ); ?></span>
                                 </label>
                                 <div class="ldnft_renewals_count">
                                     <span class="ldnft_sales_renewals_amount"></span>
@@ -464,7 +484,7 @@ class LDNFT_Sales_Menu {
                             </div>
                             <div class="ldfmt-top3-countries-count-box ldfmt-sales-box ldnft-countries-tooltip-container">
                                 <label><?php echo __('Top 3 Countries', LDNFT_TEXT_DOMAIN);?>
-                                    <span class="lndft-countries-tooltip"><?php echo __( 'Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum 5', LDNFT_TEXT_DOMAIN ); ?></span>
+                                    <span class="lndft-countries-tooltip ldnft_sales_top3_countries_tooltip"><?php echo __( 'Loading details...', LDNFT_TEXT_DOMAIN ); ?></span>
                                 </label>
                                 <div class="ldnft_sales_top3_countries_main">
                                     <div class="ldnft_sales_top3_countries"></div>

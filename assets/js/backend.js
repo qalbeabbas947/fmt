@@ -7,6 +7,7 @@
             display_review_type:        'filter',
             display_customer_type:      'filter',
             current_cron_step:          'plugins',
+            subscription_page_loaded:   'no',
             init: function() {
 
                 LDNFTbackEnd.hooks();
@@ -730,6 +731,7 @@
                         }
                         
                         $('.ldnft_sales_points').html(list_items).css('display', 'block');
+                        $('.ldnft_sales_points_tooltip').html( response.gross_message );
                         $('.ldnft_sales_points_count').html('(' + response.gross_total_count+')');
                         
                         if( response.tax_rate_total.length > 0 && response.gross_total != undefined ) {
@@ -747,13 +749,16 @@
                             var tax_rate_total = '0';
                         }
                         $('.ldnft_sales_tax_fee').html(tax_rate_total).css('display', 'block');
-                        
+                        $('.ldnft_sales_tax_fee_tooltip').html( response.tax_message );
+
                         $('.ldnft_sales_renewals_amount').html(response.total_new_renewals_amount).css('display', 'block');
                         $('.ldnft_new_renewals_count').html('(' + response.total_new_renewals + ')');
+                        $('.ldnft_sales_renewals_tooltip').html( response.new_renewals_message );
                         $('.ldnft-subssummary-loader').css('display', 'none');
                         $('.ldnft_sales_new_subscriptions').html(response.total_new_subscriptions_amount).css('display', 'block');
                         $('.ldnft_new_subscriptions_count').html('(' + response.total_new_subscriptions+')');
-                        
+                        $('.ldnft_new_subscriptions_tooltip').html( response.new_subscriptions_message );
+                        $('.ldnft_sales_top3_countries_tooltip').html( response.countries_message );
                         
                         var idx = 0;
                         if( parseInt( response.gross_total_count ) > 0 ) {
@@ -850,7 +855,10 @@
                     jQuery.cookie( LDNFT.current_page + '_ldfmt-plugins-filter', ldnftplugin, { expires: 30, path: '/' } );
                     jQuery.cookie( LDNFT.current_page + '_ldfmt-sales-interval-filter', ldnftinterval, { expires: 30, path: '/' } );
                     jQuery.cookie( LDNFT.current_page + '_ldfmt-subscription-country-filter', ldnftcountry, { expires: 30, path: '/' } );
-                    jQuery.cookie( LDNFT.current_page + '_ldfmt-sales-plan_id-filter', ldnftplan_id, { expires: 30, path: '/' } );
+                    if( LDNFTbackEnd.subscription_page_loaded == 'yes' ) {
+                        jQuery.cookie( LDNFT.current_page + '_ldfmt-sales-plan_id-filter', ldnftplan_id, { expires: 30, path: '/' } );
+                    }
+                    
                     jQuery.cookie( LDNFT.current_page + '_ldfmt-subscription-gateway-filter', gateway_str, { expires: 30, path: '/' } );
                 } else {
                     var ldnftplugin     = '';
@@ -887,6 +895,7 @@
                             
                             $(this).closest("tr").toggleClass("is-expanded")
                         });
+                        LDNFTbackEnd.subscription_page_loaded = 'yes';
                     }
                 });
             },
@@ -968,6 +977,13 @@
                         }
                         tax_rate_total += '</ul>';
                         $('.ldnft_subscription_tax_fee').html(tax_rate_total).css('display', 'block');
+
+                        $('.ldnft_subscription_gross_message').html(response.gross_message);
+                        $('.ldnft_subscription_new_tax_message').html(response.tax_message);
+                        $('.ldnft_subscription_new_subscriptions_message').html(response.new_subscriptions_message);
+                        $('.ldnft_subscription_new_renewals_message').html(response.new_renewals_message);
+                        $('.ldnft_subscription_failed_payments_message').html(response.failed_payments_message);
+                        $('.ldnft_subscription_countries_message').html(response.countries_message);
 
                         //$('.ldnft_subscription_points').html(response.gross_total).css('display', 'block');
                         //$('.ldnft_subscription_tax_fee').html(response.tax_rate_total).css('display', 'block');
