@@ -127,7 +127,7 @@ class LDNFT_Reviews_Menu {
             'freemius-reviews',
             [ $this,'reviews_page']
         );
-
+        
         if( get_user_option( 'reviews_hidden_columns_set', $user_id) != 'Yes' ) {
             update_user_option( $user_id, 'managefreemius-toolkit_page_freemius-reviewscolumnshidden', $this->default_hidden_columns );
             update_user_option( $user_id, 'reviews_hidden_columns_set', 'Yes' );

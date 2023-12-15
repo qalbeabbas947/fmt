@@ -217,7 +217,7 @@ class LDNFT_Admin {
                     case "freemius-subscriptions":
                         $current_page = 'subscriptions';
                         break;
-                }
+                } 
 
                 wp_localize_script( 'fmt-backend-js', 'LDNFT', [  
                     'ajaxURL'                       => admin_url( 'admin-ajax.php' ),

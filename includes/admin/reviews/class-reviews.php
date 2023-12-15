@@ -269,7 +269,8 @@ class LDNFT_Reviews extends WP_List_Table {
      * @uses $this->set_pagination_args()
      **************************************************************************/
     public function prepare_items() {
-
+        ini_set( 'display_errors', 'On' );
+        error_reporting(E_ALL);
         global $wpdb;
         
         /**
@@ -330,7 +331,16 @@ class LDNFT_Reviews extends WP_List_Table {
          */
         $columns = $this->get_columns();
         $screen = WP_Screen::get( 'freemius-toolkit_page_freemius-reviews' );
-        $hidden   = get_hidden_columns( $screen );
+        $hidden   = get_hidden_columns( $screen ); 
+        if( empty( $hidden ) ) {
+            $hidden = get_user_meta( get_current_user_id(), 'manage' . $screen->id . 'columnshidden', true );
+            if( empty( $hidden ) ) {
+                $hidden = get_user_meta( get_current_user_id(), $wpdb->prefix.'manage' . $screen->id . 'columnshidden', true );
+            }
+        }
+        if( empty( $hidden ) ) {
+            $hidden = [];
+        }
         $sortable = $this->get_sortable_columns();
         
         /**

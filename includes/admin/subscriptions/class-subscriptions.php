@@ -242,6 +242,17 @@ class LDNFT_Subscriptions extends WP_List_Table {
         $columns = $this->get_columns();
         $screen = WP_Screen::get( 'freemius-toolkit_page_freemius-subscriptions' ); 
         $hidden   = get_hidden_columns( $screen );
+        if( empty( $hidden ) ) {
+            $hidden = get_user_meta( get_current_user_id(), 'manage' . $screen->id . 'columnshidden', true );
+            if( empty( $hidden ) ) {
+                $hidden = get_user_meta( get_current_user_id(), $wpdb->prefix.'manage' . $screen->id . 'columnshidden', true );
+            }
+        }
+
+        if( empty( $hidden ) ) {
+            $hidden = [];
+        }
+        
         $sortable = $this->get_sortable_columns();
         
         /**
