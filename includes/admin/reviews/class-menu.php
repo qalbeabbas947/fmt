@@ -248,12 +248,12 @@ class LDNFT_Reviews_Menu {
                                 <option value="0" <?php echo $selected_featured=='0'?'selected':''; ?>><?php _e('Not Featured', LDNFT_TEXT_DOMAIN);?></option>
                             </select>
                             <!-- <input class="form-control" type="text" value = "<?php echo $search;?>" name = "ldnft-reviews-general-search" id = "ldnft-reviews-general-search" placeholder="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>"> -->
-                            <input type="button" name="ldnft-reviews-search-button" value="<?php _e('Filter', LDNFT_TEXT_DOMAIN);?>" class="btn button ldnft-reviews-search-button" />
+                            <input type="button" name="ldnft-reviews-search-button" value="<?php _e('Filter', LDNFT_TEXT_DOMAIN);?>" class="btn button ldnft-reviews-search-button ldnft-reviews-search-button-filter" />
 						</div>
                     </form>
                     <form id="ldnft-reviews-filter-text" method="post">
                         <input class="form-control" type="text" value = "<?php echo $search;?>" name = "ldnft-reviews-general-search" id = "ldnft-reviews-general-search" placeholder="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>">
-                        <input type="submit" name="ldnft-reviews-search-button-text" value="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>" class="btn button ldnft-reviews-search-button" />
+                        <input type="submit" name="ldnft-reviews-search-button-text" value="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>" class="btn button ldnft-reviews-search-button ldnft-reviews-search-button-text" />
 						 
                     </form>
                     <div id="ldnft_reviews_data">	
