@@ -590,37 +590,47 @@ class LDNFT_Subscriptions_Menu {
                     
                 <div style="clear:both">&nbsp;</div> 
                 <div class="ldfmt-sales-upper-info">
-                    <div class="ldfmt-gross-sales-box ldfmt-sales-box">
-                        <label><?php echo __( 'Gross Sales', LDNFT_TEXT_DOMAIN );?></label>
+                    <div class="ldfmt-gross-sales-box ldfmt-sales-box ldnft-tooltip-container">
+                        <label><?php echo __( 'Gross Sales', LDNFT_TEXT_DOMAIN );?>
+                            <span class="lndft-tooltip"><?php echo __( 'Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum s1', LDNFT_TEXT_DOMAIN ); ?></span>
+                        </label>
                         <div class="ldnft_points">
                             <span class="ldnft_subscription_points"></span>
                             <?php echo LDNFT_Admin::get_bar_preloader("ldnft-subssummary-loader");?>
                         </div>
                     </div>
-                    <div class="ldfmt-gross-gateway-box ldfmt-sales-box">
-                        <label><?php echo __('Total Tax Rate', LDNFT_TEXT_DOMAIN);?></label>
+                    <div class="ldfmt-gross-gateway-box ldfmt-sales-box ldnft-tooltip-container">
+                        <label><?php echo __('Total Tax Rate', LDNFT_TEXT_DOMAIN);?>
+                            <span class="lndft-tooltip"><?php echo __( 'Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum s2', LDNFT_TEXT_DOMAIN ); ?></span>
+                        </label>
                         <div class="ldnft_tax_fee">
                             <span class="ldnft_subscription_tax_fee"></span>
                             <?php echo LDNFT_Admin::get_bar_preloader("ldnft-subssummary-loader");?>
                         </div>
                         
                     </div>
-                    <div class="ldfmt-new-sales-box ldfmt-sales-box">
-                        <label><?php echo __('Total Subscriptions', LDNFT_TEXT_DOMAIN);?></label>
+                    <div class="ldfmt-new-sales-box ldfmt-sales-box ldnft-tooltip-container">
+                        <label><?php echo __('Total Subscriptions', LDNFT_TEXT_DOMAIN);?>
+                            <span class="lndft-tooltip"><?php echo __( 'Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum s3', LDNFT_TEXT_DOMAIN ); ?></span>
+                        </label>
                         <div class="ldnft_new_sales_count">
                             <span class="ldnft_subscription_new_sales_count"></span>
                             <?php echo LDNFT_Admin::get_bar_preloader("ldnft-subssummary-loader");?>
                         </div>
                     </div>
-                    <div class="ldfmt-new-subscriptions-box ldfmt-sales-box">
-                        <label><?php echo __('Total Failed Attempts', LDNFT_TEXT_DOMAIN);?></label>
+                    <div class="ldfmt-new-subscriptions-box ldfmt-sales-box ldnft-tooltip-container">
+                        <label><?php echo __('Total Failed Attempts', LDNFT_TEXT_DOMAIN);?>
+                            <span class="lndft-tooltip"><?php echo __( 'Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum s4', LDNFT_TEXT_DOMAIN ); ?></span>
+                        </label>
                         <div class="ldnft_new_attempts_count">
                             <span class="ldnft_subscription_new_attempts_count"></span>
                             <?php echo LDNFT_Admin::get_bar_preloader("ldnft-subssummary-loader");?>
                         </div>
                     </div>
-                    <div class="ldfmt-top3-countries-count-box ldfmt-sales-box">
-                        <label><?php echo __('Top 3 Countries', LDNFT_TEXT_DOMAIN);?></label>
+                    <div class="ldfmt-top3-countries-count-box ldfmt-sales-box ldnft-countries-tooltip-container">
+                        <label><?php echo __('Top 3 Countries', LDNFT_TEXT_DOMAIN);?>
+                            <span class="lndft-countries-tooltip"><?php echo __( 'Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum s5', LDNFT_TEXT_DOMAIN ); ?></span>
+                        </label>
                         <div class="ldnft_subscription_top3_countries_main">
                             <div class="ldnft_subscription_top3_countries"></div>
                             <?php echo LDNFT_Admin::get_bar_preloader("ldnft-subssummary-loader");?>

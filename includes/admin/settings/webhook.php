@@ -16,7 +16,7 @@ $default_id = 0;
     </div> 
     <table class="setting-table-wrapper">
         <tr>
-            <td width="60%" valign="top">
+            <td width="55%" valign="top">
                 <form id="ldnft-save-webhook-setting-form" method="post" action="<?php echo admin_url('admin-post.php'); ?>">
                     <table class="setting-table-wrapper">
                         <tbody class="ldnft-table-content">
@@ -59,17 +59,29 @@ $default_id = 0;
                     </div>
                 </form>
             </td>
-            <td width="40%" valign="top">
-                <table class="setting-table-wrapper">
-                    <tr> 
-                        <td align="left" valign="top" >
-                            <strong><?php _e( 'Disable Webhooks:', LDNFT_TEXT_DOMAIN ); ?></strong> <?php _e( 'Disables the freemius webhook events for the selected plugin/product. By default, plugin will import the customers, sales, subscriptions and plugins data from the freemius.', LDNFT_TEXT_DOMAIN ); ?><br />
-                            <strong><?php _e( 'Mailpoet subscription for new customers:', LDNFT_TEXT_DOMAIN ); ?></strong> <?php _e( 'If enabled, then system will subscribe new customers with mailpoet. Customer subscription is enabled by default.', LDNFT_TEXT_DOMAIN ); ?><br />
-                            <strong><?php _e( 'Mailpoet List:', LDNFT_TEXT_DOMAIN ); ?></strong> <?php _e( 'New customer will be subscribed in the selected mailpoet list.', LDNFT_TEXT_DOMAIN ); ?><br />
-                            <strong><?php _e( 'Webhooks:', LDNFT_TEXT_DOMAIN ); ?></strong> <?php _e( 'Our script supports user.created, review.created, review.updated, payment.created, subscription.created and plan.created webhooks only.', LDNFT_TEXT_DOMAIN ); ?>
-                        </td>
-                    </tr>
-                </table>
+            <td width="45%" valign="top">
+                <div class="ldnft-webhook-instruction-wapper">
+                    <div class="ldnft-webhook-content">
+                        <span class="dashicons dashicons-info"></span>
+                        <span class="ldnft-instruction-title"><?php echo __( 'Disable Webhooks:', LDNFT_TEXT_DOMAIN ); ?></span>
+                        <span class="ldnft-instruction-description"><?php echo __( 'Disables the freemius webhook events for the selected plugin/product. By default, plugin will import the customers, sales, subscriptions and plugins data from the freemius.', LDNFT_TEXT_DOMAIN ); ?></span>
+                    </div>
+                    <div class="ldnft-webhook-content">
+                        <span class="dashicons dashicons-info"></span>
+                        <span class="ldnft-instruction-title"><?php echo __( 'Mailpoet subscription for new customers:', LDNFT_TEXT_DOMAIN ); ?></span>
+                        <span class="ldnft-instruction-description"><?php echo __( 'If enabled, then system will subscribe new customers with mailpoet. Customer subscription is enabled by default.', LDNFT_TEXT_DOMAIN ); ?></span>
+                    </div>
+                    <div class="ldnft-webhook-content">
+                        <span class="dashicons dashicons-info"></span>
+                        <span class="ldnft-instruction-title"><?php echo __( 'Mailpoet List:', LDNFT_TEXT_DOMAIN ); ?></span>
+                        <span class="ldnft-instruction-description"><?php echo __( 'New customer will be subscribed in the selected mailpoet list.', LDNFT_TEXT_DOMAIN ); ?></span>
+                    </div>
+                    <div class="ldnft-webhook-content">
+                        <span class="dashicons dashicons-info"></span>
+                        <span class="ldnft-instruction-title"><?php echo __( 'Webhooks:', LDNFT_TEXT_DOMAIN ); ?></span>
+                        <span class="ldnft-instruction-description"><?php echo __( 'Our script supports user.created, review.created, review.updated, payment.created, subscription.created and plan.created webhooks only.', LDNFT_TEXT_DOMAIN ); ?></span>
+                    </div>
+                </div>
             </td>
         </tr>
     </table>

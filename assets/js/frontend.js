@@ -191,7 +191,9 @@
                 .done(function( html ) {
                     review_div.find( '#ldnft-is-loadmore-link' ).remove();
                     
-                    review_div.find('.ldmft-filter-reviews').append( html );
+                    var newContent = $( html ).hide();
+                    review_div.find( '.ldmft-filter-reviews' ).append( newContent );
+                    newContent.fadeIn( 1000 );
                     review_div.find('.ldfmt-loader-div-btm-reviews').css('display', 'none');
                     
                     link.css('disabled', false);

@@ -4,10 +4,17 @@
   width: 100%;
   padding: 20px;
 }
+.ldfmt-loader-div-btm-reviews img {
+  width: 24px;
+  margin-left: 5px;
+}
 .ldnft-reviews-wrapper .ldnft-review-profile-img {
   width: 40px;
   align-items: center !important;
   display: flex;
+}
+.ldnft-reviews-wrapper .ldnft-review-profile-img img {
+  width: 100%;
 }
 .ldnft-reviews-wrapper .ldnft-reviews-profile-wrap {
   display: flex;
@@ -33,9 +40,10 @@
   font-size: 16px;
   text-align: right;
   position: relative;
+  display: flex !important;
+  justify-content: end;
 }
 .ldmft_wrapper .ldfmt-load-more-btn .ldfmt-loader-div-btm {
-  position: absolute;
   right: -22px;
   top: 3px;
   width: 19px;

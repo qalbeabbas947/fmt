@@ -137,10 +137,30 @@
 .ldnft-process-freemius-data-log{
     height: 300px;
     width: 98%;
-    overflow: scroll;
+    overflow: auto;
     background-color: #222222;
     color: white;
     border-radius: 5px;
+}
+.ldnft-process-freemius-data-log {
+    scrollbar-width: thin;
+    scrollbar-color: #adadad #f3f1f1;
+}
+
+.ldnft-process-freemius-data-log::-webkit-scrollbar {
+    width: 8px;
+}
+
+.ldnft-process-freemius-data-log::-webkit-scrollbar-track {
+    background: #f3f1f1;
+}
+
+.ldnft-process-freemius-data-log::-webkit-scrollbar-thumb {
+    background-color: #adadad;
+    border-radius: 10px;
+}
+.ldnft-process-freemius-data-log:hover {
+    scrollbar-color: #ffffff #f3f1f1;
 }
 /* Setting Page */
 .ldfmt-tab-data-heading {
@@ -168,6 +188,52 @@
     background-color: #fff;
     padding-bottom: 10px;
 }
+/* sales Tooltip style */
+.ldnft-tooltip-container,
+.ldnft-countries-tooltip-container {
+    position: relative;
+}
+
+.lndft-tooltip,
+.lndft-countries-tooltip {
+    position: absolute;
+    z-index: 999;
+    font-size: 12px;
+    font-weight: 400;
+    left: 40%;
+    bottom: 100%;
+    font-family: revert;
+    width: 100%;
+    background-color: #fafafa;
+    color: #000000db;
+    padding: 8px;
+    border-radius: 4px;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+}
+.lndft-countries-tooltip {
+    width: 55%;
+}
+.lndft-tooltip::after,
+.lndft-countries-tooltip::after {
+    border-left: solid transparent 10px;
+    border-right: solid transparent 10px;
+    border-top: solid #e4e4e4 10px;
+    bottom: -10px;
+    content: " ";
+    height: 0;
+    left: 50%;
+    margin-left: -13px;
+    position: absolute;
+    width: 0;
+}
+.ldnft-tooltip-container:hover .lndft-tooltip,
+.ldnft-countries-tooltip-container:hover .lndft-countries-tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+/* sales tooltip end */
 /* Setting Page end */
 
 #ldnft-settings-import-mailpoet-message, .ldnft-webhook-message{
@@ -269,7 +335,6 @@
 .ldfmt-sales-upper-info{
     clear: both;
     display: block;
-    overflow: auto;
 }
 .ldnft-wrap {
     margin-top: 36px;
@@ -451,6 +516,21 @@
 }
 .setting-table-wrapper .ldnft-table-content {
     line-height: 3;
+}
+/* webhook instruction */
+.ldnft-webhook-instruction-wapper {
+    padding-top: 20px;
+}
+.ldnft-webhook-content {
+    margin-bottom: 15px;
+}
+.ldnft-webhook-content .ldnft-instruction-title {
+    font-size: 15px;
+    font-weight: 600;
+}
+.ldnft-webhook-content .ldnft-instruction-description {
+    font-size: 14px;
+    font-style: italic;
 }
 #ldnft-subscription-filter-form-text, #ldnft-sales-filter-text, #ldnft-reviews-filter-text, #ldnft-customer-filter-text{
     float:right;
