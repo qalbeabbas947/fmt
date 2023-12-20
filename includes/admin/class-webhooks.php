@@ -542,7 +542,7 @@ class LDNFT_Webhooks {
                 break;
             
             case "subscription.created":
-               
+            case "subscription.cancelled":   
                 $user_id            = $request->get_param( 'user_id' );
                 $plugin_id          = $request->get_param( 'plugin_id' );
                 $settings = get_option( 'ldnft_webhook_settings_'.$plugin_id );
