@@ -13,7 +13,14 @@ class LDNFT_Crons_Settings {
     public function __construct() {
         
         global $wpdb;
-        
+        // echo '<pre>';
+        // $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
+        // $inserted = 0;
+        // $updatednum = 0;
+
+        // $subobj = $api->Api('plugins/9176/subscriptions.json?count=50', 'GET', []);
+        // print_r($subobj);
+        // exit;
         //import data via cron work
         add_action( 'wp_ajax_ldnft_check_cron_status',          [ $this, 'check_cron_status' ], 100 );
         add_action( 'ldnft_process_freemius_customers_data',    [ $this, 'ldnft_process_freemius_customers' ], 10, 3 );
@@ -483,6 +490,7 @@ class LDNFT_Crons_Settings {
                 `coupon_id` int(11) DEFAULT NULL,
                 `trial_ends` datetime DEFAULT NULL,
                 `next_payment` datetime DEFAULT NULL,
+                `canceled_at` datetime DEFAULT NULL,
                 `created` datetime DEFAULT NULL,
                 `updated_at` datetime DEFAULT NULL,
                 `currency` varchar(3) DEFAULT NULL,
@@ -499,10 +507,10 @@ class LDNFT_Crons_Settings {
                 `renewal_amount` float DEFAULT NULL,
                 `renewals_discount` float DEFAULT NULL,
                 `renewals_discount_type` varchar(12) DEFAULT NULL,
-                `license_id` int(11) DEFAULT NULL, 
+                `license_id` int(11) DEFAULT NULL,
+                `status` varchar(20) DEFAULT NULL,
                 PRIMARY KEY (`id`)
             )" );   
-
         }
         
         $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
@@ -526,6 +534,7 @@ class LDNFT_Crons_Settings {
                 $failed_payments = $subscription->failed_payments; 
                 $trial_ends = $subscription->trial_ends; 
                 $next_payment = $subscription->next_payment; 
+                $canceled_at  = $subscription->canceled_at; 
                 $user_id = $subscription->user_id; 
                 $install_id = $subscription->install_id; 
                 $plan_id = $subscription->plan_id; 
@@ -547,7 +556,17 @@ class LDNFT_Crons_Settings {
                 $vat_id = $subscription->vat_id; 
                 $source = $subscription->source; 
                 $environment = $subscription->environment; 
-
+                $status = '';
+                if( !empty( $canceled_at ) ) {
+                    $status = 'cancelled';
+                } else if( !empty( $next_payment ) ) {
+                    if( strtotime( $next_payment ) > time() ) {
+                        $status = 'active';
+                    } else {
+                        $status = 'expired';
+                    }
+                }
+               // $next_payment
                 $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_name." where id=%d", $id ));
 
                 if( count( $res ) == 0 ) {
@@ -575,6 +594,7 @@ class LDNFT_Crons_Settings {
                             'coupon_id'                 => $coupon_id,
                             'trial_ends'                => $trial_ends,
                             'next_payment'              => $next_payment,
+                            'canceled_at'               => $canceled_at,
                             'created'                   => $created,
                             'updated_at'                => $updated,
                             'currency'                  => $currency,
@@ -586,7 +606,8 @@ class LDNFT_Crons_Settings {
                             'renewal_amount'            => $renewal_amount,
                             'renewals_discount'         => $renewals_discount,
                             'renewals_discount_type'    => $renewals_discount_type,
-                            'license_id'               => $license_id,
+                            'license_id'                => $license_id,
+                            'status'                    => $status
                         )
                     );
 
@@ -615,6 +636,7 @@ class LDNFT_Crons_Settings {
                             'coupon_id'                 => $coupon_id,
                             'trial_ends'                => $trial_ends,
                             'next_payment'              => $next_payment,
+                            'canceled_at'               => $canceled_at,
                             'created'                   => $created,
                             'updated_at'                => $updated,
                             'currency'                  => $currency,
@@ -626,7 +648,8 @@ class LDNFT_Crons_Settings {
                             'renewal_amount'            => $renewal_amount,
                             'renewals_discount'         => $renewals_discount,
                             'renewals_discount_type'    => $renewals_discount_type,
-                            'license_id'               => $license_id
+                            'license_id'               => $license_id,
+                            'status'                    => $status
                         ), array('id'=>$id));
                         $updatednum++;
                 }

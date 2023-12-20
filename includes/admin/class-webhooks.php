@@ -190,7 +190,17 @@ class LDNFT_Webhooks {
         $table_name = $wpdb->prefix.'ldnft_subscription';
         
         $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_name." where id=%d", $id ));
-
+        
+        $status = '';
+        if( !empty( $subscription['canceled_at'] ) ) {
+            $status = 'cancelled';
+        } else if( !empty( $subscription['next_payment'] ) ) {
+            if( strtotime( $subscription['next_payment'] ) > time() ) {
+                $status = 'active';
+            } else {
+                $status = 'expired';
+            }
+        }
         if( count( $res ) == 0 ) {
 
             $wpdb->insert(
@@ -216,6 +226,7 @@ class LDNFT_Webhooks {
                     'coupon_id'                 => $subscription['coupon_id'],
                     'trial_ends'                => $subscription['trial_ends'],
                     'next_payment'              => $subscription['next_payment'],
+                    'canceled_at'               => $subscription['canceled_at'],
                     'created'                   => $subscription['created'],
                     'updated_at'                => $subscription['updated'],
                     'currency'                  => $subscription['currency'],
@@ -227,7 +238,8 @@ class LDNFT_Webhooks {
                     'renewal_amount'            => $subscription['renewal_amount'],
                     'renewals_discount'         => $subscription['renewals_discount'],
                     'renewals_discount_type'    => $subscription['renewals_discount_type'],
-                    'license_id'                => $subscription['license_id']
+                    'license_id'                => $subscription['license_id'],
+                    'status'                    => $status
                 )
             );
 
@@ -255,6 +267,7 @@ class LDNFT_Webhooks {
                     'coupon_id'                 => $subscription['coupon_id'],
                     'trial_ends'                => $subscription['trial_ends'],
                     'next_payment'              => $subscription['next_payment'],
+                    'canceled_at'               => $subscription['canceled_at'],
                     'created'                   => $subscription['created'],
                     'updated_at'                => $subscription['updated'],
                     'currency'                  => $subscription['currency'],
@@ -266,7 +279,8 @@ class LDNFT_Webhooks {
                     'renewal_amount'            => $subscription['renewal_amount'],
                     'renewals_discount'         => $subscription['renewals_discount'],
                     'renewals_discount_type'    => $subscription['renewals_discount_type'],
-                    'license_id'                => $subscription['license_id']
+                    'license_id'                => $subscription['license_id'],
+                    'status'                    => $status
                 ), array('id'=>$id));
             error_log('updated the subscription with id:'.$id);
         }

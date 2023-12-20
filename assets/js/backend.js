@@ -849,6 +849,7 @@
                     var order_str       = $('.ldnft-freemius-order').val();
                     var orderby_str     = $('.ldnft-freemius-orderby').val();
                     var gateway_str     = $('.ldfmt-subscription-gateway-filter').val();
+                    var status_str      = $('.ldfmt-subscription-status-filter').val();
                     var search_str      = '';
 
                     jQuery.cookie( LDNFT.current_page + '_ldfmt-plugins-filter', ldnftplugin, { expires: 30, path: '/' } );
@@ -867,6 +868,7 @@
                     var order_str       = $('.ldnft-freemius-order').val();
                     var orderby_str     = $('.ldnft-freemius-orderby').val();
                     var gateway_str     = '';
+                    var status_str      = '';
                     var search_str      = $('.ldnft-subscription-general-search').val();
                     jQuery.cookie( LDNFT.current_page + '_ldnft-subscription-general-search', search_str, { expires: 30, path: '/' } );
                 }
@@ -883,6 +885,7 @@
                         country: ldnftcountry,
                         gateway: gateway_str,
                         search: search_str,
+                        status: status_str,
                         order: order_str,
                         orderby: orderby_str,
                         plan_id: ldnftplan_id,
@@ -919,6 +922,8 @@
                     var order_str       = $('.ldnft-freemius-order').val();
                     var orderby_str     = $('.ldnft-freemius-orderby').val();
                     var gateway_str     = $('.ldfmt-subscription-gateway-filter').val();
+                    var status_str      = $('.ldfmt-subscription-status-filter').val();
+                    
                     var search_str      = '';
                 } else {
                     var ldnftplugin     = '';
@@ -928,6 +933,7 @@
                     var order_str       = $('.ldnft-freemius-order').val();
                     var orderby_str     = $('.ldnft-freemius-orderby').val();
                     var gateway_str     = '';
+                    var status_str     = '';
                     var search_str      = $('.ldnft-subscription-general-search').val();
                 }
 
@@ -942,7 +948,8 @@
                         country: ldnftcountry,
                         plan_id: ldnftplan_id,
                         gateway: gateway_str,
-                        search: search_str
+                        search: search_str,
+                        status: status_str,
                     },
                     success: function ( response ) {
                         var list_items = '<ul>';
@@ -1156,6 +1163,8 @@
                 $('#ldnft-review-coloumn-pricing_id').html( lnk.data('pricing_id') );
                 $('#ldnft-review-coloumn-renewals_discount').html( lnk.data('renewals_discount') );
                 $('#ldnft-review-coloumn-license_id').html( lnk.data('license_id') );
+                $('#ldnft-review-coloumn-status').html( lnk.data('status') );
+                $('#ldnft-review-coloumn-canceled_at').html( lnk.data('canceled_at') );
                 $('.ldnft-popup-loader').css('display', 'none');
             },
             /**

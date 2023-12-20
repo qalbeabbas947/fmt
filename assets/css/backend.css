@@ -9,6 +9,10 @@
     text-align: center;
     text-transform: uppercase;
 }
+.ldfmt-subscription-plan_id-filter{
+    width: 170px;
+
+}
 .ldnft-save-setting, .ldnft-save-setting {
     background: #135e96;
     border-color: #135e96;

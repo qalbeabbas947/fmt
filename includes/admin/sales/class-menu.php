@@ -37,6 +37,7 @@ class LDNFT_Sales_Menu {
             'user_card_id', 
             'plugin_id', 
             'external_id'
+            
         ];
 
         add_action( 'admin_menu', [ $this, 'admin_menu_page' ] );

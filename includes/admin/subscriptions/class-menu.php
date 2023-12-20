@@ -25,10 +25,12 @@ class LDNFT_Subscriptions_Menu {
             'created', 
             'initial_amount', 
             'next_payment', 
+            'canceled_at',
             'currency',
             'country_code', 
             'id', 
             'user_id',  
+            'status'
         ];
 
         add_action( 'admin_menu', [ $this, 'admin_menu_page' ] );
@@ -200,6 +202,12 @@ class LDNFT_Subscriptions_Menu {
                                 <th><?php _e('Gateway:', LDNFT_TEXT_DOMAIN)?></th>
                                 <td><?php echo $result->gateway;?></td>
                             </tr>
+                            <tr>
+                                <th><?php _e('Status:', LDNFT_TEXT_DOMAIN)?></th>
+                                <td><?php echo $result->status;?></td>
+                                <th></th>
+                                <td></td>
+                            </tr>
                         </tbody>
                     </table>
                 <?php
@@ -288,6 +296,7 @@ class LDNFT_Subscriptions_Menu {
             $where .= ' and t.plan_id='.sanitize_text_field( $_GET['plan_id'] );
         } 
 
+        $where .= $_GET['status'] != ''? " and t.status='".sanitize_text_field( $_GET['status'] )."' " : '';
         $where .= $_GET['gateway'] != ''? " and t.gateway='".sanitize_text_field( $_GET['gateway'] )."' " : '';
         $search = sanitize_text_field( $_GET['search'] );
         if( ! empty( $search )) {
@@ -565,6 +574,12 @@ class LDNFT_Subscriptions_Menu {
                             <option value="current_month" <?php echo $selected_interval=='current_month'?'selected':'';?>><?php echo __( 'Current Month', LDNFT_TEXT_DOMAIN );?></option>
                             <option value="last_month" <?php echo $selected_interval=='last_month'?'selected':'';?>><?php echo __( 'Last Month', LDNFT_TEXT_DOMAIN );?></option>
                         </select>
+                        <select name="ldfmt-subscription-status-filter" class="ldfmt-subscription-status-filter">
+                            <option value=""><?php echo __( 'All Statuses', LDNFT_TEXT_DOMAIN );?></option>
+                            <option value="active" <?php echo $selected_interval=='active'?'selected':'';?>><?php echo __( 'Active', LDNFT_TEXT_DOMAIN );?></option>
+                            <option value="expired" <?php echo $selected_interval=='expired'?'selected':'';?>><?php echo __( 'Expired', LDNFT_TEXT_DOMAIN );?></option>
+                            <option value="cancelled" <?php echo $selected_interval=='cancelled'?'selected':'';?>><?php echo __( 'Cancelled', LDNFT_TEXT_DOMAIN );?></option>
+                        </select>
                         <select name="ldfmt-subscription-country-filter" class="ldfmt-subscription-country-filter">
                             <option value=""><?php echo __( 'All Countries', LDNFT_TEXT_DOMAIN );?></option>
                             <?php $countries = LDNFT_Freemius::get_country_name_by_code( 'list' ); 
@@ -730,7 +745,6 @@ class LDNFT_Subscriptions_Menu {
                                         <th><?php _e('VAT ID:', LDNFT_TEXT_DOMAIN)?></th>
                                         <td id = "ldnft-review-coloumn-vat_id"></td>
                                     </tr>
-                                    
                                     <tr>
                                         <th><?php _e('Coupon ID:', LDNFT_TEXT_DOMAIN)?></th>
                                         <td id = "ldnft-review-coloumn-coupon_id"></td>
@@ -756,7 +770,12 @@ class LDNFT_Subscriptions_Menu {
                                         <th><?php _e('Updated At:', LDNFT_TEXT_DOMAIN)?></th>
                                         <td id = "ldnft-review-coloumn-updated_at"></td>
                                     </tr>
-                                    
+                                    <tr>
+                                        <th><?php _e('Status:', LDNFT_TEXT_DOMAIN)?></th>
+                                        <td id = "ldnft-review-coloumn-status"></td>
+                                        <th></th>
+                                        <td></td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
