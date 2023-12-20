@@ -734,13 +734,12 @@
                         $('.ldnft_sales_points_tooltip').html( response.gross_message );
                         $('.ldnft_sales_points_count').html('(' + response.gross_total_count+')');
                         
-                        if( response.tax_rate_total.length > 0 && response.gross_total != undefined ) {
+                        if( parseInt( response.gross_total_count ) > 0 ) {
                             var tax_rate_total = '<ul>';
+                            
                             for (const key in response.tax_rate_total ) {
                                 if (Object.hasOwnProperty.call(response.tax_rate_total, key)) {
-                                
                                     tax_rate_total += '<li>'+key+': '+response.tax_rate_total[key]+'</li>';
-                                    
                                 }
                             }
 
@@ -981,15 +980,15 @@
                         $('.ldnft_subscription_gross_message').html(response.gross_message);
                         $('.ldnft_subscription_new_tax_message').html(response.tax_message);
                         $('.ldnft_subscription_new_subscriptions_message').html(response.new_subscriptions_message);
-                        $('.ldnft_subscription_new_renewals_message').html(response.new_renewals_message);
+                        //$('.ldnft_subscription_new_renewals_message').html(response.new_renewals_message); 
                         $('.ldnft_subscription_failed_payments_message').html(response.failed_payments_message);
                         $('.ldnft_subscription_countries_message').html(response.countries_message);
 
                         //$('.ldnft_subscription_points').html(response.gross_total).css('display', 'block');
                         //$('.ldnft_subscription_tax_fee').html(response.tax_rate_total).css('display', 'block');
                         $('.ldnft_subscription_new_sales_count').html(response.total_number_of_sales).css('display', 'block');
-                        $('.ldnft_subscription_new_subscriptions_count').html(response.total_new_subscriptions).css('display', 'block');
-                        $('.ldnft_subscription_renewals_count').html(response.total_new_renewals).css('display', 'block');
+                       // $('.ldnft_subscription_new_subscriptions_count').html(response.total_new_subscriptions).css('display', 'block');
+                        //$('.ldnft_subscription_renewals_count').html(response.total_new_renewals).css('display', 'block');
                         $('.ldnft_subscription_new_attempts_count').html(response.failed_payments).css('display', 'block');
                         $('.ldnft-subssummary-loader').css('display', 'none');
                         
@@ -1024,16 +1023,6 @@
                             var list_items = '<span class="ldnft-empty-countries-box">-</span>';
                         }
                         
-
-                        // var list_items = '<ul>';
-                        // for (const key in response.countries ) {
-                        //     if (Object.hasOwnProperty.call(response.countries, key)) {
-                        //         const element = response.countries[key];
-                        //         list_items += '<li>'+element.country_name+': '+element.gross+'</li>';
-                               
-                        //     }
-                        // }
-                        // list_items += '</ul>';
                         $('.ldnft_subscription_top3_countries').html(list_items).css('display', 'block');
                     }
                 });

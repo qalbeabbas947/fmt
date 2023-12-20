@@ -255,8 +255,8 @@ class LDNFT_Subscriptions_Menu {
 
         $table_name = $wpdb->prefix.'ldnft_subscription t inner join '.$wpdb->prefix.'ldnft_customers c on (t.user_id=c.id)';  
         $where = " where 1 = 1";
-        if( ! empty( $this->selected_plugin_id )) {
-            $where .= " and t.plugin_id='".$this->selected_plugin_id."'";
+        if( ! empty( $selected_plugin_id )) {
+            $where .= " and t.plugin_id='".$selected_plugin_id."'";
         }
 
        if( !empty( $_GET['interval'] )) {
@@ -300,11 +300,6 @@ class LDNFT_Subscriptions_Menu {
         $tax_rate_total = [];
         $total_number_of_sales = 0;
         $failed_payments = 0;
-        
-        $total_new_subscriptions = 0;
-        $total_new_subscriptions_amount = 0;
-        $total_new_renewals = 0;
-        $total_new_renewals_amount = 0;
 
         if( isset($result) && isset($result) ) {
             foreach( $result as $obj ) {
@@ -318,6 +313,7 @@ class LDNFT_Subscriptions_Menu {
                 if( ! array_key_exists( $obj->currency, $tax_rate_total ) ) {
                     $tax_rate_total[ $obj->currency ] = 0;    
                 }
+                
                 $tax_rate_total[ $obj->currency ] = floatval( $tax_rate_total[ $obj->currency ] ) + floatval($obj->tax_rate);
 
                 // $gross_total += $obj->gross;
@@ -348,12 +344,12 @@ class LDNFT_Subscriptions_Menu {
                 ];
             }
             
-            if( count($countries) > 0 ) {
-                $countries_msg = sprintf(__( 'Gross sales of the top %d countries.', LDNFT_TEXT_DOMAIN ), count($countries) );
-            } else {
-                $countries_msg = sprintf(__( 'No countries data found.', LDNFT_TEXT_DOMAIN ), count($countries) );
-            }
-            
+            $countries_msg = __( 'Countries with most subscription are from.', LDNFT_TEXT_DOMAIN );
+            // if( count($countries) > 0 ) {
+            //     $countries_msg = sprintf(__( 'Gross sales of the top %d countries.', LDNFT_TEXT_DOMAIN ), count($countries) );
+            // } else {
+            //     $countries_msg = sprintf(__( 'No countries data found.', LDNFT_TEXT_DOMAIN ), count($countries) );
+            // }
         }
         $gross_str = '';
         foreach( $gross_total as $key => $value ) {
@@ -370,20 +366,16 @@ class LDNFT_Subscriptions_Menu {
         }
 
         $data = [
+            'qry' => "SELECT t.* FROM $table_name $where",
             'gross_total_count' => $gross_total_count,
             'gross_total' => $gross_total,
-            'gross_message' => sprintf(__( 'Gross sales of %d sales items is %s.', LDNFT_TEXT_DOMAIN ), $gross_total_count, $gross_str),
+            'gross_message' => sprintf(__( 'Gross sale amount from total %d subscriptions.', LDNFT_TEXT_DOMAIN ), $gross_total_count),
             'tax_rate_total' => $tax_rate_total,
             'total_number_of_sales' => $total_number_of_sales,
-            'tax_message' => sprintf(__( 'Total tax of %d sales items is %s.', LDNFT_TEXT_DOMAIN ), $gross_total_count, $tax_str),
-            'total_new_subscriptions' => $total_new_subscriptions,
-            'total_new_subscriptions_amount' => number_format($total_new_subscriptions_amount, 2),
-            'new_subscriptions_message' => sprintf(__( '%d new subscriptions total is %s.', LDNFT_TEXT_DOMAIN ), $total_new_subscriptions, number_format( $total_new_subscriptions_amount , 2 )),
-            'total_new_renewals_amount' => number_format($total_new_renewals_amount, 2),
-            'new_renewals_message' => sprintf(__( '%d new renewals total is %s.', LDNFT_TEXT_DOMAIN ), $total_new_renewals, number_format( $total_new_renewals_amount , 2 )),
+            'tax_message' => sprintf(__( 'Total tax amount from %d subscription.', LDNFT_TEXT_DOMAIN ), $gross_total_count),
+            'new_subscriptions_message' => __( 'Total new subscriptions from the selected filter.', LDNFT_TEXT_DOMAIN ),
             'failed_payments'       => $failed_payments,
-            'failed_payments_message' => sprintf(__( 'Total failed payment attempts are %d .', LDNFT_TEXT_DOMAIN ), $failed_payments),
-            'total_new_renewals'    => $total_new_renewals,
+            'failed_payments_message' => __( 'Number of failed attempts in auto renewal of subscription.', LDNFT_TEXT_DOMAIN ),
             'countries' => $countries,
             'currency_keys' => $currency_keys,
             'countries_message' => $countries_msg

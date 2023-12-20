@@ -19,7 +19,7 @@ class LDNFT_Webhooks {
     public function register_routes() {
         
           add_action( 'rest_api_init', function () {
-            register_rest_route( 'lfnft/v1', '/webhooks', array(
+            register_rest_route( 'ldnft/v1', '/webhooks', array(
                 'methods' => 'POST',
                 'callback' => [ $this, 'webhooks_callback' ],
                 ) );

@@ -199,12 +199,7 @@ class LDNFT_Sales_Menu {
                 ];
             }
 
-            if( count($countries) > 0 ) {
-                $countries_msg = sprintf(__( 'Gross sales of the top %d countries.', LDNFT_TEXT_DOMAIN ), count($countries) );
-            } else {
-                $countries_msg = sprintf(__( 'No countries data found.', LDNFT_TEXT_DOMAIN ), count($countries) );
-            }
-            
+            $countries_msg = __( 'Countries with most sales are from.', LDNFT_TEXT_DOMAIN );
         }
 
         $gross_str = '';
@@ -224,16 +219,16 @@ class LDNFT_Sales_Menu {
         $data = [
             'gross_total_count' => $gross_total_count,
             'gross_total' => $gross_total,
-            'gross_message' => sprintf(__( 'Gross sales of %d sales items is %s.', LDNFT_TEXT_DOMAIN ), $gross_total_count, $gross_str),
+            'gross_message' => sprintf( __( 'Gross sale amount from total %d sales.', LDNFT_TEXT_DOMAIN ), $gross_total_count ),
             'tax_rate_total' => $tax_rate_total,
             'total_number_of_sales' => $total_number_of_sales,
-            'tax_message' => sprintf(__( 'Total tax of %d sales items is %s.', LDNFT_TEXT_DOMAIN ), $gross_total_count, $tax_str),
+            'tax_message' => sprintf(__( 'Total tax amount from %d sales.', LDNFT_TEXT_DOMAIN ), $gross_total_count ),
             'total_new_subscriptions' => $total_new_subscriptions,
             'total_new_subscriptions_amount' => number_format( $total_new_subscriptions_amount , 2 ),
-            'new_subscriptions_message' => sprintf(__( '%d new subscriptions total is %s.', LDNFT_TEXT_DOMAIN ), $total_new_subscriptions, number_format( $total_new_subscriptions_amount , 2 )),
+            'new_subscriptions_message' => __( 'Total new subscriptions amount from the selected filter.', LDNFT_TEXT_DOMAIN ),
             'total_new_renewals_amount' => number_format( $total_new_renewals_amount, 2 ) ,
             'total_new_renewals' => $total_new_renewals,
-            'new_renewals_message' => sprintf(__( '%d new renewals total is %s.', LDNFT_TEXT_DOMAIN ), $total_new_renewals, number_format( $total_new_renewals_amount , 2 )),
+            'new_renewals_message' => __( 'Total amount of renewal with the selected period.', LDNFT_TEXT_DOMAIN ),
             'countries' => $countries,
             'currency_keys' => $currency_keys,
             'countries_message' => $countries_msg,

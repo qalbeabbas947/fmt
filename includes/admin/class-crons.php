@@ -960,7 +960,6 @@ class LDNFT_Crons_Settings {
         $status[ 'crons_status_sales_data' ]        = wp_next_scheduled( 'ldnft_process_freemius_sales_data' );
         $status[ 'crons_status_reviews_data' ]      = wp_next_scheduled( 'ldnft_process_freemius_reviews_data' );
 
-        
         switch( $state ){
             case "plugins":
 
@@ -1668,7 +1667,6 @@ class LDNFT_Crons_Settings {
                 PRIMARY KEY ( `plugin_id`, `customer_id` )
             )" );     
         }
-        
         
         $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
         $inserted = 0;

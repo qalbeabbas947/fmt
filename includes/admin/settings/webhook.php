@@ -12,7 +12,7 @@ $plugins = LDNFT_Freemius::$products;
 $default_id = 0;
 ?>
 <div  id="general_settings" class="cs_ld_tabs">
-    <div class="ldfmt-tab-data-heading"><span class="fa fa-book ldfmt-icon"></span> <?php _e( 'Webhook URL:', LDNFT_TEXT_DOMAIN ); ?> <strong><?php echo site_url(); ?>/wp-json/lfnft/v1/webhooks</strong>
+    <div class="ldfmt-tab-data-heading"><span class="fa fa-book ldfmt-icon"></span> <?php _e( 'Webhook URL:', LDNFT_TEXT_DOMAIN ); ?> <strong><?php echo site_url(); ?>/wp-json/ldnft/v1/webhooks</strong>&nbsp;&nbsp;&nbsp;<a href="https://youtube.com" target="_blank"><strong>How to configure webhooks?</strong></a>
     </div> 
     <table class="setting-table-wrapper">
         <tr>
@@ -64,23 +64,19 @@ $default_id = 0;
                     <div class="ldnft-webhook-content">
                         <span class="dashicons dashicons-info"></span>
                         <span class="ldnft-instruction-title"><?php echo __( 'Disable Webhooks:', LDNFT_TEXT_DOMAIN ); ?></span>
-                        <span class="ldnft-instruction-description"><?php echo __( 'Disables the freemius webhook events for the selected plugin/product. By default, plugin will import the customers, sales, subscriptions and plugins data from the freemius.', LDNFT_TEXT_DOMAIN ); ?></span>
-                    </div>
-                    <div class="ldnft-webhook-content">
-                        <span class="dashicons dashicons-info"></span>
-                        <span class="ldnft-instruction-title"><?php echo __( 'Mailpoet subscription for new customers:', LDNFT_TEXT_DOMAIN ); ?></span>
-                        <span class="ldnft-instruction-description"><?php echo __( 'If enabled, then system will subscribe new customers with mailpoet. Customer subscription is enabled by default.', LDNFT_TEXT_DOMAIN ); ?></span>
-                    </div>
-                    <div class="ldnft-webhook-content">
-                        <span class="dashicons dashicons-info"></span>
-                        <span class="ldnft-instruction-title"><?php echo __( 'Mailpoet List:', LDNFT_TEXT_DOMAIN ); ?></span>
-                        <span class="ldnft-instruction-description"><?php echo __( 'New customer will be subscribed in the selected mailpoet list.', LDNFT_TEXT_DOMAIN ); ?></span>
+                        <span class="ldnft-instruction-description"><?php echo __( '(not recommended) Disabling the freemius webhook events for the selected plugin/product will not sync new sales/subscription data and you will have to manually sync them every time.', LDNFT_TEXT_DOMAIN ); ?></span>
                     </div>
                     <div class="ldnft-webhook-content">
                         <span class="dashicons dashicons-info"></span>
                         <span class="ldnft-instruction-title"><?php echo __( 'Webhooks:', LDNFT_TEXT_DOMAIN ); ?></span>
                         <span class="ldnft-instruction-description"><?php echo __( 'Our script supports user.created, review.created, review.updated, payment.created, subscription.created and plan.created webhooks only.', LDNFT_TEXT_DOMAIN ); ?></span>
                     </div>
+                    <div class="ldnft-webhook-content">
+                        <span class="dashicons dashicons-info"></span>
+                        <span class="ldnft-instruction-title"><?php echo __( 'MailPoet:', LDNFT_TEXT_DOMAIN ); ?></span>
+                        <span class="ldnft-instruction-description"><?php echo __( '(Optional) you can add your new customers to the selected mailpoet list.', LDNFT_TEXT_DOMAIN ); ?></span>
+                    </div>
+                    
                 </div>
             </td>
         </tr>
