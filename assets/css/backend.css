@@ -30,6 +30,10 @@
     background: white;
     margin: 20px 5px;
 }
+.ldfmt-sales-box:hover {
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    cursor: pointer;
+}
 .ldnft_sales_top3_countries .ldnft-empty-countries-box, .ldnft_subscription_top3_countries .ldnft-empty-countries-box{
     width: 100%;
     font-size: 20px;
@@ -202,35 +206,38 @@
 .lndft-countries-tooltip {
     position: absolute;
     z-index: 999;
-    font-size: 12px;
     font-weight: 400;
     left: 40%;
     bottom: 100%;
     font-family: revert;
     width: 100%;
-    background-color: #fafafa;
-    color: #000000db;
-    padding: 8px;
-    border-radius: 4px;
+    font-family: sans-serif;
+    font-size: 14px;
+    background-color: #ff8b13;
+    color: #fff;
+    padding: 12px;
+    border-radius: 6px;
     visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-    box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+    bottom: 132px;
 }
 .lndft-countries-tooltip {
     width: 55%;
+    left: 40%;
 }
 .lndft-tooltip::after,
 .lndft-countries-tooltip::after {
-    border-left: solid transparent 10px;
-    border-right: solid transparent 10px;
-    border-top: solid #e4e4e4 10px;
-    bottom: -10px;
+    border-left: solid transparent 20px;
+    border-right: solid transparent 20px;
+    border-top: solid #ff8b13 20px;
+    bottom: 24px;
     content: " ";
     height: 0;
-    left: 50%;
+    left: 15%;
     margin-left: -13px;
     position: absolute;
     width: 0;
+    transform: rotate(281deg) translate(-71%,0);
+    z-index: -1;
 }
 .ldnft-tooltip-container:hover .lndft-tooltip,
 .ldnft-countries-tooltip-container:hover .lndft-countries-tooltip {
