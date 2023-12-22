@@ -625,7 +625,7 @@ class LDNFT_Subscriptions_Menu {
                             <?php echo LDNFT_Admin::get_bar_preloader("ldnft-subssummary-loader");?>
                         </div>
                     </div>
-                    <div class="ldfmt-gross-gateway-box ldfmt-sales-box ldnft-tooltip-container">
+                    <!-- <div class="ldfmt-gross-gateway-box ldfmt-sales-box ldnft-tooltip-container">
                         <label><?php echo __('Total Tax Rate', LDNFT_TEXT_DOMAIN);?>
                             <span class="lndft-tooltip ldnft_subscription_new_tax_message"><?php echo __( 'Loading details...', LDNFT_TEXT_DOMAIN ); ?></span>
                         </label>
@@ -634,7 +634,7 @@ class LDNFT_Subscriptions_Menu {
                             <?php echo LDNFT_Admin::get_bar_preloader("ldnft-subssummary-loader");?>
                         </div>
                         
-                    </div>
+                    </div>  -->
                     <div class="ldfmt-new-sales-box ldfmt-sales-box ldnft-tooltip-container">
                         <label><?php echo __('Total Subscriptions', LDNFT_TEXT_DOMAIN);?>
                             <span class="lndft-tooltip ldnft_subscription_new_subscriptions_message"><?php echo __( 'Loading details...', LDNFT_TEXT_DOMAIN ); ?></span>

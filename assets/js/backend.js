@@ -671,7 +671,7 @@
                 $('.ldnft_sales_points').css('display', 'none');
                 $('.ldnft_sales_points_count').html('');
                 $('.ldnft_sales_top3_countries').css('display', 'none');;
-                $('.ldnft_sales_tax_fee').css('display', 'none');
+                //$('.ldnft_sales_tax_fee').css('display', 'none');
                 $('.ldnft_sales_new_subscriptions_count').css('display', 'none');
                 $('.ldnft_sales_renewals_count').css('display', 'none');
                 
@@ -747,8 +747,8 @@
                         } else {
                             var tax_rate_total = '0';
                         }
-                        $('.ldnft_sales_tax_fee').html(tax_rate_total).css('display', 'block');
-                        $('.ldnft_sales_tax_fee_tooltip').html( response.tax_message );
+                       // $('.ldnft_sales_tax_fee').html(tax_rate_total).css('display', 'block');
+                        //$('.ldnft_sales_tax_fee_tooltip').html( response.tax_message );
 
                         $('.ldnft_sales_renewals_amount').html(response.total_new_renewals_amount).css('display', 'block');
                         $('.ldnft_new_renewals_count').html('(' + response.total_new_renewals + ')');
@@ -908,7 +908,7 @@
                 
                 $('.ldnft-subssummary-loader').css('display', 'inline');
                 $('.ldnft_subscription_points').css('display', 'none');
-                $('.ldnft_subscription_tax_fee').css('display', 'none');
+                //$('.ldnft_subscription_tax_fee').css('display', 'none');
                 $('.ldnft_subscription_new_sales_count').css('display', 'none');
                 $('.ldnft_subscription_new_subscriptions_count').css('display', 'none');
                 $('.ldnft_subscription_renewals_count').css('display', 'none');
@@ -982,10 +982,10 @@
                             tax_rate_total += '<li>0</li>';
                         }
                         tax_rate_total += '</ul>';
-                        $('.ldnft_subscription_tax_fee').html(tax_rate_total).css('display', 'block');
+                        //$('.ldnft_subscription_tax_fee').html(tax_rate_total).css('display', 'block');
 
                         $('.ldnft_subscription_gross_message').html(response.gross_message);
-                        $('.ldnft_subscription_new_tax_message').html(response.tax_message);
+                        //$('.ldnft_subscription_new_tax_message').html(response.tax_message);
                         $('.ldnft_subscription_new_subscriptions_message').html(response.new_subscriptions_message);
                         //$('.ldnft_subscription_new_renewals_message').html(response.new_renewals_message); 
                         $('.ldnft_subscription_failed_payments_message').html(response.failed_payments_message);
