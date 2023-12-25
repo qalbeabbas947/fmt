@@ -13,14 +13,7 @@ class LDNFT_Crons_Settings {
     public function __construct() {
         
         global $wpdb;
-        // echo '<pre>';
-        // $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
-        // $inserted = 0;
-        // $updatednum = 0;
-
-        // $subobj = $api->Api('plugins/9176/subscriptions.json?count=50', 'GET', []);
-        // print_r($subobj);
-        // exit;
+        
         //import data via cron work
         add_action( 'wp_ajax_ldnft_check_cron_status',          [ $this, 'check_cron_status' ], 100 );
         add_action( 'ldnft_process_freemius_customers_data',    [ $this, 'ldnft_process_freemius_customers' ], 10, 3 );

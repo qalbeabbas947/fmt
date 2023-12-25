@@ -128,21 +128,21 @@ class LDNFT_Settings {
         $ldnft_mailpeot_plugin  = sanitize_text_field( $_POST['ldnft_mailpeot_plugin'] );
         if( ! isset( $_POST['ldnft_mailpeot_plugin'] ) || empty($ldnft_mailpeot_plugin) ) {
             $errormsg = __('Freemius product is required for import.', LDNFT_TEXT_DOMAIN);
-            $response = ['added'=>0, 'exists'=>0, 'message'=>'', 'errors'=> [$errormsg], 'errormsg'=> $errormsg ];
-            echo json_encode($response);exit;
+            $response = [ 'added' => 0, 'exists' => 0, 'message'=>'', 'errors' => [ $errormsg ], 'errormsg' => $errormsg ];
+            echo json_encode( $response );exit;
         }
 
         $ldnft_mailpeot_list    = sanitize_text_field( $_POST['ldnft_mailpeot_list'] );
         if( ! isset( $_POST['ldnft_mailpeot_list'] ) || empty($ldnft_mailpeot_list) ) {
             $errormsg = __('Mailpoet list is required for import.', LDNFT_TEXT_DOMAIN);
-            $response = ['added'=>0, 'exists'=>0, 'message'=>'', 'errors'=> [$errormsg], 'errormsg'=> $errormsg ];
-            echo json_encode($response);exit;
+            $response = ['added' => 0, 'exists' => 0, 'message' => '', 'errors'=> [ $errormsg ], 'errormsg' => $errormsg ];
+            echo json_encode( $response );exit;
         }
 
         $ldnft_mailpeot_ctype    = sanitize_text_field( $_POST['ldnft_mailpeot_ctype'] );
         if (!is_plugin_active('mailpoet/mailpoet.php')) {
             $errormsg = __('This section requires MailPoet to be installed and configured.', LDNFT_TEXT_DOMAIN);
-            $response = [ 'added' => 0, 'exists' => 0, 'message' => '', 'errors' => [$errormsg], 'errormsg' => $errormsg ];
+            $response = [ 'added' => 0, 'exists' => 0, 'message' => '', 'errors' => [ $errormsg ], 'errormsg' => $errormsg ];
             echo json_encode($response);exit;
         }
 
@@ -154,6 +154,27 @@ class LDNFT_Settings {
                 $where_type = " and ( m.status!='".$ldnft_mailpeot_plugin."' and m.status is not Null) ";
             } else {
                 $where_type = " and (m.status='' or m.status is Null)";
+            }
+        }
+
+        if( $ldnft_mailpeot_ctype == 'free' ) {
+            $res = $wpdb->get_results( "select id from ".$wpdb->prefix."mailpoet_tags where name='Free Subscriber'" );
+            $tag_id = 0;
+            if( count( $res ) == 0 ) {
+                $wpdb->insert(
+                    $wpdb->prefix.'mailpoet_tags',
+                    array(
+                        'name'                      => 'Free Subscriber',
+                        'description'               => 'Freemius Free Subscriber',
+                        'created_at'                 => date('Y-m-d H:i:s')
+                    )
+                );
+
+                $tag_id = $wpdb->insert_id;
+
+            } else {
+
+                $tag_id = $res[0]->id;
             }
         }
 
@@ -192,20 +213,47 @@ class LDNFT_Settings {
                             $wpdb->query( $sql );
                         }
                     }
-
+                    
+                    if( $ldnft_mailpeot_ctype == 'free' ) {
+                        $res = $wpdb->get_results( $wpdb->prepare("select * from ".$wpdb->prefix."mailpoet_subscriber_tag where subscriber_id=%d and tag_id=%d", $subscriber['id'], $tag_id ) );
+                        if( count( $res ) == 0 ) {
+                            $wpdb->insert(
+                                $wpdb->prefix.'mailpoet_subscriber_tag',
+                                array(
+                                    'subscriber_id'        => $subscriber['id'],
+                                    'tag_id'               => $tag_id,
+                                    'created_at'           => date('Y-m-d H:i:s')
+                                )
+                            );
+                        }
+                    }
                     $exists++;
                 } catch(\MailPoet\API\MP\v1\APIException $exception) {
                     if($exception->getCode() == 4 || $exception->getCode() == '4' ) {
                         try {
                             $subscriber = \MailPoet\API\API::MP('v1')->addSubscriber($subscriber_data, [], $options); // Add to default mailing list
                             
-                            if( !empty( $subscriber['id'] ) ) {
+                            if( ! empty( $subscriber['id'] ) ) {
                                 $sql = "update `".$wpdb->prefix."mailpoet_subscribers` set status='".$status."' WHERE id='".$subscriber['id']."'";
                                 $wpdb->query( $sql );
     
                                 $sql = "insert into `".$wpdb->prefix."mailpoet_subscriber_segment`(subscriber_id, segment_id, status, created_at, updated_at) values('".$subscriber['id']."', '".$ldnft_mailpeot_list."', '".$status."', now(), now() )";
                                 $wpdb->query( $sql );
                                 $count++;
+                            }
+                            
+                            if( $ldnft_mailpeot_ctype == 'free' ) {
+                                $res = $wpdb->get_results( $wpdb->prepare("select * from ".$wpdb->prefix."mailpoet_subscriber_tag where subscriber_id=%d and tag_id=%d", $subscriber['id'], $tag_id ) );
+                                if( count( $res ) == 0 ) {
+                                    $wpdb->insert (
+                                        $wpdb->prefix.'mailpoet_subscriber_tag',
+                                        array (
+                                            'subscriber_id'        => $subscriber['id'],
+                                            'tag_id'               => $tag_id,
+                                            'created_at'           => date('Y-m-d H:i:s')
+                                        )
+                                    );
+                                }
                             }
                         } catch(\MailPoet\API\MP\v1\APIException $exception) {
                             if($exception->getCode() == 6 || $exception->getCode() == '6' ) {
@@ -239,7 +287,7 @@ class LDNFT_Settings {
             $message = __('No available subscriber(s) to import.', LDNFT_TEXT_DOMAIN);
         }
 
-        $response = [ 'added' => $count, 'exists' => $exists, 'message' => $message, 'errors' => $errors, 'errormsg' => $errormsg ];
+        $response = [ 'tag_id' => $tag_id, 'added' => $count, 'exists' => $exists, 'message' => $message, 'errors' => $errors, 'errormsg' => $errormsg ];
         echo json_encode( $response );
         die();
     }
