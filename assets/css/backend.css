@@ -24,7 +24,7 @@
 }
 
 .ldfmt-sales-box {
-    width: 14%;
+    width: 15.4%;
     height: 120px;
     border: 1px solid #ddd;
     background: white;
@@ -41,6 +41,14 @@
     margin-top: 20px;
     font-weight: bold;
 }
+/*Filter*/
+.ldnft-filter-handler {
+    width: 100%;
+    margin-bottom: 10px;
+}
+.ldnft-filter-handler select {
+    padding: 0 55px 0 8px;
+}
 .ldnft-course-currency-totals tr td:first-child{
     text-align: left;
 }
@@ -52,15 +60,6 @@
 }
 
 .ldfmt-gross-sales-box {
-    float: left;
-    border-radius: 5px; 
-    font-size: 2em;
-    text-align: center;
-    padding:5px;
-}
-
-.ldfmt-gross-sales-box {
-    float: left;
     border-radius: 5px; 
     font-size: 1em;
     text-align: center;
@@ -107,7 +106,7 @@
     margin-left: 20px;
     text-align: center;
     padding:5px; 
-    width: 26%;
+    width: 30%;
 }
 
 .ldnft-course-currency-totals{
@@ -344,8 +343,8 @@
     text-align: center;
 }
 .ldfmt-sales-upper-info{
-    clear: both;
-    display: block;
+    width: 100%;
+    display: flex;
 }
 .ldnft-wrap {
     margin-top: 36px;

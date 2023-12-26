@@ -440,7 +440,7 @@ class LDNFT_Sales_Menu {
                                 <input type="button" name="ldnft-sales-search-button" value="<?php _e('Filter', LDNFT_TEXT_DOMAIN);?>" class="btn button ldnft-sales-search-button" />
                             </div>
                         </form>
-                        <div style="clear:both">&nbsp;</div> 
+                        <!-- <div style="clear:both">&nbsp;</div>  -->
                         <div class="ldfmt-sales-upper-info">
                             <div class="ldfmt-gross-sales-box ldfmt-sales-box ldnft-tooltip-container">
                                 <label><?php echo __( 'Gross Sales', LDNFT_TEXT_DOMAIN );?><span class="ldnft_sales_points_count"></span><span class="lndft-tooltip ldnft_sales_points_tooltip"><?php echo __( 'Loading details...', LDNFT_TEXT_DOMAIN ); ?></span></label>

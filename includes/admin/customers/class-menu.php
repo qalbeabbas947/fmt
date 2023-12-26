@@ -191,7 +191,7 @@ class LDNFT_Customers_Menu {
                 
                     <div class="ldnft_filters_top">
                         <form id="ldnft-customer-filter" method="get">
-                            <div class="alignleft actions bulkactions">
+                            <div class="ldnft-filter-handler alignleft actions bulkactions">
                                 <span class="ldnft_filter_labels"><?php _e( 'Filters:', LDNFT_TEXT_DOMAIN ); ?></span>
                                 <select name="ldfmt-plugins-filter" class="ldfmt-plugins-filter ldfmt-plugins-customers-filter" >
                                     <option value=""><?php echo __( 'All Plugin/Product', LDNFT_TEXT_DOMAIN );?></option>
