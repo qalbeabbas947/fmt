@@ -276,7 +276,7 @@ class LDNFT_Sales_Menu {
         );
         
         if( get_user_option( 'sales_hidden_columns_set', $user_id) != 'Yes' ) {
-            update_user_option( $user_id, 'managefreemius-toolkit_page_freemius-salescolumnshidden', $default_hidden_columns );
+            update_user_option( $user_id, 'managefreemius-toolkit_page_freemius-salescolumnshidden', $this->default_hidden_columns );
             update_user_option( $user_id, 'sales_hidden_columns_set', 'Yes' );
         }
 

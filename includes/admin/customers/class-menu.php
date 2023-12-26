@@ -94,7 +94,7 @@ class LDNFT_Customers_Menu {
         );
 
         if( get_user_option( 'customers_hidden_columns_set', $user_id) != 'Yes' ) {
-            update_user_option( $user_id, 'managefreemius-toolkit_page_freemius-customerscolumnshidden', $default_hidden_columns );
+            update_user_option( $user_id, 'managefreemius-toolkit_page_freemius-customerscolumnshidden', $this->default_hidden_columns );
             update_user_option( $user_id, 'customers_hidden_columns_set', 'Yes' );
         }
 
