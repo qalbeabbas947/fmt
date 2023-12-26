@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Freemius Toolkit
- * Description: This add-on helps you to display subscriptions, sales, reviews and customers on our website.
+ * Description: This add-on helps you to display subscriptions, sales, reviews and customers to your website.
  * Version: 1.0
  * Author: LDninjas
  * Author URI: ldninjas.com
@@ -57,24 +57,24 @@ class LDNFT_Freemius {
      */
     public function enable_freemius() {
 
-        if ( ! function_exists( 'test_freemius_addon' ) ) {
+        if ( ! function_exists( 'freemius_toolkit' ) ) {
 
             /**
              * Create a helper function for easy SDK access.
              */
-            function test_freemius_addon() {
-                global $test_freemius_addon;
+            function freemius_toolkit() {
+                global $freemius_toolkit;
         
-                if ( ! isset( $test_freemius_addon ) ) {
+                if ( ! isset( $freemius_toolkit ) ) {
                     
                     /**
                      * Include Freemius SDK.
                      */
                     require_once dirname(__FILE__) . '/freemius/start.php';
         
-                    $test_freemius_addon = fs_dynamic_init( [
+                    $freemius_toolkit = fs_dynamic_init( [
                         'id'                  => '12667',
-                        'slug'                => 'coordinator-course-reset',
+                        'slug'                => 'freemius-toolkit',
                         'type'                => 'plugin',
                         'public_key'          => 'pk_30d13bc8bd91e0687bf2cb41b61c6',
                         'is_premium'          => false,
@@ -86,18 +86,18 @@ class LDNFT_Freemius {
                     ] );
                 }
         
-                return $test_freemius_addon;
+                return $freemius_toolkit;
             }
         
             /**
              * Init Freemius.
              */
-            test_freemius_addon();
+            freemius_toolkit();
             
             /**
              * Signal that SDK was initiated.
              */
-            do_action( 'test_freemius_addon_loaded' );
+            do_action( 'freemius_toolkit_loaded' );
         }
     }
 
@@ -135,12 +135,13 @@ class LDNFT_Freemius {
         if( $fs_connection ) {
             $table_name = $wpdb->prefix.'ldnft_plugins';
             if( !is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
-                self::$products = $wpdb->get_results( 'select * from '.$table_name); 
+                self::$products = $wpdb->get_results( 'select id from '.$table_name); 
                 if( is_array( self::$products ) && count( self::$products ) > 0  ) {
                     foreach( self::$products as $prd ) {
                         $settings = get_option( 'ldnft_webhook_settings_'.$prd->id );
-                        if( empty( $settings ) )
+                        if( empty( $settings ) ) {
                             update_option( 'ldnft_webhook_settings_'.$prd->id, [ 'mailpeot_list' => 0, 'disable_webhooks' => 'no', 'mailpoet_subscription' => 'yes' ] );
+                        }
                     }
                 }
             }
@@ -195,44 +196,47 @@ class LDNFT_Freemius {
             require_once LDNFT_INCLUDES_DIR . 'admin/class-crons.php';
         }        
         
-        if( file_exists( LDNFT_INCLUDES_DIR . 'admin/settings.php' ) ) {
-            require_once LDNFT_INCLUDES_DIR . 'admin/settings.php';
-        }        
+        if( is_admin() ) {
+            
+            if( file_exists( LDNFT_INCLUDES_DIR . 'admin/settings.php' ) ) {
+                require_once LDNFT_INCLUDES_DIR . 'admin/settings.php';
+            }        
 
-        if( file_exists( LDNFT_INCLUDES_DIR . 'admin/class-admin.php' ) ) {
-            require_once LDNFT_INCLUDES_DIR . 'admin/class-admin.php';
-        }        
-        
-        if( file_exists( LDNFT_INCLUDES_DIR . 'admin/customers/class-menu.php' ) ) {
-            require_once LDNFT_INCLUDES_DIR . 'admin/customers/class-menu.php';
-        }
+            if( file_exists( LDNFT_INCLUDES_DIR . 'admin/class-admin.php' ) ) {
+                require_once LDNFT_INCLUDES_DIR . 'admin/class-admin.php';
+            }        
+            
+            if( file_exists( LDNFT_INCLUDES_DIR . 'admin/customers/class-menu.php' ) ) {
+                require_once LDNFT_INCLUDES_DIR . 'admin/customers/class-menu.php';
+            }
 
-        if( file_exists( LDNFT_INCLUDES_DIR . 'admin/customers/class-customers.php' ) ) {
-            require_once LDNFT_INCLUDES_DIR . 'admin/customers/class-customers.php';
-        }
+            if( file_exists( LDNFT_INCLUDES_DIR . 'admin/customers/class-customers.php' ) ) {
+                require_once LDNFT_INCLUDES_DIR . 'admin/customers/class-customers.php';
+            }
 
-        if( file_exists( LDNFT_INCLUDES_DIR . 'admin/reviews/class-menu.php' ) ) {
-            require_once LDNFT_INCLUDES_DIR . 'admin/reviews/class-menu.php';
-        }
+            if( file_exists( LDNFT_INCLUDES_DIR . 'admin/reviews/class-menu.php' ) ) {
+                require_once LDNFT_INCLUDES_DIR . 'admin/reviews/class-menu.php';
+            }
 
-        if( file_exists( LDNFT_INCLUDES_DIR . 'admin/reviews/class-reviews.php' ) ) {
-            require_once LDNFT_INCLUDES_DIR . 'admin/reviews/class-reviews.php';
-        }
-        
-        if( file_exists( LDNFT_INCLUDES_DIR . 'admin/subscriptions/class-menu.php' ) ) {
-            require_once LDNFT_INCLUDES_DIR . 'admin/subscriptions/class-menu.php';
-        }
+            if( file_exists( LDNFT_INCLUDES_DIR . 'admin/reviews/class-reviews.php' ) ) {
+                require_once LDNFT_INCLUDES_DIR . 'admin/reviews/class-reviews.php';
+            }
+            
+            if( file_exists( LDNFT_INCLUDES_DIR . 'admin/subscriptions/class-menu.php' ) ) {
+                require_once LDNFT_INCLUDES_DIR . 'admin/subscriptions/class-menu.php';
+            }
 
-        if( file_exists( LDNFT_INCLUDES_DIR . 'admin/subscriptions/class-subscriptions.php' ) ) {
-            require_once LDNFT_INCLUDES_DIR . 'admin/subscriptions/class-subscriptions.php';
-        }
+            if( file_exists( LDNFT_INCLUDES_DIR . 'admin/subscriptions/class-subscriptions.php' ) ) {
+                require_once LDNFT_INCLUDES_DIR . 'admin/subscriptions/class-subscriptions.php';
+            }
 
-        if( file_exists( LDNFT_INCLUDES_DIR . 'admin/sales/class-menu.php' ) ) {
-            require_once LDNFT_INCLUDES_DIR . 'admin/sales/class-menu.php';
-        }
+            if( file_exists( LDNFT_INCLUDES_DIR . 'admin/sales/class-menu.php' ) ) {
+                require_once LDNFT_INCLUDES_DIR . 'admin/sales/class-menu.php';
+            }
 
-        if( file_exists( LDNFT_INCLUDES_DIR . 'admin/sales/class-sales.php' ) ) {
-            require_once LDNFT_INCLUDES_DIR . 'admin/sales/class-sales.php';
+            if( file_exists( LDNFT_INCLUDES_DIR . 'admin/sales/class-sales.php' ) ) {
+                require_once LDNFT_INCLUDES_DIR . 'admin/sales/class-sales.php';
+            }
         }
 
         if( file_exists( LDNFT_INCLUDES_DIR . 'shortcodes/class-reviews.php' ) ) {
