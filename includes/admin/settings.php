@@ -157,7 +157,7 @@ class LDNFT_Settings {
             }
         }
 
-        if( $ldnft_mailpeot_ctype == 'free' ) {
+        if( $ldnft_mailpeot_ctype != 'paid' ) {
             $res = $wpdb->get_results( "select id from ".$wpdb->prefix."mailpoet_tags where name='Free Subscriber'" );
             $tag_id = 0;
             if( count( $res ) == 0 ) {
@@ -214,7 +214,7 @@ class LDNFT_Settings {
                         }
                     }
                     
-                    if( $ldnft_mailpeot_ctype == 'free' ) {
+                    if( $ldnft_mailpeot_ctype != 'paid' && empty( $user->status ) ) { 
                         $res = $wpdb->get_results( $wpdb->prepare("select * from ".$wpdb->prefix."mailpoet_subscriber_tag where subscriber_id=%d and tag_id=%d", $subscriber['id'], $tag_id ) );
                         if( count( $res ) == 0 ) {
                             $wpdb->insert(
@@ -242,7 +242,7 @@ class LDNFT_Settings {
                                 $count++;
                             }
                             
-                            if( $ldnft_mailpeot_ctype == 'free' ) {
+                            if( $ldnft_mailpeot_ctype != 'paid' && empty( $user->status ) ) { 
                                 $res = $wpdb->get_results( $wpdb->prepare("select * from ".$wpdb->prefix."mailpoet_subscriber_tag where subscriber_id=%d and tag_id=%d", $subscriber['id'], $tag_id ) );
                                 if( count( $res ) == 0 ) {
                                     $wpdb->insert (
