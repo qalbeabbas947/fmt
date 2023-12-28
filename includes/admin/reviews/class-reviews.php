@@ -682,13 +682,6 @@ class LDNFT_Reviews extends WP_List_Table {
         $this->_pagination = "<div class='tablenav-pages{$page_class}'>$output</div>";
     
         echo $this->_pagination;
-	}
-
-    public function extra_tablenav( $which ) {
-        
-        if ( $which == "top" ){
-            
-        }
-
+	
     }
 }

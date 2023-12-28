@@ -230,8 +230,7 @@ class LDNFT_Subscriptions_Menu {
         global $wpdb;
         
         $selected_plugin_id = isset( $_GET['ldfmt_plugins_filter'] ) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ? intval( $_GET['ldfmt_plugins_filter'] ) : 0;
-
-        $table_name = $wpdb->prefix.'ldnft_subscription t inner join '.$wpdb->prefix.'ldnft_customers c on (t.user_id=c.id)';  
+        $table_name         = $wpdb->prefix.'ldnft_subscription t inner join '.$wpdb->prefix.'ldnft_customers c on (t.user_id=c.id)';  
         $where = " where 1 = 1";
         $where .= ! empty( $selected_plugin_id ) ? " and t.plugin_id='".$selected_plugin_id."'" : "";
 
