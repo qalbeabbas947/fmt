@@ -94,7 +94,11 @@ class LDNFT_Reviews extends WP_List_Table {
      **************************************************************************/
     public function column_default($item, $column_name){
         
-         return $item[$column_name];
+        if( array_key_exists( $column_name, $item ) ) {
+            return $item[$column_name]; 
+        }
+		
+        return ''; 
     }
 	
 	public function column_company( $item ) {
@@ -269,8 +273,7 @@ class LDNFT_Reviews extends WP_List_Table {
      * @uses $this->set_pagination_args()
      **************************************************************************/
     public function prepare_items() {
-        ini_set( 'display_errors', 'On' );
-        error_reporting(E_ALL);
+        
         global $wpdb;
         
         /**

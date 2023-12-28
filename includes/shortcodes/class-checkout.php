@@ -77,17 +77,17 @@ class LDNFT_Checkout_Shortcode {
             'image' => ''
         ), $atts );
 
-        $plugin_id  = sanitize_text_field($attributes['product_id']);
-        $plan_id    = sanitize_text_field($attributes['plan_id']);
+        $plugin_id  = sanitize_text_field( $attributes['product_id'] );
+        $plan_id    = sanitize_text_field( $attributes['plan_id'] );
 
-        if( empty( $plugin_id ) || intval($plugin_id) < 1 ) {
-            return '<div class="ldnft-error-message">'.__('Product ID is a required parameter.', LDNFT_TEXT_DOMAIN).'</div>';
+        if( empty( $plugin_id ) || intval( $plugin_id ) < 1 ) {
+            return '<div class="ldnft-error-message">'.__( 'Product ID is a required parameter.', LDNFT_TEXT_DOMAIN ).'</div>';
         }
 
         $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
         if( $plan_id == 0 ) {
             
-            $result = $api->Api('plugins/'.$plugin_id.'/plans.json', 'GET', []);
+            $result = $api->Api( 'plugins/' . $plugin_id . '/plans.json', 'GET', [] );
             if( !isset( $result->plans ) || !is_array( $result->plans ) || count( $result->plans ) == 0 ) {
                 return '<div class="ldnft-error-message">'.__('Please, configure a plan before visiting this page.', LDNFT_TEXT_DOMAIN).'</div>';
             }
@@ -97,10 +97,10 @@ class LDNFT_Checkout_Shortcode {
         }
         
        
-        $presult = $api->Api('plugins/'.$plugin_id.'/plans/'.$plan_id.'/pricing.json', 'GET', []);
+        $presult = $api->Api( 'plugins/'. $plugin_id .'/plans/'.$plan_id.'/pricing.json', 'GET', [] );
         if( !isset( $presult->pricing ) || !is_array( $presult->pricing ) || count( $presult->pricing ) == 0 ) {
 
-            return '<div class="ldnft-error-message">'.__('Please configure the product pricing before visiting this page.', LDNFT_TEXT_DOMAIN).'</div>';
+            return '<div class="ldnft-error-message">'.__( 'Please configure the product pricing before visiting this page.', LDNFT_TEXT_DOMAIN ).'</div>';
         }
 
         $ldnft_settings = get_option( 'ldnft_settings' ); 

@@ -97,7 +97,7 @@ class LDNFT_Sales extends WP_List_Table {
     public function column_view( $item ) {
         
         if( !empty( intval( strip_tags( $item['id'] ) ) ) ) {
-            return '<a class="ldnft_sales_view_detail" data-action="ldnft_sales_view_detail" data-username="'.$item['username'].'" data-useremail="'.$item['useremail'].'" data-subscription_id="'.$item['subscription_id'].'" data-gateway_fee="'.$item['gateway_fee'].'" data-gross="'.$item['gross'].'" data-license_id="'.$item['license_id'].'" data-gateway="'.$item['gateway'].'" data-country_code="'.$item['country_code'].'" data-is_renewal="'.$item['is_renewal'].'" data-type="'.$item['type'].'" data-bound_payment_id="'.$item['bound_payment_id'].'" data-created="'.$item['created'].'" data-vat="'.$item['vat'].'" data-install_id="'.$item['install_id'].'" data-plan_id="'.$item['plan_id'].'"  data-coupon_id="'.$item['coupon_id'].'"  data-external_id="'.$item['external_id'].'" data-user_id="'.$item['user_id'].'" data-plugin_id="'.$item['plugin_id'].'" data-id="'.$item['id'].'" class="ldnft_sales_view_detail" href="javascript:;">'.__('Get More', LDNFT_TEXT_DOMAIN).'</a>';
+            return '<a class="ldnft_sales_view_detail" data-action="ldnft_sales_view_detail" data-username="'.$item['username'].'" data-useremail="'.$item['useremail'].'" data-subscription_id="'.$item['subscription_id'].'" data-gateway_fee="'.$item['gateway_fee'].'" data-gross="'.$item['gross'].'" data-license_id="'.$item['license_id'].'" data-gateway="'.$item['gateway'].'" data-country_code="'.$item['country_code'].'" data-is_renewal="'.$item['is_renewal'].'" data-type="'.$item['type'].'" data-bound_payment_id="'.$item['bound_payment_id'].'" data-created="'.$item['created'].'" data-vat="'.$item['vat'].'" data-install_id="'.$item['install_id'].'"  data-coupon_id="'.$item['coupon_id'].'"  data-external_id="'.$item['external_id'].'" data-user_id="'.$item['user_id'].'" data-plugin_id="'.$item['plugin_id'].'" data-id="'.$item['id'].'" class="ldnft_sales_view_detail" href="javascript:;">'.__('Get More', LDNFT_TEXT_DOMAIN).'</a>';
 
  			
 			
@@ -129,7 +129,12 @@ class LDNFT_Sales extends WP_List_Table {
      * @return string Text or HTML to be placed inside the column <td>
      **************************************************************************/
     public function column_default($item, $column_name){
-        return $item[$column_name];
+        
+        if( array_key_exists( $column_name, $item ) ) {
+            return $item[$column_name]; 
+        }
+		
+        return ''; 
     }
     
     /** ************************************************************************
@@ -163,7 +168,6 @@ class LDNFT_Sales extends WP_List_Table {
             'created'               => __( 'Payment Date',LDNFT_TEXT_DOMAIN ), 
             'vat'                   => __( 'VAT',LDNFT_TEXT_DOMAIN ), 
             'install_id'            => __( 'Install ID',LDNFT_TEXT_DOMAIN ), 
-            'plan_id'               => __( 'Plan ID',LDNFT_TEXT_DOMAIN ), 
             'coupon_id'             => __( 'Coupon ID',LDNFT_TEXT_DOMAIN ), 
             'plugin_id'             => __( 'Product ID',LDNFT_TEXT_DOMAIN ), 
             'external_id'           => __( 'External ID',LDNFT_TEXT_DOMAIN ), 
@@ -257,7 +261,8 @@ class LDNFT_Sales extends WP_List_Table {
     public function prepare_items() {
         
         global $wpdb;
-        
+        ini_set( 'display_errors', 'On' );
+        error_reporting(E_ALL);
         /**
          * First, lets decide how many records per page to show
          */
@@ -290,7 +295,6 @@ class LDNFT_Sales extends WP_List_Table {
                     'created'               => LDNFT_Admin::get_bar_preloader(), 
                     'vat'                   => LDNFT_Admin::get_bar_preloader(),  
                     'install_id'            => LDNFT_Admin::get_bar_preloader(), 
-                    'plan_id'               => LDNFT_Admin::get_bar_preloader(), 
                     'coupon_id'             => LDNFT_Admin::get_bar_preloader(),
                     'plugin_id'             => LDNFT_Admin::get_bar_preloader(),
                     'external_id'           => LDNFT_Admin::get_bar_preloader(),
@@ -560,13 +564,12 @@ class LDNFT_Sales extends WP_List_Table {
         } else {
             
             $page_links[] = sprintf( 
-                "<a data-action='ldnft_sales_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-plan_id='%s' data-interval='%d' data-search='%s' data-type='%s' data-gateway='%s' data-country='%s' data-per_page='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' data-paged='1' href='javascript:;'>" .
+                "<a data-action='ldnft_sales_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-interval='%d' data-search='%s' data-type='%s' data-gateway='%s' data-country='%s' data-per_page='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' data-paged='1' href='javascript:;'>" .
                     "<span class='screen-reader-text'>%s</span>" .
                     "<span aria-hidden='true'>%s</span>" .
                 '</a>',
                 $this->selected_plugin_id,
                 $this->selected_status,
-                $this->selected_plan_id,
                 $this->selected_interval,
                 $this->selected_search,
                 $this->selected_type,
@@ -584,13 +587,12 @@ class LDNFT_Sales extends WP_List_Table {
             $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&lsaquo;</span>';
         } else {
             $page_links[] = sprintf(
-                "<a data-action='ldnft_sales_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-plan_id='%s' data-interval='%d' data-search='%s' data-type='%s' data-gateway='%s' data-country='%s' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
+                "<a data-action='ldnft_sales_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-interval='%d' data-search='%s' data-type='%s' data-gateway='%s' data-country='%s' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
                     "<span class='screen-reader-text'>%s</span>" .
                     "<span aria-hidden='true'>%s</span>" .
                 '</a>',
                 $this->selected_plugin_id,
                 $this->selected_status,
-                $this->selected_plan_id,
                 $this->selected_interval,
                 $this->selected_search,
                 $this->selected_type,
@@ -628,13 +630,12 @@ class LDNFT_Sales extends WP_List_Table {
             $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&rsaquo;</span>';
         } else {
             $page_links[] = sprintf(
-                "<a data-action='ldnft_sales_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-plan_id='%s' data-interval='%d' data-search='%s' data-type='%s' data-gateway='%s' data-country='%s' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
+                "<a data-action='ldnft_sales_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-interval='%d' data-search='%s' data-type='%s' data-gateway='%s' data-country='%s' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
                     "<span class='screen-reader-text'>%s</span>" .
                     "<span aria-hidden='true'>%s</span>" .
                 '</a>',
                 $this->selected_plugin_id,
                 $this->selected_status,
-                $this->selected_plan_id,
                 $this->selected_interval,
                 $this->selected_search,
                 $this->selected_type,
@@ -653,13 +654,12 @@ class LDNFT_Sales extends WP_List_Table {
             $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&raquo;</span>';
         } else {
             $page_links[] = sprintf(
-                "<a data-action='ldnft_sales_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-plan_id='%s' data-interval='%d' data-search='%s' data-type='%s' data-gateway='%s' data-country='%s' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
+                "<a data-action='ldnft_sales_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-interval='%d' data-search='%s' data-type='%s' data-gateway='%s' data-country='%s' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
                     "<span class='screen-reader-text'>%s</span>" .
                     "<span aria-hidden='true'>%s</span>" .
                 '</a>',
                 $this->selected_plugin_id,
                 $this->selected_status,
-                $this->selected_plan_id,
                 $this->selected_interval,
                 $this->selected_search,
                 $this->selected_type,

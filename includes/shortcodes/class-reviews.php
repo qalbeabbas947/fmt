@@ -35,6 +35,7 @@ class LDNFT_Reviews_Shortcode {
      * Define hooks
      */
     private function hooks() {
+        
         add_action( 'wp_ajax_ldnft_load_reviews', [ $this, 'load_reviews' ], 100 );
         add_shortcode( 'LDNFT_Reviews', [ $this, 'reviews_shortcode_cb' ] );
         add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_front_scripts' ] );

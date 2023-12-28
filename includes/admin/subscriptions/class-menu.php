@@ -375,7 +375,6 @@ class LDNFT_Subscriptions_Menu {
         }
 
         $data = [
-            'qry' => "SELECT t.* FROM $table_name $where",
             'gross_total_count' => $gross_total_count,
             'gross_total' => $gross_total,
             'gross_message' => sprintf(__( 'Gross sale amount from total %d subscriptions.', LDNFT_TEXT_DOMAIN ), $gross_total_count),

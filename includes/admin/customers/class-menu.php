@@ -20,7 +20,6 @@ class LDNFT_Customers_Menu {
     /** ************************************************************************
      * REQUIRED. Set up a constructor.
      ***************************************************************************/
-
 	function __construct() {
 
         $this->default_hidden_columns = [ 

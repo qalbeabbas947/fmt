@@ -147,8 +147,12 @@ class LDNFT_Subscriptions extends WP_List_Table {
 	 */
 
 	public function column_default( $item, $column_name ) {
-
-		return $item[$column_name]; 
+        
+        if( array_key_exists( $column_name, $item ) ) {
+            return $item[$column_name]; 
+        }
+		
+        return ''; 
 	}
 	
 	/**
@@ -224,6 +228,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
                     'outstanding_balance'   => LDNFT_Admin::get_bar_preloader(), 
                     'failed_payments'       => LDNFT_Admin::get_bar_preloader(), 
                     'trial_ends'            => LDNFT_Admin::get_bar_preloader(), 
+                    'canceled_at'           => LDNFT_Admin::get_bar_preloader(), 
                     'created'               => LDNFT_Admin::get_bar_preloader(), 
                     'initial_amount'        => LDNFT_Admin::get_bar_preloader(),  
                     'next_payment'          => LDNFT_Admin::get_bar_preloader(), 

@@ -113,8 +113,6 @@ class LDNFT_Customers extends WP_List_Table {
             case 'products':
             case 'created':
                 return $item[$column_name];
-            
-                
             default:
                 return print_r($item,true);
         }
@@ -387,21 +385,17 @@ class LDNFT_Customers extends WP_List_Table {
             
         }
 
-        $where .= $this->selected_status != ''? " and c.is_verified='".$this->selected_status."' " : '';
-        $where .= $this->selected_marketing != ''? ( $this->selected_marketing == '1'? " and c.is_marketing_allowed='1' ": " and ( c.is_marketing_allowed='0' or c.is_marketing_allowed is Null) ") : '';
+        $where .= $this->selected_status != '' ? " and c.is_verified='".$this->selected_status."' " : '';
+        $where .= $this->selected_marketing != '' ? ( $this->selected_marketing == '1'? " and c.is_marketing_allowed='1' ": " and ( c.is_marketing_allowed='0' or c.is_marketing_allowed is Null) ") : '';
+        $where .= ! empty( $this->selected_search ) ? " and ( c.id like '%".$this->selected_search."%' or lower(c.email) like '%".strtolower($this->selected_search)."%' or lower(c.first) like '%".strtolower($this->selected_search)."%' or lower(c.last) like '%".strtolower($this->selected_search)."%' )" : '';
 
-        if( ! empty( $this->selected_search )) {
-            $where   .= " and ( c.id like '%".$this->selected_search."%' or lower(c.email) like '%".strtolower($this->selected_search)."%' or lower(c.first) like '%".strtolower($this->selected_search)."%' or lower(c.last) like '%".strtolower($this->selected_search)."%' )";
-        }
-        
-        
         $total_items = $wpdb->get_var("SELECT COUNT(c.id) FROM $table_name".$where);
 
         // prepare query params, as usual current page, order by and order direction
         $offset      = isset($paged) ? intval(($paged-1) * $per_page) : 0;
         $orderby    = (isset($_REQUEST['orderby']) && in_array($_REQUEST['orderby'], array_keys($this->get_sortable_columns()))) ? sanitize_text_field( $_REQUEST['orderby'] ) : 'created';
         $order      = (isset($_REQUEST['order']) && in_array($_REQUEST['order'], array('asc', 'desc'))) ? sanitize_text_field( $_REQUEST['order'] ) : 'desc';
-        $result     = $wpdb->get_results( "SELECT * FROM $table_name $where ORDER BY c.$orderby $order LIMIT $per_page OFFSET $offset", ARRAY_A );
+        $result     = $wpdb->get_results( "SELECT c.* FROM $table_name $where ORDER BY c.$orderby $order LIMIT $per_page OFFSET $offset", ARRAY_A );
         
         $data = [];
         $count = 0;
@@ -452,6 +446,7 @@ class LDNFT_Customers extends WP_List_Table {
 		extract( $this->_pagination_args, EXTR_SKIP );
 
 		ob_start();
+
 		if ( ! empty( $_REQUEST['no_placeholder'] ) ) {
             $this->display_rows();
         } else {
@@ -501,11 +496,12 @@ class LDNFT_Customers extends WP_List_Table {
             <div class="tablenav <?php echo esc_attr( $which ); ?>">
 
                 <?php if ( $this->has_items() ) : ?>
-                <div class="alignleft actions bulkactions">
-                    <?php $this->bulk_actions( $which ); ?>
-                </div>
-                    <?php
+                    <div class="alignleft actions bulkactions">
+                        <?php $this->bulk_actions( $which ); ?>
+                    </div>
+                <?php
                 endif;
+                
                 $this->extra_tablenav( $which );
                 $this->pagination_new( $which );
                 ?>

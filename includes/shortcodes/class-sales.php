@@ -39,7 +39,6 @@ class LDNFT_Sales_Shortcode {
         add_shortcode( 'LDNFT_Sales', [ $this, 'sales_shortcode_cb' ] );
         add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_front_scripts' ] );
         add_action( 'wp_ajax_ldnft_load_sales', [ $this, 'load_sales' ], 100 );
-        
     }
 
     /**
@@ -49,14 +48,10 @@ class LDNFT_Sales_Shortcode {
         
         global $wpdb;
 
-        $plugin_id  = sanitize_text_field($_POST['plugin_id']);
-        $show       = sanitize_text_field($_POST['show']);
-        $per_page   = sanitize_text_field($_POST['per_page']);
-        $offset     = sanitize_text_field($_POST['offset']);
-        
-        if( empty($show) ) {
-            $show = 'both';
-        }
+        $plugin_id  = sanitize_text_field( $_POST['plugin_id'] );
+        $show       = ! empty( $show ) ? sanitize_text_field( $_POST['show'] ) : 'both';
+        $per_page   = sanitize_text_field( $_POST['per_page'] );
+        $offset     = sanitize_text_field( $_POST['offset'] );
         
         ob_start();
         
@@ -77,7 +72,7 @@ class LDNFT_Sales_Shortcode {
             echo '<div class="ldfmt-clear-div">&nbsp;</div>';
         }
         
-        if( $show == 'both' || $show=='listing' ) {
+        if( $show == 'both' || $show == 'listing' ) {
             
             $table_name = $wpdb->prefix.'ldnft_subscription t inner join '.$wpdb->prefix.'ldnft_customers c on (t.user_id=c.id)'; 
             $results    = $wpdb->get_results( $wpdb->prepare( "SELECT t.*, concat(c.first, ' ', c.last) as username, c.email FROM $table_name where t.plugin_id=%d LIMIT %d OFFSET %d", $plugin_id, $per_page, $offset ) );
