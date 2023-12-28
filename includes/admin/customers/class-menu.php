@@ -29,7 +29,6 @@ class LDNFT_Customers_Menu {
 
         add_action( 'admin_menu', [ $this, 'admin_menu_page' ] );
 		add_action('wp_ajax_ldnft_customers_display', 		[ $this, 'ldnft_customers_display' ], 100 );
-        add_action( 'wp_ajax_ldnft_customers_check_next',      [ $this, 'customers_check_next' ], 100 );
 	}
 	
 	/**
@@ -49,30 +48,6 @@ class LDNFT_Customers_Menu {
                 "display" => $display
             ])
         );
-    }
-	
-	/**
-     * checks if there are subscribers records
-     */
-    public function customers_check_next() {
-        
-        $per_page       = isset($_REQUEST['per_page']) && intval($_REQUEST['per_page'])>0?intval($_REQUEST['per_page']):10;
-        $offset         = isset($_REQUEST['offset']) && intval($_REQUEST['offset'])>0?intval($_REQUEST['offset']):1;
-        $current_recs   = isset($_REQUEST['current_recs']) && intval($_REQUEST['current_recs'])>0?intval($_REQUEST['current_recs']):0;
-        $plugin_id      = isset($_REQUEST['plugin_id']) && intval($_REQUEST['plugin_id'])>0?intval($_REQUEST['plugin_id']):0;
-        $interval       = isset($_REQUEST['status']) && intval($_REQUEST['status'])>0?intval($_REQUEST['status']):'';
-        $offset_rec     = ($offset-1) * $per_page;
-
-        $status = "";
-        if( !empty( $this->selected_status ) ) {
-            $status = "&filter=".$this->selected_status;
-        }
-        $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
-        $result = $api->Api('plugins/'.$plugin_id.'/users.json?count='.$per_page.'&offset='.$offset_rec.$status, 'GET', []);
-        if( ! is_array( $result->users ) || count( $result->users ) == 0) {
-            echo __('No more record(s) found.', LDNFT_TEXT_DOMAIN);
-        }
-        exit;
     }
 
     /**

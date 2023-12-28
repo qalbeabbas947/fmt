@@ -71,7 +71,6 @@ class LDNFT_Subscriptions extends WP_List_Table {
         $this->selected_interval = ( isset( $_GET['interval'] ) ) ? sanitize_text_field( $_GET['interval'] ) : 12; 
         $this->selected_country = ( isset( $_GET['country'] )  ) ? sanitize_text_field( $_GET['country'] ) : ''; 
         $this->selected_plan_id = ( isset( $_GET['plan_id'] ) && intval( $_GET['plan_id'] ) > 0 ) ? sanitize_text_field( $_GET['plan_id'] ) : '';
-
         $this->selected_gateway = isset( $_GET['gateway'] ) ? sanitize_text_field( $_GET['gateway'] ) : ''; 
         $this->selected_search = isset( $_GET['search'] ) ? sanitize_text_field( $_GET['search'] ) : '';
         $this->selected_status = isset( $_GET['status'] ) ? sanitize_text_field( $_GET['status'] ) : '';
@@ -145,7 +144,6 @@ class LDNFT_Subscriptions extends WP_List_Table {
 	 * Method column_default let at your choice the rendering of everyone of column
 	 *
 	 */
-
 	public function column_default( $item, $column_name ) {
         
         if( array_key_exists( $column_name, $item ) ) {
@@ -301,19 +299,11 @@ class LDNFT_Subscriptions extends WP_List_Table {
             }
         }
 
-        if( !empty($this->selected_country) ) {  
-            $where .= " and t.country_code='".$this->selected_country."'";
-        }
-
-        if( !empty($this->selected_plan_id) && intval($this->selected_plan_id) > 0 ) {  
-            $where .= ' and plan_id='.$this->selected_plan_id;
-        }
-
-        $where .= $this->selected_gateway != ''? " and t.gateway='".sanitize_text_field( $_GET['gateway'] )."' " : '';
-        $where .= $this->selected_status != ''? " and t.status='".sanitize_text_field( $_GET['status'] )."' " : '';
-        if( ! empty( $this->selected_search )) {
-            $where   .= " and ( t.id like '%".$this->selected_search."%' or t.user_id like '%".$this->selected_search."%' or lower(c.email) like '%".strtolower($this->selected_search)."%' or lower(c.first) like '%".strtolower($this->selected_search)."%' or lower(c.last) like '%".strtolower($this->selected_search)."%' )";
-        }
+        $where .= ! empty( $this->selected_country ) ? " and t.country_code='".$this->selected_country."'" : '';
+        $where .= ! empty( $this->selected_plan_id ) && intval( $this->selected_plan_id ) > 0 ? ' and plan_id='.$this->selected_plan_id : '';
+        $where .= $this->selected_gateway != '' ? " and t.gateway='".sanitize_text_field( $_GET['gateway'] )."' " : '';
+        $where .= $this->selected_status != '' ? " and t.status='".sanitize_text_field( $_GET['status'] )."' " : '';
+        $where .= ! empty( $this->selected_search ) ? " and ( t.id like '%".$this->selected_search."%' or t.user_id like '%".$this->selected_search."%' or lower(c.email) like '%".strtolower($this->selected_search)."%' or lower(c.first) like '%".strtolower($this->selected_search)."%' or lower(c.last) like '%".strtolower($this->selected_search)."%' )" : '';
         
         $total_items = $wpdb->get_var("SELECT COUNT(t.id) FROM $table_name".$where);
 
@@ -441,11 +431,12 @@ class LDNFT_Subscriptions extends WP_List_Table {
             <div class="tablenav <?php echo esc_attr( $which ); ?>">
 
                 <?php if ( $this->has_items() ) : ?>
-                <div class="alignleft actions bulkactions">
-                    <?php $this->bulk_actions( $which ); ?>
-                </div>
-                    <?php
+                    <div class="alignleft actions bulkactions">
+                        <?php $this->bulk_actions( $which ); ?>
+                    </div>
+                <?php
                 endif;
+
                 $this->extra_tablenav( $which );
                 $this->pagination_new( $which );
                 ?>
@@ -521,7 +512,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
         } else {
             
             $page_links[] = sprintf( 
-                "<a  data-action='ldnft_subscriber_check_next' data-plugin_id='%d' data-country='%s' data-plan_id='%s' data-interval='%d' data-gateway='%s' data-status='%s' data-search='%s' data-per_page='%d'  data-paged='1' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
+                "<a data-plugin_id='%d' data-country='%s' data-plan_id='%s' data-interval='%d' data-gateway='%s' data-status='%s' data-search='%s' data-per_page='%d'  data-paged='1' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
                     "<span class='screen-reader-text'>%s</span>" .
                     "<span aria-hidden='true'>%s</span>" .
                 '</a>',
@@ -544,7 +535,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
             $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&lsaquo;</span>';
         } else {
             $page_links[] = sprintf(
-                "<a  data-action='ldnft_subscriber_check_next' data-plugin_id='%d' data-country='%s' data-plan_id='%s' data-interval='%d' data-gateway='%s' data-status='%s' data-search='%s' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
+                "<a data-plugin_id='%d' data-country='%s' data-plan_id='%s' data-interval='%d' data-gateway='%s' data-status='%s' data-search='%s' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
                     "<span class='screen-reader-text'>%s</span>" .
                     "<span aria-hidden='true'>%s</span>" .
                 '</a>',
@@ -587,7 +578,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
             $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&rsaquo;</span>';
         } else {
             $page_links[] = sprintf(
-                "<a  data-action='ldnft_subscriber_check_next' data-plugin_id='%d' data-country='%s' data-plan_id='%s' data-interval='%d' data-gateway='%s' data-status='%s' data-search='%s' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
+                "<a data-plugin_id='%d' data-country='%s' data-plan_id='%s' data-interval='%d' data-gateway='%s' data-status='%s' data-search='%s' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
                     "<span class='screen-reader-text'>%s</span>" .
                     "<span aria-hidden='true'>%s</span>" .
                 '</a>',
@@ -611,7 +602,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
             $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&raquo;</span>';
         } else {
             $page_links[] = sprintf(
-                "<a data-action='ldnft_subscriber_check_next' data-plugin_id='%d' data-country='%s' data-plan_id='%s' data-interval='%d' data-gateway='%s' data-status='%s' data-search='%s' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
+                "<a data-plugin_id='%d' data-country='%s' data-plan_id='%s' data-interval='%d' data-gateway='%s' data-status='%s' data-search='%s' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
                     "<span class='screen-reader-text'>%s</span>" .
                     "<span aria-hidden='true'>%s</span>" .
                 '</a>',
@@ -646,16 +637,4 @@ class LDNFT_Subscriptions extends WP_List_Table {
     
         echo $this->_pagination;
 	}
-
-    /**
-	 * Displays the search filter bar.
-	 *
-	 * @param string $which
-	 */
-    public function extra_tablenav( $which ) {
-        
-        if ( $which == "top" ){
-        
-        }
-    }
 }

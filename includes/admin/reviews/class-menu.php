@@ -38,8 +38,7 @@ class LDNFT_Reviews_Menu {
         ];
 
         add_action( 'admin_menu', 								[ $this, 'admin_menu_page' ] );
-		add_action('wp_ajax_ldnft_reviews_display', 			[ $this, 'ldnft_reviews_display' ], 100 );
-        add_action( 'wp_ajax_ldnft_reviews_check_next',      	[ $this, 'reviews_check_next' ], 100 );
+		add_action( 'wp_ajax_ldnft_reviews_display', 			[ $this, 'ldnft_reviews_display' ], 100 );
         add_action( 'wp_ajax_ldnft_reviews_enable_disable',      	[ $this, 'reviews_enable_disable' ], 100 );
 	}
     
@@ -91,25 +90,6 @@ class LDNFT_Reviews_Menu {
                 "display" => $display
             ])
         );
-    }
-	
-	/**
-     * checks if there are subscribers records
-     */
-    public function reviews_check_next() {
-        
-        $per_page       = isset($_REQUEST['per_page']) && intval($_REQUEST['per_page'])>0?intval($_REQUEST['per_page']):10;
-        $offset         = isset($_REQUEST['offset']) && intval($_REQUEST['offset'])>0?intval($_REQUEST['offset']):1;
-        $current_recs   = isset($_REQUEST['current_recs']) && intval($_REQUEST['current_recs'])>0?intval($_REQUEST['current_recs']):0;
-        $plugin_id      = isset($_REQUEST['plugin_id']) && intval($_REQUEST['plugin_id'])>0?intval($_REQUEST['plugin_id']):0;
-        $offset_rec     = ($offset-1) * $per_page;
-
-        $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
-        $result = $api->Api('plugins/'.$plugin_id.'/reviews.json?count='.$per_page.'&offset='.$offset_rec, 'GET', []);
-        if( ! is_array( $result->reviews ) || count( $result->reviews ) == 0) {
-            echo __('No more record(s) found.', LDNFT_TEXT_DOMAIN);
-        }
-        exit;
     }
 	
     /**

@@ -575,7 +575,7 @@ class LDNFT_Customers extends WP_List_Table {
             $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&laquo;</span>';
         } else {
             $page_links[] = sprintf( 
-                "<a data-action='ldnft_customers_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-marketing='%d' data-pmtstatus='%d' data-search='%s' data-per_page='%d' class='first-page button ldnft_check_load_next' data-paged='1' href='javascript:;'>" .
+                "<a data-ldfmt_plugins_filter='%d' data-status='%s' data-marketing='%d' data-pmtstatus='%d' data-search='%s' data-per_page='%d' class='first-page button ldnft_check_load_next' data-paged='1' href='javascript:;'>" .
                     "<span class='screen-reader-text'>%s</span>" .
                     "<span aria-hidden='true'>%s</span>" .
                 '</a>',
@@ -595,7 +595,7 @@ class LDNFT_Customers extends WP_List_Table {
             $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&lsaquo;</span>';
         } else {
             $page_links[] = sprintf(
-                "<a data-action='ldnft_customers_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-marketing='%d' data-pmtstatus='%d' data-search='%s' data-per_page='%d' class='prev-page button ldnft_check_load_next' data-paged='%d' href='javascript:;'>" .
+                "<a data-ldfmt_plugins_filter='%d' data-status='%s' data-marketing='%d' data-pmtstatus='%d' data-search='%s' data-per_page='%d' class='prev-page button ldnft_check_load_next' data-paged='%d' href='javascript:;'>" .
                     "<span class='screen-reader-text'>%s</span>" .
                     "<span aria-hidden='true'>%s</span>" .
                 '</a>',
@@ -635,7 +635,7 @@ class LDNFT_Customers extends WP_List_Table {
             $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&rsaquo;</span>';
         } else {
             $page_links[] = sprintf(
-                "<a data-action='ldnft_customers_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-marketing='%d' data-pmtstatus='%d' data-search='%s' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
+                "<a data-ldfmt_plugins_filter='%d' data-status='%s' data-marketing='%d' data-pmtstatus='%d' data-search='%s' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
                     "<span class='screen-reader-text'>%s</span>" .
                     "<span aria-hidden='true'>%s</span>" .
                 '</a>',
@@ -657,7 +657,7 @@ class LDNFT_Customers extends WP_List_Table {
             $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&raquo;</span>';
         } else {
             $page_links[] = sprintf(
-                "<a  data-action='ldnft_customers_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-marketing='%d' data-pmtstatus='%d' data-search='%s' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='last-page button ldnft_check_load_next' href='javascript:;'>" .
+                "<a data-ldfmt_plugins_filter='%d' data-status='%s' data-marketing='%d' data-pmtstatus='%d' data-search='%s' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='last-page button ldnft_check_load_next' href='javascript:;'>" .
                     "<span class='screen-reader-text'>%s</span>" .
                     "<span aria-hidden='true'>%s</span>" .
                 '</a>',

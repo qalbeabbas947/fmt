@@ -261,8 +261,7 @@ class LDNFT_Sales extends WP_List_Table {
     public function prepare_items() {
         
         global $wpdb;
-        ini_set( 'display_errors', 'On' );
-        error_reporting(E_ALL);
+        
         /**
          * First, lets decide how many records per page to show
          */
@@ -363,9 +362,7 @@ class LDNFT_Sales extends WP_List_Table {
          */
         $table_name = $wpdb->prefix.'ldnft_transactions t inner join '.$wpdb->prefix.'ldnft_customers c on (t.user_id=c.id)';  
         $where = " where 1 = 1";
-        if( ! empty( $this->selected_plugin_id )) {
-            $where .= " and t.plugin_id='".$this->selected_plugin_id."'";
-        }
+        $where .= ! empty( $this->selected_plugin_id ) ? " and t.plugin_id='".$this->selected_plugin_id."'" : "";
         
         if( $this->selected_status != 'all' ) {
             switch( $this->selected_status ) {
@@ -383,12 +380,10 @@ class LDNFT_Sales extends WP_List_Table {
                     break;
                         
             }
-        } else {
-            //$where .= " and t.type in ('payment', 'refund' ) ";
         }
 
         $where_interval = '';
-        if( !empty( $this->selected_interval )) {
+        if( ! empty( $this->selected_interval )) {
             switch( $this->selected_interval ) {
                 case "current_week":
                     $where_interval = " and YEARWEEK(t.created) = YEARWEEK(NOW())";
@@ -408,21 +403,10 @@ class LDNFT_Sales extends WP_List_Table {
             }
         }
 
-        if( $this->selected_gateway != '' ) {
-            $where .= " and t.gateway='".$this->selected_gateway."'";
-        }
-
-        if( $this->selected_type != '' ) {
-            $where .= " and t.is_renewal='".$this->selected_type."'";
-        }
-
-        if( ! empty( $this->selected_country ) ) {
-            $where .= " and t.country_code='".$this->selected_country."'";
-        }
-
-        if( ! empty( $this->selected_search ) ) {
-            $where   .= " and ( t.license_id like '%".$this->selected_search."%' or t.user_id like '%".$this->selected_search."%' or t.id like '%".$this->selected_search."%' or lower(c.first) like '%".strtolower($this->selected_search)."%' or lower(c.last) like '%".strtolower($this->selected_search)."%' or lower(c.email) like '%".strtolower($this->selected_search)."%' )";
-        }
+        $where .= $this->selected_gateway != '' ? " and t.gateway='".$this->selected_gateway."'" : "";
+        $where .= $this->selected_type != '' ? " and t.is_renewal='".$this->selected_type."'" : "";
+        $where .= ! empty( $this->selected_country ) ? " and t.country_code='".$this->selected_country."'" : "";
+        $where .= ! empty( $this->selected_search ) ? " and ( t.license_id like '%".$this->selected_search."%' or t.user_id like '%".$this->selected_search."%' or t.id like '%".$this->selected_search."%' or lower(c.first) like '%".strtolower($this->selected_search)."%' or lower(c.last) like '%".strtolower($this->selected_search)."%' or lower(c.email) like '%".strtolower($this->selected_search)."%' )" : "";
 
         $total_items = $wpdb->get_var("SELECT COUNT(t.id) FROM $table_name".$where.$where_interval);
  
@@ -485,13 +469,15 @@ class LDNFT_Sales extends WP_List_Table {
             <div class="tablenav <?php echo esc_attr( $which ); ?>">
 
                 <?php if ( $this->has_items() ) : ?>
-                <div class="alignleft actions bulkactions">
-                    <?php $this->bulk_actions( $which ); ?>
-                </div>
-                    <?php
+                    <div class="alignleft actions bulkactions">
+                        <?php $this->bulk_actions( $which ); ?>
+                    </div>
+                <?php
                 endif;
+
                 $this->extra_tablenav( $which );
                 $this->pagination_new( $which );
+
                 ?>
 
                 <br class="clear" />
@@ -564,7 +550,7 @@ class LDNFT_Sales extends WP_List_Table {
         } else {
             
             $page_links[] = sprintf( 
-                "<a data-action='ldnft_sales_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-interval='%d' data-search='%s' data-type='%s' data-gateway='%s' data-country='%s' data-per_page='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' data-paged='1' href='javascript:;'>" .
+                "<a data-ldfmt_plugins_filter='%d' data-status='%s' data-interval='%d' data-search='%s' data-type='%s' data-gateway='%s' data-country='%s' data-per_page='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' data-paged='1' href='javascript:;'>" .
                     "<span class='screen-reader-text'>%s</span>" .
                     "<span aria-hidden='true'>%s</span>" .
                 '</a>',
@@ -587,7 +573,7 @@ class LDNFT_Sales extends WP_List_Table {
             $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&lsaquo;</span>';
         } else {
             $page_links[] = sprintf(
-                "<a data-action='ldnft_sales_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-interval='%d' data-search='%s' data-type='%s' data-gateway='%s' data-country='%s' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
+                "<a data-ldfmt_plugins_filter='%d' data-status='%s' data-interval='%d' data-search='%s' data-type='%s' data-gateway='%s' data-country='%s' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
                     "<span class='screen-reader-text'>%s</span>" .
                     "<span aria-hidden='true'>%s</span>" .
                 '</a>',
@@ -630,7 +616,7 @@ class LDNFT_Sales extends WP_List_Table {
             $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&rsaquo;</span>';
         } else {
             $page_links[] = sprintf(
-                "<a data-action='ldnft_sales_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-interval='%d' data-search='%s' data-type='%s' data-gateway='%s' data-country='%s' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
+                "<a data-ldfmt_plugins_filter='%d' data-status='%s' data-interval='%d' data-search='%s' data-type='%s' data-gateway='%s' data-country='%s' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
                     "<span class='screen-reader-text'>%s</span>" .
                     "<span aria-hidden='true'>%s</span>" .
                 '</a>',
@@ -654,7 +640,7 @@ class LDNFT_Sales extends WP_List_Table {
             $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&raquo;</span>';
         } else {
             $page_links[] = sprintf(
-                "<a data-action='ldnft_sales_check_next' data-ldfmt_plugins_filter='%d' data-status='%s' data-interval='%d' data-search='%s' data-type='%s' data-gateway='%s' data-country='%s' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
+                "<a data-ldfmt_plugins_filter='%d' data-status='%s' data-interval='%d' data-search='%s' data-type='%s' data-gateway='%s' data-country='%s' data-per_page='%d' data-paged='%d' data-current_recs='%d' class='next-page button ldnft_check_load_next' href='javascript:;'>" .
                     "<span class='screen-reader-text'>%s</span>" .
                     "<span aria-hidden='true'>%s</span>" .
                 '</a>',
@@ -688,6 +674,5 @@ class LDNFT_Sales extends WP_List_Table {
         $this->_pagination = "<div class='tablenav-pages{$page_class}'>$output</div>";
     
         echo $this->_pagination;
-
 	}
 }
