@@ -309,7 +309,7 @@ class LDNFT_Sales extends WP_List_Table {
 			return;
 		}
 
-        $paged = isset( $_REQUEST['paged'] ) && intval( $_REQUEST['paged'] ) > 0 ? intval( $_REQUEST['paged'] ) : 1;
+        $paged      = isset( $_REQUEST['paged'] ) && intval( $_REQUEST['paged'] ) > 0 ? intval( $_REQUEST['paged'] ) : 1;
 
         /**
          * REQUIRED. Now we need to define our column headers. This includes a complete
@@ -318,9 +318,9 @@ class LDNFT_Sales extends WP_List_Table {
          * can be defined in another method (as we've done here) before being
          * used to build the value for our _column_headers property.
          */
-        $columns = $this->get_columns();
-        $screen = WP_Screen::get( 'freemius-toolkit_page_freemius-sales' );
-        $hidden   = get_hidden_columns( $screen );
+        $columns    = $this->get_columns();
+        $screen     = WP_Screen::get( 'freemius-toolkit_page_freemius-sales' );
+        $hidden     = get_hidden_columns( $screen );
         if( empty( $hidden ) ) {
             $hidden = get_user_meta( get_current_user_id(), 'manage' . $screen->id . 'columnshidden', true );
             if( empty( $hidden ) ) {
@@ -408,9 +408,9 @@ class LDNFT_Sales extends WP_List_Table {
         $total_items = $wpdb->get_var("SELECT COUNT(t.id) FROM $table_name".$where.$where_interval);
  
         // prepare query params, as usual current page, order by and order direction
-        $offset = isset($paged) ? (intval($paged) -1) * $per_page : 0;
-        $orderby = (isset($_REQUEST['orderby']) && in_array($_REQUEST['orderby'], array_keys($this->get_sortable_columns()))) ? sanitize_text_field( $_REQUEST['orderby'] ) : 'id';
-        $order = (isset($_REQUEST['order']) && in_array($_REQUEST['order'], array('asc', 'desc'))) ? sanitize_text_field( $_REQUEST['order'] ) : 'desc';
+        $offset     = isset($paged) ? (intval($paged) -1) * $per_page : 0;
+        $orderby    = (isset($_REQUEST['orderby']) && in_array($_REQUEST['orderby'], array_keys($this->get_sortable_columns()))) ? sanitize_text_field( $_REQUEST['orderby'] ) : 'id';
+        $order      = (isset($_REQUEST['order']) && in_array($_REQUEST['order'], array('asc', 'desc'))) ? sanitize_text_field( $_REQUEST['order'] ) : 'desc';
 
         $orderby_prefix = "t.";
         if( in_array( $orderby, [ 'username', 'useremail' ] ) ) {

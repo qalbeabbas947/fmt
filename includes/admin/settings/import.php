@@ -7,8 +7,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 global $wpdb;
-$api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
-$plugins = LDNFT_Freemius::$products;
+$api        = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
+$plugins    = LDNFT_Freemius::$products;
 ?>
 <div id="general_settings" class="cs_ld_tabs">
     <div class="ldfmt-tab-data-heading"><span class="fa fa-cogs ldfmt-icon"></span> <?php _e( 'Mailpoet Import', LDNFT_TEXT_DOMAIN ); ?></div> 

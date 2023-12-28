@@ -7,8 +7,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 
-$args = array( 'post_type' => 'page', 'post_status' => 'publish', 'posts_per_page' => -1 );
-$pages = new WP_Query( $args );
+$args   = array( 'post_type' => 'page', 'post_status' => 'publish', 'posts_per_page' => -1 );
+$pages  = new WP_Query( $args );
 
 $tc_roundtable_main_page 	= get_option( 'tc_roundtable_main_page' );
 $tc_roundtable_sub_page 	= get_option( 'tc_roundtable_sub_page' );

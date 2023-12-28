@@ -39,7 +39,7 @@ class LDNFT_Reviews_Menu {
 
         add_action( 'admin_menu', 								[ $this, 'admin_menu_page' ] );
 		add_action( 'wp_ajax_ldnft_reviews_display', 			[ $this, 'ldnft_reviews_display' ], 100 );
-        add_action( 'wp_ajax_ldnft_reviews_enable_disable',      	[ $this, 'reviews_enable_disable' ], 100 );
+        add_action( 'wp_ajax_ldnft_reviews_enable_disable',     [ $this, 'reviews_enable_disable' ], 100 );
 	}
     
     /**

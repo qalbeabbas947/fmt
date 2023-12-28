@@ -284,6 +284,7 @@ class LDNFT_Webhooks {
                     'license_id'                => $subscription['license_id'],
                     'status'                    => $status
                 ), array('id'=>$id));
+                
             error_log('updated the subscription with id:'.$id);
         }
     }

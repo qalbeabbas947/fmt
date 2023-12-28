@@ -53,10 +53,10 @@ class LDNFT_Reviews extends WP_List_Table {
         
         global $status, $page;
 
-		$this->plugins = LDNFT_Freemius::$products;
-        $this->selected_plugin_id = ( isset( $_GET['ldfmt_plugins_filter'] ) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) ? intval( $_GET['ldfmt_plugins_filter'] ) : '';
-        $this->selected_featured   = isset( $_REQUEST['featured'] ) ? sanitize_text_field( $_REQUEST['featured'] ) : '';
-        $this->selected_search     = isset( $_REQUEST['search'] ) ? sanitize_text_field( $_REQUEST['search'] ) : '';
+		$this->plugins              = LDNFT_Freemius::$products;
+        $this->selected_plugin_id   = ( isset( $_GET['ldfmt_plugins_filter'] ) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) ? intval( $_GET['ldfmt_plugins_filter'] ) : '';
+        $this->selected_featured    = isset( $_REQUEST['featured'] ) ? sanitize_text_field( $_REQUEST['featured'] ) : '';
+        $this->selected_search      = isset( $_REQUEST['search'] ) ? sanitize_text_field( $_REQUEST['search'] ) : '';
         $this->selected_verified    = isset( $_REQUEST['verified'] ) ? sanitize_text_field( $_REQUEST['verified'] ) : '';
 
         /**
@@ -193,7 +193,7 @@ class LDNFT_Reviews extends WP_List_Table {
 	* format the is_featured column
 	*/
 	public function column_is_featured($item){
-       //return LDNFT_Admin::get_bar_preloader().' != '. $item['is_featured'];
+       
         if( LDNFT_Admin::get_bar_preloader() !=  $item['is_featured'] ) {
             return '<input class="ldnft_is_featured_enabled_click" type="checkbox" '.(intval( $item['is_featured'] ) == 1?'checked':'').' id="is_featured_'.$item['id'].'" data-plugin_id="'.$item['plugin_id'].'" data-id="'.$item['id'].'" name="is_featured[]" value="'.$item['is_featured'].'" />';
         } elseif( $item['is_featured'] == 1 ) {
@@ -344,6 +344,7 @@ class LDNFT_Reviews extends WP_List_Table {
         if( empty( $hidden ) ) {
             $hidden = [];
         }
+        
         $sortable = $this->get_sortable_columns();
         
         /**

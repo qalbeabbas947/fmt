@@ -311,7 +311,7 @@ class LDNFT_Sales_Menu {
             return;
         }
 
-        $products = LDNFT_Freemius::$products;
+        $products           = LDNFT_Freemius::$products;
         $selected_plugin_id = isset( $_GET['ldfmt_plugins_filter'] ) ? intval( $_GET[ 'ldfmt_plugins_filter' ] ) : 0;
         $selected_interval  = isset( $_GET['interval'] ) ? sanitize_text_field( $_GET['interval'] ) : 'current_month';
         $selected_filter    = isset( $_GET['filter'] ) ? sanitize_text_field( $_GET['filter'] ) : 'all';
