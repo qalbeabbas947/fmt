@@ -37,7 +37,7 @@ class LDNFT_Reviews_Shortcode {
     private function hooks() {
         
         add_action( 'wp_ajax_ldnft_load_reviews', [ $this, 'load_reviews' ], 100 );
-        add_shortcode( 'LDNFT_Reviews', [ $this, 'reviews_shortcode_cb' ] );
+        add_shortcode( 'ldnft_reviews', [ $this, 'reviews_shortcode_cb' ] );
         add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_front_scripts' ] );
     }
 
@@ -46,6 +46,11 @@ class LDNFT_Reviews_Shortcode {
      */
     public function enqueue_front_scripts() {
 
+        global $post;
+        if( !has_shortcode( $post->post_content, 'ldnft_reviews' ) ) {
+            return false;
+        }
+
         /**
          * Enqueue frontend css
          */
@@ -53,7 +58,10 @@ class LDNFT_Reviews_Shortcode {
         wp_enqueue_style( 'ldnft-font-awesome-css', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css', [], LDNFT_VERSION, null );
         wp_enqueue_style( 'ldnft-bxslider-css', 'https://cdn.jsdelivr.net/bxslider/4.2.12/jquery.bxslider.css', [], LDNFT_VERSION, null );
         wp_enqueue_style( 'ldnft-front-css', LDNFT_ASSETS_URL . 'css/frontend.css', [], LDNFT_VERSION, null );
+        wp_enqueue_style( 'ldnft-lightbox-css', LDNFT_ASSETS_URL . 'lightbox/css/lightbox.min.css', [], LDNFT_VERSION, null );
+        
         wp_enqueue_script('ldnft-bxslider-js', 'https://cdn.jsdelivr.net/bxslider/4.2.12/jquery.bxslider.min.js', ['jquery'], LDNFT_VERSION, true);
+        wp_enqueue_script('ldnft-lightbox-js', LDNFT_ASSETS_URL.'lightbox/js/lightbox-plus-jquery.min.js', ['jquery'], LDNFT_VERSION, true);
     }
 
     /**
@@ -65,7 +73,7 @@ class LDNFT_Reviews_Shortcode {
 
         $plugin_id      = sanitize_text_field($_POST['plugin_id']);
         $per_page       = sanitize_text_field($_POST['per_page']);
-        $listing_type   = sanitize_text_field($_POST['type']); //pagination, onetime, slider
+        $listing_type   = sanitize_text_field($_POST['type']);
         $offset         = sanitize_text_field($_POST['offset']);
         
         $table_name = $wpdb->prefix.'ldnft_reviews r inner join '.$wpdb->prefix.'ldnft_customers c on (r.user_id=c.id)'; 
@@ -88,7 +96,7 @@ class LDNFT_Reviews_Shortcode {
             if( $listing_type == 'pagination' ) {
                 echo '<input type="hidden" id="ldnft-is-loadmore-link" value="no" />';
             }
-            echo '<div class="ldfmt-no-results">'.__('No review(s) found.', LDNFT_TEXT_DOMAIN).'</div>';
+            echo '<div class="ldfmt-no-results">'.__('No review(s) found.', 'ldninjas-freemius-toolkit').'</div>';
         }
         
         exit;
@@ -103,14 +111,12 @@ class LDNFT_Reviews_Shortcode {
         
         $attributes = shortcode_atts( array(
             'product_id' => 0,
-            'listing_type'   => 'pagination',  //pagination, onetime, slider
+            'listing_type'   => 'pagination',
             'limit'   => 10
         ), $atts );
 
         ob_start();
-        
         require_once( LDNFT_SHORTCODES_TEMPLATES_DIR . 'reviews.php' );
-
         $content = ob_get_contents();
         ob_get_clean();
 
