@@ -1,6 +1,6 @@
 (function( $ ) { 'use strict';
     $( document ).ready( function() {
-        var LDFMTCheckout = {
+        var LDNFT_Checkout = {
             /**
              * Initial function to load things
              */
@@ -10,6 +10,7 @@
                 var plan_id_value = $('#ldnft-checkout-plan_id').val();
                 var public_key_value = $('#ldnft-checkout-public_key').val();
                 var image_value = $('#ldnft-checkout-image').val();
+                var pluginName = $( '#ldnft-checkout-plugin_name' ).val();
                 
                 var handler = FS.Checkout.configure({
                     plugin_id: plugin_id_value,
@@ -17,13 +18,14 @@
                     public_key: public_key_value,
                     image: image_value,
                 });
+
                 $('#ldnft-purchase').on('click', function(e) {
                     handler.open({
-                        name: 'Custom Tabs for LearnDash',
+                        name: pluginName,
+                        checkout_style: 'next',
                         licenses: $('input[name="ld_licenses_options"]:checked').val(),
-                        // You can consume the response for after purchase logic.
                         purchaseCompleted: function(response) {
-                            // The logic here will be executed immediately after the purchase confirmation.                                // alert(response.user.email);
+                            // alert(response.user.email);
                         },
                         success: function(response) {
                             // The logic here will be executed after the customer closes the checkout, after a successful purchase.                                // alert(response.user.email);
@@ -34,7 +36,7 @@
             },
         };
 
-        LDFMTCheckout.init();
+        LDNFT_Checkout.init();
     });   
 })( jQuery );
 

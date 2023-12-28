@@ -36,7 +36,7 @@ class LDNFT_Checkout_Shortcode {
      */
     private function hooks() {
         
-        add_shortcode( 'LDNFT_Checkout', [ $this, 'checkout_shortcode_cb' ] );
+        add_shortcode( 'ldnft_checkout', [ $this, 'checkout_shortcode_cb' ] );
         add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_front_scripts' ] );
     }
 
@@ -44,6 +44,11 @@ class LDNFT_Checkout_Shortcode {
      * Enqueue frontend scripte
      */
     public function enqueue_front_scripts() {
+
+        global $post;
+        if( !has_shortcode( $post->post_content, 'ldnft_checkout' ) ) {
+            return false;
+        }
 
         /**
          * Enqueue frontend css
@@ -54,10 +59,9 @@ class LDNFT_Checkout_Shortcode {
         /**
          * Enqueue frontend js
          */
-        wp_enqueue_script( 'ldnft-jquery.freemius.com-js', 'https://code.jquery.com/jquery-1.12.4.min.js', [], LDNFT_VERSION, false ); 
-        wp_enqueue_script( 'ldnft-checkout.freemius.com-js', 'https://checkout.freemius.com/checkout.min.js', [ 'jquery' ], LDNFT_VERSION, false ); 
-        wp_enqueue_script( 'ldnft-frontend-js', LDNFT_ASSETS_URL . 'js/frontend.js', [ 'jquery' ], LDNFT_VERSION, true ); 
-        wp_enqueue_script( 'ldnft-frontend-checkout-js', LDNFT_ASSETS_URL . 'js/checkout.js', [ 'jquery' ], LDNFT_VERSION, true ); 
+        wp_enqueue_script( 'jquery' ); 
+        wp_enqueue_script( 'ldnft-checkout.freemius.com-js', 'https://checkout.freemius.com/checkout.min.js', [ 'jquery' ], LDNFT_VERSION, true ); 
+        wp_enqueue_script( 'ldnft-frontend-checkout-js', LDNFT_ASSETS_URL . 'js/checkout.js', [ 'jquery', 'ldnft-checkout.freemius.com-js' ], LDNFT_VERSION, true ); 
         
         wp_localize_script( 'ldnft-frontend-js', 'LDNFT', [ 
             'ajaxURL' => admin_url( 'admin-ajax.php' ),
@@ -81,7 +85,7 @@ class LDNFT_Checkout_Shortcode {
         $plan_id    = sanitize_text_field( $attributes['plan_id'] );
 
         if( empty( $plugin_id ) || intval( $plugin_id ) < 1 ) {
-            return '<div class="ldnft-error-message">'.__( 'Product ID is a required parameter.', LDNFT_TEXT_DOMAIN ).'</div>';
+            return '<div class="ldnft-error-message">'.__( 'Product ID is a required parameter.', 'ldninjas-freemius-toolkit' ).'</div>';
         }
 
         $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
@@ -89,18 +93,17 @@ class LDNFT_Checkout_Shortcode {
             
             $result = $api->Api( 'plugins/' . $plugin_id . '/plans.json', 'GET', [] );
             if( !isset( $result->plans ) || !is_array( $result->plans ) || count( $result->plans ) == 0 ) {
-                return '<div class="ldnft-error-message">'.__('Please, configure a plan before visiting this page.', LDNFT_TEXT_DOMAIN).'</div>';
+                return '<div class="ldnft-error-message">'.__('Please, configure a plan before visiting this page.', 'ldninjas-freemius-toolkit').'</div>';
             }
 
             $plan = $result->plans[0];
             $plan_id = $plan->id;
         }
-        
        
         $presult = $api->Api( 'plugins/'. $plugin_id .'/plans/'.$plan_id.'/pricing.json', 'GET', [] );
         if( !isset( $presult->pricing ) || !is_array( $presult->pricing ) || count( $presult->pricing ) == 0 ) {
 
-            return '<div class="ldnft-error-message">'.__( 'Please configure the product pricing before visiting this page.', LDNFT_TEXT_DOMAIN ).'</div>';
+            return '<div class="ldnft-error-message">'.__( 'Please configure the product pricing before visiting this page.', 'ldninjas-freemius-toolkit' ).'</div>';
         }
 
         $ldnft_settings = get_option( 'ldnft_settings' ); 
