@@ -120,31 +120,12 @@ class LDNFT_Customers_Menu {
             return;
         }
 		
-		$selected_plugin_id = '';
-        if( isset( $_GET['ldfmt_plugins_filter'] ) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) {
-            $selected_plugin_id = intval( $_GET['ldfmt_plugins_filter'] ); 
-        }
-		
-		$selected_status = 'active';
-        if( isset( $_GET['status'] )  ) {
-            $selected_status = sanitize_text_field( $_GET['status'] ); 
-        }
-		
-        $search = '';
-        if( isset( $_GET['search'] )  ) {
-            $search = sanitize_text_field( $_GET['search'] ); 
-        }
-        
-        $selected_marketing = '';
-        if( isset( $_GET['marketing'] )  ) {
-            $selected_marketing = sanitize_text_field( $_GET['marketing'] ); 
-        }
+		$selected_plugin_id         = isset( $_GET['ldfmt_plugins_filter'] ) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ? intval( $_GET['ldfmt_plugins_filter'] ) : ''; 
+        $selected_status            = isset( $_GET['status'] ) ? sanitize_text_field( $_GET['status'] ) : 'active'; 
+        $search                     = isset( $_GET['search'] ) ? sanitize_text_field( $_GET['search'] ) : ''; 
+        $selected_marketing         = isset( $_GET['marketing'] ) ? sanitize_text_field( $_GET['marketing'] ) : ''; 
+        $selected_paymentstatus     = isset( $_GET['pmtstatus'] ) ? sanitize_text_field( $_GET['pmtstatus'] ) : ''; 
 
-        $selected_paymentstatus = '';
-        if( isset( $_GET['pmtstatus'] )  ) {
-            $selected_paymentstatus = sanitize_text_field( $_GET['pmtstatus'] ); 
-        }
-        
 		$products = LDNFT_Freemius::$products;
 		
         /**

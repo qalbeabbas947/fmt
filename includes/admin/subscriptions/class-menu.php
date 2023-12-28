@@ -34,9 +34,8 @@ class LDNFT_Subscriptions_Menu {
         ];
 
         add_action( 'admin_menu', [ $this, 'admin_menu_page' ] );
-        add_action('wp_ajax_ldnft_subscriptions_display', [ $this, 'ldnft_subscriptions_display' ], 100 );
+        add_action( 'wp_ajax_ldnft_subscriptions_display', [ $this, 'ldnft_subscriptions_display' ], 100 );
         add_action( 'wp_ajax_ldnft_subscriptions_summary', [ $this, 'ldnft_subscriptions_summary_callback' ], 100 );
-        
         add_action( 'wp_ajax_ldnft_subscribers_view_detail',    [ $this, 'subscribers_view_detail' ], 100 );
         add_action( 'wp_ajax_ldnft_subscription_plans_dropdown',    [ $this, 'subscription_plans_dropdown' ], 100 );
     }
@@ -230,18 +229,13 @@ class LDNFT_Subscriptions_Menu {
         
         global $wpdb;
         
-        $selected_plugin_id = 0;
-        if( isset($_GET['ldfmt_plugins_filter']) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) {
-            $selected_plugin_id = intval( $_GET['ldfmt_plugins_filter'] ); 
-        }
+        $selected_plugin_id = isset( $_GET['ldfmt_plugins_filter'] ) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ? intval( $_GET['ldfmt_plugins_filter'] ) : 0;
 
         $table_name = $wpdb->prefix.'ldnft_subscription t inner join '.$wpdb->prefix.'ldnft_customers c on (t.user_id=c.id)';  
         $where = " where 1 = 1";
-        if( ! empty( $selected_plugin_id )) {
-            $where .= " and t.plugin_id='".$selected_plugin_id."'";
-        }
+        $where .= ! empty( $selected_plugin_id ) ? " and t.plugin_id='".$selected_plugin_id."'" : "";
 
-       if( !empty( $_GET['interval'] )) {
+        if( !empty( $_GET['interval'] )) {
             $interval = sanitize_text_field( $_GET['interval'] );
             switch( $interval ) {
                 case "current_week":
@@ -262,16 +256,11 @@ class LDNFT_Subscriptions_Menu {
             }
         }
 
-        if( isset( $_GET['country'] ) && !empty( $_GET['country'] )  ) {
-            $where .=  " and t.country_code='".sanitize_text_field( $_GET['country'] )."'";
-        }
-        
-        if( isset( $_GET['plan_id'] ) && intval( $_GET['plan_id'] ) > 0 ) {
-            $where .= ' and t.plan_id='.sanitize_text_field( $_GET['plan_id'] );
-        } 
-
+        $where .=  isset( $_GET['country'] ) && !empty( $_GET['country'] ) ? " and t.country_code='".sanitize_text_field( $_GET['country'] )."'" : "";
+        $where .= isset( $_GET['plan_id'] ) && intval( $_GET['plan_id'] ) > 0 ? ' and t.plan_id='.sanitize_text_field( $_GET['plan_id'] ) : "";
         $where .= $_GET['status'] != ''? " and t.status='".sanitize_text_field( $_GET['status'] )."' " : '';
         $where .= $_GET['gateway'] != ''? " and t.gateway='".sanitize_text_field( $_GET['gateway'] )."' " : '';
+        
         $search = sanitize_text_field( $_GET['search'] );
         if( ! empty( $search )) {
             $where   .= " and ( t.id like '%".$search."%' or t.user_id like '%".$search."%' or lower(c.email) like '%".strtolower($search)."%' or lower(c.first) like '%".strtolower($search)."%' or lower(c.last) like '%".strtolower($search)."%' )";
@@ -299,8 +288,6 @@ class LDNFT_Subscriptions_Menu {
                 
                 $tax_rate_total[ $obj->currency ] = floatval( $tax_rate_total[ $obj->currency ] ) + floatval($obj->tax_rate);
 
-                // $gross_total += $obj->gross;
-                // $tax_rate_total += $obj->tax_rate;
                 $total_number_of_sales++;
                 $failed_payments += $obj->failed_payments;
             }
@@ -328,11 +315,6 @@ class LDNFT_Subscriptions_Menu {
             }
             
             $countries_msg = __( 'Countries with most subscription are from.', LDNFT_TEXT_DOMAIN );
-            // if( count($countries) > 0 ) {
-            //     $countries_msg = sprintf(__( 'Gross sales of the top %d countries.', LDNFT_TEXT_DOMAIN ), count($countries) );
-            // } else {
-            //     $countries_msg = sprintf(__( 'No countries data found.', LDNFT_TEXT_DOMAIN ), count($countries) );
-            // }
         }
         $gross_str = '';
         foreach( $gross_total as $key => $value ) {
@@ -455,7 +437,6 @@ class LDNFT_Subscriptions_Menu {
             return;
         }
 
-
         /**
          * Create an instance of our package class... 
          */
@@ -464,26 +445,10 @@ class LDNFT_Subscriptions_Menu {
         $api = new Freemius_Api_WordPress(FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY);
         $products = LDNFT_Freemius::$products;
         
-        $selected_plugin_id = '';
-        if( isset($_GET['ldfmt_plugins_filter']) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) {
-            $selected_plugin_id = intval( $_GET['ldfmt_plugins_filter'] ); 
-        }
-
-        $selected_interval = 'current_month';
-        if( isset($_GET['interval'])  ) {
-            $selected_interval = sanitize_text_field( $_GET['interval'] ); 
-        }
-        
-        $selected_country = '';
-        if( isset( $_GET['country'] )  ) {
-            $selected_country = sanitize_text_field( $_GET['country'] ); 
-        }
-        
-        $selected_plan_id = '';
-        if( isset( $_GET['plan_id'] ) ) {
-            $selected_plan_id = sanitize_text_field( $_GET['plan_id'] ); 
-        }
-        
+        $selected_plugin_id = isset( $_GET['ldfmt_plugins_filter'] ) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ? intval( $_GET['ldfmt_plugins_filter'] ) : ""; 
+        $selected_interval = isset($_GET['interval']) ? sanitize_text_field( $_GET['interval'] ) : 'current_month';
+        $selected_country = isset( $_GET['country'] ) ? sanitize_text_field( $_GET['country'] ) : ""; 
+        $selected_plan_id = isset( $_GET['plan_id'] ) ? sanitize_text_field( $_GET['plan_id'] ) : ''; 
         $selected_gateway = ( isset( $_GET['gateway'] )  ) ? sanitize_text_field( $_GET['gateway'] ) : ''; 
         $search = ( isset( $_GET['search'] )  ) ? sanitize_text_field( $_GET['search'] ) : ''; 
 
@@ -598,16 +563,6 @@ class LDNFT_Subscriptions_Menu {
                             <?php echo LDNFT_Admin::get_bar_preloader("ldnft-subssummary-loader");?>
                         </div>
                     </div>
-                    <!-- <div class="ldfmt-gross-gateway-box ldfmt-sales-box ldnft-tooltip-container">
-                        <label><?php echo __('Total Tax Rate', LDNFT_TEXT_DOMAIN);?>
-                            <span class="lndft-tooltip ldnft_subscription_new_tax_message"><?php echo __( 'Loading details...', LDNFT_TEXT_DOMAIN ); ?></span>
-                        </label>
-                        <div class="ldnft_tax_fee">
-                            <span class="ldnft_subscription_tax_fee"></span>
-                            <?php echo LDNFT_Admin::get_bar_preloader("ldnft-subssummary-loader");?>
-                        </div>
-                        
-                    </div>  -->
                     <div class="ldfmt-new-sales-box ldfmt-sales-box ldnft-tooltip-container">
                         <label><?php echo __('Total Subscriptions', LDNFT_TEXT_DOMAIN);?>
                             <span class="lndft-tooltip ldnft_subscription_new_subscriptions_message"><?php echo __( 'Loading details...', LDNFT_TEXT_DOMAIN ); ?></span>
@@ -767,8 +722,6 @@ class LDNFT_Subscriptions_Menu {
             <input type="hidden" class="ldnft-freemius-orderby" name="orderby" value="asc" />
             <input type="hidden" class="ldnft-freemius-page" name="page" value="1" />
             <input type="hidden" class="ldnft-script-freemius-type" name="ldnft-script-freemius-type" value="subscribers" />
-        
-            
         </div>
         <?php
     }

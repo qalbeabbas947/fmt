@@ -53,26 +53,10 @@ class LDNFT_Sales_Menu {
 
         global $wpdb;
         
-        $selected_plugin_id = 0;
-        if( isset($_GET['ldfmt_plugins_filter']) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) {
-            $selected_plugin_id = intval( $_GET['ldfmt_plugins_filter'] ); 
-        }
-
-        $selected_interval = '';
-        if( isset( $_GET['interval'] ) && !empty( $_GET['interval'] ) ) {
-            $selected_interval = sanitize_text_field( $_GET['interval'] );
-        }
-
-        $selected_status = '';
-        if( isset( $_GET['status'] )  ) {
-            $selected_status = sanitize_text_field( $_GET['status'] );
-        }
-        
-        $plan_str = '';
-        if( isset( $_GET['plan_id'] ) && intval($_GET['plan_id']) > 0 ) {
-            $plan_str = sanitize_text_field( $_GET['plan_id'] ); 
-        } 
-        
+        $selected_plugin_id        = isset( $_GET['ldfmt_plugins_filter'] ) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ? intval( $_GET['ldfmt_plugins_filter'] ) : 0;
+        $selected_interval      = isset( $_GET[ 'interval' ] ) && ! empty( $_GET[ 'interval' ] ) ? sanitize_text_field( $_GET[ 'interval' ] ) : '';
+        $selected_status        = isset( $_GET['status'] ) ? sanitize_text_field( $_GET['status'] ) : '';
+        $plan_str               = isset( $_GET['plan_id'] ) && intval( $_GET['plan_id'] ) > 0 ? sanitize_text_field( $_GET['plan_id'] ) : '';
         $selected_search        = isset( $_REQUEST['search'] ) ? sanitize_text_field( $_REQUEST['search'] ) : '';
         $selected_type          = isset( $_REQUEST['type'] ) ? sanitize_text_field( $_REQUEST['type'] ) : '';
         $selected_gateway       = isset( $_REQUEST['gateway'] ) ? sanitize_text_field( $_REQUEST['gateway'] ) : '';
@@ -328,33 +312,13 @@ class LDNFT_Sales_Menu {
         }
 
         $products = LDNFT_Freemius::$products;
-        
-        $selected_plugin_id = 0;
-        if( isset($_GET['ldfmt_plugins_filter']) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) {
-            $selected_plugin_id = intval( $_GET['ldfmt_plugins_filter'] ); 
-        }
-
-        $selected_interval = 'current_month';
-        if( isset($_GET['interval'])  ) {
-            $selected_interval = sanitize_text_field( $_GET['interval'] ); 
-        }
-        
-        $selected_filter = 'all';
-        if( isset( $_GET['filter'] )  ) {
-            $selected_filter = sanitize_text_field( $_GET['filter'] ); 
-        }
-
-        $search = '';
-        if( isset( $_GET['search'] ) ) {
-            $search = intval( $_GET['search'] ); 
-        }
-
-        $selected_country = '';
-        if( isset( $_GET['country'] )  ) {
-            $selected_country = sanitize_text_field( $_GET['country'] ); 
-        }
-
+        $selected_plugin_id = isset( $_GET['ldfmt_plugins_filter'] ) ? intval( $_GET[ 'ldfmt_plugins_filter' ] ) : 0;
+        $selected_interval  = isset( $_GET['interval'] ) ? sanitize_text_field( $_GET['interval'] ) : 'current_month';
+        $selected_filter    = isset( $_GET['filter'] ) ? sanitize_text_field( $_GET['filter'] ) : 'all';
+        $search             = isset( $_GET['search'] ) ? sanitize_text_field( $_GET['search'] ) : '';
+        $selected_country   = isset( $_GET['country'] ) ? sanitize_text_field( $_GET['country'] ) : '';
         $selected_gateway = ( isset( $_GET['gateway'] )  ) ? sanitize_text_field( $_GET['gateway'] ) : '';
+
         /**
          * Create an instance of our package class... 
          */

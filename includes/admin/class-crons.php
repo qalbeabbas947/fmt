@@ -339,7 +339,7 @@ class LDNFT_Crons_Settings {
                 $environment = $payment->environment; 
                 $currency = $payment->currency; 
                 
-                $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_name." where id=%d", $id ));
+                $res = $wpdb->get_results($wpdb->prepare("select id from ".$table_name." where id=%d", $id ));
                 if( count( $res ) == 0 ) {
 
                     $wpdb->insert(
@@ -372,6 +372,7 @@ class LDNFT_Crons_Settings {
                             'updated'                   => $updated,
                         )
                     );
+
                     $inserted++;
                 } else {
 
@@ -403,6 +404,7 @@ class LDNFT_Crons_Settings {
                             'created'                   => $created,
                             'updated'                   => $updated,
                         ), array('id'=>$id));
+
                     $updatednum++;
                 }
             }
@@ -414,8 +416,8 @@ class LDNFT_Crons_Settings {
 
                     $active_crons[$plugin_id] = 1;
                     
-                    $meta_table_name = $wpdb->prefix.'ldnft_customer_meta';
-                    $records = $wpdb->get_results( $wpdb->prepare("select * from ".$meta_table_name." where plugin_id=%d", $plugin_id ) );
+                    $meta_table_name    = $wpdb->prefix.'ldnft_customer_meta';
+                    $records            = $wpdb->get_results( $wpdb->prepare("select customer_id from ".$meta_table_name." where plugin_id=%d", $plugin_id ) );
                     foreach( $records as $record ) {
                         $status = $wpdb->get_var( $wpdb->prepare("select type from ".$table_name." where plugin_id=%d and user_id=%d order by id desc limit 1", $plugin_id, $record->customer_id ) );
                         
@@ -549,6 +551,7 @@ class LDNFT_Crons_Settings {
                 $vat_id = $subscription->vat_id; 
                 $source = $subscription->source; 
                 $environment = $subscription->environment; 
+                
                 $status = '';
                 if( !empty( $canceled_at ) ) {
                     $status = 'cancelled';
@@ -559,8 +562,8 @@ class LDNFT_Crons_Settings {
                         $status = 'expired';
                     }
                 }
-               // $next_payment
-                $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_name." where id=%d", $id ));
+               
+                $res = $wpdb->get_results($wpdb->prepare("select id from ".$table_name." where id=%d", $id ));
 
                 if( count( $res ) == 0 ) {
 
@@ -644,6 +647,7 @@ class LDNFT_Crons_Settings {
                             'license_id'               => $license_id,
                             'status'                    => $status
                         ), array('id'=>$id));
+                        
                         $updatednum++;
                 }
                 
@@ -735,7 +739,7 @@ class LDNFT_Crons_Settings {
 
             foreach( $reviewsobj->reviews as $review ) {
 
-                $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_name." where id=%d", $review->id ));
+                $res = $wpdb->get_results($wpdb->prepare("select id from ".$table_name." where id=%d", $review->id ));
                 
                 if( count( $res ) == 0 ) {
 
@@ -1365,7 +1369,7 @@ class LDNFT_Crons_Settings {
 
                 foreach( $plans_obj->plans as $plan ) {
                     
-                    $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_name." where id=%d", $plan->id ));
+                    $res = $wpdb->get_results($wpdb->prepare("select id from ".$table_name." where id=%d", $plan->id ));
                     if( count( $res ) == 0 ) {
 
                         $wpdb->insert(
@@ -1475,7 +1479,7 @@ class LDNFT_Crons_Settings {
 
                 foreach( $plugins->plugins as $plugin ) {
                     $updated_index++;
-                    $res = $wpdb->get_results( $wpdb->prepare("select * from ".$table_name." where id=%d", $plugin->id ) );
+                    $res = $wpdb->get_results( $wpdb->prepare("select id from ".$table_name." where id=%d", $plugin->id ) );
                     if( count( $res ) == 0 ) {
                         $wpdb->insert(
                             $table_name,
@@ -1693,7 +1697,7 @@ class LDNFT_Crons_Settings {
             
             foreach( $usrobj->users as $user ) {
                 
-                $res = $wpdb->get_results( $wpdb->prepare("select * from ".$table_name." where id=%d", $user->id ));
+                $res = $wpdb->get_results( $wpdb->prepare("select id from ".$table_name." where id=%d", $user->id ));
                 
                 if( count( $res ) == 0 ) {
 
@@ -1733,7 +1737,7 @@ class LDNFT_Crons_Settings {
                             'is_marketing_allowed'  => $user->is_marketing_allowed
                         ), array( 'id' => $user->id ) );
                     
-                    $res = $wpdb->get_results( $wpdb->prepare("select * from ".$meta_table_name." where customer_id=%d and plugin_id=%d", $user->id, $plugin_id ));
+                    $res = $wpdb->get_results( $wpdb->prepare("select plugin_id from ".$meta_table_name." where customer_id=%d and plugin_id=%d", $user->id, $plugin_id ));
 
                     if( count( $res ) == 0 ) {
 

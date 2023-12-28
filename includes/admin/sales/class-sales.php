@@ -98,9 +98,6 @@ class LDNFT_Sales extends WP_List_Table {
         
         if( !empty( intval( strip_tags( $item['id'] ) ) ) ) {
             return '<a class="ldnft_sales_view_detail" data-action="ldnft_sales_view_detail" data-username="'.$item['username'].'" data-useremail="'.$item['useremail'].'" data-subscription_id="'.$item['subscription_id'].'" data-gateway_fee="'.$item['gateway_fee'].'" data-gross="'.$item['gross'].'" data-license_id="'.$item['license_id'].'" data-gateway="'.$item['gateway'].'" data-country_code="'.$item['country_code'].'" data-is_renewal="'.$item['is_renewal'].'" data-type="'.$item['type'].'" data-bound_payment_id="'.$item['bound_payment_id'].'" data-created="'.$item['created'].'" data-vat="'.$item['vat'].'" data-install_id="'.$item['install_id'].'"  data-coupon_id="'.$item['coupon_id'].'"  data-external_id="'.$item['external_id'].'" data-user_id="'.$item['user_id'].'" data-plugin_id="'.$item['plugin_id'].'" data-id="'.$item['id'].'" class="ldnft_sales_view_detail" href="javascript:;">'.__('Get More', LDNFT_TEXT_DOMAIN).'</a>';
-
- 			
-			
         } else {
             return LDNFT_Admin::get_bar_preloader();
         }    
@@ -265,7 +262,7 @@ class LDNFT_Sales extends WP_List_Table {
         /**
          * First, lets decide how many records per page to show
          */
-        $per_page = get_user_option(
+        $per_page = get_user_option (
             'sales_per_page',
             get_current_user_id()
         );

@@ -162,8 +162,6 @@ class LDNFT_Admin {
      */
     public function admin_enqueue_scripts_callback() {
         
-        
-        
         $screen = get_current_screen();
         if( $screen ) { 
             if( $screen->id == 'freemius-toolkit_page_freemius-settings' 

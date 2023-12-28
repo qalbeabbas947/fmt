@@ -67,13 +67,13 @@ class LDNFT_Subscriptions extends WP_List_Table {
         $this->api = new Freemius_Api_WordPress( FS__API_SCOPE, FS__API_DEV_ID, FS__API_PUBLIC_KEY, FS__API_SECRET_KEY );
         $this->plugins = LDNFT_Freemius::$products;
         
-        $this->selected_plugin_id = ( isset( $_GET['ldfmt_plugins_filter'] ) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) ? intval( $_GET['ldfmt_plugins_filter'] ) : '';
-        $this->selected_interval = ( isset( $_GET['interval'] ) ) ? sanitize_text_field( $_GET['interval'] ) : 12; 
-        $this->selected_country = ( isset( $_GET['country'] )  ) ? sanitize_text_field( $_GET['country'] ) : ''; 
-        $this->selected_plan_id = ( isset( $_GET['plan_id'] ) && intval( $_GET['plan_id'] ) > 0 ) ? sanitize_text_field( $_GET['plan_id'] ) : '';
-        $this->selected_gateway = isset( $_GET['gateway'] ) ? sanitize_text_field( $_GET['gateway'] ) : ''; 
-        $this->selected_search = isset( $_GET['search'] ) ? sanitize_text_field( $_GET['search'] ) : '';
-        $this->selected_status = isset( $_GET['status'] ) ? sanitize_text_field( $_GET['status'] ) : '';
+        $this->selected_plugin_id   = ( isset( $_GET['ldfmt_plugins_filter'] ) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) ? intval( $_GET['ldfmt_plugins_filter'] ) : '';
+        $this->selected_interval    = ( isset( $_GET['interval'] ) ) ? sanitize_text_field( $_GET['interval'] ) : 12; 
+        $this->selected_country     = ( isset( $_GET['country'] )  ) ? sanitize_text_field( $_GET['country'] ) : ''; 
+        $this->selected_plan_id     = ( isset( $_GET['plan_id'] ) && intval( $_GET['plan_id'] ) > 0 ) ? sanitize_text_field( $_GET['plan_id'] ) : '';
+        $this->selected_gateway     = isset( $_GET['gateway'] ) ? sanitize_text_field( $_GET['gateway'] ) : ''; 
+        $this->selected_search      = isset( $_GET['search'] ) ? sanitize_text_field( $_GET['search'] ) : '';
+        $this->selected_status      = isset( $_GET['status'] ) ? sanitize_text_field( $_GET['status'] ) : '';
 
 		parent::__construct(
 			[

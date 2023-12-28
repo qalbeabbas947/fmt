@@ -162,26 +162,11 @@ class LDNFT_Reviews_Menu {
 
 		$products = LDNFT_Freemius::$products;
 		
-		$selected_plugin_id = 0;
-        if( isset( $_GET['ldfmt_plugins_filter'] ) && intval( $_GET['ldfmt_plugins_filter'] ) > 0 ) {
-            $selected_plugin_id = intval( $_GET['ldfmt_plugins_filter'] ); 
-        }
+		$selected_plugin_id = isset( $_GET['ldfmt_plugins_filter'] ) && intval( $_GET['ldfmt_plugins_filter'] ) > 0  ? intval( $_GET['ldfmt_plugins_filter'] ) : ''; 
+        $selected_verified = isset( $_GET[ 'verified' ] ) && intval( $_GET[ 'verified' ] ) > 0 ? intval( $_GET[ 'verified' ] ) : ''; 
+        $selected_featured = isset( $_GET['featured'] ) && intval( $_GET['featured'] ) > 0 ? intval( $_GET['featured'] ) : ''; 
+        $search = isset( $_GET['search'] ) ? sanitize_text_field( $_GET['search'] ) : ''; 
 
-        $selected_featured = '';
-        if( isset( $_GET['featured'] ) && intval( $_GET['featured'] ) > 0 ) {
-            $selected_featured = intval( $_GET['featured'] ); 
-        }
-
-        $selected_verified = ''; 
-        if( isset( $_GET['verified'] ) && intval( $_GET['verified'] ) > 0 ) {
-            $selected_verified = intval( $_GET['verified'] ); 
-        }
-
-        $search = '';
-        if( isset( $_GET['search'] ) ) {
-            $search = intval( $_GET['search'] ); 
-        }
-		
         /**
          * Create an instance of our package class... 
          */

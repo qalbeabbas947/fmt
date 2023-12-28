@@ -36,7 +36,7 @@ class LDNFT_Webhooks {
         $table_name = $wpdb->prefix.'ldnft_customers';
         $meta_table_name = $wpdb->prefix.'ldnft_customer_meta';
         
-        $res = $wpdb->get_results( $wpdb->prepare("select * from ".$table_name." where id=%d", $user_id ));
+        $res = $wpdb->get_results( $wpdb->prepare("select id from ".$table_name." where id=%d", $user_id ));
     
         if( count( $res ) == 0 ) {
             
@@ -76,7 +76,7 @@ class LDNFT_Webhooks {
                     'is_marketing_allowed'  => $user['is_marketing_allowed'],
                 ), array( 'id' => $user_id ) );
             
-            $res = $wpdb->get_results( $wpdb->prepare("select * from ".$meta_table_name." where customer_id=%d and plugin_id=%d", $user_id, $plugin_id ));
+            $res = $wpdb->get_results( $wpdb->prepare("select plugin_id from ".$meta_table_name." where customer_id=%d and plugin_id=%d", $user_id, $plugin_id ));
 
             if( count( $res ) == 0 ) {
 
@@ -104,7 +104,7 @@ class LDNFT_Webhooks {
         
         $table_name = $wpdb->prefix.'ldnft_transactions';
         
-        $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_name." where id=%d", $payment['id'] ));
+        $res = $wpdb->get_results($wpdb->prepare("select id from ".$table_name." where id=%d", $payment['id'] ));
         if( count( $res ) == 0 ) {
 
             $wpdb->insert(
@@ -138,6 +138,7 @@ class LDNFT_Webhooks {
                     'updated'                   => $payment['updated']
                 )
             );
+            
             error_log('inserted new sale with id:'.$payment['id']);
         } else {
 
@@ -169,6 +170,7 @@ class LDNFT_Webhooks {
                     'created'                   => $payment['created'],
                     'updated'                   => $payment['updated']
                 ), array('id'=>$payment['id']));
+
             error_log('updated new sale with id:'.$payment['id']);
         }
 
@@ -189,7 +191,7 @@ class LDNFT_Webhooks {
         
         $table_name = $wpdb->prefix.'ldnft_subscription';
         
-        $res = $wpdb->get_results($wpdb->prepare("select * from ".$table_name." where id=%d", $id ));
+        $res = $wpdb->get_results($wpdb->prepare("select id from ".$table_name." where id=%d", $id ));
         
         $status = '';
         if( !empty( $subscription['canceled_at'] ) ) {
@@ -433,11 +435,11 @@ class LDNFT_Webhooks {
         $type = $request->get_param( 'type' );
         switch( $type ) {
             case "user.created":
-                $user_id = $request->get_param( 'user_id' );
+                $user_id                        = $request->get_param( 'user_id' );
                 
-                $plugin_id = $request->get_param( 'plugin_id' );
-                $settings = get_option( 'ldnft_webhook_settings_'.$plugin_id );
-                $ldnft_disable_webhooks          = isset( $settings['disable_webhooks'] ) && $settings['disable_webhooks']=='yes' ? 'yes': 'no';
+                $plugin_id                      = $request->get_param( 'plugin_id' );
+                $settings                       = get_option( 'ldnft_webhook_settings_'.$plugin_id );
+                $ldnft_disable_webhooks         = isset( $settings['disable_webhooks'] ) && $settings['disable_webhooks']=='yes' ? 'yes': 'no';
                 if( $ldnft_disable_webhooks != 'yes' ) {
                     $objects = $request->get_param( 'objects' );
                     if( is_array($objects ) && array_key_exists( 'user', $objects ) ) {
@@ -506,9 +508,9 @@ class LDNFT_Webhooks {
             
             case "review.created":
             case "review.updated":
-                $plugin_id          = $request->get_param( 'plugin_id' );
-                $settings = get_option( 'ldnft_webhook_settings_'.$plugin_id );
-                $ldnft_disable_webhooks          = isset( $settings['disable_webhooks'] ) && $settings['disable_webhooks']=='yes' ? 'yes': 'no';
+                $plugin_id                  = $request->get_param( 'plugin_id' );
+                $settings                   = get_option( 'ldnft_webhook_settings_'.$plugin_id );
+                $ldnft_disable_webhooks     = isset( $settings['disable_webhooks'] ) && $settings['disable_webhooks']=='yes' ? 'yes': 'no';
                 if( $ldnft_disable_webhooks != 'yes' ) {
                     
                     $review_id               = $request->get_param( 'data' );
@@ -590,24 +592,3 @@ class LDNFT_Webhooks {
 }
 
 new LDNFT_Webhooks();
-
-    function my_awesome_func( WP_REST_Request $request ) {
-        // You can access parameters via direct array access on the object:
-        $param = $request['some_param'];
-      
-        // Or via the helper method:
-        $param = $request->get_param( 'some_param' );
-      
-        // You can get the combined, merged set of parameters:
-        $parameters = $request->get_params();
-        print_r($parameters);exit;
-        // The individual sets of parameters are also available, if needed:
-        $parameters = $request->get_url_params();
-        $parameters = $request->get_query_params();
-        $parameters = $request->get_body_params();
-        $parameters = $request->get_json_params();
-        $parameters = $request->get_default_params();
-      
-        // Uploads aren't merged in, but can be accessed separately:
-        $parameters = $request->get_file_params();
-    }

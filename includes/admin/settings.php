@@ -35,7 +35,7 @@ class LDNFT_Settings {
             echo $errormsg;exit;
         }
 
-        $ldnft_disable_webhooks          = isset( $_POST['ldnft_disable_webhooks'] ) && $_POST['ldnft_disable_webhooks'] == 'yes' ? 'yes': 'no';
+        $ldnft_disable_webhooks         = isset( $_POST['ldnft_disable_webhooks'] ) && $_POST['ldnft_disable_webhooks'] == 'yes' ? 'yes': 'no';
         $ldnft_mailpoet_subscription    = isset( $_POST['ldnft_mailpoet_subscription'] ) && $_POST['ldnft_mailpoet_subscription'] == 'yes' ? 'yes': 'no';
         $ldnft_mailpeot_list            = sanitize_text_field( $_POST['ldnft_mailpeot_list'] );
         update_option( 'ldnft_webhook_settings_'.$ldnft_webhook_plugin_ddl, [ 'mailpeot_list' => $ldnft_mailpeot_list, 'disable_webhooks' => $ldnft_disable_webhooks, 'mailpoet_subscription' => $ldnft_mailpoet_subscription ] );
@@ -57,11 +57,11 @@ class LDNFT_Settings {
             echo $errormsg;exit;
         }
 
-        $settings = get_option( 'ldnft_webhook_settings_'.$plugin_id );
-        
+        $settings                       = get_option( 'ldnft_webhook_settings_'.$plugin_id );
         $ldnft_disable_webhooks         = isset( $settings['disable_webhooks'] ) && $settings['disable_webhooks']=='yes' ? 'yes': 'no';
         $ldnft_mailpoet_subscription    = isset( $settings['mailpoet_subscription'] ) && $settings['mailpoet_subscription']=='yes' ? 'yes': 'no';
         $ldnft_mailpeot_list            = intval( $settings['mailpeot_list'] );
+
         ob_start();
         ?>
             <table class="setting-table-wrapper">
@@ -90,17 +90,17 @@ class LDNFT_Settings {
                             <td>
                                 <?php
                                     
-                                        $table_name = $wpdb->prefix.'mailpoet_segments';
-                                        $list = $wpdb->get_results('select id, name from '.$table_name.'');
-                                        $is_list_available = true;
-                                        if( is_array($list) && count( $list ) > 0 ) {
-                                            echo '<select id="ldnft_mailpeot_list" name="ldnft_mailpeot_list">';
-                                            echo '<option value="">'.__( 'Select List', LDNFT_TEXT_DOMAIN ).'</option>';
-                                            foreach( $list as $item ) {
-                                                echo '<option value="'.$item->id.'" '.($ldnft_mailpeot_list == $item->id?'selected':"" ).'>'.$item->name.'</option>';
-                                            }
-                                            echo '</select>';
+                                    $table_name = $wpdb->prefix.'mailpoet_segments';
+                                    $list = $wpdb->get_results('select id, name from '.$table_name.'');
+                                    $is_list_available = true;
+                                    if( is_array($list) && count( $list ) > 0 ) {
+                                        echo '<select id="ldnft_mailpeot_list" name="ldnft_mailpeot_list">';
+                                        echo '<option value="">'.__( 'Select List', LDNFT_TEXT_DOMAIN ).'</option>';
+                                        foreach( $list as $item ) {
+                                            echo '<option value="'.$item->id.'" '.($ldnft_mailpeot_list == $item->id?'selected':"" ).'>'.$item->name.'</option>';
                                         }
+                                        echo '</select>';
+                                    }
                                     
                                 ?>
                             </td>
@@ -148,6 +148,7 @@ class LDNFT_Settings {
 
         $table_name = $wpdb->prefix.'ldnft_customers'; 
         $meta_table_name = $wpdb->prefix.'ldnft_customer_meta'; 
+        
         $where_type = '';
         if( !empty( $ldnft_mailpeot_ctype ) ) {
             if( $ldnft_mailpeot_ctype == 'paid' ) {
@@ -300,12 +301,12 @@ class LDNFT_Settings {
         if( isset( $_GET['message'] ) ) {
 
             $class = 'notice notice-success is-dismissible';
-            if( $_GET['message'] == 'ldnft_updated' )
+            if( $_GET['message'] == 'ldnft_updated' ) {
                 $message = __( 'Settings Updated', LDNFT_TEXT_DOMAIN );
-            else {
+            } else {
                 $message = sanitize_text_field( $_GET['message'] );
-                
             }
+
             printf ( '<div id="message" class="%s"> <p>%s</p></div>', $class, $message );
         }
     }
@@ -392,7 +393,9 @@ class LDNFT_Settings {
                 'icon' => 'fa-cog',
             ),
         );
+
         if( FS__API_CONNECTION ) {
+            
             $settings_sections['import'] =  array (
                 'title' => __( 'Import', LDNFT_TEXT_DOMAIN ),
                 'icon' => 'fa-cogs',
