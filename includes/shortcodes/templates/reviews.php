@@ -25,7 +25,15 @@ switch ( $listing_type ) {
         include( LDNFT_SHORTCODES_TEMPLATES_DIR . 'reviews/onetime.php' );
         break;
     default: 
-        include( LDNFT_SHORTCODES_TEMPLATES_DIR . 'reviews/pagination.php' );
+        ?><div class="paginated-review-wrapper"><?php
+        LDNFT_Reviews_Shortcode::paginated_review( $results );
+        ?>
+        </div>
+        <div class="ldnft-reviews-load-more">
+            <button class="button button-primary review-load-more" data-limit="<?php echo $limit; ?>" data-offset="<?php echo $limit; ?>" data-plugin_id="<?php echo $product_id; ?>"><?php echo __( 'Load More', 'ldninjas-freemius-toolkit' ); ?></button>
+        </div> 
+        <?php
+        break;
 }
 ?>
 </div>
