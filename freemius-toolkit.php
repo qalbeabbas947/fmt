@@ -235,15 +235,11 @@ class LDNFT_Freemius {
             }
         }
 
-        if( !is_admin() ) {
+        if( !is_admin() || '/wp-admin/admin-ajax.php' == $_SERVER['REQUEST_URI'] ) {
 
             if( file_exists( LDNFT_INCLUDES_DIR . 'shortcodes/class-reviews.php' ) ) {
                 require_once LDNFT_INCLUDES_DIR . 'shortcodes/class-reviews.php';
             }
-
-            // if( file_exists( LDNFT_INCLUDES_DIR . 'shortcodes/class-sales.php' ) ) {
-            //     require_once LDNFT_INCLUDES_DIR . 'shortcodes/class-sales.php';
-            // }
 
             if( file_exists( LDNFT_INCLUDES_DIR . 'shortcodes/class-checkout.php' ) ) {
                 require_once LDNFT_INCLUDES_DIR . 'shortcodes/class-checkout.php';

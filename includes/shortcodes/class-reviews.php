@@ -2,7 +2,6 @@
 /**
  * LDNFT_Reviews shortcode class
  */
-
 if( ! defined( 'ABSPATH' ) ) exit;
 
 /**
@@ -56,51 +55,40 @@ class LDNFT_Reviews_Shortcode {
          * Enqueue frontend css
          */
         wp_enqueue_style( 'dashicons' );
-        wp_enqueue_style( 'ldnft-font-awesome-css', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css', [], LDNFT_VERSION, null );
-        wp_enqueue_style( 'ldnft-bxslider-css', 'https://cdn.jsdelivr.net/bxslider/4.2.12/jquery.bxslider.css', [], LDNFT_VERSION, null );
+        // wp_enqueue_style( 'ldnft-bxslider-css', 'https://cdn.jsdelivr.net/bxslider/4.2.12/jquery.bxslider.css', [], LDNFT_VERSION, null );
+        // wp_enqueue_style( 'ldnft-lightbox-css', LDNFT_ASSETS_URL . 'lightbox/css/lightbox.min.css', [], LDNFT_VERSION, null );
         wp_enqueue_style( 'ldnft-front-css', LDNFT_ASSETS_URL . 'css/frontend.css', [], LDNFT_VERSION, null );
-        wp_enqueue_style( 'ldnft-lightbox-css', LDNFT_ASSETS_URL . 'lightbox/css/lightbox.min.css', [], LDNFT_VERSION, null );
         
-        wp_enqueue_script('ldnft-bxslider-js', 'https://cdn.jsdelivr.net/bxslider/4.2.12/jquery.bxslider.min.js', ['jquery'], LDNFT_VERSION, true);
-        wp_enqueue_script('ldnft-lightbox-js', LDNFT_ASSETS_URL.'lightbox/js/lightbox-plus-jquery.min.js', ['jquery'], LDNFT_VERSION, true);
+        // wp_enqueue_script( 'jquery' );
+        // wp_enqueue_script('ldnft-bxslider-js', 'https://cdn.jsdelivr.net/bxslider/4.2.12/jquery.bxslider.min.js', [], LDNFT_VERSION, true );
+        // wp_enqueue_script('ldnft-lightbox-js', LDNFT_ASSETS_URL.'lightbox/js/lightbox-plus-jquery.min.js', ['jquery'], LDNFT_VERSION, true );
+        // wp_enqueue_script('ldnft-frontend-js', LDNFT_ASSETS_URL.'js/frontend.js', ['jquery'], LDNFT_VERSION, true );
+        
+        // wp_localize_script( 'ldnft-frontend-js', 'LDNFT', [ 
+        //     'ajaxURL' => admin_url( 'admin-ajax.php' ),
+        // ] );
     }
 
     /**
-     * Enqueue frontend scripte
+     * Return plugin reviews
+     * return false on error
      */
-    public function load_reviews() {
+    public static function get_reviews( $plugin_id = 0, $per_page = 10, $offset = 0 ) {
         
         global $wpdb;
 
-        $plugin_id      = sanitize_text_field($_POST['plugin_id']);
-        $per_page       = sanitize_text_field($_POST['per_page']);
-        $listing_type   = sanitize_text_field($_POST['type']);
-        $offset         = sanitize_text_field($_POST['offset']);
+        $plugin_id      = intval( $plugin_id );
+        $per_page       = intval( $per_page );
+        $offset         = intval( $offset );
         
-        $table_name = $wpdb->prefix.'ldnft_reviews r inner join '.$wpdb->prefix.'ldnft_customers c on (r.user_id=c.id)'; 
-        $results = $wpdb->get_results( $wpdb->prepare( "SELECT r.*, c.email as useremail FROM $table_name where is_featured = 1 and r.plugin_id = %d ORDER BY r.id LIMIT %d OFFSET %d", $plugin_id, $per_page, $offset ) );
+        $table_name = $wpdb->prefix.'ldnft_reviews'; 
+        $results = $wpdb->get_results( $wpdb->prepare( "SELECT name,rate,title,text,profile_url FROM $table_name where plugin_id = %d AND is_featured = 1 ORDER BY id LIMIT %d OFFSET %d", $plugin_id, $per_page, $offset ) );
         
-        if( is_array($results) && count( $results ) > 0 ) {
-            switch( $listing_type ) {
-                case "onetime":
-                    require_once( LDNFT_SHORTCODES_TEMPLATES_DIR . 'reviews/onetime.php' );
-                    break;
-                case "slider":
-                    require_once( LDNFT_SHORTCODES_TEMPLATES_DIR . 'reviews/slider.php' );
-                    break;
-                case "pagination":
-                    require_once( LDNFT_SHORTCODES_TEMPLATES_DIR . 'reviews/pagination.php' );
-                    break;
-            }
-            
-        } else if( $offset == 0 ) {
-            if( $listing_type == 'pagination' ) {
-                echo '<input type="hidden" id="ldnft-is-loadmore-link" value="no" />';
-            }
-            echo '<div class="ldfmt-no-results">'.__('No review(s) found.', 'ldninjas-freemius-toolkit').'</div>';
+        if( count( $results ) > 0 ) {
+            return $results;
         }
-        
-        exit;
+
+        return false;
     }
 
     /**
@@ -115,12 +103,16 @@ class LDNFT_Reviews_Shortcode {
             'listing_type'   => 'pagination',
             'limit'   => 10
         ), $atts );
+        
+        $product_id = $atts['product_id'];
+        $listing_type = $atts['listing_type'];
+        $limit = $atts['limit'];
 
         ob_start();
-        require_once( LDNFT_SHORTCODES_TEMPLATES_DIR . 'reviews.php' );
+        include( LDNFT_SHORTCODES_TEMPLATES_DIR . 'reviews.php' );
         $content = ob_get_contents();
         ob_get_clean();
-
+        
         return $content;
     }
 }
