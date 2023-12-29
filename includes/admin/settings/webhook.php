@@ -69,7 +69,8 @@ $default_id = 0;
                     <div class="ldnft-webhook-content">
                         <span class="dashicons dashicons-info"></span>
                         <span class="ldnft-instruction-title"><?php echo __( 'Webhooks:', LDNFT_TEXT_DOMAIN ); ?></span>
-                        <span class="ldnft-instruction-description"><?php echo __( 'Our script supports user.created, review.created, review.updated, payment.created, subscription.created, subscription.cancelled and plan.created webhooks only.', LDNFT_TEXT_DOMAIN ); ?></span>
+                        <span class="ldnft-instruction-description"><?php echo __( 'Our script supports user.created, user.marketing.opted_in, user.marketing.opted_in, user.email.verified, user.email.changed, user.name.changed, review.created, review.updated, payment.created, subscription.created, subscription.cancelled and plan.created webhooks only.', LDNFT_TEXT_DOMAIN ); ?></span>
+                        
                     </div>
                     <div class="ldnft-webhook-content">
                         <span class="dashicons dashicons-info"></span>
