@@ -31,7 +31,7 @@ class LDNFT_Settings {
         
         $ldnft_webhook_plugin_ddl  = sanitize_text_field( $_POST['ldnft_webhook_plugin_ddl'] );
         if( intval( $ldnft_webhook_plugin_ddl ) == 0 ) {
-            $errormsg = __('Freemius plugin/product is required field.', LDNFT_TEXT_DOMAIN);
+            $errormsg = __('Freemius plugin/product is required field.', 'ldninjas-freemius-toolkit');
             echo $errormsg;exit;
         }
 
@@ -40,7 +40,7 @@ class LDNFT_Settings {
         $ldnft_mailpeot_list            = sanitize_text_field( $_POST['ldnft_mailpeot_list'] );
         update_option( 'ldnft_webhook_settings_'.$ldnft_webhook_plugin_ddl, [ 'mailpeot_list' => $ldnft_mailpeot_list, 'disable_webhooks' => $ldnft_disable_webhooks, 'mailpoet_subscription' => $ldnft_mailpoet_subscription ] );
         
-        $msg = __('Freemius plugin/product webhook settings are updated.', LDNFT_TEXT_DOMAIN);
+        $msg = __('Freemius plugin/product webhook settings are updated.', 'ldninjas-freemius-toolkit');
         echo $msg;exit;
     }
 
@@ -53,7 +53,7 @@ class LDNFT_Settings {
         
         $plugin_id  = sanitize_text_field( $_POST['plugin_id'] );
         if( ! isset( $_POST['plugin_id'] ) || empty($plugin_id) ) {
-            $errormsg = __('Freemius plugin/product is required field.', LDNFT_TEXT_DOMAIN);
+            $errormsg = __('Freemius plugin/product is required field.', 'ldninjas-freemius-toolkit');
             echo $errormsg;exit;
         }
 
@@ -68,24 +68,24 @@ class LDNFT_Settings {
                 <tbody class="ldnft-table-content">
                     <tr> 
                         <td align="left" valign="top" width="42%">
-						    <strong><label align="left" for="ldnft_disable_webhooks"><?php _e( 'Disable Webhooks:', LDNFT_TEXT_DOMAIN ); ?></label></strong>
+						    <strong><label align="left" for="ldnft_disable_webhooks"><?php _e( 'Disable Webhooks:', 'ldninjas-freemius-toolkit' ); ?></label></strong>
 					    </td width="58%">
                         <td>
-                            <input type="checkbox" id="ldnft_disable_webhooks" <?php echo $ldnft_disable_webhooks=='yes'?'checked':''; ?> name="ldnft_disable_webhooks" value="yes"> <strong><label align="left" for="ldnft_disable_webhooks"><?php _e( 'Yes', LDNFT_TEXT_DOMAIN ); ?></label></strong>
+                            <input type="checkbox" id="ldnft_disable_webhooks" <?php echo $ldnft_disable_webhooks=='yes'?'checked':''; ?> name="ldnft_disable_webhooks" value="yes"> <strong><label align="left" for="ldnft_disable_webhooks"><?php _e( 'Yes', 'ldninjas-freemius-toolkit' ); ?></label></strong>
                         </td>    
                     </tr> 
                     <?php if (defined('MAILPOET_VERSION')) { ?>  
                         <tr> 
                             <td align="left" valign="top">
-                                <strong><label align = "left" for="ldnft_mailpoet_subscription"><?php _e( 'Mailpoet subscription for new customers:', LDNFT_TEXT_DOMAIN ); ?></label></strong>
+                                <strong><label align = "left" for="ldnft_mailpoet_subscription"><?php _e( 'Mailpoet subscription for new customers:', 'ldninjas-freemius-toolkit' ); ?></label></strong>
                             </td>
                             <td>
-                                <input type="checkbox" id="ldnft_mailpoet_subscription" <?php echo $ldnft_mailpoet_subscription=='yes'?'checked':''; ?> name="ldnft_mailpoet_subscription" value="yes"> <strong><label align="left" for="ldnft_mailpoet_subscription"><?php _e( 'Yes', LDNFT_TEXT_DOMAIN ); ?></label></strong>
+                                <input type="checkbox" id="ldnft_mailpoet_subscription" <?php echo $ldnft_mailpoet_subscription=='yes'?'checked':''; ?> name="ldnft_mailpoet_subscription" value="yes"> <strong><label align="left" for="ldnft_mailpoet_subscription"><?php _e( 'Yes', 'ldninjas-freemius-toolkit' ); ?></label></strong>
                             </td>    
                         </tr> 
                         <tr> 
                             <td align="left" valign="top">
-                                <strong><label align = "left" for="ldnft_mailpoet_subscription"><?php _e( 'Mailpoet List:', LDNFT_TEXT_DOMAIN ); ?></label></strong>
+                                <strong><label align = "left" for="ldnft_mailpoet_subscription"><?php _e( 'Mailpoet List:', 'ldninjas-freemius-toolkit' ); ?></label></strong>
                             </td>
                             <td>
                                 <?php
@@ -95,7 +95,7 @@ class LDNFT_Settings {
                                     $is_list_available = true;
                                     if( is_array($list) && count( $list ) > 0 ) {
                                         echo '<select id="ldnft_mailpeot_list" name="ldnft_mailpeot_list">';
-                                        echo '<option value="">'.__( 'Select List', LDNFT_TEXT_DOMAIN ).'</option>';
+                                        echo '<option value="">'.__( 'Select List', 'ldninjas-freemius-toolkit' ).'</option>';
                                         foreach( $list as $item ) {
                                             echo '<option value="'.$item->id.'" '.($ldnft_mailpeot_list == $item->id?'selected':"" ).'>'.$item->name.'</option>';
                                         }
@@ -106,7 +106,7 @@ class LDNFT_Settings {
                             </td>
                         </tr>
                     <?php } else {
-                        echo '<tr><td></td><td><span class="mailpoet_unable_to_import">'.__( 'Activate the mailpoet plugin for customer subscriptions.', LDNFT_TEXT_DOMAIN ).'</span></td></tr>';
+                        echo '<tr><td></td><td><span class="mailpoet_unable_to_import">'.__( 'Activate the mailpoet plugin for customer subscriptions.', 'ldninjas-freemius-toolkit' ).'</span></td></tr>';
                         $allow_import = false;
                         $is_list_available = false;
                     } ?>
@@ -127,21 +127,21 @@ class LDNFT_Settings {
 
         $ldnft_mailpeot_plugin  = sanitize_text_field( $_POST['ldnft_mailpeot_plugin'] );
         if( ! isset( $_POST['ldnft_mailpeot_plugin'] ) || empty($ldnft_mailpeot_plugin) ) {
-            $errormsg = __('Freemius product is required for import.', LDNFT_TEXT_DOMAIN);
+            $errormsg = __('Freemius product is required for import.', 'ldninjas-freemius-toolkit');
             $response = [ 'added' => 0, 'exists' => 0, 'message'=>'', 'errors' => [ $errormsg ], 'errormsg' => $errormsg ];
             echo json_encode( $response );exit;
         }
 
         $ldnft_mailpeot_list    = sanitize_text_field( $_POST['ldnft_mailpeot_list'] );
         if( ! isset( $_POST['ldnft_mailpeot_list'] ) || empty($ldnft_mailpeot_list) ) {
-            $errormsg = __('Mailpoet list is required for import.', LDNFT_TEXT_DOMAIN);
+            $errormsg = __('Mailpoet list is required for import.', 'ldninjas-freemius-toolkit');
             $response = ['added' => 0, 'exists' => 0, 'message' => '', 'errors'=> [ $errormsg ], 'errormsg' => $errormsg ];
             echo json_encode( $response );exit;
         }
 
         $ldnft_mailpeot_ctype    = sanitize_text_field( $_POST['ldnft_mailpeot_ctype'] );
         if (!is_plugin_active('mailpoet/mailpoet.php')) {
-            $errormsg = __('This section requires MailPoet to be installed and configured.', LDNFT_TEXT_DOMAIN);
+            $errormsg = __('This section requires MailPoet to be installed and configured.', 'ldninjas-freemius-toolkit');
             $response = [ 'added' => 0, 'exists' => 0, 'message' => '', 'errors' => [ $errormsg ], 'errormsg' => $errormsg ];
             echo json_encode($response);exit;
         }
@@ -275,17 +275,17 @@ class LDNFT_Settings {
         $message = '';
         $errormsg = '';
         if( $count == $total ) {
-            $message .= __('All subscribers are updated.', LDNFT_TEXT_DOMAIN);
+            $message .= __('All subscribers are updated.', 'ldninjas-freemius-toolkit');
         } else if( $count > 0 ) {
-            $message .= sprintf( __('%d subscriber(s) updated.', LDNFT_TEXT_DOMAIN),$count );
+            $message .= sprintf( __('%d subscriber(s) updated.', 'ldninjas-freemius-toolkit'),$count );
         } else if( $count == 0 && $exists > 0 ) {
-            $message .= __('All subscribers are updated.', LDNFT_TEXT_DOMAIN);
+            $message .= __('All subscribers are updated.', 'ldninjas-freemius-toolkit');
         } else{
-            $errormsg .= __('Errors:', LDNFT_TEXT_DOMAIN).'<br>'.implode('<br>', $errors );
+            $errormsg .= __('Errors:', 'ldninjas-freemius-toolkit').'<br>'.implode('<br>', $errors );
         }
         
         if( empty( $message ) && empty( $errormsg ) ) {
-            $message = __('No available subscriber(s) to import.', LDNFT_TEXT_DOMAIN);
+            $message = __('No available subscriber(s) to import.', 'ldninjas-freemius-toolkit');
         }
 
         $response = [ 'tag_id' => $tag_id, 'added' => $count, 'exists' => $exists, 'message' => $message, 'errors' => $errors, 'errormsg' => $errormsg ];
@@ -302,7 +302,7 @@ class LDNFT_Settings {
 
             $class = 'notice notice-success is-dismissible';
             if( $_GET['message'] == 'ldnft_updated' ) {
-                $message = __( 'Settings Updated', LDNFT_TEXT_DOMAIN );
+                $message = __( 'Settings Updated', 'ldninjas-freemius-toolkit' );
             } else {
                 $message = sanitize_text_field( $_GET['message'] );
             }
@@ -372,8 +372,8 @@ class LDNFT_Settings {
          */
         add_submenu_page(
             'ldnft-freemius',
-            __( 'Settings', LDNFT_TEXT_DOMAIN ),
-            __( 'Settings', LDNFT_TEXT_DOMAIN ),
+            __( 'Settings', 'ldninjas-freemius-toolkit' ),
+            __( 'Settings', 'ldninjas-freemius-toolkit' ),
             'manage_options',
             'freemius-settings',
             [ $this, 'load_setting_menu' ]
@@ -389,7 +389,7 @@ class LDNFT_Settings {
         
 		$settings_sections = array (
             'freemius-api' => array (
-                'title' => __( 'Freemius API', LDNFT_TEXT_DOMAIN ),
+                'title' => __( 'Freemius API', 'ldninjas-freemius-toolkit' ),
                 'icon' => 'fa-cog',
             ),
         );
@@ -397,17 +397,17 @@ class LDNFT_Settings {
         if( FS__API_CONNECTION ) {
             
             $settings_sections['import'] =  array (
-                'title' => __( 'Import', LDNFT_TEXT_DOMAIN ),
+                'title' => __( 'Import', 'ldninjas-freemius-toolkit' ),
                 'icon' => 'fa-cogs',
             );
 
             $settings_sections['shortcodes'] =  array(
-                'title' => __( 'Shortcodes', LDNFT_TEXT_DOMAIN ),
+                'title' => __( 'Shortcodes', 'ldninjas-freemius-toolkit' ),
                 'icon' => 'fa-code',
             );
 
             $settings_sections['webhook'] =  array(
-                'title' => __( 'Webhooks', LDNFT_TEXT_DOMAIN ),
+                'title' => __( 'Webhooks', 'ldninjas-freemius-toolkit' ),
                 'icon' => 'fa-book',
             );
 
@@ -417,14 +417,14 @@ class LDNFT_Settings {
         ?>
 		<div class="wrap">
 			<div id="icon-options-freemius-api" class="icon32"></div>
-			<h2><?php _e( 'Freemius Settings', LDNFT_TEXT_DOMAIN ); ?></h2>
+			<h2><?php _e( 'Freemius Settings', 'ldninjas-freemius-toolkit' ); ?></h2>
 		
 			<div class="nav-tab-wrapper">
 				<?php foreach( $settings_sections as $key => $section ) { ?>
 						<a href="?page=freemius-settings&tab=<?php echo $key; ?>"
 							class="nav-tab <?php echo $this->page_tab == $key ? 'nav-tab-active' : ''; ?>">
 							<i class="fa <?php echo $section['icon']; ?>" aria-hidden="true"></i>
-							<?php _e( $section['title'], LDNFT_TEXT_DOMAIN ); ?>
+							<?php _e( $section['title'], 'ldninjas-freemius-toolkit' ); ?>
 						</a>
 				<?php } ?>
 			</div>

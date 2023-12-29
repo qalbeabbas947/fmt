@@ -167,23 +167,23 @@ class LDNFT_Reviews extends WP_List_Table {
     public function get_columns(){
 
         $columns = [
-            'is_featured'       => __( 'Is Featured', LDNFT_TEXT_DOMAIN ),
-            'id'                => __( 'ID', LDNFT_TEXT_DOMAIN ),
-            'user_id'           => __( 'User ID', LDNFT_TEXT_DOMAIN ),
-            'useremail'         => __( 'Email',LDNFT_TEXT_DOMAIN ),
-            'job_title'         => __( 'Job Title', LDNFT_TEXT_DOMAIN ),
-            'company_url'       => __( 'Company URL', LDNFT_TEXT_DOMAIN ),
-            'picture'           => __( 'Picture', LDNFT_TEXT_DOMAIN ),
-            'profile_url'       => __( 'Profile URL', LDNFT_TEXT_DOMAIN ),
-            'is_verified'       => __( 'Is Verified', LDNFT_TEXT_DOMAIN ),
-            'sharable_img'      => __( 'Sharable Image', LDNFT_TEXT_DOMAIN ),
-            'title'             => __( 'Review Title', LDNFT_TEXT_DOMAIN ),
-            'text'              => __( 'Comment', LDNFT_TEXT_DOMAIN ),
-            'name'              => __( 'Name', LDNFT_TEXT_DOMAIN ),
-            'rate'              => __( 'Rating', LDNFT_TEXT_DOMAIN ),
-            'company'           => __( 'Company', LDNFT_TEXT_DOMAIN ),
-            'created'           => __( 'Joined', LDNFT_TEXT_DOMAIN ),
-			'view'              => __( 'Action', LDNFT_TEXT_DOMAIN ),
+            'is_featured'       => __( 'Is Featured', 'ldninjas-freemius-toolkit' ),
+            'id'                => __( 'ID', 'ldninjas-freemius-toolkit' ),
+            'user_id'           => __( 'User ID', 'ldninjas-freemius-toolkit' ),
+            'useremail'         => __( 'Email','ldninjas-freemius-toolkit' ),
+            'job_title'         => __( 'Job Title', 'ldninjas-freemius-toolkit' ),
+            'company_url'       => __( 'Company URL', 'ldninjas-freemius-toolkit' ),
+            'picture'           => __( 'Picture', 'ldninjas-freemius-toolkit' ),
+            'profile_url'       => __( 'Profile URL', 'ldninjas-freemius-toolkit' ),
+            'is_verified'       => __( 'Is Verified', 'ldninjas-freemius-toolkit' ),
+            'sharable_img'      => __( 'Sharable Image', 'ldninjas-freemius-toolkit' ),
+            'title'             => __( 'Review Title', 'ldninjas-freemius-toolkit' ),
+            'text'              => __( 'Comment', 'ldninjas-freemius-toolkit' ),
+            'name'              => __( 'Name', 'ldninjas-freemius-toolkit' ),
+            'rate'              => __( 'Rating', 'ldninjas-freemius-toolkit' ),
+            'company'           => __( 'Company', 'ldninjas-freemius-toolkit' ),
+            'created'           => __( 'Joined', 'ldninjas-freemius-toolkit' ),
+			'view'              => __( 'Action', 'ldninjas-freemius-toolkit' ),
         ];
         
         return $columns;
@@ -210,9 +210,9 @@ class LDNFT_Reviews extends WP_List_Table {
 	public function column_is_verified( $item ){
         
 		if( isset( $item['column_is_verified'] ) && intval( $item['column_is_verified'] ) == 1 ) {
-			return __( 'Yes', LDNFT_TEXT_DOMAIN );
+			return __( 'Yes', 'ldninjas-freemius-toolkit' );
 		} else {
-			return __( 'No', LDNFT_TEXT_DOMAIN );
+			return __( 'No', 'ldninjas-freemius-toolkit' );
 		}
 	}
 
@@ -252,7 +252,7 @@ class LDNFT_Reviews extends WP_List_Table {
     public function column_view( $item ){
         
         if( !empty( intval( strip_tags( $item['id'] ) ) ) ) {
-            return '<a class="ldnft_review_view_detail" data-action="ldnft_review_view_detail" data-useremail="'.$item['useremail'].'" data-title="'.$item['title'].'" data-text="'.$item['text'].'" data-job_title="'.$item['job_title'].'"  data-company_url="'.$item['company_url'].'" data-picture="'.$item['picture'].'" data-profile_url="'.$item['profile_url'].'" data-is_verified="'.$item['is_verified'].'" data-is_featured="'.$item['is_featured'].'" data-sharable_img="'.$item['sharable_img'].'" data-name="'.$item['name'].'" data-created="'.$item['created'].'" data-company="'.$item['company'].'" data-user_id="'.$item['user_id'].'" data-plugin_id="'.$item['plugin_id'].'" data-id="'.$item['id'].'" class="ldnft_review_view_detail" href="javascript:;">'.__('Get More', LDNFT_TEXT_DOMAIN).'</a>';
+            return '<a class="ldnft_review_view_detail" data-action="ldnft_review_view_detail" data-useremail="'.$item['useremail'].'" data-title="'.$item['title'].'" data-text="'.$item['text'].'" data-job_title="'.$item['job_title'].'"  data-company_url="'.$item['company_url'].'" data-picture="'.$item['picture'].'" data-profile_url="'.$item['profile_url'].'" data-is_verified="'.$item['is_verified'].'" data-is_featured="'.$item['is_featured'].'" data-sharable_img="'.$item['sharable_img'].'" data-name="'.$item['name'].'" data-created="'.$item['created'].'" data-company="'.$item['company'].'" data-user_id="'.$item['user_id'].'" data-plugin_id="'.$item['plugin_id'].'" data-id="'.$item['id'].'" class="ldnft_review_view_detail" href="javascript:;">'.__('Get More', 'ldninjas-freemius-toolkit').'</a>';
         } else {
             return LDNFT_Admin::get_bar_preloader();
         }    

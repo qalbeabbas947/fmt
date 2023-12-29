@@ -36,7 +36,7 @@ class LDNFT_Product_Rating {
      */
     private function hooks() {
         
-        add_shortcode( 'LDNFT_Product_Rating', [ $this, 'rating_shortcode_cb' ] );
+        add_shortcode( 'ldnft_product_rating', [ $this, 'rating_shortcode_cb' ] );
         add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_front_scripts' ] );
     }
 
@@ -44,6 +44,12 @@ class LDNFT_Product_Rating {
      * Enqueue frontend scripte
      */
     public function enqueue_front_scripts() {
+
+        global $post;
+        
+        if( !has_shortcode( $post->post_content, 'ldnft_product_rating' ) ) {
+            return false;
+        }
 
         /**
          * Enqueue frontend css

@@ -177,7 +177,6 @@ class LDNFT_Freemius {
          */
         define( 'LDNFT_VERSION', time() );
 
-        define( 'LDNFT_TEXT_DOMAIN', 'ldninjas-freemius-toolkit' );
     }
 
     /**

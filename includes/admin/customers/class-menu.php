@@ -59,8 +59,8 @@ class LDNFT_Customers_Menu {
         
         $hook = add_submenu_page( 
             'ldnft-freemius',
-            __( 'Customers', LDNFT_TEXT_DOMAIN ),
-            __( 'Customers', LDNFT_TEXT_DOMAIN ),
+            __( 'Customers', 'ldninjas-freemius-toolkit' ),
+            __( 'Customers', 'ldninjas-freemius-toolkit' ),
             'manage_options',
             'freemius-customers',
             [ $this,'customers_page'],
@@ -101,8 +101,8 @@ class LDNFT_Customers_Menu {
         if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
             ?> 
                 <div class="wrap">
-                    <h2><?php _e( 'Customers', LDNFT_TEXT_DOMAIN ); ?></h2>
-                    <p id="ldnft-dat-not-imported-message"><?php _e( 'Customers are not imported yet. Please, click <a href="admin.php?page=freemius-settings&tab=freemius-api">here</a> to open the setting page and start the import process automatically.', LDNFT_TEXT_DOMAIN ); ?></p>
+                    <h2><?php _e( 'Customers', 'ldninjas-freemius-toolkit' ); ?></h2>
+                    <p id="ldnft-dat-not-imported-message"><?php _e( 'Customers are not imported yet. Please, click <a href="admin.php?page=freemius-settings&tab=freemius-api">here</a> to open the setting page and start the import process automatically.', 'ldninjas-freemius-toolkit' ); ?></p>
                 </div>
             <?php
 
@@ -112,8 +112,8 @@ class LDNFT_Customers_Menu {
         if( !FS__HAS_PLUGINS ) {
             ?>
                 <div class="wrap">
-                    <h2><?php _e( 'Customers', LDNFT_TEXT_DOMAIN ); ?></h2>
-                    <p id="ldnft-dat-not-imported-message"><?php _e( 'No product(s) exists in your freemius account. Please, add a product on freemius and reload the page.', LDNFT_TEXT_DOMAIN ); ?></p>
+                    <h2><?php _e( 'Customers', 'ldninjas-freemius-toolkit' ); ?></h2>
+                    <p id="ldnft-dat-not-imported-message"><?php _e( 'No product(s) exists in your freemius account. Please, add a product on freemius and reload the page.', 'ldninjas-freemius-toolkit' ); ?></p>
                 </div>
             <?php
 
@@ -140,16 +140,16 @@ class LDNFT_Customers_Menu {
 		
         ?>
             <div class="wrap">
-                <h2><?php _e( 'Customers', LDNFT_TEXT_DOMAIN ); ?></h2>
+                <h2><?php _e( 'Customers', 'ldninjas-freemius-toolkit' ); ?></h2>
                 
                 <!-- Forms are NOT created automatically, so you need to wrap the table in one to use features like bulk actions -->
                 
                     <div class="ldnft_filters_top">
                         <form id="ldnft-customer-filter" method="get">
                             <div class="ldnft-filter-handler alignleft actions bulkactions">
-                                <span class="ldnft_filter_labels"><?php _e( 'Filters:', LDNFT_TEXT_DOMAIN ); ?></span>
+                                <span class="ldnft_filter_labels"><?php _e( 'Filters:', 'ldninjas-freemius-toolkit' ); ?></span>
                                 <select name="ldfmt-plugins-filter" class="ldfmt-plugins-filter ldfmt-plugins-customers-filter" >
-                                    <option value=""><?php echo __( 'All Plugin/Product', LDNFT_TEXT_DOMAIN );?></option>
+                                    <option value=""><?php echo __( 'All Plugin/Product', 'ldninjas-freemius-toolkit' );?></option>
                                     <?php
                                         foreach( $products as $plugin ) {
                                             
@@ -164,27 +164,27 @@ class LDNFT_Customers_Menu {
                                     ?>
                                 </select>&nbsp;&nbsp;
                                 <select name="ldfmt-plugins-status" class="ldfmt-plugins-customers-status">
-                                    <option value=""><?php _e('All Statuses', LDNFT_TEXT_DOMAIN);?></option>
-                                    <option value="1" <?php echo $selected_status=='1'?'selected':''; ?>><?php _e('Verified', LDNFT_TEXT_DOMAIN);?></option>
-                                    <option value="0" <?php echo $selected_status=='0'?'selected':''; ?>><?php _e('Unverified', LDNFT_TEXT_DOMAIN);?></option>
+                                    <option value=""><?php _e('All Statuses', 'ldninjas-freemius-toolkit');?></option>
+                                    <option value="1" <?php echo $selected_status=='1'?'selected':''; ?>><?php _e('Verified', 'ldninjas-freemius-toolkit');?></option>
+                                    <option value="0" <?php echo $selected_status=='0'?'selected':''; ?>><?php _e('Unverified', 'ldninjas-freemius-toolkit');?></option>
                                 </select>
                                 <select name="ldfmt-plugins-marketing" class="ldfmt-plugins-customers-marketing">
-                                    <option value=""><?php _e('All', LDNFT_TEXT_DOMAIN);?></option>
-                                    <option value="1" <?php echo $selected_marketing=='1'?'selected':''; ?>><?php _e('Is Marketing Allowed', LDNFT_TEXT_DOMAIN);?></option>
-                                    <option value="0" <?php echo $selected_marketing=='0'?'selected':''; ?>><?php _e('Marketing Not Allowed', LDNFT_TEXT_DOMAIN);?></option>
+                                    <option value=""><?php _e('All', 'ldninjas-freemius-toolkit');?></option>
+                                    <option value="1" <?php echo $selected_marketing=='1'?'selected':''; ?>><?php _e('Is Marketing Allowed', 'ldninjas-freemius-toolkit');?></option>
+                                    <option value="0" <?php echo $selected_marketing=='0'?'selected':''; ?>><?php _e('Marketing Not Allowed', 'ldninjas-freemius-toolkit');?></option>
                                 </select>
                                 <select name="ldfmt-payment-status" class="ldfmt-payment-status">
-                                    <option value=""><?php _e('All Payment Status', LDNFT_TEXT_DOMAIN);?></option>
-                                    <option value="paid" <?php echo $selected_paymentstatus=='paid'?'selected':''; ?>><?php _e('Paid', LDNFT_TEXT_DOMAIN);?></option>
-                                    <option value="free" <?php echo $selected_paymentstatus=='free'?'selected':''; ?>><?php _e('Free', LDNFT_TEXT_DOMAIN);?></option>
+                                    <option value=""><?php _e('All Payment Status', 'ldninjas-freemius-toolkit');?></option>
+                                    <option value="paid" <?php echo $selected_paymentstatus=='paid'?'selected':''; ?>><?php _e('Paid', 'ldninjas-freemius-toolkit');?></option>
+                                    <option value="free" <?php echo $selected_paymentstatus=='free'?'selected':''; ?>><?php _e('Free', 'ldninjas-freemius-toolkit');?></option>
                                 </select>
-                                <!-- <input type="text" value="<?php echo $search;?>" name="ldnft-customers-general-search" class="form-control ldnft-customers-general-search" placeholder="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>"> -->
-                                <input type="button" name="ldnft-customer-search-button" value="<?php _e('Filter', LDNFT_TEXT_DOMAIN);?>" class="btn button ldnft-customer-search-button" />
+                                <!-- <input type="text" value="<?php echo $search;?>" name="ldnft-customers-general-search" class="form-control ldnft-customers-general-search" placeholder="<?php _e('Search', 'ldninjas-freemius-toolkit');?>"> -->
+                                <input type="button" name="ldnft-customer-search-button" value="<?php _e('Filter', 'ldninjas-freemius-toolkit');?>" class="btn button ldnft-customer-search-button" />
                             </div>
                         </form>
                         <form id="ldnft-reviews-filter-text" method="post">
-                            <input type="text" value="<?php echo $search;?>" name="ldnft-customers-general-search" class="form-control ldnft-customers-general-search" placeholder="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>">
-                            <input type="submit" name="ldnft-customer-search-button-txt" value="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>" class="btn button ldnft-customer-search-button-txt" />
+                            <input type="text" value="<?php echo $search;?>" name="ldnft-customers-general-search" class="form-control ldnft-customers-general-search" placeholder="<?php _e('Search', 'ldninjas-freemius-toolkit');?>">
+                            <input type="submit" name="ldnft-customer-search-button-txt" value="<?php _e('Search', 'ldninjas-freemius-toolkit');?>" class="btn button ldnft-customer-search-button-txt" />
                         </form>
                 		<div id="ldnft_customers_data">
 							<!-- Now we can render the completed list table -->

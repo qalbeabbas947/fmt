@@ -28,7 +28,7 @@ if( intval( $product_id ) > 0 ) { ?>
         
         <div class="ldfmt-load-more-btn">
             <?php if( $listing_type=='pagination' ) { ?>
-                <a href="javascript:;" style="display:none;"><?php echo __( 'Load More', LDNFT_TEXT_DOMAIN );?></a>
+                <a href="javascript:;" style="display:none;"><?php echo __( 'Load More', 'ldninjas-freemius-toolkit' );?></a>
             <?php } ?>
             <div style="display:none" class="ldfmt-loader-div-btm ldfmt-loader-div-btm-reviews"><img width="30px" class="ldfmt-data-loader" src="<?php echo LDNFT_ASSETS_URL.'images/spinner-2x.gif';?>" /></div>
         </div>
@@ -36,7 +36,7 @@ if( intval( $product_id ) > 0 ) { ?>
 <?php } else { ?>
     <div class="ldmft_wrapper">
         <div class="ldmft-filter-reviews">    
-            <?php echo __( 'To display product reviews, you need to attach product id with the shortcode', LDNFT_TEXT_DOMAIN );?>
+            <?php echo __( 'To display product reviews, you need to attach product id with the shortcode', 'ldninjas-freemius-toolkit' );?>
         </div>
     </div>
 <?php

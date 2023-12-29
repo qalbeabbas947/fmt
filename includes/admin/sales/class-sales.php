@@ -97,7 +97,7 @@ class LDNFT_Sales extends WP_List_Table {
     public function column_view( $item ) {
         
         if( !empty( intval( strip_tags( $item['id'] ) ) ) ) {
-            return '<a class="ldnft_sales_view_detail" data-action="ldnft_sales_view_detail" data-username="'.$item['username'].'" data-useremail="'.$item['useremail'].'" data-subscription_id="'.$item['subscription_id'].'" data-gateway_fee="'.$item['gateway_fee'].'" data-gross="'.$item['gross'].'" data-license_id="'.$item['license_id'].'" data-gateway="'.$item['gateway'].'" data-country_code="'.$item['country_code'].'" data-is_renewal="'.$item['is_renewal'].'" data-type="'.$item['type'].'" data-bound_payment_id="'.$item['bound_payment_id'].'" data-created="'.$item['created'].'" data-vat="'.$item['vat'].'" data-install_id="'.$item['install_id'].'"  data-coupon_id="'.$item['coupon_id'].'"  data-external_id="'.$item['external_id'].'" data-user_id="'.$item['user_id'].'" data-plugin_id="'.$item['plugin_id'].'" data-id="'.$item['id'].'" class="ldnft_sales_view_detail" href="javascript:;">'.__('Get More', LDNFT_TEXT_DOMAIN).'</a>';
+            return '<a class="ldnft_sales_view_detail" data-action="ldnft_sales_view_detail" data-username="'.$item['username'].'" data-useremail="'.$item['useremail'].'" data-subscription_id="'.$item['subscription_id'].'" data-gateway_fee="'.$item['gateway_fee'].'" data-gross="'.$item['gross'].'" data-license_id="'.$item['license_id'].'" data-gateway="'.$item['gateway'].'" data-country_code="'.$item['country_code'].'" data-is_renewal="'.$item['is_renewal'].'" data-type="'.$item['type'].'" data-bound_payment_id="'.$item['bound_payment_id'].'" data-created="'.$item['created'].'" data-vat="'.$item['vat'].'" data-install_id="'.$item['install_id'].'"  data-coupon_id="'.$item['coupon_id'].'"  data-external_id="'.$item['external_id'].'" data-user_id="'.$item['user_id'].'" data-plugin_id="'.$item['plugin_id'].'" data-id="'.$item['id'].'" class="ldnft_sales_view_detail" href="javascript:;">'.__('Get More', 'ldninjas-freemius-toolkit').'</a>';
         } else {
             return LDNFT_Admin::get_bar_preloader();
         }    
@@ -149,28 +149,28 @@ class LDNFT_Sales extends WP_List_Table {
      **************************************************************************/
     public function get_columns(){
         $columns = [
-            'id'                    => __( 'Tansaction ID',LDNFT_TEXT_DOMAIN ), 
-            'user_id'               => __( 'User ID',LDNFT_TEXT_DOMAIN ), 
-            'username'              => __( 'Name',LDNFT_TEXT_DOMAIN ), 
-            'useremail'             => __( 'Email',LDNFT_TEXT_DOMAIN ), 
-            'subscription_id'       => __( 'Subscription ID',LDNFT_TEXT_DOMAIN ), 
-            'gateway_fee'           => __( 'Gateway Fee',LDNFT_TEXT_DOMAIN ), 
-            'gross'                 => __( 'Total Amount',LDNFT_TEXT_DOMAIN ), 
-            'license_id'            => __( 'License',LDNFT_TEXT_DOMAIN ), 
-            'gateway'               => __( 'Gateway',LDNFT_TEXT_DOMAIN ), 
-            'country_code'          => __( 'Country',LDNFT_TEXT_DOMAIN ), 
-            'is_renewal'            => __( 'Renewal?',LDNFT_TEXT_DOMAIN ), 
-            'type'                  => __( 'Type',LDNFT_TEXT_DOMAIN ), 
-            'bound_payment_id'      => __( 'Bound Payment ID',LDNFT_TEXT_DOMAIN ), 
-            'created'               => __( 'Payment Date',LDNFT_TEXT_DOMAIN ), 
-            'vat'                   => __( 'VAT',LDNFT_TEXT_DOMAIN ), 
-            'install_id'            => __( 'Install ID',LDNFT_TEXT_DOMAIN ), 
-            'coupon_id'             => __( 'Coupon ID',LDNFT_TEXT_DOMAIN ), 
-            'plugin_id'             => __( 'Product ID',LDNFT_TEXT_DOMAIN ), 
-            'external_id'           => __( 'External ID',LDNFT_TEXT_DOMAIN ), 
-            'username'              => __( 'User Name',LDNFT_TEXT_DOMAIN ), 
-            'useremail'             => __( 'Email',LDNFT_TEXT_DOMAIN ), 
-			'view'					=> __( 'Action',LDNFT_TEXT_DOMAIN ) 
+            'id'                    => __( 'Tansaction ID','ldninjas-freemius-toolkit' ), 
+            'user_id'               => __( 'User ID','ldninjas-freemius-toolkit' ), 
+            'username'              => __( 'Name','ldninjas-freemius-toolkit' ), 
+            'useremail'             => __( 'Email','ldninjas-freemius-toolkit' ), 
+            'subscription_id'       => __( 'Subscription ID','ldninjas-freemius-toolkit' ), 
+            'gateway_fee'           => __( 'Gateway Fee','ldninjas-freemius-toolkit' ), 
+            'gross'                 => __( 'Total Amount','ldninjas-freemius-toolkit' ), 
+            'license_id'            => __( 'License','ldninjas-freemius-toolkit' ), 
+            'gateway'               => __( 'Gateway','ldninjas-freemius-toolkit' ), 
+            'country_code'          => __( 'Country','ldninjas-freemius-toolkit' ), 
+            'is_renewal'            => __( 'Renewal?','ldninjas-freemius-toolkit' ), 
+            'type'                  => __( 'Type','ldninjas-freemius-toolkit' ), 
+            'bound_payment_id'      => __( 'Bound Payment ID','ldninjas-freemius-toolkit' ), 
+            'created'               => __( 'Payment Date','ldninjas-freemius-toolkit' ), 
+            'vat'                   => __( 'VAT','ldninjas-freemius-toolkit' ), 
+            'install_id'            => __( 'Install ID','ldninjas-freemius-toolkit' ), 
+            'coupon_id'             => __( 'Coupon ID','ldninjas-freemius-toolkit' ), 
+            'plugin_id'             => __( 'Product ID','ldninjas-freemius-toolkit' ), 
+            'external_id'           => __( 'External ID','ldninjas-freemius-toolkit' ), 
+            'username'              => __( 'User Name','ldninjas-freemius-toolkit' ), 
+            'useremail'             => __( 'Email','ldninjas-freemius-toolkit' ), 
+			'view'					=> __( 'Action','ldninjas-freemius-toolkit' ) 
         ];
         
         return $columns;

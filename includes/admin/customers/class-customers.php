@@ -148,9 +148,9 @@ class LDNFT_Customers extends WP_List_Table {
 	public function column_is_verified($item){
 		
         if( intval( $item['is_verified'] ) == 1 ) {
-			return __( 'Yes', LDNFT_TEXT_DOMAIN );
+			return __( 'Yes', 'ldninjas-freemius-toolkit' );
 		} else {
-			return __( 'No', LDNFT_TEXT_DOMAIN );
+			return __( 'No', 'ldninjas-freemius-toolkit' );
 		}
 	}
 
@@ -161,9 +161,9 @@ class LDNFT_Customers extends WP_List_Table {
 	public function column_is_marketing_allowed($item){
 		
         if( intval( $item['is_marketing_allowed'] ) == 1 ) {
-			return __( 'Yes', LDNFT_TEXT_DOMAIN );
+			return __( 'Yes', 'ldninjas-freemius-toolkit' );
 		} else {
-			return __( 'No', LDNFT_TEXT_DOMAIN );
+			return __( 'No', 'ldninjas-freemius-toolkit' );
 		}
 	}
 
@@ -184,14 +184,14 @@ class LDNFT_Customers extends WP_List_Table {
     public function get_columns(){
         
         $columns = [
-            'id'                        => __( 'ID', LDNFT_TEXT_DOMAIN ),
-            'email'                     => __( 'Email', LDNFT_TEXT_DOMAIN ),
-            'first'                     => __( 'First Name', LDNFT_TEXT_DOMAIN ),
-            'last'                      => __( 'Last Name', LDNFT_TEXT_DOMAIN ),
-            'is_verified'               => __( 'Verified?', LDNFT_TEXT_DOMAIN ),
-            'created'                   => __( 'Joined', LDNFT_TEXT_DOMAIN ),
-            'is_marketing_allowed'      => __( 'Is Marketing Allowed?', LDNFT_TEXT_DOMAIN ),
-            'products'                  => __( 'Products', LDNFT_TEXT_DOMAIN ),
+            'id'                        => __( 'ID', 'ldninjas-freemius-toolkit' ),
+            'email'                     => __( 'Email', 'ldninjas-freemius-toolkit' ),
+            'first'                     => __( 'First Name', 'ldninjas-freemius-toolkit' ),
+            'last'                      => __( 'Last Name', 'ldninjas-freemius-toolkit' ),
+            'is_verified'               => __( 'Verified?', 'ldninjas-freemius-toolkit' ),
+            'created'                   => __( 'Joined', 'ldninjas-freemius-toolkit' ),
+            'is_marketing_allowed'      => __( 'Is Marketing Allowed?', 'ldninjas-freemius-toolkit' ),
+            'products'                  => __( 'Products', 'ldninjas-freemius-toolkit' ),
         ];
 
         return $columns;

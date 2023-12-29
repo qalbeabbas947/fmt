@@ -91,7 +91,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
         
         if( !empty( intval( strip_tags( $item['id'] ) ) ) ) {
  
-            return '<a data-action="ldnft_subscribers_view_detail" data-user_id="'.$item['user_id'].'" data-install_id="'.$item['install_id'].'"  data-coupon_id="'.$item['coupon_id'].'"  data-updated_at="'.$item['updated_at'].'" data-external_id="'.$item['external_id'].'"  data-plan_id="'.$item['plan_id'].'"  data-pricing_id="'.$item['pricing_id'].'" data-renewals_discount="'.$item['renewals_discount'].'"  data-license_id="'.$item['license_id'].'" data-plugin_id="'.$item['plugin_id'].'" data-id="'.$item['id'].'" data-username="'.$item['username'].'" data-useremail="'.$item['useremail'].'" data-amount_per_cycle="'.$item['amount_per_cycle'].'" data-discount="'.$item['discount'].'" data-billing_cycle="'.$item['billing_cycle'].'" data-gross="'.$item['gross'].'" data-gateway="'.$item['gateway'].'" data-renewal_amount="'.$item['renewal_amount'].'" data-outstanding_balance="'.$item['outstanding_balance'].'" data-failed_payments="'.$item['failed_payments'].'" data-trial_ends="'.$item['trial_ends'].'" data-created="'.$item['created'].'" data-initial_amount="'.$item['initial_amount'].'" data-next_payment="'.$item['next_payment'].'" data-canceled_at="'.$item['canceled_at'].'" data-currency="'.$item['currency'].'" data-country_code="'.$item['country_code'].'" data-status="'.$item['status'].'" class="ldnft_subscribers_view_detail" href="javascript:;">'.__('Get More', LDNFT_TEXT_DOMAIN).'</a>';
+            return '<a data-action="ldnft_subscribers_view_detail" data-user_id="'.$item['user_id'].'" data-install_id="'.$item['install_id'].'"  data-coupon_id="'.$item['coupon_id'].'"  data-updated_at="'.$item['updated_at'].'" data-external_id="'.$item['external_id'].'"  data-plan_id="'.$item['plan_id'].'"  data-pricing_id="'.$item['pricing_id'].'" data-renewals_discount="'.$item['renewals_discount'].'"  data-license_id="'.$item['license_id'].'" data-plugin_id="'.$item['plugin_id'].'" data-id="'.$item['id'].'" data-username="'.$item['username'].'" data-useremail="'.$item['useremail'].'" data-amount_per_cycle="'.$item['amount_per_cycle'].'" data-discount="'.$item['discount'].'" data-billing_cycle="'.$item['billing_cycle'].'" data-gross="'.$item['gross'].'" data-gateway="'.$item['gateway'].'" data-renewal_amount="'.$item['renewal_amount'].'" data-outstanding_balance="'.$item['outstanding_balance'].'" data-failed_payments="'.$item['failed_payments'].'" data-trial_ends="'.$item['trial_ends'].'" data-created="'.$item['created'].'" data-initial_amount="'.$item['initial_amount'].'" data-next_payment="'.$item['next_payment'].'" data-canceled_at="'.$item['canceled_at'].'" data-currency="'.$item['currency'].'" data-country_code="'.$item['country_code'].'" data-status="'.$item['status'].'" class="ldnft_subscribers_view_detail" href="javascript:;">'.__('Get More', 'ldninjas-freemius-toolkit').'</a>';
         } else {
             return LDNFT_Admin::get_bar_preloader();
         }    
@@ -109,27 +109,27 @@ class LDNFT_Subscriptions extends WP_List_Table {
 	public function get_columns() {
 
 		$columns = [
-            'id'                    => __( 'Transaction ID',LDNFT_TEXT_DOMAIN ), 
-            'user_id'               => __( 'User ID',LDNFT_TEXT_DOMAIN ),  
-            'username'              => __( 'Name',LDNFT_TEXT_DOMAIN ),
-            'useremail'             => __( 'Email',LDNFT_TEXT_DOMAIN ),
-            'amount_per_cycle'      => __( 'Price',LDNFT_TEXT_DOMAIN ),
-            'discount'              => __( 'Discount', LDNFT_TEXT_DOMAIN ),
-            'billing_cycle'         => __( 'Billing Cycle (months)',LDNFT_TEXT_DOMAIN ),
-            'gross'                 => __( 'Total Amount',LDNFT_TEXT_DOMAIN ),
-            'gateway'               => __( 'Gateway',LDNFT_TEXT_DOMAIN ),
-            'renewal_amount'        => __( 'Next Renewal Amount', LDNFT_TEXT_DOMAIN ),
-            'outstanding_balance'   => __( 'Balance',LDNFT_TEXT_DOMAIN ), 
-            'failed_payments'       => __( 'Failed Attempt',LDNFT_TEXT_DOMAIN ), 
-            'trial_ends'            => __( 'Trial End',LDNFT_TEXT_DOMAIN ), 
-            'created'               => __( 'Payment Date',LDNFT_TEXT_DOMAIN ), 
-            'initial_amount'        => __( 'First Payment',LDNFT_TEXT_DOMAIN ), 
-            'next_payment'          => __( 'Next Renewal Date',LDNFT_TEXT_DOMAIN ), 
-            'canceled_at'           => __( 'Canceled Date',LDNFT_TEXT_DOMAIN ),
-            'status'                => __( 'Status',LDNFT_TEXT_DOMAIN ),
-            'currency'              => __( 'Currency',LDNFT_TEXT_DOMAIN ),
-            'country_code'          => __( 'Country',LDNFT_TEXT_DOMAIN ), 
-            'view'                  => __( 'Action', LDNFT_TEXT_DOMAIN ),
+            'id'                    => __( 'Transaction ID','ldninjas-freemius-toolkit' ), 
+            'user_id'               => __( 'User ID','ldninjas-freemius-toolkit' ),  
+            'username'              => __( 'Name','ldninjas-freemius-toolkit' ),
+            'useremail'             => __( 'Email','ldninjas-freemius-toolkit' ),
+            'amount_per_cycle'      => __( 'Price','ldninjas-freemius-toolkit' ),
+            'discount'              => __( 'Discount', 'ldninjas-freemius-toolkit' ),
+            'billing_cycle'         => __( 'Billing Cycle (months)','ldninjas-freemius-toolkit' ),
+            'gross'                 => __( 'Total Amount','ldninjas-freemius-toolkit' ),
+            'gateway'               => __( 'Gateway','ldninjas-freemius-toolkit' ),
+            'renewal_amount'        => __( 'Next Renewal Amount', 'ldninjas-freemius-toolkit' ),
+            'outstanding_balance'   => __( 'Balance','ldninjas-freemius-toolkit' ), 
+            'failed_payments'       => __( 'Failed Attempt','ldninjas-freemius-toolkit' ), 
+            'trial_ends'            => __( 'Trial End','ldninjas-freemius-toolkit' ), 
+            'created'               => __( 'Payment Date','ldninjas-freemius-toolkit' ), 
+            'initial_amount'        => __( 'First Payment','ldninjas-freemius-toolkit' ), 
+            'next_payment'          => __( 'Next Renewal Date','ldninjas-freemius-toolkit' ), 
+            'canceled_at'           => __( 'Canceled Date','ldninjas-freemius-toolkit' ),
+            'status'                => __( 'Status','ldninjas-freemius-toolkit' ),
+            'currency'              => __( 'Currency','ldninjas-freemius-toolkit' ),
+            'country_code'          => __( 'Country','ldninjas-freemius-toolkit' ), 
+            'view'                  => __( 'Action', 'ldninjas-freemius-toolkit' ),
         ];
         
         return $columns;
@@ -342,7 +342,7 @@ class LDNFT_Subscriptions extends WP_List_Table {
                     if( strtolower( $subscription->renewals_discount_type ) == 'percentage' ) {
                         $data[$count]['discount']  = ''.$subscription->renewals_discount.'% - (' .number_format( ( $subscription->renewals_discount*$subscription->gross ) / 100, 2 ).$subscription->currency.')';
                     } else {
-                        $data[$count]['discount']  = __( 'Fixed - ', LDNFT_TEXT_DOMAIN ).'('.$subscription->renewals_discount.$subscription->currency.')';
+                        $data[$count]['discount']  = __( 'Fixed - ', 'ldninjas-freemius-toolkit' ).'('.$subscription->renewals_discount.$subscription->currency.')';
                     }
                 }
                  

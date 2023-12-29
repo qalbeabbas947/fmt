@@ -47,6 +47,7 @@ class LDNFT_Reviews_Shortcode {
     public function enqueue_front_scripts() {
 
         global $post;
+        
         if( !has_shortcode( $post->post_content, 'ldnft_reviews' ) ) {
             return false;
         }

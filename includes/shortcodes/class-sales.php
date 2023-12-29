@@ -36,7 +36,7 @@ class LDNFT_Sales_Shortcode {
      */
     private function hooks() {
         
-        add_shortcode( 'LDNFT_Sales', [ $this, 'sales_shortcode_cb' ] );
+        add_shortcode( 'ldnft_sales', [ $this, 'sales_shortcode_cb' ] );
         add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_front_scripts' ] );
         add_action( 'wp_ajax_ldnft_load_sales', [ $this, 'load_sales' ], 100 );
     }
@@ -61,11 +61,11 @@ class LDNFT_Sales_Shortcode {
             $gateway_total  = $wpdb->get_var($wpdb->prepare("SELECT sum(gateway) as total FROM $table_name where plugin_id=%d", $plugin_id));
             ?>
                 <div class="ldfmt-gross-sales-box ldfmt-sales-box">
-                    <label><?php echo __('Gross Sales', LDNFT_TEXT_DOMAIN);?></label>
+                    <label><?php echo __('Gross Sales', 'ldninjas-freemius-toolkit');?></label>
                     <div class="ldnft_points"><?php echo number_format( floatval($gross_total), 2);?></div>
                 </div>
                 <div class="ldfmt-gross-gateway-box ldfmt-sales-box">
-                    <label><?php echo __('Gateway Fee', LDNFT_TEXT_DOMAIN);?></label>
+                    <label><?php echo __('Gateway Fee', 'ldninjas-freemius-toolkit');?></label>
                     <div class="ldnft_gateway_fee"><?php echo number_format( floatval($gateway_total), 2);?></div>
                 </div>
             <?php
@@ -82,11 +82,11 @@ class LDNFT_Sales_Shortcode {
                     ?>
                         <table class="ldfmt-sales-list">
                             <tr>
-                                <th><?php echo __('Name', LDNFT_TEXT_DOMAIN);?></th>
-                                <th><?php echo __('Gross', LDNFT_TEXT_DOMAIN);?></th>
-                                <th><?php echo __('Tax Rate', LDNFT_TEXT_DOMAIN);?></th>
-                                <th><?php echo __('Created', LDNFT_TEXT_DOMAIN);?></th>
-                                <th><?php echo __('Next Payment', LDNFT_TEXT_DOMAIN);?></th>
+                                <th><?php echo __('Name', 'ldninjas-freemius-toolkit');?></th>
+                                <th><?php echo __('Gross', 'ldninjas-freemius-toolkit');?></th>
+                                <th><?php echo __('Tax Rate', 'ldninjas-freemius-toolkit');?></th>
+                                <th><?php echo __('Created', 'ldninjas-freemius-toolkit');?></th>
+                                <th><?php echo __('Next Payment', 'ldninjas-freemius-toolkit');?></th>
                             </tr>
 
                     <?php
@@ -110,7 +110,7 @@ class LDNFT_Sales_Shortcode {
 
             } elseif(  $offset == 0 ) {
 
-                echo '<div class="ldfmt-no-results">'.__('No sale record(s) found.', LDNFT_TEXT_DOMAIN).'</div>';
+                echo '<div class="ldfmt-no-results">'.__('No sale record(s) found.', 'ldninjas-freemius-toolkit').'</div>';
             }
         }
         
@@ -125,6 +125,12 @@ class LDNFT_Sales_Shortcode {
      * Enqueue frontend scripte
      */
     public function enqueue_front_scripts() {
+
+        global $post;
+        
+        if( !has_shortcode( $post->post_content, 'ldnft_sales' ) ) {
+            return false;
+        }
 
         /**
          * Enqueue frontend css

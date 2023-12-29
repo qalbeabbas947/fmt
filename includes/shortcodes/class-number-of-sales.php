@@ -35,7 +35,7 @@ class LDNFT_Number_of_Sales_Shortcode {
      */
     private function hooks() {
         
-        add_shortcode( 'LDNFT_Number_of_Sales', [ $this, 'sales_shortcode_cb' ] );
+        add_shortcode( 'ldnft_number_of_sales', [ $this, 'sales_shortcode_cb' ] );
     }
     
     /**

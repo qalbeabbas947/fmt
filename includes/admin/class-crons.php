@@ -162,7 +162,7 @@ class LDNFT_Crons_Settings {
 
         if( isset( $plugins->error )  ) {
 
-            $response = [ 'is_cron_page_check' => 'No', 'plugins'=>$plugins, 'import_cron_status' => $cron_status, 'message' => __('There seems to be an issue with API connectivity, please try again by <a href="admin.php?page=freemius-settings">reloading the page</a>.', LDNFT_TEXT_DOMAIN) ];
+            $response = [ 'is_cron_page_check' => 'No', 'plugins'=>$plugins, 'import_cron_status' => $cron_status, 'message' => __('There seems to be an issue with API connectivity, please try again by <a href="admin.php?page=freemius-settings">reloading the page</a>.', 'ldninjas-freemius-toolkit') ];
             die(json_encode($response));
         }
         
@@ -209,10 +209,10 @@ class LDNFT_Crons_Settings {
                 
                 $this->ldnft_process_freemius_plugins( 0 );
                 
-                $response = [ 'is_cron_page_check' => 'Yes', 'import_cron_status' => $cron_status, 'message' => __('Import process has been restarted.', LDNFT_TEXT_DOMAIN) ];
+                $response = [ 'is_cron_page_check' => 'Yes', 'import_cron_status' => $cron_status, 'message' => __('Import process has been restarted.', 'ldninjas-freemius-toolkit') ];
             } else {
 
-                $response = [ 'is_cron_page_check' => 'No', 'import_cron_status' => $cron_status, 'message' => __('Sync process is already running. Please try again by <a href="admin.php?page=freemius-settings">reloading the page</a> if process is not started yet.', LDNFT_TEXT_DOMAIN) ];
+                $response = [ 'is_cron_page_check' => 'No', 'import_cron_status' => $cron_status, 'message' => __('Sync process is already running. Please try again by <a href="admin.php?page=freemius-settings">reloading the page</a> if process is not started yet.', 'ldninjas-freemius-toolkit') ];
             }
 
         } else {
@@ -247,11 +247,11 @@ class LDNFT_Crons_Settings {
 
                 $this->ldnft_process_freemius_plugins( 0 );
                 
-                $response = [ 'is_cron_page_check' => 'Yes', 'import_cron_status' => $cron_status, 'message' => __('Import process has been restarted.', LDNFT_TEXT_DOMAIN) ];
+                $response = [ 'is_cron_page_check' => 'Yes', 'import_cron_status' => $cron_status, 'message' => __('Import process has been restarted.', 'ldninjas-freemius-toolkit') ];
                 
             } else{
                 
-                $response = [ 'is_cron_page_check' => 'No', 'import_cron_status' => $cron_status, 'message' => __('Sync process is already running. Please try again by <a href="admin.php?page=freemius-settings">reloading the page</a> if process is not started yet.', LDNFT_TEXT_DOMAIN) ];
+                $response = [ 'is_cron_page_check' => 'No', 'import_cron_status' => $cron_status, 'message' => __('Sync process is already running. Please try again by <a href="admin.php?page=freemius-settings">reloading the page</a> if process is not started yet.', 'ldninjas-freemius-toolkit') ];
             }
         }
         
@@ -946,30 +946,30 @@ class LDNFT_Crons_Settings {
         if( isset( $plugins->error )  ) {
             switch( $state ) {
                 case "plugins": 
-                    $status = [ 'status' => $state, 'error' => 1,  'Plugins' => 0, 'Pluginmsg' => __( 'There seems to be an issue with API connectivity, please try again by <a href="admin.php?page=freemius-settings">reloading the page</a>.', LDNFT_TEXT_DOMAIN ) ];
+                    $status = [ 'status' => $state, 'error' => 1,  'Plugins' => 0, 'Pluginmsg' => __( 'There seems to be an issue with API connectivity, please try again by <a href="admin.php?page=freemius-settings">reloading the page</a>.', 'ldninjas-freemius-toolkit' ) ];
                     break;
                 case "plans":
-                    $status = [ 'status' => $state, 'error' => 1, 'Plans' => 0, 'Planmsg' => __( 'There seems to be an issue with API connectivity, please try again by <a href="admin.php?page=freemius-settings">reloading the page</a>.', LDNFT_TEXT_DOMAIN ) ];
+                    $status = [ 'status' => $state, 'error' => 1, 'Plans' => 0, 'Planmsg' => __( 'There seems to be an issue with API connectivity, please try again by <a href="admin.php?page=freemius-settings">reloading the page</a>.', 'ldninjas-freemius-toolkit' ) ];
                     break;
                 case "customers":
-                    $status = [ 'status' => $state, 'error' => 1, 'Customers' => 0, 'Customermsg' => __( 'There seems to be an issue with API connectivity, please try again by <a href="admin.php?page=freemius-settings">reloading the page</a>.', LDNFT_TEXT_DOMAIN ) ];
+                    $status = [ 'status' => $state, 'error' => 1, 'Customers' => 0, 'Customermsg' => __( 'There seems to be an issue with API connectivity, please try again by <a href="admin.php?page=freemius-settings">reloading the page</a>.', 'ldninjas-freemius-toolkit' ) ];
                     break;
                 case "sales":
-                    $status = [ 'status' => $state, 'error' => 1, 'Sales' => 0, 'Salesmsg' => __( 'There seems to be an issue with API connectivity, please try again by <a href="admin.php?page=freemius-settings">reloading the page</a>.', LDNFT_TEXT_DOMAIN ) ];
+                    $status = [ 'status' => $state, 'error' => 1, 'Sales' => 0, 'Salesmsg' => __( 'There seems to be an issue with API connectivity, please try again by <a href="admin.php?page=freemius-settings">reloading the page</a>.', 'ldninjas-freemius-toolkit' ) ];
                     break;
                 case "subscription":
-                    $status = [ 'status' => $state, 'error' => 1, 'Subscription' => 0, 'Subscriptionmsg' => __( 'There seems to be an issue with API connectivity, please try again by <a href="admin.php?page=freemius-settings">reloading the page</a>.', LDNFT_TEXT_DOMAIN ) ];
+                    $status = [ 'status' => $state, 'error' => 1, 'Subscription' => 0, 'Subscriptionmsg' => __( 'There seems to be an issue with API connectivity, please try again by <a href="admin.php?page=freemius-settings">reloading the page</a>.', 'ldninjas-freemius-toolkit' ) ];
                     break;
                 case "reviews":
-                    $status = [ 'status' => $state, 'error' => 1, 'Reviews' => 0, 'Reviewsmsg' => __( 'There seems to be an issue with API connectivity, please try again by <a href="admin.php?page=freemius-settings">reloading the page</a>.', LDNFT_TEXT_DOMAIN ) ];
+                    $status = [ 'status' => $state, 'error' => 1, 'Reviews' => 0, 'Reviewsmsg' => __( 'There seems to be an issue with API connectivity, please try again by <a href="admin.php?page=freemius-settings">reloading the page</a>.', 'ldninjas-freemius-toolkit' ) ];
                     break;
             }
             
-            if( $last_step == 'general' && $last_message == __( 'There seems to be an issue with API connectivity, please try again by <a href="admin.php?page=freemius-settings">reloading the page</a>.', LDNFT_TEXT_DOMAIN ) ) {
+            if( $last_step == 'general' && $last_message == __( 'There seems to be an issue with API connectivity, please try again by <a href="admin.php?page=freemius-settings">reloading the page</a>.', 'ldninjas-freemius-toolkit' ) ) {
                 $status['no_messgae'] = 1;
             }
 
-            update_option( 'ldnft_last_log_message', __( 'There seems to be an issue with API connectivity, please try again by <a href="admin.php?page=freemius-settings">reloading the page</a>.', LDNFT_TEXT_DOMAIN ) );
+            update_option( 'ldnft_last_log_message', __( 'There seems to be an issue with API connectivity, please try again by <a href="admin.php?page=freemius-settings">reloading the page</a>.', 'ldninjas-freemius-toolkit' ) );
             update_option( 'ldnft_last_log_message_step', 'general' );
             return  $status;
         }
@@ -994,10 +994,10 @@ class LDNFT_Crons_Settings {
 
                     if( $new_rec_diff <= 1 ) {
 
-                        $status[ 'Pluginmsg' ] = __('already synced.', LDNFT_TEXT_DOMAIN);
+                        $status[ 'Pluginmsg' ] = __('already synced.', 'ldninjas-freemius-toolkit');
                     } else {
 
-                        $status[ 'Pluginmsg' ] = sprintf(__('%d plugin(s) are synced.', LDNFT_TEXT_DOMAIN), $new_rec_diff );
+                        $status[ 'Pluginmsg' ] = sprintf(__('%d plugin(s) are synced.', 'ldninjas-freemius-toolkit'), $new_rec_diff );
                     }
                     
                     $seperator = '<br>';
@@ -1006,7 +1006,7 @@ class LDNFT_Crons_Settings {
                         $seperator = '';
                     }
 
-                    $status[ 'Pluginmsg' ] .= $seperator.__('plugins -> done.', LDNFT_TEXT_DOMAIN);
+                    $status[ 'Pluginmsg' ] .= $seperator.__('plugins -> done.', 'ldninjas-freemius-toolkit');
 
                 } else {
                     
@@ -1014,10 +1014,10 @@ class LDNFT_Crons_Settings {
 
                     if( $new_rec_diff <= 1 ) {
                         
-                        $status[ 'Pluginmsg' ] = __('already synced.', LDNFT_TEXT_DOMAIN);
+                        $status[ 'Pluginmsg' ] = __('already synced.', 'ldninjas-freemius-toolkit');
                     } else {
 
-                        $status[ 'Pluginmsg' ] = sprintf(__('%d plugin(s) are synced.', LDNFT_TEXT_DOMAIN), $new_rec_diff );
+                        $status[ 'Pluginmsg' ] = sprintf(__('%d plugin(s) are synced.', 'ldninjas-freemius-toolkit'), $new_rec_diff );
                     }
                 }
 
@@ -1042,10 +1042,10 @@ class LDNFT_Crons_Settings {
 
                     if( $new_rec_diff <= 1 ) {
 
-                        $status[ 'Planmsg' ] = __('already synced.', LDNFT_TEXT_DOMAIN);
+                        $status[ 'Planmsg' ] = __('already synced.', 'ldninjas-freemius-toolkit');
                     } else {
 
-                        $status[ 'Planmsg' ] = sprintf(__( '%d plan(s) are synced', LDNFT_TEXT_DOMAIN ), $new_rec_diff );
+                        $status[ 'Planmsg' ] = sprintf(__( '%d plan(s) are synced', 'ldninjas-freemius-toolkit' ), $new_rec_diff );
                     }
 
                     $seperator = '<br>';
@@ -1054,15 +1054,15 @@ class LDNFT_Crons_Settings {
                         $seperator = '';
                     }
 
-                    $status[ 'Planmsg' ] .= $seperator.__( 'plans -> done.', LDNFT_TEXT_DOMAIN );
+                    $status[ 'Planmsg' ] .= $seperator.__( 'plans -> done.', 'ldninjas-freemius-toolkit' );
                 } else {
                     $status[ 'Plans' ] = 0;
                     if( $new_rec_diff <= 1 ) {
 
-                        $status[ 'Planmsg' ] = __('already synced.', LDNFT_TEXT_DOMAIN);
+                        $status[ 'Planmsg' ] = __('already synced.', 'ldninjas-freemius-toolkit');
                     } else {
 
-                        $status[ 'Planmsg' ] = sprintf(__( '%d plan(s) are synced', LDNFT_TEXT_DOMAIN ), $new_rec_diff );
+                        $status[ 'Planmsg' ] = sprintf(__( '%d plan(s) are synced', 'ldninjas-freemius-toolkit' ), $new_rec_diff );
                     }
                 }
 
@@ -1104,10 +1104,10 @@ class LDNFT_Crons_Settings {
 
                     if( $new_import <= 1 ) {
 
-                        $status[ 'Customermsg' ] = __('already synced.', LDNFT_TEXT_DOMAIN);
+                        $status[ 'Customermsg' ] = __('already synced.', 'ldninjas-freemius-toolkit');
                     } else {
 
-                        $status[ 'Customermsg' ] = sprintf(__( '%d customer(s) are synced', LDNFT_TEXT_DOMAIN ), $new_import );
+                        $status[ 'Customermsg' ] = sprintf(__( '%d customer(s) are synced', 'ldninjas-freemius-toolkit' ), $new_import );
                     }
 
                     $seperator = '<br>';
@@ -1116,17 +1116,17 @@ class LDNFT_Crons_Settings {
                         $seperator = '';
                     }
 
-                    $status[ 'Customermsg' ] .= $seperator.__( 'customers -> done.', LDNFT_TEXT_DOMAIN );
+                    $status[ 'Customermsg' ] .= $seperator.__( 'customers -> done.', 'ldninjas-freemius-toolkit' );
                 } else {
 
                     $status[ 'Customers' ] = 0;
 
                     if( $new_import <= 1 ) {
 
-                        $status[ 'Customermsg' ] = __('already synced.', LDNFT_TEXT_DOMAIN);
+                        $status[ 'Customermsg' ] = __('already synced.', 'ldninjas-freemius-toolkit');
                     } else {
 
-                        $status[ 'Customermsg' ] = sprintf(__( '%d customer(s) are synced', LDNFT_TEXT_DOMAIN ), $new_import );
+                        $status[ 'Customermsg' ] = sprintf(__( '%d customer(s) are synced', 'ldninjas-freemius-toolkit' ), $new_import );
                     }
                 }
 
@@ -1163,10 +1163,10 @@ class LDNFT_Crons_Settings {
                         
                         if( $new_import <= 1 ) {
 
-                            $status[ 'Salesmsg' ] = __('already synced.', LDNFT_TEXT_DOMAIN);
+                            $status[ 'Salesmsg' ] = __('already synced.', 'ldninjas-freemius-toolkit');
                         } else {
 
-                            $status[ 'Salesmsg' ] = sprintf(__( '%d sale(s) are synced', LDNFT_TEXT_DOMAIN ), $new_import );
+                            $status[ 'Salesmsg' ] = sprintf(__( '%d sale(s) are synced', 'ldninjas-freemius-toolkit' ), $new_import );
                         }
                         
                         $seperator = '<br>';
@@ -1175,16 +1175,16 @@ class LDNFT_Crons_Settings {
                             $seperator = '';
                         }
 
-                        $status[ 'Salesmsg' ] .= $seperator.__( 'sales -> done.', LDNFT_TEXT_DOMAIN );
+                        $status[ 'Salesmsg' ] .= $seperator.__( 'sales -> done.', 'ldninjas-freemius-toolkit' );
                     } else {
                         $status[ 'Sales' ] = 0;
                         
                         if( $new_import <= 1 ) {
 
-                            $status[ 'Salesmsg' ] = __('already synced.', LDNFT_TEXT_DOMAIN);
+                            $status[ 'Salesmsg' ] = __('already synced.', 'ldninjas-freemius-toolkit');
                         } else {
 
-                            $status[ 'Salesmsg' ] = sprintf(__( '%d sale(s) are synced', LDNFT_TEXT_DOMAIN ), $new_import );
+                            $status[ 'Salesmsg' ] = sprintf(__( '%d sale(s) are synced', 'ldninjas-freemius-toolkit' ), $new_import );
                         }
                     }
                 }
@@ -1218,10 +1218,10 @@ class LDNFT_Crons_Settings {
                     update_option('ldnft_process_subscription_updated', 'yes' );
                     if( $new_import <= 1 ) {
 
-                        $status[ 'Subscriptionmsg' ] = __('already synced.', LDNFT_TEXT_DOMAIN);
+                        $status[ 'Subscriptionmsg' ] = __('already synced.', 'ldninjas-freemius-toolkit');
                     } else {
 
-                        $status[ 'Subscriptionmsg' ] = sprintf(__( '%d subscription(s) are synced', LDNFT_TEXT_DOMAIN ), $new_import );
+                        $status[ 'Subscriptionmsg' ] = sprintf(__( '%d subscription(s) are synced', 'ldninjas-freemius-toolkit' ), $new_import );
                     }
                     
                     $seperator = '<br>';
@@ -1230,16 +1230,16 @@ class LDNFT_Crons_Settings {
                         $seperator = '';
                     }
 
-                    $status[ 'Subscriptionmsg' ] .= $seperator.__( 'Subscription -> done.', LDNFT_TEXT_DOMAIN );
+                    $status[ 'Subscriptionmsg' ] .= $seperator.__( 'Subscription -> done.', 'ldninjas-freemius-toolkit' );
                 } else {
 
                     $status[ 'Subscription' ] = 0;
                     if( $new_import <= 1 ) {
 
-                        $status[ 'Subscriptionmsg' ] = __('already synced.', LDNFT_TEXT_DOMAIN);
+                        $status[ 'Subscriptionmsg' ] = __('already synced.', 'ldninjas-freemius-toolkit');
                     } else {
 
-                        $status[ 'Subscriptionmsg' ] = sprintf(__( '%d subscription(s) are synced', LDNFT_TEXT_DOMAIN ), $new_import );
+                        $status[ 'Subscriptionmsg' ] = sprintf(__( '%d subscription(s) are synced', 'ldninjas-freemius-toolkit' ), $new_import );
                     }
                 }
 
@@ -1277,10 +1277,10 @@ class LDNFT_Crons_Settings {
                         update_option('ldnft_process_reviews_updated', 'yes' );
                         if( $new_import <= 1 ) {
 
-                            $status[ 'Reviewsmsg' ] = __('already synced.', LDNFT_TEXT_DOMAIN);
+                            $status[ 'Reviewsmsg' ] = __('already synced.', 'ldninjas-freemius-toolkit');
                         } else {
 
-                            $status[ 'Reviewsmsg' ] = sprintf(__( '%d review(s) are synced', LDNFT_TEXT_DOMAIN ), $new_import );
+                            $status[ 'Reviewsmsg' ] = sprintf(__( '%d review(s) are synced', 'ldninjas-freemius-toolkit' ), $new_import );
                         }
                         
                         $seperator = '<br>';
@@ -1289,16 +1289,16 @@ class LDNFT_Crons_Settings {
                             $seperator = '';
                         }
 
-                        $status[ 'Reviewsmsg' ] .= $seperator.__( 'Reviews -> done.', LDNFT_TEXT_DOMAIN );
+                        $status[ 'Reviewsmsg' ] .= $seperator.__( 'Reviews -> done.', 'ldninjas-freemius-toolkit' );
                     } else {
 
                         $status[ 'Reviews' ] = 0;
                         if( $new_import <= 1 ) {
 
-                            $status[ 'Reviewsmsg' ] = __('already synced.', LDNFT_TEXT_DOMAIN);
+                            $status[ 'Reviewsmsg' ] = __('already synced.', 'ldninjas-freemius-toolkit');
                         } else {
 
-                            $status[ 'Reviewsmsg' ] = sprintf(__( '%d review(s) are synced', LDNFT_TEXT_DOMAIN ), $new_import );
+                            $status[ 'Reviewsmsg' ] = sprintf(__( '%d review(s) are synced', 'ldninjas-freemius-toolkit' ), $new_import );
                         }
                         
                     }

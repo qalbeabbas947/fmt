@@ -56,7 +56,7 @@ class LDNFT_Reviews_Menu {
         $status     = $_REQUEST['status'] == "true" ? true : false;
 
         if( intval( $id ) == 0 ) {
-            echo json_encode([ 'status'=> 'error', 'message' => __('Invalid review id.', LDNFT_TEXT_DOMAIN) ]);
+            echo json_encode([ 'status'=> 'error', 'message' => __('Invalid review id.', 'ldninjas-freemius-toolkit') ]);
             exit();
         } 
 
@@ -69,7 +69,7 @@ class LDNFT_Reviews_Menu {
                             'is_featured'                => $status
                         ), array('id'=>$id));
         $result = $api->Api('plugins/'.$plugin_id.'/reviews/'.$id.'.json', 'PUT', [ 'is_featured' => $status ] );
-        echo json_encode([ 'status'=> 'success', 's'=> $status,  'data'=> $result, 'message' => __('Record is updated.', LDNFT_TEXT_DOMAIN) ]);
+        echo json_encode([ 'status'=> 'success', 's'=> $status,  'data'=> $result, 'message' => __('Record is updated.', 'ldninjas-freemius-toolkit') ]);
         exit;
     }
 
@@ -101,8 +101,8 @@ class LDNFT_Reviews_Menu {
         
         $hook = add_submenu_page( 
             'ldnft-freemius',
-            __( 'Reviews', LDNFT_TEXT_DOMAIN ),
-            __( 'Reviews', LDNFT_TEXT_DOMAIN ),
+            __( 'Reviews', 'ldninjas-freemius-toolkit' ),
+            __( 'Reviews', 'ldninjas-freemius-toolkit' ),
             'manage_options',
             'freemius-reviews',
             [ $this,'reviews_page']
@@ -141,8 +141,8 @@ class LDNFT_Reviews_Menu {
         if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
             ?> 
                 <div class="wrap">
-                    <h2><?php _e( 'Reviews', LDNFT_TEXT_DOMAIN ); ?></h2>
-                    <p id="ldnft-dat-not-imported-message"><?php _e( 'Reviews are not imported yet. Please, click <a href="admin.php?page=freemius-settings&tab=freemius-api">here</a> to open the setting page and start the import process automatically.', LDNFT_TEXT_DOMAIN ); ?></p>
+                    <h2><?php _e( 'Reviews', 'ldninjas-freemius-toolkit' ); ?></h2>
+                    <p id="ldnft-dat-not-imported-message"><?php _e( 'Reviews are not imported yet. Please, click <a href="admin.php?page=freemius-settings&tab=freemius-api">here</a> to open the setting page and start the import process automatically.', 'ldninjas-freemius-toolkit' ); ?></p>
                 </div>
             <?php
 
@@ -152,8 +152,8 @@ class LDNFT_Reviews_Menu {
 		if( !FS__HAS_PLUGINS ) {
             ?> 
                 <div class="wrap">
-                    <h2><?php _e( 'Reviews', LDNFT_TEXT_DOMAIN ); ?></h2>
-                    <p id="ldnft-dat-not-imported-message"><?php _e( 'No product(s) exists in your freemius account. Please, add a product on freemius and reload the page.', LDNFT_TEXT_DOMAIN ); ?></p>
+                    <h2><?php _e( 'Reviews', 'ldninjas-freemius-toolkit' ); ?></h2>
+                    <p id="ldnft-dat-not-imported-message"><?php _e( 'No product(s) exists in your freemius account. Please, add a product on freemius and reload the page.', 'ldninjas-freemius-toolkit' ); ?></p>
                 </div>
             <?php
 
@@ -180,15 +180,15 @@ class LDNFT_Reviews_Menu {
         ?>
             <div class="wrap">
                 
-                <h2><?php _e( 'Reviews', LDNFT_TEXT_DOMAIN ); ?></h2>                
+                <h2><?php _e( 'Reviews', 'ldninjas-freemius-toolkit' ); ?></h2>                
                 <!-- Forms are NOT created automatically, so you need to wrap the table in one to use features like bulk actions -->
                 
                 <div class="ldnft_filters_top">
                     <form id="ldnft-reviews-filter" method="get">
 						<div class="ldnft-filter-handler alignleft actions bulkactions">
-							<span class="ldnft_filter_labels"><?php _e( 'Filters:', LDNFT_TEXT_DOMAIN ); ?></span>
+							<span class="ldnft_filter_labels"><?php _e( 'Filters:', 'ldninjas-freemius-toolkit' ); ?></span>
 							<select name="ldfmt-plugins-filter" class="ldfmt-plugins-filter ldfmt-plugins-reviews-filter">
-                                <option value=""><?php echo __( 'All Plugins/Products', LDNFT_TEXT_DOMAIN );?></option>
+                                <option value=""><?php echo __( 'All Plugins/Products', 'ldninjas-freemius-toolkit' );?></option>
 								<?php
 									foreach( $products as $plugin ) {
 										
@@ -203,22 +203,22 @@ class LDNFT_Reviews_Menu {
 								?>
 							</select>
                             <select name="ldfmt-plugins-status" class="ldfmt-plugins-reviews-verified">
-								<option value=""><?php _e('All', LDNFT_TEXT_DOMAIN);?></option>
-								<option value="1" <?php echo $selected_verified=='1'?'selected':''; ?>><?php _e('Verified', LDNFT_TEXT_DOMAIN);?></option>
-								<option value="0" <?php echo $selected_verified=='0'?'selected':''; ?>><?php _e('Unverified', LDNFT_TEXT_DOMAIN);?></option>
+								<option value=""><?php _e('All', 'ldninjas-freemius-toolkit');?></option>
+								<option value="1" <?php echo $selected_verified=='1'?'selected':''; ?>><?php _e('Verified', 'ldninjas-freemius-toolkit');?></option>
+								<option value="0" <?php echo $selected_verified=='0'?'selected':''; ?>><?php _e('Unverified', 'ldninjas-freemius-toolkit');?></option>
 							</select>
                             <select name="ldfmt-plugins-featured" class="ldfmt-plugins-reviews-featured">
-                                <option value=""><?php _e('All', LDNFT_TEXT_DOMAIN);?></option>
-                                <option value="1" <?php echo $selected_featured=='1'?'selected':''; ?>><?php _e('Featured', LDNFT_TEXT_DOMAIN);?></option>
-                                <option value="0" <?php echo $selected_featured=='0'?'selected':''; ?>><?php _e('Not Featured', LDNFT_TEXT_DOMAIN);?></option>
+                                <option value=""><?php _e('All', 'ldninjas-freemius-toolkit');?></option>
+                                <option value="1" <?php echo $selected_featured=='1'?'selected':''; ?>><?php _e('Featured', 'ldninjas-freemius-toolkit');?></option>
+                                <option value="0" <?php echo $selected_featured=='0'?'selected':''; ?>><?php _e('Not Featured', 'ldninjas-freemius-toolkit');?></option>
                             </select>
-                            <!-- <input class="form-control" type="text" value = "<?php echo $search;?>" name = "ldnft-reviews-general-search" id = "ldnft-reviews-general-search" placeholder="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>"> -->
-                            <input type="button" name="ldnft-reviews-search-button" value="<?php _e('Filter', LDNFT_TEXT_DOMAIN);?>" class="btn button ldnft-reviews-search-button ldnft-reviews-search-button-filter" />
+                            <!-- <input class="form-control" type="text" value = "<?php echo $search;?>" name = "ldnft-reviews-general-search" id = "ldnft-reviews-general-search" placeholder="<?php _e('Search', 'ldninjas-freemius-toolkit');?>"> -->
+                            <input type="button" name="ldnft-reviews-search-button" value="<?php _e('Filter', 'ldninjas-freemius-toolkit');?>" class="btn button ldnft-reviews-search-button ldnft-reviews-search-button-filter" />
 						</div>
                     </form>
                     <form id="ldnft-reviews-filter-text" method="post">
-                        <input class="form-control" type="text" value = "<?php echo $search;?>" name = "ldnft-reviews-general-search" id = "ldnft-reviews-general-search" placeholder="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>">
-                        <input type="submit" name="ldnft-reviews-search-button-text" value="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>" class="btn button ldnft-reviews-search-button ldnft-reviews-search-button-text" />
+                        <input class="form-control" type="text" value = "<?php echo $search;?>" name = "ldnft-reviews-general-search" id = "ldnft-reviews-general-search" placeholder="<?php _e('Search', 'ldninjas-freemius-toolkit');?>">
+                        <input type="submit" name="ldnft-reviews-search-button-text" value="<?php _e('Search', 'ldninjas-freemius-toolkit');?>" class="btn button ldnft-reviews-search-button ldnft-reviews-search-button-text" />
 						 
                     </form>
                     <div id="ldnft_reviews_data">	
@@ -237,55 +237,55 @@ class LDNFT_Reviews_Menu {
 					<div class="ldnft-admin-modal-content">
 						<div class="ldnft-admin-modal-header">
 						<span class="ldnft-admin-modal-close">&times;</span>
-							<h2><?php echo __( 'Review Detail', LDNFT_TEXT_DOMAIN );?></h2>
+							<h2><?php echo __( 'Review Detail', 'ldninjas-freemius-toolkit' );?></h2>
 						</div>
 						<div class="ldnft-admin-modal-body">
 							<table id="ldnft-reviews-popup" width="100%" cellpadding="5" cellspacing="1">
 								<tbody>
 									<tr>
-										<th><?php _e('Transaction', LDNFT_TEXT_DOMAIN)?></th>
+										<th><?php _e('Transaction', 'ldninjas-freemius-toolkit')?></th>
 										<td id = "ldnft-review-coloumn-transaction-id"></td>
-										<th><?php _e('User ID', LDNFT_TEXT_DOMAIN)?></th>
+										<th><?php _e('User ID', 'ldninjas-freemius-toolkit')?></th>
 										<td id = "ldnft-review-coloumn-user_id"></td>
 									</tr>
 									<tr>
-										<th><?php _e('Name', LDNFT_TEXT_DOMAIN)?></th>
+										<th><?php _e('Name', 'ldninjas-freemius-toolkit')?></th>
 										<td id = "ldnft-review-coloumn-name"></td>
-										<th><?php _e('Transaction', LDNFT_TEXT_DOMAIN)?></th>
+										<th><?php _e('Transaction', 'ldninjas-freemius-toolkit')?></th>
 										<td id = "ldnft-review-coloumn-useremail"></td>
 									</tr>
 									<tr>
-										<th><?php _e('Company', LDNFT_TEXT_DOMAIN)?></th>
+										<th><?php _e('Company', 'ldninjas-freemius-toolkit')?></th>
 										<td id = "ldnft-review-coloumn-company"></td>
-										<th><?php _e('Company URL', LDNFT_TEXT_DOMAIN)?></th>
+										<th><?php _e('Company URL', 'ldninjas-freemius-toolkit')?></th>
 										<td id = "ldnft-review-coloumn-company_url"></td>
 									</tr>
 									<tr>
-										<th><?php _e('Job Title', LDNFT_TEXT_DOMAIN)?></th>
+										<th><?php _e('Job Title', 'ldninjas-freemius-toolkit')?></th>
 										<td id = "ldnft-review-coloumn-job_title"></td>
-										<th><?php _e('Posted At', LDNFT_TEXT_DOMAIN)?></th>
+										<th><?php _e('Posted At', 'ldninjas-freemius-toolkit')?></th>
 										<td id = "ldnft-review-coloumn-created"></td>
 									</tr>
 									<tr>
-										<th><?php _e('Picture', LDNFT_TEXT_DOMAIN)?></th>
+										<th><?php _e('Picture', 'ldninjas-freemius-toolkit')?></th>
 										<td id = "ldnft-review-coloumn-picture"></td>
-										<th><?php _e('Profile URL', LDNFT_TEXT_DOMAIN)?></th>
+										<th><?php _e('Profile URL', 'ldninjas-freemius-toolkit')?></th>
 										<td id = "ldnft-review-coloumn-profile_url"></td>
 									</tr>
 									<tr>
-										<th><?php _e('Rate', LDNFT_TEXT_DOMAIN)?></th>
+										<th><?php _e('Rate', 'ldninjas-freemius-toolkit')?></th>
 										<td id = "ldnft-review-coloumn-rate"></td>
-										<th><?php _e('Sharable Image', LDNFT_TEXT_DOMAIN)?></th>
+										<th><?php _e('Sharable Image', 'ldninjas-freemius-toolkit')?></th>
 										<td id = "ldnft-review-coloumn-sharable_img"></td>
 									</tr>
 									<tr>
-										<th><?php _e('Is Verified', LDNFT_TEXT_DOMAIN)?></th>
+										<th><?php _e('Is Verified', 'ldninjas-freemius-toolkit')?></th>
 										<td id = "ldnft-review-coloumn-is_verified"></td>
-										<th><?php _e('Is Featured', LDNFT_TEXT_DOMAIN)?></th>
+										<th><?php _e('Is Featured', 'ldninjas-freemius-toolkit')?></th>
 										<td id = "ldnft-review-coloumn-is_featured"></td>
 									</tr>
 									<tr>
-										<th><?php _e('Title', LDNFT_TEXT_DOMAIN)?></th>
+										<th><?php _e('Title', 'ldninjas-freemius-toolkit')?></th>
 										<td colspan="3" id = "ldnft-review-coloumn-title"></td>
 									</tr>
 									<tr>

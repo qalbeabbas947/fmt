@@ -56,7 +56,7 @@ class LDNFT_Subscriptions_Menu {
 
         $table_name = $wpdb->prefix.'ldnft_plans'; 
         $plans = $wpdb->get_results("SELECT id, title FROM $table_name".$where );
-        $options = '<option value="">'.__( 'All Plans', LDNFT_TEXT_DOMAIN ).'</option>';
+        $options = '<option value="">'.__( 'All Plans', 'ldninjas-freemius-toolkit' ).'</option>';
         if( is_array( $plans ) && count( $plans ) > 0 ) {
             foreach( $plans as $plan ) {
                 $options .= '<option value="'.$plan->id.'">'.$plan->title.'</option>';
@@ -76,7 +76,7 @@ class LDNFT_Subscriptions_Menu {
         $id             = isset( $_REQUEST['id'] ) ? intval( $_REQUEST['id'] ):0;
         if( $id == 0 || $plugin_id == 0 )  {
             echo '<div class="ldnft-error-message">';
-            echo __('Transaction id and Product id are required fields.', LDNFT_TEXT_DOMAIN);    
+            echo __('Transaction id and Product id are required fields.', 'ldninjas-freemius-toolkit');    
             echo '</div>';
             exit;    
         }
@@ -94,7 +94,7 @@ class LDNFT_Subscriptions_Menu {
                 if(strtolower($result->renewals_discount_type) == 'percentage')
                     $discount  = $result->renewals_discount.'% - (' .number_format(($result->renewals_discount*$result->total_gross)/100, 2).$result->currency.')';
                 else {
-                    $discount  = __( 'Fixed - ', LDNFT_TEXT_DOMAIN ).'('.$result->renewals_discount.$result->currency.')';
+                    $discount  = __( 'Fixed - ', 'ldninjas-freemius-toolkit' ).'('.$result->renewals_discount.$result->currency.')';
                 }
             }
 
@@ -104,105 +104,105 @@ class LDNFT_Subscriptions_Menu {
                     <table id="ldnft-subscriptions" width="100%" cellpadding="5" cellspacing="1">
                         <tbody>
                             <tr>
-                                <th><?php _e('Transaction', LDNFT_TEXT_DOMAIN)?></th>
+                                <th><?php _e('Transaction', 'ldninjas-freemius-toolkit')?></th>
                                 <td><?php echo $result->id;?></td>
-                                <th><?php _e('User ID', LDNFT_TEXT_DOMAIN)?></th>
+                                <th><?php _e('User ID', 'ldninjas-freemius-toolkit')?></th>
                                 <td><?php echo $result->user_id;?></td>
                             </tr>
                             <tr>
-                                <th><?php _e('Name', LDNFT_TEXT_DOMAIN)?></th>
+                                <th><?php _e('Name', 'ldninjas-freemius-toolkit')?></th>
                                 <td><?php echo $user->first.' '.$user->last;?></td>
-                                <th><?php _e('Email', LDNFT_TEXT_DOMAIN)?></th>
+                                <th><?php _e('Email', 'ldninjas-freemius-toolkit')?></th>
                                 <td><?php echo $user->email;?></td>
                             </tr>
                             <tr>
-                                <th><?php _e('Country', LDNFT_TEXT_DOMAIN)?></th>
+                                <th><?php _e('Country', 'ldninjas-freemius-toolkit')?></th>
                                 <td><?php echo LDNFT_Freemius::get_country_name_by_code( strtoupper($result->country_code) );?></td>
-                                <th><?php _e('Discount', LDNFT_TEXT_DOMAIN)?></th>
+                                <th><?php _e('Discount', 'ldninjas-freemius-toolkit')?></th>
                                 <td><?php echo $discount;?></td>
                             </tr>
                             <tr>
-                                <th><?php _e('Amount Per Cycle:', LDNFT_TEXT_DOMAIN)?></th>
+                                <th><?php _e('Amount Per Cycle:', 'ldninjas-freemius-toolkit')?></th>
                                 <td><?php echo $result->amount_per_cycle;?></td>
-                                <th><?php _e('First Payment:', LDNFT_TEXT_DOMAIN)?></th>
+                                <th><?php _e('First Payment:', 'ldninjas-freemius-toolkit')?></th>
                                 <td><?php echo $result->initial_amount;?></td>
                             </tr>
                             <tr>
-                                <th><?php _e('Tax Rate:', LDNFT_TEXT_DOMAIN)?></th>
+                                <th><?php _e('Tax Rate:', 'ldninjas-freemius-toolkit')?></th>
                                 <td><?php echo $result->tax_rate;?></td>
-                                <th><?php _e('Total Amount:', LDNFT_TEXT_DOMAIN)?></th>
+                                <th><?php _e('Total Amount:', 'ldninjas-freemius-toolkit')?></th>
                                 <td><?php echo $result->total_gross;?></td>
                             </tr>
                             <tr>
-                                <th><?php _e('Renewal Amount:', LDNFT_TEXT_DOMAIN)?></th>
+                                <th><?php _e('Renewal Amount:', 'ldninjas-freemius-toolkit')?></th>
                                 <td><?php echo $result->renewal_amount;?></td>
-                                <th><?php _e('Billing Cycle (months):', LDNFT_TEXT_DOMAIN)?></th>
+                                <th><?php _e('Billing Cycle (months):', 'ldninjas-freemius-toolkit')?></th>
                                 <td><?php echo $result->billing_cycle;?></td>
                             </tr>
                             <tr>
-                                <th><?php _e('Outstanding Balance:', LDNFT_TEXT_DOMAIN)?></th>
+                                <th><?php _e('Outstanding Balance:', 'ldninjas-freemius-toolkit')?></th>
                                 <td><?php echo $result->outstanding_balance;?></td>
-                                <th><?php _e('Failed Payments:', LDNFT_TEXT_DOMAIN)?></th>
+                                <th><?php _e('Failed Payments:', 'ldninjas-freemius-toolkit')?></th>
                                 <td><?php echo $result->failed_payments;?></td>
                             </tr>
                             <tr>
-                                <th><?php _e('Trial Ends:', LDNFT_TEXT_DOMAIN)?></th>
+                                <th><?php _e('Trial Ends:', 'ldninjas-freemius-toolkit')?></th>
                                 <td><?php echo $result->trial_ends;?></td>
-                                <th><?php _e('Next Payments:', LDNFT_TEXT_DOMAIN)?></th>
+                                <th><?php _e('Next Payments:', 'ldninjas-freemius-toolkit')?></th>
                                 <td><?php echo $result->next_payment;?></td>
                             </tr>
                             <tr>
-                                <th><?php _e('Cancelled At:', LDNFT_TEXT_DOMAIN)?></th>
+                                <th><?php _e('Cancelled At:', 'ldninjas-freemius-toolkit')?></th>
                                 <td><?php echo $result->canceled_at;?></td>
-                                <th><?php _e('Install ID:', LDNFT_TEXT_DOMAIN)?></th>
+                                <th><?php _e('Install ID:', 'ldninjas-freemius-toolkit')?></th>
                                 <td><?php echo $result->install_id;?></td>
                             </tr>
                             <tr>
-                                <th><?php _e('Plan ID:', LDNFT_TEXT_DOMAIN)?></th>
+                                <th><?php _e('Plan ID:', 'ldninjas-freemius-toolkit')?></th>
                                 <td><?php echo $result->plan_id;?></td>
-                                <th><?php _e('Plan:', LDNFT_TEXT_DOMAIN)?></th>
+                                <th><?php _e('Plan:', 'ldninjas-freemius-toolkit')?></th>
                                 <td><?php echo $plan->title;?></td>
                             </tr>
                             <tr>
-                                <th><?php _e('License ID:', LDNFT_TEXT_DOMAIN)?></th>
+                                <th><?php _e('License ID:', 'ldninjas-freemius-toolkit')?></th>
                                 <td><?php echo $result->license_id;?></td>
-                                <th><?php _e('IP:', LDNFT_TEXT_DOMAIN)?></th>
+                                <th><?php _e('IP:', 'ldninjas-freemius-toolkit')?></th>
                                 <td><?php echo $result->ip;?></td>
                             </tr>
                             <tr>
-                                <th><?php _e('Zip/Postal Code:', LDNFT_TEXT_DOMAIN)?></th>
+                                <th><?php _e('Zip/Postal Code:', 'ldninjas-freemius-toolkit')?></th>
                                 <td><?php echo $result->zip_postal_code;?></td>
-                                <th><?php _e('VAT ID:', LDNFT_TEXT_DOMAIN)?></th>
+                                <th><?php _e('VAT ID:', 'ldninjas-freemius-toolkit')?></th>
                                 <td><?php echo $result->vat_id;?></td>
                             </tr>
                             <?php if($result->coupon_id) { ?>
                                 <tr>
-                                    <th><?php _e('Coupon ID:', LDNFT_TEXT_DOMAIN)?></th>
+                                    <th><?php _e('Coupon ID:', 'ldninjas-freemius-toolkit')?></th>
                                     <td><?php echo $result->coupon_id;?></td>
-                                    <th><?php _e('Code:', LDNFT_TEXT_DOMAIN)?></th>
+                                    <th><?php _e('Code:', 'ldninjas-freemius-toolkit')?></th>
                                     <td><?php echo $coupon->code;?></td>
                                 </tr>
                                 <tr>
-                                    <th><?php _e('Coupon Discount Type:', LDNFT_TEXT_DOMAIN)?></th>
+                                    <th><?php _e('Coupon Discount Type:', 'ldninjas-freemius-toolkit')?></th>
                                     <td><?php echo $coupon->discount_type;?></td>
-                                    <th><?php _e('Coupon Discount:', LDNFT_TEXT_DOMAIN)?></th>
+                                    <th><?php _e('Coupon Discount:', 'ldninjas-freemius-toolkit')?></th>
                                     <td><?php echo $coupon->discount_type=='percentage'?$coupon->discount.'%':$coupon->discount.$result->currency;?></td>
                                 </tr>
                             <?php } ?>
                             <tr>
-                                <th><?php _e('External ID:', LDNFT_TEXT_DOMAIN)?></th>
+                                <th><?php _e('External ID:', 'ldninjas-freemius-toolkit')?></th>
                                 <td><?php echo $result->external_id;?></td>
-                                <th><?php _e('Gateway', LDNFT_TEXT_DOMAIN)?></th>
+                                <th><?php _e('Gateway', 'ldninjas-freemius-toolkit')?></th>
                                 <td><?php echo $result->gateway;?></td>
                             </tr>
                             <tr>
-                                <th><?php _e('Payment Date:', LDNFT_TEXT_DOMAIN)?></th>
+                                <th><?php _e('Payment Date:', 'ldninjas-freemius-toolkit')?></th>
                                 <td><?php echo $result->created;?></td>
-                                <th><?php _e('Gateway:', LDNFT_TEXT_DOMAIN)?></th>
+                                <th><?php _e('Gateway:', 'ldninjas-freemius-toolkit')?></th>
                                 <td><?php echo $result->gateway;?></td>
                             </tr>
                             <tr>
-                                <th><?php _e('Status:', LDNFT_TEXT_DOMAIN)?></th>
+                                <th><?php _e('Status:', 'ldninjas-freemius-toolkit')?></th>
                                 <td><?php echo $result->status;?></td>
                                 <th></th>
                                 <td></td>
@@ -216,7 +216,7 @@ class LDNFT_Subscriptions_Menu {
             echo $content;
         } else {   
             echo '<div class="ldnft-error-message">';
-            echo __('No record(s) found.', LDNFT_TEXT_DOMAIN) ;    
+            echo __('No record(s) found.', 'ldninjas-freemius-toolkit') ;    
             echo '</div>';
         }
         exit;
@@ -313,7 +313,7 @@ class LDNFT_Subscriptions_Menu {
                 ];
             }
             
-            $countries_msg = __( 'Countries with most subscription are from.', LDNFT_TEXT_DOMAIN );
+            $countries_msg = __( 'Countries with most subscription are from.', 'ldninjas-freemius-toolkit' );
         }
         $gross_str = '';
         foreach( $gross_total as $key => $value ) {
@@ -332,13 +332,13 @@ class LDNFT_Subscriptions_Menu {
         $data = [
             'gross_total_count' => $gross_total_count,
             'gross_total' => $gross_total,
-            'gross_message' => sprintf(__( 'Gross sale amount from total %d subscriptions.', LDNFT_TEXT_DOMAIN ), $gross_total_count),
+            'gross_message' => sprintf(__( 'Gross sale amount from total %d subscriptions.', 'ldninjas-freemius-toolkit' ), $gross_total_count),
             'tax_rate_total' => $tax_rate_total,
             'total_number_of_sales' => $total_number_of_sales,
-            'tax_message' => sprintf(__( 'Total tax amount from %d subscription.', LDNFT_TEXT_DOMAIN ), $gross_total_count),
-            'new_subscriptions_message' => __( 'Total new subscriptions from the selected filter.', LDNFT_TEXT_DOMAIN ),
+            'tax_message' => sprintf(__( 'Total tax amount from %d subscription.', 'ldninjas-freemius-toolkit' ), $gross_total_count),
+            'new_subscriptions_message' => __( 'Total new subscriptions from the selected filter.', 'ldninjas-freemius-toolkit' ),
             'failed_payments'       => $failed_payments,
-            'failed_payments_message' => __( 'Number of failed attempts in auto renewal of subscription.', LDNFT_TEXT_DOMAIN ),
+            'failed_payments_message' => __( 'Number of failed attempts in auto renewal of subscription.', 'ldninjas-freemius-toolkit' ),
             'countries' => $countries,
             'currency_keys' => $currency_keys,
             'countries_message' => $countries_msg
@@ -376,8 +376,8 @@ class LDNFT_Subscriptions_Menu {
         $user_id = get_current_user_id();
         $hook = add_submenu_page( 
             'ldnft-freemius',
-            __( 'Subscriptions', LDNFT_TEXT_DOMAIN ),
-            __( 'Subscriptions', LDNFT_TEXT_DOMAIN ),
+            __( 'Subscriptions', 'ldninjas-freemius-toolkit' ),
+            __( 'Subscriptions', 'ldninjas-freemius-toolkit' ),
             'manage_options',
             'freemius-subscriptions',
             [ $this, 'subscribers_page' ],
@@ -417,8 +417,8 @@ class LDNFT_Subscriptions_Menu {
         if( is_null( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) ) {
             ?> 
                 <div class="wrap">
-                    <h2><?php _e( 'Subscriptions', LDNFT_TEXT_DOMAIN ); ?></h2>
-                    <p id="ldnft-dat-not-imported-message"><?php _e( 'Subscriptions are not imported yet. Please, click <a href="admin.php?page=freemius-settings&tab=freemius-api">here</a> to open the setting page and start the import process automatically.', LDNFT_TEXT_DOMAIN ); ?></p>
+                    <h2><?php _e( 'Subscriptions', 'ldninjas-freemius-toolkit' ); ?></h2>
+                    <p id="ldnft-dat-not-imported-message"><?php _e( 'Subscriptions are not imported yet. Please, click <a href="admin.php?page=freemius-settings&tab=freemius-api">here</a> to open the setting page and start the import process automatically.', 'ldninjas-freemius-toolkit' ); ?></p>
                 </div>
             <?php
 
@@ -428,8 +428,8 @@ class LDNFT_Subscriptions_Menu {
         if( !FS__HAS_PLUGINS ) {
             ?>
                 <div class="wrap">
-                    <h2><?php _e( 'Subscriptions', LDNFT_TEXT_DOMAIN ); ?></h2>
-                    <p id="ldnft-dat-not-imported-message"><?php _e( 'No product(s) exists in your freemius account. Please, add a product on freemius and reload the page.', LDNFT_TEXT_DOMAIN ); ?></p>
+                    <h2><?php _e( 'Subscriptions', 'ldninjas-freemius-toolkit' ); ?></h2>
+                    <p id="ldnft-dat-not-imported-message"><?php _e( 'No product(s) exists in your freemius account. Please, add a product on freemius and reload the page.', 'ldninjas-freemius-toolkit' ); ?></p>
                 </div>
             <?php
 
@@ -458,13 +458,13 @@ class LDNFT_Subscriptions_Menu {
         ?>
         <div class="wrap">
             
-            <h2><?php _e( 'Subscriptions', LDNFT_TEXT_DOMAIN ); ?></h2>
+            <h2><?php _e( 'Subscriptions', 'ldninjas-freemius-toolkit' ); ?></h2>
             <div class="ldnft_filters_top">
                 <form id="ldnft-subscription-filter-form" method="get">
                     <div class="alignleft actions bulkactions">
-                        <span class="ldnft_filter_labels"><?php _e( 'Filters:', LDNFT_TEXT_DOMAIN ); ?></span>
+                        <span class="ldnft_filter_labels"><?php _e( 'Filters:', 'ldninjas-freemius-toolkit' ); ?></span>
                         <select name="ldfmt-plugins-filter" class="ldfmt-plugins-filter ldfmt-plugins-subscription-filter">
-                            <option value=""><?php echo __( 'All Plugins/Products', LDNFT_TEXT_DOMAIN );?></option>
+                            <option value=""><?php echo __( 'All Plugins/Products', 'ldninjas-freemius-toolkit' );?></option>
                             <?php
                                 foreach( $products as $plugin ) {
                                     if( $selected_plugin_id == 0 ) {
@@ -486,7 +486,7 @@ class LDNFT_Subscriptions_Menu {
                             $plans = $wpdb->get_results($wpdb->prepare("SELECT id, title FROM $table_name where plugin_id = %d", $selected_plugin_id ) );
                         ?>
                         <select name="ldfmt-sales-plan_id-filter" class="ldfmt-subscription-plan_id-filter">
-                            <option value=""><?php _e( 'All Plans', LDNFT_TEXT_DOMAIN ); ?></option>
+                            <option value=""><?php _e( 'All Plans', 'ldninjas-freemius-toolkit' ); ?></option>
                             <?php
                             if( isset( $plans ) && is_array( $plans ) ) {
                                 foreach( $plans as $plan ) {
@@ -504,21 +504,21 @@ class LDNFT_Subscriptions_Menu {
                         </select>
                         
                         <select name="ldfmt-sales-interval-filter" class="ldfmt-subscription-interval-filter">
-                            <option value=""><?php echo __( 'All Time', LDNFT_TEXT_DOMAIN );?></option>
-                            <option value="today" <?php echo $selected_interval=='today'?'selected':'';?>><?php echo __( 'Today', LDNFT_TEXT_DOMAIN );?></option>
-                            <option value="current_week" <?php echo $selected_interval=='current_week'?'selected':'';?>><?php echo __( 'Current Week', LDNFT_TEXT_DOMAIN );?></option>
-                            <option value="last_week" <?php echo $selected_interval=='last_week'?'selected':'';?>><?php echo __( 'Last Week', LDNFT_TEXT_DOMAIN );?></option>
-                            <option value="current_month" <?php echo $selected_interval=='current_month'?'selected':'';?>><?php echo __( 'Current Month', LDNFT_TEXT_DOMAIN );?></option>
-                            <option value="last_month" <?php echo $selected_interval=='last_month'?'selected':'';?>><?php echo __( 'Last Month', LDNFT_TEXT_DOMAIN );?></option>
+                            <option value=""><?php echo __( 'All Time', 'ldninjas-freemius-toolkit' );?></option>
+                            <option value="today" <?php echo $selected_interval=='today'?'selected':'';?>><?php echo __( 'Today', 'ldninjas-freemius-toolkit' );?></option>
+                            <option value="current_week" <?php echo $selected_interval=='current_week'?'selected':'';?>><?php echo __( 'Current Week', 'ldninjas-freemius-toolkit' );?></option>
+                            <option value="last_week" <?php echo $selected_interval=='last_week'?'selected':'';?>><?php echo __( 'Last Week', 'ldninjas-freemius-toolkit' );?></option>
+                            <option value="current_month" <?php echo $selected_interval=='current_month'?'selected':'';?>><?php echo __( 'Current Month', 'ldninjas-freemius-toolkit' );?></option>
+                            <option value="last_month" <?php echo $selected_interval=='last_month'?'selected':'';?>><?php echo __( 'Last Month', 'ldninjas-freemius-toolkit' );?></option>
                         </select>
                         <select name="ldfmt-subscription-status-filter" class="ldfmt-subscription-status-filter">
-                            <option value=""><?php echo __( 'All Statuses', LDNFT_TEXT_DOMAIN );?></option>
-                            <option value="active" <?php echo $selected_interval=='active'?'selected':'';?>><?php echo __( 'Active', LDNFT_TEXT_DOMAIN );?></option>
-                            <option value="expired" <?php echo $selected_interval=='expired'?'selected':'';?>><?php echo __( 'Expired', LDNFT_TEXT_DOMAIN );?></option>
-                            <option value="cancelled" <?php echo $selected_interval=='cancelled'?'selected':'';?>><?php echo __( 'Cancelled', LDNFT_TEXT_DOMAIN );?></option>
+                            <option value=""><?php echo __( 'All Statuses', 'ldninjas-freemius-toolkit' );?></option>
+                            <option value="active" <?php echo $selected_interval=='active'?'selected':'';?>><?php echo __( 'Active', 'ldninjas-freemius-toolkit' );?></option>
+                            <option value="expired" <?php echo $selected_interval=='expired'?'selected':'';?>><?php echo __( 'Expired', 'ldninjas-freemius-toolkit' );?></option>
+                            <option value="cancelled" <?php echo $selected_interval=='cancelled'?'selected':'';?>><?php echo __( 'Cancelled', 'ldninjas-freemius-toolkit' );?></option>
                         </select>
                         <select name="ldfmt-subscription-country-filter" class="ldfmt-subscription-country-filter">
-                            <option value=""><?php echo __( 'All Countries', LDNFT_TEXT_DOMAIN );?></option>
+                            <option value=""><?php echo __( 'All Countries', 'ldninjas-freemius-toolkit' );?></option>
                             <?php $countries = LDNFT_Freemius::get_country_name_by_code( 'list' ); 
                                 foreach( $countries as $key=>$value ) {
                             ?>
@@ -530,7 +530,7 @@ class LDNFT_Subscriptions_Menu {
                             $gateways      = $wpdb->get_results( "SELECT distinct( gateway ) as gateway FROM $table_name" );
                         ?>
                         <select name="ldfmt-subscription-gateway-filter" class="ldfmt-subscription-gateway-filter">
-                            <option value=""><?php _e( 'All Gateways', LDNFT_TEXT_DOMAIN ); ?></option>
+                            <option value=""><?php _e( 'All Gateways', 'ldninjas-freemius-toolkit' ); ?></option>
                             <?php
                             if( isset( $gateways ) && is_array( $gateways ) ) {
                                 foreach( $gateways as $gateway ) {
@@ -546,16 +546,16 @@ class LDNFT_Subscriptions_Menu {
                             }
                             ?>
                         </select>
-                        <!-- <input type="text" value="<?php echo $search;?>" name="ldnft-subscription-general-search" class="form-control ldnft-subscription-general-search" placeholder="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>"> -->
-                        <input type="button" name="ldnft-subscription-search-button" value="<?php _e('Filter', LDNFT_TEXT_DOMAIN);?>" class="btn button ldnft-subscription-search-button" />
+                        <!-- <input type="text" value="<?php echo $search;?>" name="ldnft-subscription-general-search" class="form-control ldnft-subscription-general-search" placeholder="<?php _e('Search', 'ldninjas-freemius-toolkit');?>"> -->
+                        <input type="button" name="ldnft-subscription-search-button" value="<?php _e('Filter', 'ldninjas-freemius-toolkit');?>" class="btn button ldnft-subscription-search-button" />
                     </div>
                 </form>
                     
                 <div style="clear:both">&nbsp;</div> 
                 <div class="ldfmt-sales-upper-info">
                     <div class="ldfmt-gross-sales-box ldfmt-sales-box ldnft-tooltip-container">
-                        <label><?php echo __( 'Gross Sales', LDNFT_TEXT_DOMAIN );?>
-                            <span class="lndft-tooltip ldnft_subscription_gross_message"><?php echo __( 'Loading details...', LDNFT_TEXT_DOMAIN ); ?></span>
+                        <label><?php echo __( 'Gross Sales', 'ldninjas-freemius-toolkit' );?>
+                            <span class="lndft-tooltip ldnft_subscription_gross_message"><?php echo __( 'Loading details...', 'ldninjas-freemius-toolkit' ); ?></span>
                         </label>
                         <div class="ldnft_points">
                             <span class="ldnft_subscription_points"></span>
@@ -563,8 +563,8 @@ class LDNFT_Subscriptions_Menu {
                         </div>
                     </div>
                     <div class="ldfmt-new-sales-box ldfmt-sales-box ldnft-tooltip-container">
-                        <label><?php echo __('Total Subscriptions', LDNFT_TEXT_DOMAIN);?>
-                            <span class="lndft-tooltip ldnft_subscription_new_subscriptions_message"><?php echo __( 'Loading details...', LDNFT_TEXT_DOMAIN ); ?></span>
+                        <label><?php echo __('Total Subscriptions', 'ldninjas-freemius-toolkit');?>
+                            <span class="lndft-tooltip ldnft_subscription_new_subscriptions_message"><?php echo __( 'Loading details...', 'ldninjas-freemius-toolkit' ); ?></span>
                         </label>
                         <div class="ldnft_new_sales_count">
                             <span class="ldnft_subscription_new_sales_count"></span>
@@ -572,8 +572,8 @@ class LDNFT_Subscriptions_Menu {
                         </div>
                     </div>
                     <div class="ldfmt-new-subscriptions-box ldfmt-sales-box ldnft-tooltip-container">
-                        <label><?php echo __('Total Failed Attempts', LDNFT_TEXT_DOMAIN);?>
-                            <span class="lndft-tooltip ldnft_subscription_failed_payments_message"><?php echo __( 'Loading details...', LDNFT_TEXT_DOMAIN ); ?></span>
+                        <label><?php echo __('Total Failed Attempts', 'ldninjas-freemius-toolkit');?>
+                            <span class="lndft-tooltip ldnft_subscription_failed_payments_message"><?php echo __( 'Loading details...', 'ldninjas-freemius-toolkit' ); ?></span>
                         </label>
                         <div class="ldnft_new_attempts_count">
                             <span class="ldnft_subscription_new_attempts_count"></span>
@@ -581,8 +581,8 @@ class LDNFT_Subscriptions_Menu {
                         </div>
                     </div>
                     <div class="ldfmt-top3-countries-count-box ldfmt-sales-box ldnft-countries-tooltip-container">
-                        <label><?php echo __('Top 3 Countries', LDNFT_TEXT_DOMAIN);?>
-                            <span class="lndft-countries-tooltip ldnft_subscription_countries_message"><?php echo __( 'Loading details...', LDNFT_TEXT_DOMAIN ); ?></span>
+                        <label><?php echo __('Top 3 Countries', 'ldninjas-freemius-toolkit');?>
+                            <span class="lndft-countries-tooltip ldnft_subscription_countries_message"><?php echo __( 'Loading details...', 'ldninjas-freemius-toolkit' ); ?></span>
                         </label>
                         <div class="ldnft_subscription_top3_countries_main">
                             <div class="ldnft_subscription_top3_countries"></div>
@@ -595,110 +595,110 @@ class LDNFT_Subscriptions_Menu {
                     <div class="ldnft-admin-modal-content">
                         <div class="ldnft-admin-modal-header">
                         <span class="ldnft-admin-modal-close">&times;</span>
-                            <h2><?php echo __( 'Subscription Detail', LDNFT_TEXT_DOMAIN );?></h2>
+                            <h2><?php echo __( 'Subscription Detail', 'ldninjas-freemius-toolkit' );?></h2>
                         </div>
                         <div class="ldnft-admin-modal-body">
                             <table id="ldnft-subscriptions" width="100%" cellpadding="5" cellspacing="1">
                                 <tbody>
                                     <tr>
-                                        <th><?php _e('Transaction', LDNFT_TEXT_DOMAIN)?></th>
+                                        <th><?php _e('Transaction', 'ldninjas-freemius-toolkit')?></th>
                                         <td id = "ldnft-review-coloumn-transaction-id"></td>
-                                        <th><?php _e('User ID', LDNFT_TEXT_DOMAIN)?></th>
+                                        <th><?php _e('User ID', 'ldninjas-freemius-toolkit')?></th>
                                         <td id = "ldnft-review-coloumn-user_id"></td>
                                     </tr>
                                     <tr>
-                                        <th><?php _e('Name', LDNFT_TEXT_DOMAIN)?></th>
+                                        <th><?php _e('Name', 'ldninjas-freemius-toolkit')?></th>
                                         <td id = "ldnft-review-coloumn-username"></td>
-                                        <th><?php _e('Email', LDNFT_TEXT_DOMAIN)?></th>
+                                        <th><?php _e('Email', 'ldninjas-freemius-toolkit')?></th>
                                         <td id = "ldnft-review-coloumn-useremail"></td>
                                     </tr>
                                     <tr>
-                                        <th><?php _e('Country', LDNFT_TEXT_DOMAIN)?></th>
+                                        <th><?php _e('Country', 'ldninjas-freemius-toolkit')?></th>
                                         <td id = "ldnft-review-coloumn-country_code"></td>
-                                        <th><?php _e('Discount', LDNFT_TEXT_DOMAIN)?></th>
+                                        <th><?php _e('Discount', 'ldninjas-freemius-toolkit')?></th>
                                         <td id = "ldnft-review-coloumn-discount"></td>
                                     </tr>
                                     <tr>
-                                        <th><?php _e('Amount Per Cycle:', LDNFT_TEXT_DOMAIN)?></th>
+                                        <th><?php _e('Amount Per Cycle:', 'ldninjas-freemius-toolkit')?></th>
                                         <td id = "ldnft-review-coloumn-amount_per_cycle"></td>
-                                        <th><?php _e('First Payment:', LDNFT_TEXT_DOMAIN)?></th>
+                                        <th><?php _e('First Payment:', 'ldninjas-freemius-toolkit')?></th>
                                         <td id = "ldnft-review-coloumn-initial_amount"></td>
                                     </tr>
                                     <tr>
-                                        <th><?php _e('Tax Rate:', LDNFT_TEXT_DOMAIN)?></th>
+                                        <th><?php _e('Tax Rate:', 'ldninjas-freemius-toolkit')?></th>
                                         <td id = "ldnft-review-coloumn-tax_rate"></td>
-                                        <th><?php _e('Total Amount:', LDNFT_TEXT_DOMAIN)?></th>
+                                        <th><?php _e('Total Amount:', 'ldninjas-freemius-toolkit')?></th>
                                         <td id = "ldnft-review-coloumn-gross"></td>
                                     </tr>
                                     <tr>
-                                        <th><?php _e('Renewal Amount:', LDNFT_TEXT_DOMAIN)?></th>
+                                        <th><?php _e('Renewal Amount:', 'ldninjas-freemius-toolkit')?></th>
                                         <td id = "ldnft-review-coloumn-renewal_amount"></td>
-                                        <th><?php _e('Billing Cycle (months):', LDNFT_TEXT_DOMAIN)?></th>
+                                        <th><?php _e('Billing Cycle (months):', 'ldninjas-freemius-toolkit')?></th>
                                         <td id = "ldnft-review-coloumn-billing_cycle"></td>
                                     </tr>
                                     <tr>
-                                        <th><?php _e('Outstanding Balance:', LDNFT_TEXT_DOMAIN)?></th>
+                                        <th><?php _e('Outstanding Balance:', 'ldninjas-freemius-toolkit')?></th>
                                         <td id = "ldnft-review-coloumn-outstanding_balance"></td>
-                                        <th><?php _e('Failed Payments:', LDNFT_TEXT_DOMAIN)?></th>
+                                        <th><?php _e('Failed Payments:', 'ldninjas-freemius-toolkit')?></th>
                                         <td id = "ldnft-review-coloumn-failed_payments"></td>
                                     </tr>
                                     <tr>
-                                        <th><?php _e('Trial Ends:', LDNFT_TEXT_DOMAIN)?></th>
+                                        <th><?php _e('Trial Ends:', 'ldninjas-freemius-toolkit')?></th>
                                         <td id = "ldnft-review-coloumn-trial_ends"></td>
-                                        <th><?php _e('Next Payments:', LDNFT_TEXT_DOMAIN)?></th>
+                                        <th><?php _e('Next Payments:', 'ldninjas-freemius-toolkit')?></th>
                                         <td id = "ldnft-review-coloumn-next_payment"></td>
                                     </tr>
                                     <tr>
-                                        <th><?php _e('Cancelled At:', LDNFT_TEXT_DOMAIN)?></th>
+                                        <th><?php _e('Cancelled At:', 'ldninjas-freemius-toolkit')?></th>
                                         <td id = "ldnft-review-coloumn-canceled_at"></td>
-                                        <th><?php _e('Install ID:', LDNFT_TEXT_DOMAIN)?></th>
+                                        <th><?php _e('Install ID:', 'ldninjas-freemius-toolkit')?></th>
                                         <td id = "ldnft-review-coloumn-install_id"></td>
                                     </tr>
                                     <tr>
-                                        <th><?php _e('Plan ID:', LDNFT_TEXT_DOMAIN)?></th>
+                                        <th><?php _e('Plan ID:', 'ldninjas-freemius-toolkit')?></th>
                                         <td id = "ldnft-review-coloumn-plan_id"></td>
-                                        <th><?php _e('Plan:', LDNFT_TEXT_DOMAIN)?></th>
+                                        <th><?php _e('Plan:', 'ldninjas-freemius-toolkit')?></th>
                                         <td id = "ldnft-review-coloumn-title"></td>
                                     </tr>
                                     <tr>
-                                        <th><?php _e('License ID:', LDNFT_TEXT_DOMAIN)?></th>
+                                        <th><?php _e('License ID:', 'ldninjas-freemius-toolkit')?></th>
                                         <td id = "ldnft-review-coloumn-license_id"></td>
-                                        <th><?php _e('Plugin ID:', LDNFT_TEXT_DOMAIN)?></th>
+                                        <th><?php _e('Plugin ID:', 'ldninjas-freemius-toolkit')?></th>
                                         <td id = "ldnft-review-coloumn-plugin_id"></td>
                                     </tr>
                                     <tr>
-                                        <th><?php _e('Zip/Postal Code:', LDNFT_TEXT_DOMAIN)?></th>
+                                        <th><?php _e('Zip/Postal Code:', 'ldninjas-freemius-toolkit')?></th>
                                         <td id = "ldnft-review-coloumn-zip_postal_code"></td>
-                                        <th><?php _e('VAT ID:', LDNFT_TEXT_DOMAIN)?></th>
+                                        <th><?php _e('VAT ID:', 'ldninjas-freemius-toolkit')?></th>
                                         <td id = "ldnft-review-coloumn-vat_id"></td>
                                     </tr>
                                     <tr>
-                                        <th><?php _e('Coupon ID:', LDNFT_TEXT_DOMAIN)?></th>
+                                        <th><?php _e('Coupon ID:', 'ldninjas-freemius-toolkit')?></th>
                                         <td id = "ldnft-review-coloumn-coupon_id"></td>
                                         
-                                        <th><?php _e('Currency:', LDNFT_TEXT_DOMAIN)?></th>
+                                        <th><?php _e('Currency:', 'ldninjas-freemius-toolkit')?></th>
                                         <td id = "ldnft-review-coloumn-currency"></td>
                                     </tr>
                                     <tr>
-                                        <th><?php _e('External ID:', LDNFT_TEXT_DOMAIN)?></th>
+                                        <th><?php _e('External ID:', 'ldninjas-freemius-toolkit')?></th>
                                         <td id = "ldnft-review-coloumn-external_id"></td>
-                                        <th><?php _e('Gateway', LDNFT_TEXT_DOMAIN)?></th>
+                                        <th><?php _e('Gateway', 'ldninjas-freemius-toolkit')?></th>
                                         <td id = "ldnft-review-coloumn-gateway"></td>
                                     </tr>
                                     <tr>
-                                        <th><?php _e('Pricing ID', LDNFT_TEXT_DOMAIN)?></th>
+                                        <th><?php _e('Pricing ID', 'ldninjas-freemius-toolkit')?></th>
                                         <td id = "ldnft-review-coloumn-pricing_id"></td>
-                                        <th><?php _e('Renewal Discount:', LDNFT_TEXT_DOMAIN)?></th>
+                                        <th><?php _e('Renewal Discount:', 'ldninjas-freemius-toolkit')?></th>
                                         <td id = "ldnft-review-coloumn-renewals_discount"></td>
                                     </tr>
                                     <tr>
-                                        <th><?php _e('Payment Date:', LDNFT_TEXT_DOMAIN)?></th>
+                                        <th><?php _e('Payment Date:', 'ldninjas-freemius-toolkit')?></th>
                                         <td id = "ldnft-review-coloumn-created"></td>
-                                        <th><?php _e('Updated At:', LDNFT_TEXT_DOMAIN)?></th>
+                                        <th><?php _e('Updated At:', 'ldninjas-freemius-toolkit')?></th>
                                         <td id = "ldnft-review-coloumn-updated_at"></td>
                                     </tr>
                                     <tr>
-                                        <th><?php _e('Status:', LDNFT_TEXT_DOMAIN)?></th>
+                                        <th><?php _e('Status:', 'ldninjas-freemius-toolkit')?></th>
                                         <td id = "ldnft-review-coloumn-status"></td>
                                         <th></th>
                                         <td></td>
@@ -710,8 +710,8 @@ class LDNFT_Subscriptions_Menu {
                     </div>
                 </div>
                 <form id="ldnft-subscription-filter-form-text" method="post">
-                    <input type="text" value="<?php echo $search;?>" name="ldnft-subscription-general-search" class="form-control ldnft-subscription-general-search" placeholder="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>">
-                    <input type="submit" name="ldnft-subscription-search" value="<?php _e('Search', LDNFT_TEXT_DOMAIN);?>" class="btn button ldnft-subscription-search" />
+                    <input type="text" value="<?php echo $search;?>" name="ldnft-subscription-general-search" class="form-control ldnft-subscription-general-search" placeholder="<?php _e('Search', 'ldninjas-freemius-toolkit');?>">
+                    <input type="submit" name="ldnft-subscription-search" value="<?php _e('Search', 'ldninjas-freemius-toolkit');?>" class="btn button ldnft-subscription-search" />
                 </form>
             </div>
             <div id="ldnft_subscriptions_data">
