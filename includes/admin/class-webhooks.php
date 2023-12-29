@@ -582,6 +582,24 @@ class LDNFT_Webhooks {
                     }
                 }
                 break;
+            case "user.marketing.opted_in":
+            case "user.marketing.opted_in":
+            case "user.email.verified":
+            case "user.email.changed":
+            case "user.name.changed":
+                $user_id                        = $request->get_param( 'user_id' );
+                $plugin_id                      = $request->get_param( 'plugin_id' );
+                $settings                       = get_option( 'ldnft_webhook_settings_'.$plugin_id );
+                $ldnft_disable_webhooks         = isset( $settings[ 'disable_webhooks' ] ) && $settings[ 'disable_webhooks' ] == 'yes' ? 'yes': 'no';
+                if( $ldnft_disable_webhooks != 'yes' ) {
+                    $objects = $request->get_param( 'objects' );
+                    if( is_array($objects ) && array_key_exists( 'user', $objects ) ) { 
+                        
+                        $user = $objects['user'];
+                        $this->customer_webhook_callback( $user_id, $plugin_id, $user );
+                    }
+                }
+                break;
             default:
                 error_log('type:'.$type);
                 error_log(print_r( $request , true));    
