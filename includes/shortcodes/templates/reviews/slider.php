@@ -3,10 +3,23 @@
  * reviews shortcode template to display slider.
  */
 
+ /**
+   * 
+   * Enqueue specific js and css
+   */
+wp_enqueue_style( 'ldnft-bxslider-css' );
+wp_enqueue_style( 'ldnft-lightbox-css' );
+
+wp_enqueue_script( 'jquery' );
+wp_enqueue_script( 'ldnft-bxslider-js' );
+wp_enqueue_script( 'ldnft-lightbox-js' );
+wp_enqueue_script( 'ldnft-frontend-js' );
+
 $slide_index = 0;
+?><div class="bxslider"><?php
 foreach( $results as $review ) {
   
-    $client_name        = isset( $review->name ) ? $review->name : '';
+    $client_name        = isset( $review->name ) ? $review->name : __( 'anonymous', 'ldninjas-freemius-toolkit' );
     $rating             = isset( $review->rate ) ? $review->rate : '';
     $title              = isset( $review->title ) ? $review->title : '';
     $description        = isset( $review->text ) ? $review->text : '';
@@ -24,12 +37,11 @@ foreach( $results as $review ) {
                 <?php 
                     for( $i = 1; $i <= 5; $i++ ) {
 
-                        $selected = '';
-                        if( $i * 2 <= $rating ) {
-                            $selected = 'ldnft-checked';
+                        $selected = 'empty';
+                        if( $i * 20 <= $rating ) {
+                            $selected = 'filled';
                         }
-
-                        echo '<span class="fa fa-star '.$selected.'"></span>';
+                        echo '<span class="dashicons dashicons-star-'.$selected.'"></span>';
                     }
                 ?>
                 </div> 
@@ -44,3 +56,4 @@ foreach( $results as $review ) {
     <?php
 }
 ?>
+</div>

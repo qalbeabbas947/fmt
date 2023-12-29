@@ -6,7 +6,8 @@
 
             init: function() {
 
-                LDNFT_Frontend.reviews();
+                LDNFT_Frontend.paginatedReviews();
+                LDNFT_Frontend.sliderReviews();
             },
 
             /**
@@ -14,7 +15,7 @@
              * To display the product reviews on frontend.
              * Options are pagination/onetime/slider
              */
-            reviews: function() {
+            paginatedReviews: function() {
 
                 $( '.review-load-more' ).on( 'click', function( e ) {
 
@@ -43,6 +44,22 @@
                     });
                 } );
             },
+
+            /**
+             * Add a slider review
+             */
+            sliderReviews: function() {
+
+                if( $('.bxslider').length > 0 ) {
+                    $(function(){
+                        $('.bxslider').bxSlider({
+                          mode: 'fade',
+                          captions: true,
+                          slideWidth: 600
+                        });
+                    });
+                }   
+            }
         };
 
         LDNFT_Frontend.init();
