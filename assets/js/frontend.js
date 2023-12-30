@@ -30,8 +30,6 @@
                         'plugin_id': self.data( 'plugin_id' )
                     };
 
-                    alert(self.data( 'offset' ));
-
                     jQuery.post( LDNFT.ajaxURL, data, function( response ) {
                         
                         response = JSON.parse( response );

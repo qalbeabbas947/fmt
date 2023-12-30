@@ -42,16 +42,19 @@ class LDNFT_Reviews_Shortcode {
          */
         wp_enqueue_script( 'jquery' );
         wp_enqueue_script( 'ldnft-frontend-js' );
-        
-        foreach( $results as $review ) {
 
-            $client_name        = isset( $review->name ) ? $review->name : __( 'anonymous', 'ldninjas-freemius-toolkit' );
-            $rating             = isset( $review->rate ) ? $review->rate : '';
-            $title              = isset( $review->title ) ? $review->title : '';
-            $description        = isset( $review->text ) ? $review->text : '';
-            $client_profile_pic = isset( $review->profile_url ) ? $review->profile_url : ''; 
+        if ( !empty( $results ) && is_array( $results ) ) {
             
-            include( LDNFT_SHORTCODES_TEMPLATES_DIR . 'reviews/pagination.php' );
+            foreach( $results as $review ) {
+
+                $client_name        = isset( $review->name ) ? $review->name : __( 'anonymous', 'ldninjas-freemius-toolkit' );
+                $rating             = isset( $review->rate ) ? $review->rate : '';
+                $title              = isset( $review->title ) ? $review->title : '';
+                $description        = isset( $review->text ) ? $review->text : '';
+                $client_profile_pic = isset( $review->profile_url ) ? $review->profile_url : ''; 
+                
+                include( LDNFT_SHORTCODES_TEMPLATES_DIR . 'reviews/pagination.php' );
+            }
         }
     }
 
@@ -109,16 +112,20 @@ class LDNFT_Reviews_Shortcode {
         
         ob_start();
         $results = LDNFT_Reviews_Shortcode::get_reviews( $plugin_id, $limit, $offset );
-        foreach( $results as $review ) {
-
-            $client_name        = isset( $review->name ) ? $review->name : __( 'anonymous', 'ldninjas-freemius-toolkit' );
-            $rating             = isset( $review->rate ) ? $review->rate : '';
-            $title              = isset( $review->title ) ? $review->title : '';
-            $description        = isset( $review->text ) ? $review->text : '';
-            $client_profile_pic = isset( $review->profile_url ) ? $review->profile_url : ''; 
+        if ( !empty( $results ) && is_array( $results ) ) {
             
-            include( LDNFT_SHORTCODES_TEMPLATES_DIR . 'reviews/pagination.php' );
+            foreach( $results as $review ) {
+
+                $client_name        = isset( $review->name ) ? $review->name : __( 'anonymous', 'ldninjas-freemius-toolkit' );
+                $rating             = isset( $review->rate ) ? $review->rate : '';
+                $title              = isset( $review->title ) ? $review->title : '';
+                $description        = isset( $review->text ) ? $review->text : '';
+                $client_profile_pic = isset( $review->profile_url ) ? $review->profile_url : ''; 
+                
+                include( LDNFT_SHORTCODES_TEMPLATES_DIR . 'reviews/pagination.php' );
+            }
         }
+        
         $content = ob_get_contents();
         ob_get_clean();
 
@@ -191,9 +198,9 @@ class LDNFT_Reviews_Shortcode {
             'limit'   => 10
         ), $atts );
         
-        $product_id = $atts['product_id'];
-        $listing_type = $atts['listing_type'];
-        $limit = $atts['limit'];
+        $product_id = isset( $atts['product_id'] ) ? $atts['product_id'] : 0 ;
+        $listing_type = isset( $atts['listing_type'] ) ? $atts['listing_type'] : '';
+        $limit = isset( $atts['limit'] ) ? $atts['limit'] : 10 ;
 
         ob_start();
         include( LDNFT_SHORTCODES_TEMPLATES_DIR . 'reviews.php' );
