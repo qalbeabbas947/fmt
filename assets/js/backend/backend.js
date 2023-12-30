@@ -1,5 +1,7 @@
 (function( $ ) { 'use strict';
+    
     $( document ).ready( function() {  
+        
         var LDNFTbackEnd = {  
             ajax_url_new: ajaxurl,
             display_subscriptions_type: 'filter',
