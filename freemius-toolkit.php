@@ -235,7 +235,7 @@ class LDNFT_Freemius {
             }
         }
 
-        if( !is_admin() || '/wp-admin/admin-ajax.php' == $_SERVER['REQUEST_URI'] ) {
+        if( !is_admin() || strstr( $_SERVER['REQUEST_URI'], '/wp-admin/admin-ajax.php' ) ) {
 
             if( file_exists( LDNFT_INCLUDES_DIR . 'shortcodes/class-reviews.php' ) ) {
                 require_once LDNFT_INCLUDES_DIR . 'shortcodes/class-reviews.php';

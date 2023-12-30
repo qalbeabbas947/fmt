@@ -21,6 +21,8 @@
 
                     e.preventDefault();
                     let self = $( this );
+
+                    self.html( '<div class="ldnft-animated-loader">Loading</div>' );
                     let offSet = self.data( 'offset' ) + self.data( 'limit' );
                     let data = {
                         'action': 'ldnft_review_load_more',
@@ -36,8 +38,12 @@
                         if( response.status == true ) {
                             
                             let data = response.data;
+                            self.html( 'Load More' ).change();
                             self.parents( '.ldnft-reviews-load-more' ).siblings('.paginated-review-wrapper').append( data ).change();
                             self.parents( '.ldnft-reviews-load-more' ).find('.ldnft-load-more-btn').data( 'offset', offSet ).change();
+                            if ( data.length < 1 ) {
+                                self.hide();
+                            }
                         }
                     });
                 } );

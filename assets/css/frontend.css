@@ -44,9 +44,28 @@
 .ldnft-reviews-slider-wrapper .ldnft-slider-feedback-wrap {
   margin: 0 60px ;
 }
-.ldnft-load-more-btn {
+.ldnft-reviews-wrapper .ldnft-load-more-btn {
   padding: 10px 20px;
   font-weight: 500;
   cursor: pointer;
+}
+.ldnft-reviews-wrapper .ldnft-animated-loader::after {
+    display: inline-block;
+    animation: doted steps(1,end) 2s infinite;
+    content: '';
+}
+@keyframes doted {
+    0%   { content: ''; }
+    20%  { content: '.'; }
+    40%  { content: '..'; }
+    60%  { content: '...'; }
+    80%  { content: '....'; }
+    100% { content: ''; }
+}
+.ldnft-reviews-slider-wrapper .ldnft-slider-feedback-wrap .ldnft-reviews-description-wrapper {
+  padding: 10px 0;
+}
+.ldnft-reviews-wrapper .bx-viewport {
+  height: 100% !important ;
 }
 /*End Review onetime/pagination/slider*/
