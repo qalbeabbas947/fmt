@@ -17,7 +17,7 @@
              */
             paginatedReviews: function() {
 
-                $( '.review-load-more' ).on( 'click', function( e ) {
+                $( '.ldnft-load-more-btn' ).on( 'click', function( e ) {
 
                     e.preventDefault();
                     let self = $( this );
@@ -37,7 +37,7 @@
                             
                             let data = response.data;
                             self.parents( '.ldnft-reviews-load-more' ).siblings('.paginated-review-wrapper').append( data ).change();
-                            self.parents( '.ldnft-reviews-load-more' ).find('.review-load-more').data( 'offset', offSet ).change();
+                            self.parents( '.ldnft-reviews-load-more' ).find('.ldnft-load-more-btn').data( 'offset', offSet ).change();
                         }
                     });
                 } );
@@ -47,15 +47,14 @@
              * Add a slider review
              */
             sliderReviews: function() {
-
-                if( $('.bxslider').length > 0 ) {
-                    $(function(){
-                        $('.bxslider').bxSlider({
-                          mode: 'fade',
-                          captions: true,
-                          slideWidth: 600
-                        });
-                    });
+                if( $('.ldnft-slider-handler').length > 0 ) {
+                    $( function(){
+                        $('.ldnft-slider-handler').bxSlider({
+                            mode: 'horizontal',
+                            captions: true,
+                            slideWidth: 600
+                        } );
+                    } );
                 }   
             }
         };

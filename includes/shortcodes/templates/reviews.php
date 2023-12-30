@@ -30,7 +30,7 @@ switch ( $listing_type ) {
         ?>
         </div>
         <div class="ldnft-reviews-load-more">
-            <button class="button button-primary review-load-more" data-limit="<?php echo $limit; ?>" data-offset="<?php echo $limit; ?>" data-plugin_id="<?php echo $product_id; ?>"><?php echo __( 'Load More', 'ldninjas-freemius-toolkit' ); ?></button>
+            <button class="button button-primary ldnft-load-more-btn" data-limit="<?php echo $limit; ?>" data-offset="<?php echo $limit; ?>" data-plugin_id="<?php echo $product_id; ?>"><?php echo __( 'Load More', 'ldninjas-freemius-toolkit' ); ?></button>
         </div> 
         <?php
         break;

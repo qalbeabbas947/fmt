@@ -75,8 +75,6 @@ class LDNFT_Reviews_Shortcode {
      */
     public function load_reviews() {
 
-        global $wpdb;
-
         $response = [];
         if( ! wp_verify_nonce( $_POST['security'], 'ldnft_review_load_more' ) ) {
 
