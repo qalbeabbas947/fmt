@@ -1,12 +1,12 @@
 <?php
 /**
- * reviews shortcode template to display slider.
- */
+  * reviews shortcode template to display slider.
+  */
 
- /**
-   * 
-   * Enqueue specific js and css
-   */
+/**
+  * 
+  * Enqueue specific js and css
+  */
 wp_enqueue_style( 'ldnft-bxslider-css' );
 wp_enqueue_style( 'ldnft-lightbox-css' );
 

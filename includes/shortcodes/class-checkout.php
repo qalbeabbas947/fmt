@@ -79,11 +79,13 @@ class LDNFT_Checkout_Shortcode {
         $attributes = shortcode_atts( array(
             'product_id' => 0,
             'plan_id'   => 0,
+            'display'   => 'detailed',
             'image' => ''
         ), $atts );
 
         $plugin_id  = sanitize_text_field( $attributes['product_id'] );
         $plan_id    = sanitize_text_field( $attributes['plan_id'] );
+        $display    = sanitize_text_field( $attributes['display'] );
 
         if( empty( $plugin_id ) || intval( $plugin_id ) < 1 ) {
             return '<div class="ldnft-error-message">'.__( 'Product ID is a required parameter.', 'ldninjas-freemius-toolkit' ).'</div>';
@@ -112,7 +114,7 @@ class LDNFT_Checkout_Shortcode {
 
         ob_start();
         
-        require_once( LDNFT_SHORTCODES_TEMPLATES_DIR . 'checkout.php' );
+        include( LDNFT_SHORTCODES_TEMPLATES_DIR . 'checkout.php' );
 
         $content = ob_get_contents();
         ob_get_clean();

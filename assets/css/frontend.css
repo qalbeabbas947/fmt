@@ -1,4 +1,4 @@
-/* Review onetime/pagination/slider */
+/********************** Review onetime/pagination/slider ***********************/
 
 .ldnft-reviews-onetime-wrap,
 .ldnft-reviews-pagination-wrap{
@@ -73,4 +73,20 @@
 .ldnft-reviews-wrapper .bx-viewport {
   height: 100% !important ;
 }
-/*End Review onetime/pagination/slider*/
+
+/********************** / Review onetime/pagination/slider ***********************/
+
+/********************** Checkout Shortcode ***********************/
+
+#ldnft-purchase {
+  display: inline-block;
+  padding: 10px 8px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+#ldnft-purchase span {
+  display: inline-block;
+  margin-top: -5px;
+}
+
+/********************** / Checkout Shortcode *********************/

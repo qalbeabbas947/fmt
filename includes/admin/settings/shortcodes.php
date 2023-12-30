@@ -6,14 +6,6 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-
-$args   = array( 'post_type' => 'page', 'post_status' => 'publish', 'posts_per_page' => -1 );
-$pages  = new WP_Query( $args );
-
-$tc_roundtable_main_page 	= get_option( 'tc_roundtable_main_page' );
-$tc_roundtable_sub_page 	= get_option( 'tc_roundtable_sub_page' );
-$tc_roundtable_form_page	= get_option( 'tc_roundtable_form_page' );
-
 /**
  * Add an information title 
  *
@@ -44,7 +36,7 @@ function ldnft_add_info_title( $info_text ) {
         <?php echo ldnft_add_info_title( 'This shortcode displays the average rating of plugin/products based on the product_id/plugin_id.' ); ?>
     </div>
     <div class="ldfmt-tab-shortcode-data">
-        <code> [ldnft_checkout product_id="?" plan_id="?" image="?"] </code>
+        <code> [ldnft_checkout product_id="?" plan_id="?" display="[ detailed | button ]" image="?"] </code>
         <?php echo ldnft_add_info_title( 'This shortcode displays the checkout popup form of plugin/products based on the product_id/plugin_id. Prices will display based on the provided plan_id. By default, first premius plan will be used. You can also add the plugin/addon image in the shortocde that will be displayed on the checkout.' ); ?>
     </div>
 </div>
