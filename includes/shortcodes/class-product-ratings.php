@@ -55,7 +55,7 @@ class LDNFT_Product_Rating {
          * Enqueue frontend css
          */
         wp_enqueue_style( 'dashicons' );
-        wp_enqueue_style( 'ldnft-front-css', LDNFT_ASSETS_URL . 'css/frontend.css', [], LDNFT_VERSION, null );
+        wp_enqueue_style( 'ldnft-front-css', LDNFT_ASSETS_URL . 'css/frontend/frontend.css', [], LDNFT_VERSION, null );
     }
 
     /**

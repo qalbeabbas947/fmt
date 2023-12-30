@@ -31,7 +31,7 @@ class LDNFT_Settings {
         
         $ldnft_webhook_plugin_ddl  = sanitize_text_field( $_POST['ldnft_webhook_plugin_ddl'] );
         if( intval( $ldnft_webhook_plugin_ddl ) == 0 ) {
-            $errormsg = __('Freemius plugin/product is required field.', 'ldninjas-freemius-toolkit');
+            $errormsg = __( 'Freemius plugin/product is required field.', 'ldninjas-freemius-toolkit' );
             echo $errormsg;exit;
         }
 
@@ -40,8 +40,9 @@ class LDNFT_Settings {
         $ldnft_mailpeot_list            = sanitize_text_field( $_POST['ldnft_mailpeot_list'] );
         update_option( 'ldnft_webhook_settings_'.$ldnft_webhook_plugin_ddl, [ 'mailpeot_list' => $ldnft_mailpeot_list, 'disable_webhooks' => $ldnft_disable_webhooks, 'mailpoet_subscription' => $ldnft_mailpoet_subscription ] );
         
-        $msg = __('Freemius plugin/product webhook settings are updated.', 'ldninjas-freemius-toolkit');
-        echo $msg;exit;
+        $msg = __( 'Freemius plugin/product webhook settings are updated.', 'ldninjas-freemius-toolkit' );
+        echo $msg;
+        exit;
     }
 
     /**

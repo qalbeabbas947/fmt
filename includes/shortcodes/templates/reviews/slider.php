@@ -8,11 +8,9 @@
   * Enqueue specific js and css
   */
 wp_enqueue_style( 'ldnft-bxslider-css' );
-wp_enqueue_style( 'ldnft-lightbox-css' );
 
 wp_enqueue_script( 'jquery' );
 wp_enqueue_script( 'ldnft-bxslider-js' );
-wp_enqueue_script( 'ldnft-lightbox-js' );
 wp_enqueue_script( 'ldnft-frontend-js' );
 
 ?><div class="ldnft-slider-handler"><?php

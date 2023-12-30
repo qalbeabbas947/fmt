@@ -149,12 +149,10 @@ class LDNFT_Reviews_Shortcode {
          */
         wp_enqueue_style( 'dashicons' );
         wp_register_style( 'ldnft-bxslider-css', 'https://cdn.jsdelivr.net/bxslider/4.2.12/jquery.bxslider.css', [], LDNFT_VERSION, null );
-        wp_register_style( 'ldnft-lightbox-css', LDNFT_ASSETS_URL . 'lightbox/css/lightbox.min.css', [], LDNFT_VERSION, null );
-        wp_enqueue_style( 'ldnft-front-css', LDNFT_ASSETS_URL . 'css/frontend.css', [], LDNFT_VERSION, null );
+        wp_enqueue_style( 'ldnft-front-css', LDNFT_ASSETS_URL . 'css/frontend/frontend.css', [], LDNFT_VERSION, null );
         
         wp_register_script('ldnft-bxslider-js', 'https://cdn.jsdelivr.net/bxslider/4.2.12/jquery.bxslider.min.js', [], LDNFT_VERSION, true );
-        wp_register_script('s', LDNFT_ASSETS_URL.'lightbox/js/lightbox-plus-jquery.min.js', ['jquery'], LDNFT_VERSION, true );
-        wp_register_script( 'ldnft-frontend-js', LDNFT_ASSETS_URL.'js/frontend.js', ['jquery'], LDNFT_VERSION, true );
+        wp_register_script( 'ldnft-frontend-js', LDNFT_ASSETS_URL.'js/frontend/frontend.js', ['jquery'], LDNFT_VERSION, true );
         wp_localize_script( 'ldnft-frontend-js', 'LDNFT', [ 
              'ajaxURL' => admin_url( 'admin-ajax.php' ),
              'security'  => wp_create_nonce( 'ldnft_review_load_more' )
