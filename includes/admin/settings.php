@@ -391,7 +391,7 @@ class LDNFT_Settings {
 		$settings_sections = array (
             'freemius-api' => array (
                 'title' => __( 'Freemius API', 'ldninjas-freemius-toolkit' ),
-                'icon' => 'fa-cog',
+                'icon' => 'rest-api',
             ),
         );
 
@@ -399,17 +399,17 @@ class LDNFT_Settings {
             
             $settings_sections['import'] =  array (
                 'title' => __( 'Import', 'ldninjas-freemius-toolkit' ),
-                'icon' => 'fa-cogs',
+                'icon' => 'info',
             );
 
             $settings_sections['shortcodes'] =  array(
                 'title' => __( 'Shortcodes', 'ldninjas-freemius-toolkit' ),
-                'icon' => 'fa-code',
+                'icon' => 'shortcode',
             );
 
             $settings_sections['webhook'] =  array(
                 'title' => __( 'Webhooks', 'ldninjas-freemius-toolkit' ),
-                'icon' => 'fa-book',
+                'icon' => 'update-alt',
             );
 
             $settings_sections = apply_filters( 'ldnft_settings_sections', $settings_sections );
@@ -424,8 +424,8 @@ class LDNFT_Settings {
 				<?php foreach( $settings_sections as $key => $section ) { ?>
 						<a href="?page=freemius-settings&tab=<?php echo $key; ?>"
 							class="nav-tab <?php echo $this->page_tab == $key ? 'nav-tab-active' : ''; ?>">
-							<i class="fa <?php echo $section['icon']; ?>" aria-hidden="true"></i>
-							<?php _e( $section['title'], 'ldninjas-freemius-toolkit' ); ?>
+							<span class="dashicons dashicons-<?php echo $section['icon']; ?>"></span>
+                            <?php _e( $section['title'], 'ldninjas-freemius-toolkit' ); ?>
 						</a>
 				<?php } ?>
 			</div>
