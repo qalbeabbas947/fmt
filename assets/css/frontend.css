@@ -20,6 +20,11 @@
   font-size: 20px;
   text-transform: capitalize;
 }
+.ldnft-rating-div .ldnft-rate-count {
+  padding: 10px 0;
+  display: inline-block;
+}
+.ldnft-rating-div .ldnft-rating-star,
 .ldnft-reviews-onetime-wrap .ldnft-rating-star span,
 .ldnft-reviews-pagination-wrap .ldnft-rating-star span,
 .ldnft-reviews-slider-wrapper .ldnft-rating-wrapper .ldnft-rating-star span {

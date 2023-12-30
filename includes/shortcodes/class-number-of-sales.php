@@ -45,7 +45,7 @@ class LDNFT_Number_of_Sales_Shortcode {
      */
     public function sales_shortcode_cb( $atts ) {
         
-        global  $wpdb;
+        global $wpdb;
 
         $attributes = shortcode_atts( array(
             'product_id' => 0,

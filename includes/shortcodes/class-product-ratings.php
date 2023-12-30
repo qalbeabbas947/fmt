@@ -55,7 +55,6 @@ class LDNFT_Product_Rating {
          * Enqueue frontend css
          */
         wp_enqueue_style( 'dashicons' );
-        wp_enqueue_style( 'ldnft-font-awesome-css', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css', [], LDNFT_VERSION, null );
         wp_enqueue_style( 'ldnft-front-css', LDNFT_ASSETS_URL . 'css/frontend.css', [], LDNFT_VERSION, null );
     }
 
@@ -74,7 +73,7 @@ class LDNFT_Product_Rating {
 
         ob_start();
         
-        require_once( LDNFT_SHORTCODES_TEMPLATES_DIR . 'product-ratings.php' );
+        include( LDNFT_SHORTCODES_TEMPLATES_DIR . 'product-ratings.php' );
         
         $content = ob_get_contents();
         ob_get_clean();

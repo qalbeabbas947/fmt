@@ -36,13 +36,19 @@ if ( !empty( $results ) && is_array( $results ) ) {
                     <div class="ldnft-rating-wrapper">
                         <div class="ldnft-rating-star">
                             <?php 
+                            $odd = false;
                             for( $i = 1; $i <= 5; $i++ ) {
-
-                                $selected = 'empty';
-                                if( $i * 20 <= $rating ) {
+            
+                                if( $rating%20 > 0 && $i * 20 > $rating && !$odd ) {
+                                    $selected = 'half';
+                                    $odd = true;
+                                } elseif( $i * 20 <= $rating ) {
                                     $selected = 'filled';
+                                } elseif( $odd || $i * 20 > $rating ) {
+                                    $selected = 'empty';    
                                 }
-                                echo '<span class="dashicons dashicons-star-'.$selected.'"></span>';
+            
+                                echo '<span class="ldnft-rating-star dashicons dashicons-star-'.$selected.'"></span>';
                             }
                             ?>
                         </div> 
