@@ -22,6 +22,85 @@ class LDNFT_Settings {
         add_action( 'wp_ajax_ldnft_mailpoet_submit_action',     [ $this, 'mailpoet_submit_action' ], 100 );
         add_action( 'wp_ajax_ldnft_webhook_plugin_settings',    [ $this, 'webhook_plugin_settings' ], 100 );
         add_action( 'wp_ajax_ldnft_save_webhook_setting',       [ $this, 'save_webhook_setting' ], 100 );
+        //add_action( 'admin_enqueue_scripts',                    [ $this, 'admin_enqueue_scripts_callback' ] );
+	}
+	
+    /**
+     * Action wp_ajax for fetching the first time table structure
+     */
+    public function admin_enqueue_scripts_callback() {
+        $screen = get_current_screen();
+        if( $screen->id == 'freemius-toolkit_page_freemius-settings' 
+            || $screen->id == 'freemius-toolkit_page_freemius-settings-page'
+            || $screen->id == 'freemius-toolkit_page_freemius-subscriptions'
+            || $screen->id == 'freemius-toolkit_page_freemius-sales' 
+            || $screen->id == 'freemius-toolkit_page_freemius-customers' 
+            || $screen->id == 'freemius-toolkit_page_freemius-reviews' ) {
+
+            wp_enqueue_style( 'dashicons' );
+            wp_enqueue_style( 'ldnft-select2-css', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css', [], LDNFT_VERSION, null );
+
+            /**
+             * enqueue admin css
+             */
+            wp_enqueue_style( 'fmt-backend-css', LDNFT_ASSETS_URL . 'css/backend/backend.css', [], LDNFT_VERSION, null );
+            
+            /**
+             * enqueue admin js
+             */
+            wp_enqueue_script( 'fmt-select2-js', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js', [ 'jquery' ], LDNFT_VERSION, true ); 
+            wp_enqueue_script( 'fmt-backendcookie-js', LDNFT_ASSETS_URL . 'js/backend/jquery.cookie.js', [ 'jquery' ], LDNFT_VERSION, true ); 
+
+            wp_enqueue_script( 'fmt-backend-js', LDNFT_ASSETS_URL . 'js/backend/backend.js', [ 'jquery' ], LDNFT_VERSION, true ); 
+            $cron_status    = get_option('ldnft_run_cron_based_on_plugins');
+
+            $page = isset( $_REQUEST[ 'page' ] ) && $_REQUEST[ 'page' ] == 'freemius-settings' ? 'freemius' : '';
+            $tab  = isset( $_REQUEST[ 'tab' ] ) && ! empty( $_REQUEST[ 'tab' ] )? sanitize_text_field( $_REQUEST[ 'tab' ] ) : 'freemius-api';
+            $is_cron_page_check = 'no';
+            if( $page == 'freemius' && $tab == 'freemius-api' ) {
+                $is_cron_page_check = 'yes';
+            }
+            
+            $page_id = '';
+            if( isset($_REQUEST[ 'page' ]) ) {
+                $page_id = sanitize_text_field( $_REQUEST[ 'page' ] );
+            }
+            
+            $current_page = '';
+            switch ( $page_id ) {
+                case "freemius-customers":
+                    $current_page = 'customers';
+                    break;
+                case "freemius-reviews":
+                    $current_page = 'reviews';
+                    break;
+                case "freemius-sales":
+                    $current_page = 'sales';
+                    break;
+                case "freemius-subscriptions":
+                    $current_page = 'subscriptions';
+                    break;
+            } 
+
+            wp_localize_script( 'fmt-backend-js', 'LDNFT', [  
+                'ajaxURL'                       => admin_url( 'admin-ajax.php' ),
+                'import_cron_status'            => $cron_status,
+                'loader'                        => LDNFT_ASSETS_URL .'images/spinner-2x.gif',
+                'is_cron_page_check'            => $is_cron_page_check,
+                'preloader_gif_img'             => LDNFT_Admin::get_bar_preloader(),
+                'current_page'                  => $current_page,
+                'plugins_start_msg'             => __('plugins are updating', 'ldninjas-freemius-toolkit'),
+                'plans_start_msg'               => __('Plans are updating', 'ldninjas-freemius-toolkit'),
+                'customer_start_msg'            => __('Customers are updating', 'ldninjas-freemius-toolkit'),
+                'sales_start_msg'               => __('Sales are updating', 'ldninjas-freemius-toolkit'),
+                'subscription_start_msg'        => __('Subscriptions are updating', 'ldninjas-freemius-toolkit'),
+                'reviews_start_msg'             => __('Reviews are updating', 'ldninjas-freemius-toolkit'),
+                'complete_msg'                  => __('Import is complete', 'ldninjas-freemius-toolkit'),
+                'test_n_save'                   => __('Test & Save', 'ldninjas-freemius-toolkit'),
+                'sync_data'                     => __('Sync Data', 'ldninjas-freemius-toolkit'),
+                'ldnft_error_reload_message'    => __('There seems to be an issue with API connectivity, please try again by <a href="admin.php?page=freemius-settings">reloading the page</a>.', 'ldninjas-freemius-toolkit'),
+            ] );
+        }
     }
 
     /**

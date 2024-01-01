@@ -320,7 +320,7 @@ class LDNFT_Customers extends WP_List_Table {
 
 			return;
 		}
-
+        
         $paged = isset( $_REQUEST['paged'] ) && intval( $_REQUEST['paged'] ) > 0 ? intval( $_REQUEST['paged'] ) : 1;
         
         /**

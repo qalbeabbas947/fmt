@@ -40,7 +40,34 @@ class LDNFT_Reviews_Menu {
         add_action( 'admin_menu', 								[ $this, 'admin_menu_page' ] );
 		add_action( 'wp_ajax_ldnft_reviews_display', 			[ $this, 'ldnft_reviews_display' ], 100 );
         add_action( 'wp_ajax_ldnft_reviews_enable_disable',     [ $this, 'reviews_enable_disable' ], 100 );
+        add_action( 'admin_enqueue_scripts',                    [ $this, 'admin_enqueue_scripts_callback' ] );
 	}
+	
+    /**
+     * Action wp_ajax for fetching the first time table structure
+     */
+    public function admin_enqueue_scripts_callback() {
+        $screen = get_current_screen(); 
+        if( $screen->id == 'freemius-toolkit_page_freemius-reviews' ) {
+
+            /**
+             * enqueue admin css
+             */
+            wp_enqueue_style( 'ldnft-backend-css', LDNFT_ASSETS_URL . 'css/backend/backend.css', [], LDNFT_VERSION, null );
+            
+            /**
+             * enqueue admin js
+             */
+            wp_enqueue_script( 'ldnft-backendcookie-js', LDNFT_ASSETS_URL . 'js/backend/jquery.cookie.js', [ 'jquery' ], LDNFT_VERSION, true ); 
+            
+            wp_enqueue_script( 'ldnft-reviews-backend-js', LDNFT_ASSETS_URL . 'js/backend/ldnft-reviews.js', [ 'jquery' ], LDNFT_VERSION, true ); 
+            wp_localize_script( 'ldnft-reviews-backend-js', 'LDNFT', [  
+                'ajaxURL'                       => admin_url( 'admin-ajax.php' ),
+                'loader'                        => LDNFT_ASSETS_URL .'images/spinner-2x.gif',
+                'preloader_gif_img'             => LDNFT_Admin::get_bar_preloader()
+            ] );
+        }
+    }
     
     /**
      * Action wp_ajax for fetching the first time table structure
@@ -231,6 +258,7 @@ class LDNFT_Reviews_Menu {
                 <input type="hidden" class="ldnft-freemius-orderby" name="orderby" value="asc" />
                 <input type="hidden" class="ldnft-freemius-page" name="page" value="1" />
                 <input type="hidden" class="ldnft-script-freemius-type" name="ldnft-script-freemius-type" value="reviews" />
+                <input type="hidden" class="ldnft-display-review-type" name="review-type" value="filter" />
                 
                 <div id="ldnft-admin-modal" class="ldnft-admin-modal">
 					<!-- Modal content -->

@@ -29,8 +29,48 @@ class LDNFT_Customers_Menu {
 
         add_action( 'admin_menu', [ $this, 'admin_menu_page' ] );
 		add_action('wp_ajax_ldnft_customers_display', 		[ $this, 'ldnft_customers_display' ], 100 );
+        add_action( 'admin_enqueue_scripts',                    [ $this, 'admin_enqueue_scripts_callback' ] );
 	}
 	
+    /**
+     * Action wp_ajax for fetching the first time table structure
+     */
+    public function admin_enqueue_scripts_callback() {
+        $screen = get_current_screen();
+        if( $screen->id == 'freemius-toolkit_page_freemius-customers' ) {
+
+            wp_enqueue_style( 'ldnft-select2-css', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css', [], LDNFT_VERSION, null );
+
+            /**
+             * enqueue admin css
+             */
+            wp_enqueue_style( 'ldnft-backend-css', LDNFT_ASSETS_URL . 'css/backend/backend.css', [], LDNFT_VERSION, null );
+            
+            /**
+             * enqueue admin js
+             */
+            wp_enqueue_script( 'ldnft-select2-js', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js', [ 'jquery' ], LDNFT_VERSION, true ); 
+            wp_enqueue_script( 'ldnft-backendcookie-js', LDNFT_ASSETS_URL . 'js/backend/jquery.cookie.js', [ 'jquery' ], LDNFT_VERSION, true ); 
+
+            wp_enqueue_script( 'ldnft-backend-js', LDNFT_ASSETS_URL . 'js/backend/ldnft-customer.js', [ 'jquery' ], LDNFT_VERSION, true ); 
+            
+            $page = isset( $_REQUEST[ 'page' ] ) && $_REQUEST[ 'page' ] == 'freemius-settings' ? 'freemius' : '';
+            $tab  = isset( $_REQUEST[ 'tab' ] ) && ! empty( $_REQUEST[ 'tab' ] )? sanitize_text_field( $_REQUEST[ 'tab' ] ) : 'freemius-api';
+            
+            $page_id = '';
+            if( isset($_REQUEST[ 'page' ]) ) {
+                $page_id = sanitize_text_field( $_REQUEST[ 'page' ] );
+            }
+            
+            wp_localize_script( 'fmt-backend-js', 'LDNFT', [  
+                'ajaxURL'                       => admin_url( 'admin-ajax.php' ),
+                'loader'                        => LDNFT_ASSETS_URL .'images/spinner-2x.gif',
+                'preloader_gif_img'             => LDNFT_Admin::get_bar_preloader()
+            ] );
+        }
+    }  
+    
+
 	/**
      * Action wp_ajax for fetching the first time table structure
      */
@@ -195,6 +235,7 @@ class LDNFT_Customers_Menu {
                     <input type="hidden" class="ldnft-freemius-order" name="order" value="id" />
                     <input type="hidden" class="ldnft-freemius-orderby" name="orderby" value="asc" />
 					<input type="hidden" class="ldnft-script-freemius-type" name="ldnft-script-freemius-type" value="customers" />
+                    <input type="hidden" class="ldnft-display-customers-type" name="customers-type" value="filter" />
                 </form>
             </div>
         <?php

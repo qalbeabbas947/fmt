@@ -94,7 +94,7 @@ class LDNFT_Admin {
         }, 10, 3 );
 
         add_action( 'upgrader_process_complete',                [ $this, 'ldnft_create_table_when_plugin_update' ], 10, 2 );
-        add_action( 'admin_enqueue_scripts',                    [ $this, 'admin_enqueue_scripts_callback' ] );
+        //add_action( 'admin_enqueue_scripts',                    [ $this, 'admin_enqueue_scripts_callback' ] );
         add_action( 'admin_menu',                               [ $this, 'add_main_menu_page' ] );
         add_filter( 'plugin_action_links_'. LDNFT_BASE_DIR,     [ $this, 'plugin_setting_links' ] ); 
         add_action( 'in_admin_header',                          [ $this, 'remove_admin_notices' ], 100 );

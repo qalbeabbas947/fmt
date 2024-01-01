@@ -38,6 +38,36 @@ class LDNFT_Subscriptions_Menu {
         add_action( 'wp_ajax_ldnft_subscriptions_summary', [ $this, 'ldnft_subscriptions_summary_callback' ], 100 );
         add_action( 'wp_ajax_ldnft_subscribers_view_detail',    [ $this, 'subscribers_view_detail' ], 100 );
         add_action( 'wp_ajax_ldnft_subscription_plans_dropdown',    [ $this, 'subscription_plans_dropdown' ], 100 );
+        add_action( 'admin_enqueue_scripts',                    [ $this, 'admin_enqueue_scripts_callback' ] );
+	}
+	
+    /**
+     * Action wp_ajax for fetching the first time table structure
+     */
+    public function admin_enqueue_scripts_callback() { 
+        $screen = get_current_screen();
+        if( $screen->id == 'freemius-toolkit_page_freemius-subscriptions' ) {
+
+            wp_enqueue_style( 'ldnft-select2-css', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css', [], LDNFT_VERSION, null );
+
+            /**
+             * enqueue admin css
+             */
+            wp_enqueue_style( 'ldnft-backend-css', LDNFT_ASSETS_URL . 'css/backend/backend.css', [], LDNFT_VERSION, null );
+            
+            /**
+             * enqueue admin js
+             */
+            wp_enqueue_script( 'ldnft-select2-js', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js', [ 'jquery' ], LDNFT_VERSION, true ); 
+            wp_enqueue_script( 'ldnft-backendcookie-js', LDNFT_ASSETS_URL . 'js/backend/jquery.cookie.js', [ 'jquery' ], LDNFT_VERSION, true ); 
+
+            wp_enqueue_script( 'ldnft-subscriptions-backend-js', LDNFT_ASSETS_URL . 'js/backend/ldnft-subscriptions.js', [ 'jquery' ], LDNFT_VERSION, true ); 
+            wp_localize_script( 'ldnft-subscriptions-backend-js', 'LDNFT', [  
+                'ajaxURL'                       => admin_url( 'admin-ajax.php' ),
+                'loader'                        => LDNFT_ASSETS_URL .'images/spinner-2x.gif',
+                'preloader_gif_img'             => LDNFT_Admin::get_bar_preloader()
+            ] );
+        }
     }
 
     /**
@@ -721,6 +751,7 @@ class LDNFT_Subscriptions_Menu {
             <input type="hidden" class="ldnft-freemius-orderby" name="orderby" value="asc" />
             <input type="hidden" class="ldnft-freemius-page" name="page" value="1" />
             <input type="hidden" class="ldnft-script-freemius-type" name="ldnft-script-freemius-type" value="subscribers" />
+            <input type="hidden" class="ldnft-display-subscribers-type" name="subscribers-type" value="filter" />
         </div>
         <?php
     }
