@@ -22,7 +22,7 @@
                     e.preventDefault();
                     let self = $( this );
 
-                    self.html( '<div class="ldnft-animated-loader">Loading</div>' );
+                    self.html( '<div class="ldnft-animated-loader">Loading</div>' ).change();
                     let offSet = self.data( 'offset' ) + self.data( 'limit' );
                     let data = {
                         'action': 'ldnft_review_load_more',

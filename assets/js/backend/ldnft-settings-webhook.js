@@ -21,9 +21,9 @@
                     var calling_btn = $('.ldnft-save-webhook-setting');
                 
                     calling_btn.attr( 'disabled', true );
-                    $('.ldnft-webhook-message').html( '' ).css('display', 'none');
+                    $('.ldnft-webhook-message').html( '' ).css('display', 'none').change();
                     jQuery.post( LDNFT.ajaxURL, form, function( response ) {
-                        $('.ldnft-webhook-message').html( response ).css('display', 'block');
+                        $('.ldnft-webhook-message').html( response ).css('display', 'block').change();
                         calling_btn.attr('disabled', false);
                     } );
                 } ); 
@@ -52,8 +52,8 @@
                 $('.ldnft-plugin-ddl-loader').css('display', 'inline-block');
                 
                 jQuery.post( LDNFT.ajaxURL, data, function( response ) {
-                    $('.ldnft-webhook-settings-fields').html( response );
-                    $('.ldnft-webhook-message').html( '' ).css('display', 'none');
+                    $('.ldnft-webhook-settings-fields').html( response ).change();
+                    $('.ldnft-webhook-message').html( '' ).css('display', 'none').change();
                     $('.ldnft-save-webhook-setting').attr( 'disabled', false );
                     $('.ldnft-plugin-ddl-loader').css('display', 'none');
                     

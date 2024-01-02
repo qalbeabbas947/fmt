@@ -15,17 +15,17 @@
                 $( '.ldnft-settings-mailpoet' ).on( 'submit', function( e ) {
 
                     e.preventDefault();
-                    $('#ldnft-settings-import-mailpoet-message').html('').css('display', 'none');
-                    $('#ldnft-settings-import-mailpoet-errmessage').html('').css('display', 'none');
+                    $('#ldnft-settings-import-mailpoet-message').html('').css('display', 'none').change();
+                    $('#ldnft-settings-import-mailpoet-errmessage').html('').css('display', 'none').change();
                     $('.ldnft-success-message').show();
                     var data = $( this ).serialize();
                     $('#ldnft_mailpeot_list, #ldnft_mailpeot_plugin, .ldnft-mailpoet-save-setting_import').attr('disabled', true);
                     jQuery.post( LDNFT.ajaxURL, data, function( response ) {
                         
                         if( JSON.parse(response).message!='' ) {
-                            $('#ldnft-settings-import-mailpoet-message').html(JSON.parse(response).message).css('display', 'block');
+                            $('#ldnft-settings-import-mailpoet-message').html(JSON.parse(response).message).css('display', 'block').change();
                         } else if( JSON.parse(response).errormsg!='' ) {
-                            $('#ldnft-settings-import-mailpoet-errmessage').html(JSON.parse(response).errormsg).css('display', 'block');
+                            $('#ldnft-settings-import-mailpoet-errmessage').html(JSON.parse(response).errormsg).css('display', 'block').change();
                         }
                         
                         $('#ldnft_mailpeot_list, #ldnft_mailpeot_plugin, .ldnft-mailpoet-save-setting_import').attr('disabled', false);

@@ -116,7 +116,7 @@
                 }
                 
                 placeholder += '</tr>';
-                $( '#ldnft_reviews_data table tbody' ).html( placeholder );
+                $( '#ldnft_reviews_data table tbody' ).html( placeholder ).change();;
                
                 var ldnftpage       = $( '.ldnft-freemius-page' ).val();
                 var order_str       = $( '.ldnft-freemius-order' ).val();
@@ -159,7 +159,7 @@
                     },
                     success: function (response) {
 
-                        $("#ldnft_reviews_data").html(response.display);
+                        $("#ldnft_reviews_data").html(response.display).change();
 
                         $("tbody").on("click", ".toggle-row", function(e) {
                             
@@ -178,35 +178,35 @@
                 
                     var lnk = $( this );
                     
-                    $('#ldnft-review-coloumn-transaction-id').html( lnk.data('id') );
-                    $('#ldnft-review-coloumn-user_id').html( lnk.data('user_id') );
-                    $('#ldnft-review-coloumn-useremail').html( lnk.data('useremail') );
-                    $('#ldnft-review-coloumn-name').html( lnk.data('name') );
-                    $('#ldnft-review-coloumn-company').html( lnk.data('company') );
-                    $('#ldnft-review-coloumn-job_title').html( lnk.data('job_title') );
-                    $('#ldnft-review-coloumn-company_url').html( lnk.data('company_url') );
-                    $('#ldnft-review-coloumn-picture').html( lnk.data('picture') );
+                    $('#ldnft-review-coloumn-transaction-id').html( lnk.data('id') ).change();
+                    $('#ldnft-review-coloumn-user_id').html( lnk.data('user_id') ).change();
+                    $('#ldnft-review-coloumn-useremail').html( lnk.data('useremail') ).change();
+                    $('#ldnft-review-coloumn-name').html( lnk.data('name') ).change();
+                    $('#ldnft-review-coloumn-company').html( lnk.data('company') ).change();
+                    $('#ldnft-review-coloumn-job_title').html( lnk.data('job_title') ).change();
+                    $('#ldnft-review-coloumn-company_url').html( lnk.data('company_url') ).change();
+                    $('#ldnft-review-coloumn-picture').html( lnk.data('picture') ).change();
                     
                     if( lnk.data('profile_url') != '' && lnk.data('profile_url')!='-' ) {
-                        $('#ldnft-review-coloumn-profile_url').html( '<a href="'+lnk.data('profile_url')+'" target="_blank">'+lnk.data('profile_url')+'</a>' );
+                        $('#ldnft-review-coloumn-profile_url').html( '<a href="'+lnk.data('profile_url')+'" target="_blank">'+lnk.data('profile_url')+'</a>' ).change();
                     } else {
-                        $('#ldnft-review-coloumn-profile_url').html( lnk.data('profile_url') );
+                        $('#ldnft-review-coloumn-profile_url').html( lnk.data('profile_url') ).change();
                     }
                     
-                    $('#ldnft-review-coloumn-is_verified').html( lnk.data('is_verified') );
-                    $('#ldnft-review-coloumn-is_featured').html( lnk.data('is_featured') );
+                    $('#ldnft-review-coloumn-is_verified').html( lnk.data('is_verified') ).change();
+                    $('#ldnft-review-coloumn-is_featured').html( lnk.data('is_featured') ).change();
                     
                     if( lnk.data('sharable_img') != '' && lnk.data('sharable_img')!='-' ) {
-                        $('#ldnft-review-coloumn-sharable_img').html( '<a href="'+lnk.data('sharable_img')+'" target="_blank">'+lnk.data('sharable_img')+'</a>' );
+                        $('#ldnft-review-coloumn-sharable_img').html( '<a href="'+lnk.data('sharable_img')+'" target="_blank">'+lnk.data('sharable_img')+'</a>' ).change();
                     } else {
-                        $('#ldnft-review-coloumn-sharable_img').html( lnk.data('sharable_img') );
+                        $('#ldnft-review-coloumn-sharable_img').html( lnk.data('sharable_img') ).change();
                     }
                     
-                    $('#ldnft-review-coloumn-title').html( lnk.data('title') );
+                    $('#ldnft-review-coloumn-title').html( lnk.data('title') ).change();
                     
-                    $('#ldnft-review-coloumn-rate').html( lnk.parent().parent().find('.column-rate').html() );
-                    $('#ldnft-review-coloumn-text').html( lnk.data('text') );
-                    $('#ldnft-review-coloumn-created').html( lnk.data('created') );
+                    $('#ldnft-review-coloumn-rate').html( lnk.parent().parent().find('.column-rate').html() ).change();
+                    $('#ldnft-review-coloumn-text').html( lnk.data('text') ).change();
+                    $('#ldnft-review-coloumn-created').html( lnk.data('created') ).change();
                     
                     $('#ldnft-admin-modal').css('display', 'block');
                 } );

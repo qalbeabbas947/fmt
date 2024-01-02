@@ -52,7 +52,7 @@ class LDNFT_Customers_Menu {
             wp_enqueue_script( 'ldnft-select2-js', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js', [ 'jquery' ], LDNFT_VERSION, true ); 
             wp_enqueue_script( 'ldnft-backendcookie-js', LDNFT_ASSETS_URL . 'js/backend/jquery.cookie.js', [ 'jquery' ], LDNFT_VERSION, true ); 
 
-            wp_enqueue_script( 'ldnft-backend-js', LDNFT_ASSETS_URL . 'js/backend/ldnft-customer.js', [ 'jquery' ], LDNFT_VERSION, true ); 
+            wp_enqueue_script( 'ldnft-customer-backend-js', LDNFT_ASSETS_URL . 'js/backend/ldnft-customer.js', [ 'jquery' ], LDNFT_VERSION, true ); 
             
             $page = isset( $_REQUEST[ 'page' ] ) && $_REQUEST[ 'page' ] == 'freemius-settings' ? 'freemius' : '';
             $tab  = isset( $_REQUEST[ 'tab' ] ) && ! empty( $_REQUEST[ 'tab' ] )? sanitize_text_field( $_REQUEST[ 'tab' ] ) : 'freemius-api';
@@ -62,7 +62,7 @@ class LDNFT_Customers_Menu {
                 $page_id = sanitize_text_field( $_REQUEST[ 'page' ] );
             }
             
-            wp_localize_script( 'fmt-backend-js', 'LDNFT', [  
+            wp_localize_script( 'ldnft-customer-backend-js', 'LDNFT', [  
                 'ajaxURL'                       => admin_url( 'admin-ajax.php' ),
                 'loader'                        => LDNFT_ASSETS_URL .'images/spinner-2x.gif',
                 'preloader_gif_img'             => LDNFT_Admin::get_bar_preloader()

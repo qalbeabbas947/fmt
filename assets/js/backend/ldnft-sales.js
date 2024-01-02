@@ -97,7 +97,7 @@
                     placeholder += '<td align="center">' + LDNFT.preloader_gif_img + '</td>';
                 }
                 placeholder += '</tr>';
-                $('#ldnft_sales_data table tbody').html( placeholder );
+                $('#ldnft_sales_data table tbody').html( placeholder ).change();
                 
                 var ldnftpage       = $('.ldnft-freemius-page').val();
                 let display_type = $('.ldnft-display-sales-type').val();
@@ -150,7 +150,7 @@
                     },
                     success: function (response) {
                         
-                        $("#ldnft_sales_data").html(response.display);
+                        $("#ldnft_sales_data").html(response.display).change();
 
                         $("tbody").on("click", ".toggle-row", function(e) {
                             
@@ -167,7 +167,7 @@
                 $('.ldnft-subssummary-loader').css('display', 'inline');
 
                 $('.ldnft_sales_points').css('display', 'none');
-                $('.ldnft_sales_points_count').html('');
+                $('.ldnft_sales_points_count').html('').change();
                 $('.ldnft_sales_top3_countries').css('display', 'none');;
                 //$('.ldnft_sales_tax_fee').css('display', 'none');
                 $('.ldnft_sales_new_subscriptions_count').css('display', 'none');
@@ -229,9 +229,9 @@
                             var list_items = '0';
                         }
                         
-                        $('.ldnft_sales_points').html(list_items).css('display', 'block');
-                        $('.ldnft_sales_points_tooltip').html( response.gross_message );
-                        $('.ldnft_sales_points_count').html('(' + response.gross_total_count+')');
+                        $('.ldnft_sales_points').html(list_items).css('display', 'block').change();
+                        $('.ldnft_sales_points_tooltip').html( response.gross_message ).change();
+                        $('.ldnft_sales_points_count').html('(' + response.gross_total_count+')').change();
                         
                         if( parseInt( response.gross_total_count ) > 0 ) {
                             var tax_rate_total = '<ul>';
@@ -249,14 +249,14 @@
                     // $('.ldnft_sales_tax_fee').html(tax_rate_total).css('display', 'block');
                         //$('.ldnft_sales_tax_fee_tooltip').html( response.tax_message );
 
-                        $('.ldnft_sales_renewals_amount').html(response.total_new_renewals_amount).css('display', 'block');
-                        $('.ldnft_new_renewals_count').html('(' + response.total_new_renewals + ')');
-                        $('.ldnft_sales_renewals_tooltip').html( response.new_renewals_message );
+                        $('.ldnft_sales_renewals_amount').html(response.total_new_renewals_amount).css('display', 'block').change();
+                        $('.ldnft_new_renewals_count').html('(' + response.total_new_renewals + ')').change();
+                        $('.ldnft_sales_renewals_tooltip').html( response.new_renewals_message ).change();
                         $('.ldnft-subssummary-loader').css('display', 'none');
-                        $('.ldnft_sales_new_subscriptions').html(response.total_new_subscriptions_amount).css('display', 'block');
-                        $('.ldnft_new_subscriptions_count').html('(' + response.total_new_subscriptions+')');
-                        $('.ldnft_new_subscriptions_tooltip').html( response.new_subscriptions_message );
-                        $('.ldnft_sales_top3_countries_tooltip').html( response.countries_message );
+                        $('.ldnft_sales_new_subscriptions').html(response.total_new_subscriptions_amount).css('display', 'block').change();
+                        $('.ldnft_new_subscriptions_count').html('(' + response.total_new_subscriptions+')').change();
+                        $('.ldnft_new_subscriptions_tooltip').html( response.new_subscriptions_message ).change();
+                        $('.ldnft_sales_top3_countries_tooltip').html( response.countries_message ).change();
                         
                         var idx = 0;
                         if( parseInt( response.gross_total_count ) > 0 ) {
@@ -289,7 +289,7 @@
                             var list_items = '<span class="ldnft-empty-countries-box">-</span>';
                         }
                         
-                        $('.ldnft_sales_top3_countries').html(list_items).css('display', 'block');
+                        $('.ldnft_sales_top3_countries').html(list_items).css('display', 'block').change();
 
                     }
                 });
@@ -322,32 +322,32 @@
                     
                     $('#ldnft-admin-modal').css('display', 'block');
                     
-                    $('#ldnft-review-coloumn-transaction-id').html( lnk.data('id') );
-                    $('#ldnft-review-coloumn-user_id').html( lnk.data('user_id') );
-                    $('#ldnft-review-coloumn-username').html( lnk.data('username') );
-                    $('#ldnft-review-coloumn-useremail').html( lnk.data('useremail') );
-                    $('#ldnft-review-coloumn-subscription_id').html( lnk.data('subscription_id') );
-                    $('#ldnft-review-coloumn-gateway_fee').html( lnk.data('gateway_fee') );
-                    $('#ldnft-review-coloumn-gross').html( lnk.data('gross') );
-                    $('#ldnft-review-coloumn-license_id').html( lnk.data('license_id') );
-                    $('#ldnft-review-coloumn-gateway').html( lnk.data('gateway') );
-                    $('#ldnft-review-coloumn-country_code').html( lnk.data('country_code') );
-                    $('#ldnft-review-coloumn-is_renewal').html( lnk.data('is_renewal') );
-                    $('#ldnft-review-coloumn-type').html( lnk.data('type') );
-                    $('#ldnft-review-coloumn-bound_payment_id').html( lnk.data('bound_payment_id') );
-                    $('#ldnft-review-coloumn-created').html( lnk.data('created') );
-                    $('#ldnft-review-coloumn-vat').html( lnk.data('vat') );
-                    $('#ldnft-review-coloumn-install_id').html( lnk.data('install_id') );
-                    $('#ldnft-review-coloumn-plan_id').html( lnk.data('plan_id') );
+                    $('#ldnft-review-coloumn-transaction-id').html( lnk.data('id') ).change();
+                    $('#ldnft-review-coloumn-user_id').html( lnk.data('user_id') ).change();
+                    $('#ldnft-review-coloumn-username').html( lnk.data('username') ).change();
+                    $('#ldnft-review-coloumn-useremail').html( lnk.data('useremail') ).change();
+                    $('#ldnft-review-coloumn-subscription_id').html( lnk.data('subscription_id') ).change();
+                    $('#ldnft-review-coloumn-gateway_fee').html( lnk.data('gateway_fee') ).change();
+                    $('#ldnft-review-coloumn-gross').html( lnk.data('gross') ).change();
+                    $('#ldnft-review-coloumn-license_id').html( lnk.data('license_id') ).change();
+                    $('#ldnft-review-coloumn-gateway').html( lnk.data('gateway') ).change();
+                    $('#ldnft-review-coloumn-country_code').html( lnk.data('country_code') ).change();
+                    $('#ldnft-review-coloumn-is_renewal').html( lnk.data('is_renewal') ).change();
+                    $('#ldnft-review-coloumn-type').html( lnk.data('type') ).change();
+                    $('#ldnft-review-coloumn-bound_payment_id').html( lnk.data('bound_payment_id') ).change();
+                    $('#ldnft-review-coloumn-created').html( lnk.data('created') ).change();
+                    $('#ldnft-review-coloumn-vat').html( lnk.data('vat') ).change();
+                    $('#ldnft-review-coloumn-install_id').html( lnk.data('install_id') ).change();
+                    $('#ldnft-review-coloumn-plan_id').html( lnk.data('plan_id') ).change();
                     
-                    $('#ldnft-review-coloumn-zip_postal_code').html( lnk.data('zip_postal_code') );
+                    $('#ldnft-review-coloumn-zip_postal_code').html( lnk.data('zip_postal_code') ).change();
                     
-                    $('#ldnft-review-coloumn-coupon_id').html( lnk.data('coupon_id') );
-                    $('#ldnft-review-coloumn-plugin_id').html( lnk.data('plugin_id') );
-                    $('#ldnft-review-coloumn-external_id').html( lnk.data('external_id') );
-                    $('#ldnft-review-coloumn-currency').html( lnk.data('currency') );
-                    $('#ldnft-review-coloumn-username').html( lnk.data('username') );
-                    $('#ldnft-review-coloumn-useremail').html( lnk.data('useremail') );
+                    $('#ldnft-review-coloumn-coupon_id').html( lnk.data('coupon_id') ).change();
+                    $('#ldnft-review-coloumn-plugin_id').html( lnk.data('plugin_id') ).change();
+                    $('#ldnft-review-coloumn-external_id').html( lnk.data('external_id') ).change();
+                    $('#ldnft-review-coloumn-currency').html( lnk.data('currency') ).change();
+                    $('#ldnft-review-coloumn-username').html( lnk.data('username') ).change();
+                    $('#ldnft-review-coloumn-useremail').html( lnk.data('useremail') ).change();
                 } );
              },
         };

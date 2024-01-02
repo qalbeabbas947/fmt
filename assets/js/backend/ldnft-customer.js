@@ -15,6 +15,7 @@
              * Load data from the cookies
              */
             load_data_from_cookies: function() { 
+
                 $('.ldfmt-plugins-filter').val(jQuery.cookie( 'customers_ldfmt-plugins-filter' ) );
                 $('.ldfmt-plugins-customers-status').val(jQuery.cookie( 'customers_ldfmt-plugins-status' ) );
                 $('.ldfmt-plugins-customers-marketing').val(jQuery.cookie( 'customers_ldfmt-plugins-marketing' ) );
@@ -23,17 +24,30 @@
             },
             /**
              * displays customers on pagination clicks
-            */
+             */
 			display_new_page_customers: function() { 
 
-                $('#ldnft_customers_data').on('click', '.tablenav-pages a, th a', function( e ) {
+                $( '#ldnft_customers_data' ).on( 'click', '.tablenav-pages a, th a', function( e ) {
                     $( '.ldnft-freemius-order'   ).val(LDNFT_Customers.getParameterByName( 'order', $( this ).attr('href')));
                     $( '.ldnft-freemius-orderby' ).val(LDNFT_Customers.getParameterByName( 'orderby', $( this ).attr('href') ));
                     
                     e.preventDefault();
-                    var page = $('.ldnft-freemius-page').val($(this).data('paged'));
+                    var page = $( '.ldnft-freemius-page' ).val( $( this ).data( 'paged' ) );
                     LDNFT_Customers.display_customers();
                 });
+            },
+            /**
+             * get Parameter By Name
+             */
+            getParameterByName: function( name, url) {
+                
+                name = name.replace(/[\[\]]/g, '\\$&');
+                
+                var regex = new RegExp( '[?&]' + name + '(=([^&#]*)|&|#|$)' ),
+                    results = regex.exec( url );
+                if ( ! results ) return null;
+                if ( ! results[2] ) return '';
+                return decodeURIComponent( results[2].replace(/\+/g, ' ') );
             },
             /**
              * Show customers based on filters
@@ -41,7 +55,7 @@
 			display_customers_onchange: function() {
                 $('.ldnft-customer-search-button').on('click', function() {
                     $('.ldnft-display-customers-type').val('filter');
-                    var page = $('.ldnft-freemius-page').val(1);
+                    $('.ldnft-freemius-page').val(1);
                     LDNFT_Customers.display_customers();
                 });
             },
@@ -54,7 +68,7 @@
                     e.preventDefault();
 
                     $('.ldnft-display-customers-type').val('text');
-                    var page = $('.ldnft-freemius-page').val(1);
+                    $('.ldnft-freemius-page').val(1);
                     LDNFT_Customers.display_customers();
                 });
                 
@@ -75,31 +89,32 @@
                 var columns_count = $('#ldnft_customers_data table thead tr:eq(0)').find('th:not(.hidden)').length; 
                 var placeholder = '<tr>';
                 for( var i = 0; i < columns_count; i++ ) {
-                    placeholder += '<td align="center">' + LDNFT_Customers.preloader_gif_img + '</td>';
+                    placeholder += '<td align="center">' + LDNFT.preloader_gif_img + '</td>';
                 }
-                placeholder += '</tr>';
-                $('#ldnft_customers_data table tbody').html( placeholder );
-               
-                var ldnftpage       = $('.ldnft-freemius-page').val();
-                var order_str       = $('.ldnft-freemius-order').val();
-                var orderby_str     = $('.ldnft-freemius-orderby').val();
 
-                let display_type = $('.ldnft-display-customers-type').val();
+                placeholder += '</tr>';
+                $( '#ldnft_customers_data table tbody' ).html( placeholder ).change();
+               
+                var ldnftpage       = $( '.ldnft-freemius-page' ).val();
+                var order_str       = $( '.ldnft-freemius-order' ).val();
+                var orderby_str     = $( '.ldnft-freemius-orderby' ).val();
+
+                let display_type = $( '.ldnft-display-customers-type' ).val();
                 if( display_type == 'text' ) {
                     var ldnftplugin     = '';
                     var ldnftstatus     = '';
-                    var ldnftsearch     = $('.ldnft-customers-general-search').val();
+                    var ldnftsearch     = $( '.ldnft-customers-general-search' ).val();
                     var pmtstatus_str   = '';
                     var marketing_str   = '';
                     
                     jQuery.cookie( 'customers_ldnft-customers-general-search', ldnftsearch, { expires: 30, path: '/' } );
 
                 } else {
-                    var ldnftplugin     = $('.ldfmt-plugins-filter').val();
-                    var ldnftstatus     = $('.ldfmt-plugins-customers-status').val();
+                    var ldnftplugin     = $( '.ldfmt-plugins-filter' ).val();
+                    var ldnftstatus     = $( '.ldfmt-plugins-customers-status' ).val();
                     var ldnftsearch     = '';
-                    var pmtstatus_str   = $('.ldfmt-payment-status').val();
-                    var marketing_str   = $('.ldfmt-plugins-customers-marketing').val();
+                    var pmtstatus_str   = $( '.ldfmt-payment-status' ).val();
+                    var marketing_str   = $( '.ldfmt-plugins-customers-marketing' ).val();
 
                     jQuery.cookie( 'customers__ldfmt-plugins-filter', ldnftplugin, { expires: 30, path: '/' } );
                     jQuery.cookie( 'customers__ldfmt-plugins-status', ldnftstatus, { expires: 30, path: '/' } );
@@ -112,7 +127,7 @@
                     dataType: 'json',
                     data: {
                         action: 'ldnft_customers_display', 
-                        paged: ldnftpage,
+                        paged:  ldnftpage,
                         ldfmt_plugins_filter: ldnftplugin,
                         status: ldnftstatus,
                         order: order_str,
@@ -121,12 +136,10 @@
                         marketing: marketing_str,
                         orderby: orderby_str,
                     },
-                    success: function (response) {
-                        $("#ldnft_customers_data").html(response.display);
-
-                        $("tbody").on("click", ".toggle-row", function(e) {
-                            
-                            $(this).closest("tr").toggleClass("is-expanded")
+                    success: function ( response ) {
+                        $("#ldnft_customers_data").html( response.display ).change();
+                        $( "tbody" ).on( "click", ".toggle-row", function( e ) {
+                            $( this ).closest( "tr" ).toggleClass( "is-expanded" )
                         });
                     }
                 });

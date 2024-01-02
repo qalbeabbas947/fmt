@@ -54,7 +54,7 @@
                     state: Settings_API.current_cron_step
                 }
 
-                $('#ldnft-settings-import-error-message').html('').css( 'display', 'none' );
+                $('#ldnft-settings-import-error-message').html('').css( 'display', 'none' ).change();
                 jQuery.post( LDNFT.ajaxURL, data, function( response ) {
                     
                     if( response.status == 'complete' ) {
@@ -166,7 +166,7 @@
                      } 
 
                 } ).fail(function(response) {
-                    $('#ldnft-settings-import-error-message').html( LDNFT.ldnft_error_reload_message ).css( 'display', 'block' );
+                    $('#ldnft-settings-import-error-message').html( LDNFT.ldnft_error_reload_message ).css( 'display', 'block' ).change();
                     clearTimeout( Settings_API.timeout_obj );
                 });
             },
@@ -176,7 +176,7 @@
             ldnft_save_setting: function() {
                 $( '.ldnft-save-setting' ).on( 'click', function() {
                     $('.ldnft-submit-button a.ldnft-sync-data-setting').attr( 'disabled', true );
-                    $('.ldnft-submit-button a.ldnft-save-setting').html(LDNFT.test_n_save + ' <img width="16px" src="'+LDNFT.loader+'">').attr( 'disabled', true );
+                    $('.ldnft-submit-button a.ldnft-save-setting').html(LDNFT.test_n_save + ' <img width="16px" src="'+LDNFT.loader+'">').attr( 'disabled', true ).change();
                     $('#ldnft-save-setting-form').submit();
                 } );
             },
@@ -191,7 +191,7 @@
                     }
                     
                     $('.ldnft-submit-button a.ldnft-save-setting').attr( 'disabled', true );
-                    $('.ldnft-submit-button a.ldnft-sync-data-setting').attr( 'disabled', true ).html(LDNFT.sync_data + ' <img width="16px" src="'+LDNFT.loader+'">');
+                    $('.ldnft-submit-button a.ldnft-sync-data-setting').attr( 'disabled', true ).html(LDNFT.sync_data + ' <img width="16px" src="'+LDNFT.loader+'">').change();
                     
                     jQuery.post( LDNFT.ajaxURL, data, function( response ) {
                         
@@ -202,7 +202,7 @@
                             document.location.reload();
                         } else {
                             $('.ldnft-submit-button a.ldnft-save-setting').attr( 'disabled', false );
-                            $('.ldnft-submit-button a.ldnft-sync-data-setting').attr( 'disabled', false ).html(LDNFT.sync_data );
+                            $('.ldnft-submit-button a.ldnft-sync-data-setting').attr( 'disabled', false ).html(LDNFT.sync_data ).change();
                         }
                         
                     } );
