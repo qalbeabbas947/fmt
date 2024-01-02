@@ -129,7 +129,6 @@
                     $('.ldnft-subscription-search-button').on('click', LDNFTbackEnd.display_subscriptions_plus_summary);
                     $('#ldnft-subscription-filter-form-text').on('submit', LDNFTbackEnd.display_subscriptions_plus_summary_submit);
                     $('#ldnft_subscriptions_data').on('click', '.tablenav-pages a, th a', LDNFTbackEnd.display_new_page_subscriptions);
-                    
                     $('.ldfmt-plugins-subscription-filter').val(jQuery.cookie( LDNFT.current_page + '_ldfmt-plugins-filter' ) );
                     $('.ldfmt-subscription-plan_id-filter').val(jQuery.cookie( LDNFT.current_page + '_ldfmt-sales-plan_id-filter' ) );
                     $('.ldfmt-subscription-interval-filter').val(jQuery.cookie( LDNFT.current_page + '_ldfmt-sales-interval-filter' ) );

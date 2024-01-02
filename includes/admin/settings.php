@@ -22,7 +22,7 @@ class LDNFT_Settings {
         add_action( 'wp_ajax_ldnft_mailpoet_submit_action',     [ $this, 'mailpoet_submit_action' ], 100 );
         add_action( 'wp_ajax_ldnft_webhook_plugin_settings',    [ $this, 'webhook_plugin_settings' ], 100 );
         add_action( 'wp_ajax_ldnft_save_webhook_setting',       [ $this, 'save_webhook_setting' ], 100 );
-        //add_action( 'admin_enqueue_scripts',                    [ $this, 'admin_enqueue_scripts_callback' ] );
+        add_action( 'admin_enqueue_scripts',                    [ $this, 'admin_enqueue_scripts_callback' ] );
 	}
 	
     /**
@@ -30,16 +30,9 @@ class LDNFT_Settings {
      */
     public function admin_enqueue_scripts_callback() {
         $screen = get_current_screen();
-        if( $screen->id == 'freemius-toolkit_page_freemius-settings' 
-            || $screen->id == 'freemius-toolkit_page_freemius-settings-page'
-            || $screen->id == 'freemius-toolkit_page_freemius-subscriptions'
-            || $screen->id == 'freemius-toolkit_page_freemius-sales' 
-            || $screen->id == 'freemius-toolkit_page_freemius-customers' 
-            || $screen->id == 'freemius-toolkit_page_freemius-reviews' ) {
+        if( $screen->id == 'freemius-toolkit_page_freemius-settings' || $screen->id == 'freemius-toolkit_page_freemius-settings-page' ) {
 
             wp_enqueue_style( 'dashicons' );
-            wp_enqueue_style( 'ldnft-select2-css', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css', [], LDNFT_VERSION, null );
-
             /**
              * enqueue admin css
              */
@@ -48,10 +41,8 @@ class LDNFT_Settings {
             /**
              * enqueue admin js
              */
-            wp_enqueue_script( 'fmt-select2-js', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js', [ 'jquery' ], LDNFT_VERSION, true ); 
             wp_enqueue_script( 'fmt-backendcookie-js', LDNFT_ASSETS_URL . 'js/backend/jquery.cookie.js', [ 'jquery' ], LDNFT_VERSION, true ); 
 
-            wp_enqueue_script( 'fmt-backend-js', LDNFT_ASSETS_URL . 'js/backend/backend.js', [ 'jquery' ], LDNFT_VERSION, true ); 
             $cron_status    = get_option('ldnft_run_cron_based_on_plugins');
 
             $page = isset( $_REQUEST[ 'page' ] ) && $_REQUEST[ 'page' ] == 'freemius-settings' ? 'freemius' : '';
@@ -80,9 +71,22 @@ class LDNFT_Settings {
                 case "freemius-subscriptions":
                     $current_page = 'subscriptions';
                     break;
-            } 
+            }
 
-            wp_localize_script( 'fmt-backend-js', 'LDNFT', [  
+            $handle = 'ldnft-backend-settings-js';
+            switch( $tab ) {
+                case "freemius-api":
+                    wp_enqueue_script( $handle, LDNFT_ASSETS_URL . 'js/backend/ldnft-settings-api.js', [ 'jquery' ], LDNFT_VERSION, true ); 
+                    break;
+                case "import":
+                    wp_enqueue_script( $handle, LDNFT_ASSETS_URL . 'js/backend/ldnft-settings-import.js', [ 'jquery' ], LDNFT_VERSION, true ); 
+                    break;
+                case "webhook":
+                    wp_enqueue_script( $handle, LDNFT_ASSETS_URL . 'js/backend/ldnft-settings-webhook.js', [ 'jquery' ], LDNFT_VERSION, true ); 
+                    break;
+            }
+
+            wp_localize_script( $handle, 'LDNFT', [  
                 'ajaxURL'                       => admin_url( 'admin-ajax.php' ),
                 'import_cron_status'            => $cron_status,
                 'loader'                        => LDNFT_ASSETS_URL .'images/spinner-2x.gif',

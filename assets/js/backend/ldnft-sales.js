@@ -11,6 +11,7 @@
                 LDNFT_Sales.ldnft_subsciber_modal_close();
                 LDNFT_Sales.display_new_page_sales();
                 LDNFT_Sales.sales_view_detail();
+                LDNFT_Sales.display_sales_plus_summary_on_search();
                 LDNFT_Sales.load_data_from_cookies();
             },
             /**
@@ -73,13 +74,18 @@
              * Show sales based on filters
              */
             display_sales_plus_summary: function() {
-                $('.ldnft-sales-search-button').on('click', function(){
-                    $('.ldnft-display-sales-type').val('filter');
+                $('.ldnft-display-sales-type').val('filter');
                     var page = $('.ldnft-freemius-page').val(1);
                     LDNFT_Sales.display_sales();
                     LDNFT_Sales.load_sales_summary();
+            },/**
+            * Show sales based on filters
+            */
+           display_sales_plus_summary_on_search: function() {
+                $('.ldnft-sales-search-button').on('click', function(){
+                   LDNFT_Sales.display_sales_plus_summary();
                 });
-            },
+           },
             /**
              * Display the sales data based on ajax calls
              */

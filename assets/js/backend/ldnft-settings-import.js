@@ -5,19 +5,32 @@
         let Settings_Import = {
 
             init: function() {
-
-                Settings_Import.saveAPI();
+                Settings_Import.post_mailpoet_form();
             },
-
             /**
              * Comment here
              */
-            saveAPI: function() {
-
-                $( '.ldnft-load-more-btn' ).on( 'click', function( e ) {
+            post_mailpoet_form: function() {
+                $( '.ldnft-success-message' ).hide();
+                $( '.ldnft-settings-mailpoet' ).on( 'submit', function( e ) {
 
                     e.preventDefault();
-                    let self = $( this );
+                    $('#ldnft-settings-import-mailpoet-message').html('').css('display', 'none');
+                    $('#ldnft-settings-import-mailpoet-errmessage').html('').css('display', 'none');
+                    $('.ldnft-success-message').show();
+                    var data = $( this ).serialize();
+                    $('#ldnft_mailpeot_list, #ldnft_mailpeot_plugin, .ldnft-mailpoet-save-setting_import').attr('disabled', true);
+                    jQuery.post( LDNFT.ajaxURL, data, function( response ) {
+                        
+                        if( JSON.parse(response).message!='' ) {
+                            $('#ldnft-settings-import-mailpoet-message').html(JSON.parse(response).message).css('display', 'block');
+                        } else if( JSON.parse(response).errormsg!='' ) {
+                            $('#ldnft-settings-import-mailpoet-errmessage').html(JSON.parse(response).errormsg).css('display', 'block');
+                        }
+                        
+                        $('#ldnft_mailpeot_list, #ldnft_mailpeot_plugin, .ldnft-mailpoet-save-setting_import').attr('disabled', false);
+                        $('.ldnft-success-message').hide();
+                    } );
                 });
             },
         };
