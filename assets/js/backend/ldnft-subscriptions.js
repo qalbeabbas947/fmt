@@ -6,8 +6,6 @@
             display_subscriptions_type: 'filter',
             subscription_page_loaded:   'no',
             init: function() {
-                
-                LDNFT_Subscriptions.display_subscriptions_plus_summary_submit();
                 LDNFT_Subscriptions.display_new_page_subscriptions();
                 LDNFT_Subscriptions.display_subscriptions_plus_summary_callback();
                 LDNFT_Subscriptions.display_subscriptions_plus_summary();		
@@ -16,6 +14,7 @@
                 LDNFT_Subscriptions.attach_subscription_plans_dropdown();
                 LDNFT_Subscriptions.subscribers_view_detail();
                 LDNFT_Subscriptions.load_data_from_cookie();
+                LDNFT_Subscriptions.display_subscriptions_plus_summary_submit();
             },
             /**
              * Show subscription based on pagination
@@ -56,10 +55,10 @@
             /**
              * Show subscription summary
              */
-            display_subscriptions_plus_summary_submit: function( e ) {
+            display_subscriptions_plus_summary_submit: function() {
 
-                $('#ldnft-subscription-filter-form-text').on('submit', function(){
-                    e.preventDefault();
+                $('#ldnft-subscription-filter-form-text').on('submit', function( e ){
+                    e.preventDefault(); 
                     LDNFT_Subscriptions.display_subscriptions_type = 'text';
                     var page = $('.ldnft-freemius-page').val($(this).data('paged'));
                     LDNFT_Subscriptions.display_subscriptions();

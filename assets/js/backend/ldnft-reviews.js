@@ -4,14 +4,13 @@
         let LDNFT_Reviews = {
             init: function() {
                 
-                LDNFT_Reviews.display_reviews();
+                LDNFT_Reviews.load_review_cookies();
                 LDNFT_Reviews.review_view_detail();
                 LDNFT_Reviews.ldnft_is_featured_enabled();
                 LDNFT_Reviews.display_new_page_reviews();
                 LDNFT_Reviews.display_reviews_onchange();
                 LDNFT_Reviews.display_reviews_text();
-                LDNFT_Reviews.load_review_cookies();
-
+                LDNFT_Reviews.display_reviews();
             },
             load_review_cookies : function(e){  
                 $('.ldfmt-plugins-filter').val( jQuery.cookie( 'reviews_ldfmt-plugins-filter') );
@@ -82,7 +81,7 @@
              * Show reviews based on filters
              */
 			display_reviews_onchange: function() {
-                $('.ldnft-reviews-search-button').on('click', function(){
+                $('.ldnft-reviews-search-button-filter').on('click', function(){
                     $('.ldnft-display-review-type').val( 'filter' );
                     var page = $('.ldnft-freemius-page').val( 1 );
                     LDNFT_Reviews.display_reviews();

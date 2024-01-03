@@ -46,16 +46,18 @@ class LDNFT_Product_Rating {
     public function enqueue_front_scripts() {
 
         global $post;
-        
-        if( !has_shortcode( $post->post_content, 'ldnft_product_rating' ) ) {
-            return false;
+        if($post) {
+            if( !has_shortcode( $post->post_content, 'ldnft_product_rating' ) ) {
+                return false;
+            }
+    
+            /**
+             * Enqueue frontend css
+             */
+            wp_enqueue_style( 'dashicons' );
+            wp_enqueue_style( 'ldnft-front-css', LDNFT_ASSETS_URL . 'css/frontend/frontend.css', [], LDNFT_VERSION, null );
         }
-
-        /**
-         * Enqueue frontend css
-         */
-        wp_enqueue_style( 'dashicons' );
-        wp_enqueue_style( 'ldnft-front-css', LDNFT_ASSETS_URL . 'css/frontend/frontend.css', [], LDNFT_VERSION, null );
+        
     }
 
     /**

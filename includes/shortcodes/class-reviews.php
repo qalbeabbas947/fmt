@@ -139,24 +139,25 @@ class LDNFT_Reviews_Shortcode {
     public function enqueue_front_scripts() {
 
         global $post;
-        
-        if( !has_shortcode( $post->post_content, 'ldnft_reviews' ) ) {
-            return false;
-        }
+        if($post) {
+            if( !has_shortcode( $post->post_content, 'ldnft_reviews' ) ) {
+                return false;
+            }
 
-        /**
-         * Enqueue frontend css
-         */
-        wp_enqueue_style( 'dashicons' );
-        wp_register_style( 'ldnft-bxslider-css', 'https://cdn.jsdelivr.net/bxslider/4.2.12/jquery.bxslider.css', [], LDNFT_VERSION, null );
-        wp_enqueue_style( 'ldnft-front-css', LDNFT_ASSETS_URL . 'css/frontend/frontend.css', [], LDNFT_VERSION, null );
-        
-        wp_register_script('ldnft-bxslider-js', 'https://cdn.jsdelivr.net/bxslider/4.2.12/jquery.bxslider.min.js', [], LDNFT_VERSION, true );
-        wp_register_script( 'ldnft-frontend-js', LDNFT_ASSETS_URL.'js/frontend/frontend.js', ['jquery'], LDNFT_VERSION, true );
-        wp_localize_script( 'ldnft-frontend-js', 'LDNFT', [ 
-             'ajaxURL' => admin_url( 'admin-ajax.php' ),
-             'security'  => wp_create_nonce( 'ldnft_review_load_more' )
-        ] );
+            /**
+             * Enqueue frontend css
+             */
+            wp_enqueue_style( 'dashicons' );
+            wp_register_style( 'ldnft-bxslider-css', 'https://cdn.jsdelivr.net/bxslider/4.2.12/jquery.bxslider.css', [], LDNFT_VERSION, null );
+            wp_enqueue_style( 'ldnft-front-css', LDNFT_ASSETS_URL . 'css/frontend/frontend.css', [], LDNFT_VERSION, null );
+            
+            wp_register_script('ldnft-bxslider-js', 'https://cdn.jsdelivr.net/bxslider/4.2.12/jquery.bxslider.min.js', [], LDNFT_VERSION, true );
+            wp_register_script( 'ldnft-frontend-js', LDNFT_ASSETS_URL.'js/frontend/frontend.js', ['jquery'], LDNFT_VERSION, true );
+            wp_localize_script( 'ldnft-frontend-js', 'LDNFT', [ 
+                'ajaxURL' => admin_url( 'admin-ajax.php' ),
+                'security'  => wp_create_nonce( 'ldnft_review_load_more' )
+            ] );
+        }
     }
 
     /**

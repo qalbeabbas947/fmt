@@ -46,27 +46,28 @@ class LDNFT_Checkout_Shortcode {
     public function enqueue_front_scripts() {
 
         global $post;
-        
-        if( !has_shortcode( $post->post_content, 'ldnft_checkout' ) ) {
-            return false;
-        }
+        if($post) {
+            if( !has_shortcode( $post->post_content, 'ldnft_checkout' ) ) {
+                return false;
+            }
 
-        /**
-         * Enqueue frontend css
-         */
-        wp_enqueue_style( 'dashicons' );
-        wp_enqueue_style( 'ldnft-front-css', LDNFT_ASSETS_URL . 'css/frontend/frontend.css', [], LDNFT_VERSION, null );
-        
-        /**
-         * Enqueue frontend js
-         */
-        wp_enqueue_script( 'jquery' ); 
-        wp_enqueue_script( 'ldnft-checkout.freemius.com-js', 'https://checkout.freemius.com/checkout.min.js', [ 'jquery' ], LDNFT_VERSION, true ); 
-        wp_enqueue_script( 'ldnft-frontend-checkout-js', LDNFT_ASSETS_URL . 'js/frontend/checkout.js', [ 'jquery', 'ldnft-checkout.freemius.com-js' ], LDNFT_VERSION, true ); 
-        
-        wp_localize_script( 'ldnft-frontend-js', 'LDNFT', [ 
-            'ajaxURL' => admin_url( 'admin-ajax.php' ),
-        ] );
+            /**
+             * Enqueue frontend css
+             */
+            wp_enqueue_style( 'dashicons' );
+            wp_enqueue_style( 'ldnft-front-css', LDNFT_ASSETS_URL . 'css/frontend/frontend.css', [], LDNFT_VERSION, null );
+            
+            /**
+             * Enqueue frontend js
+             */
+            wp_enqueue_script( 'jquery' ); 
+            wp_enqueue_script( 'ldnft-checkout.freemius.com-js', 'https://checkout.freemius.com/checkout.min.js', [ 'jquery' ], LDNFT_VERSION, true ); 
+            wp_enqueue_script( 'ldnft-frontend-checkout-js', LDNFT_ASSETS_URL . 'js/frontend/checkout.js', [ 'jquery', 'ldnft-checkout.freemius.com-js' ], LDNFT_VERSION, true ); 
+            
+            wp_localize_script( 'ldnft-frontend-js', 'LDNFT', [ 
+                'ajaxURL' => admin_url( 'admin-ajax.php' ),
+            ] );
+        }
     }
 
     /**
