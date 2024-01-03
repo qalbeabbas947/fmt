@@ -6,22 +6,29 @@
             display_subscriptions_type: 'filter',
             subscription_page_loaded:   'no',
             init: function() {
+                LDNFT_Subscriptions.initialize_country_ddl();
                 LDNFT_Subscriptions.display_new_page_subscriptions();
                 LDNFT_Subscriptions.display_subscriptions_plus_summary_callback();
-                LDNFT_Subscriptions.display_subscriptions_plus_summary();		
                 LDNFT_Subscriptions.ldnft_subsciber_modal_close();
                 LDNFT_Subscriptions.subscription_plans_dropdown();
                 LDNFT_Subscriptions.attach_subscription_plans_dropdown();
                 LDNFT_Subscriptions.subscribers_view_detail();
                 LDNFT_Subscriptions.load_data_from_cookie();
                 LDNFT_Subscriptions.display_subscriptions_plus_summary_submit();
+                LDNFT_Subscriptions.display_subscriptions_plus_summary();
+            },
+            /**
+             * Load data from the cookies
+             */
+            initialize_country_ddl: function() { 
+                $('.ldfmt-subscription-country-filter').select2({ minimumInputLength: 3, allowClear: true, width: '150px', placeholder: "Select a Country"});
             },
             /**
              * Show subscription based on pagination
              */
-            display_new_page_subscriptions: function(e) {
+            display_new_page_subscriptions: function() {
 
-                $('#ldnft_subscriptions_data').on('click', '.tablenav-pages a, th a', function(){
+                $('#ldnft_subscriptions_data').on('click', '.tablenav-pages a, th a', function(e){
                     e.preventDefault();
                     $('.ldnft-freemius-order').val(LDNFT_Subscriptions.getParameterByName('order', $(this).attr('href')));
                     $('.ldnft-freemius-orderby').val(LDNFT_Subscriptions.getParameterByName('orderby', $(this).attr('href')));

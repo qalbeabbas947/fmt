@@ -6,13 +6,13 @@
             init: function() {
                 
                 LDNFT_Sales.initialize_country_ddl();
-                LDNFT_Sales.display_sales_plus_summary();
                 LDNFT_Sales.display_new_page_sales_text();
                 LDNFT_Sales.ldnft_subsciber_modal_close();
                 LDNFT_Sales.display_new_page_sales();
                 LDNFT_Sales.sales_view_detail();
                 LDNFT_Sales.display_sales_plus_summary_on_search();
                 LDNFT_Sales.load_data_from_cookies();
+                LDNFT_Sales.display_sales_plus_summary();
             },
             /**
              * Load data from the cookies
